@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAT CG170B-16 — Scroll ile parçalarına ayrılan gaz motorlu jeneratör seti</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --amber:#f0c200; --amber-deep:#a88400;
+    --ink:#101215; --ink-2:#4d545b; --line:#dcdee1;
+    --paper:#f2f2f0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font-family:"Barlow",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--amber-deep);text-decoration:none}
+  a:hover{color:var(--ink)}
+
+  #scroller{position:relative}
+  #stage{position:sticky;top:0;height:100svh;width:100%;overflow:hidden;
+         background:radial-gradient(112% 78% at 62% 6%, #fdfdfd 0%, #f0f1f2 34%, #e0e2e4 62%, #cfd2d5 84%, #c2c5c9 100%)}
+  #scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .leader{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:3 3}
+  #labels{position:absolute;inset:0;pointer-events:none}
+  .lbl{position:absolute;top:0;left:0;display:flex;align-items:center;gap:8px;
+       background:rgba(255,255,255,.88);backdrop-filter:blur(6px);
+       border:1px solid var(--line);border-left:3px solid var(--amber);
+       padding:6px 11px 6px 9px;white-space:nowrap;opacity:0;
+       box-shadow:0 6px 18px rgba(16,18,21,.09)}
+  .lbl-i{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--amber-deep);letter-spacing:.04em}
+  .lbl-t{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:16px;
+         letter-spacing:.02em;text-transform:uppercase}
+
+  #copy{position:fixed;left:0;top:0;height:100svh;width:min(440px,38vw);
+        padding:clamp(28px,5vh,64px) clamp(22px,3vw,52px);
+        display:flex;flex-direction:column;justify-content:center;pointer-events:none;z-index:3}
+  .chapter{position:absolute;left:clamp(22px,3vw,52px);right:clamp(22px,3vw,52px);
+           opacity:0;will-change:opacity,transform}
+  .step{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;
+        color:var(--amber-deep);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .step::after{content:"";height:1px;flex:1;background:var(--line)}
+  .chapter h2{font-family:"Barlow Condensed",sans-serif;font-weight:700;
+              font-size:clamp(30px,3.3vw,46px);line-height:1.02;margin:0 0 14px;
+              letter-spacing:-.01em;text-transform:uppercase;text-wrap:balance}
+  .chapter p{margin:0;font-size:16.5px;line-height:1.62;color:var(--ink-2);max-width:37ch;text-wrap:pretty}
+  .spec{display:grid;grid-template-columns:auto auto;gap:6px 22px;margin-top:22px;
+        font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink)}
+  .spec span:nth-child(odd){color:var(--ink-2)}
+
+  #brand{position:fixed;left:clamp(22px,3vw,52px);top:clamp(24px,4vh,40px);z-index:4;
+         background:var(--ink);color:#fff;padding:13px 22px 15px;
+         border-bottom:4px solid var(--amber)}
+  #brand b{display:block;font-family:"Barlow Condensed",sans-serif;font-weight:700;
+           font-size:26px;letter-spacing:.02em;line-height:1}
+  #brand i{display:block;font-size:13px;font-style:normal;opacity:.72;margin-top:5px;
+           font-family:"IBM Plex Mono",monospace;letter-spacing:.06em}
+
+  /* çalışma göstergesi */
+  #run{position:fixed;right:clamp(22px,3vw,52px);top:clamp(24px,4vh,40px);z-index:4;opacity:0;
+       display:grid;grid-template-columns:repeat(4,auto);gap:1px;background:var(--line);
+       border:1px solid var(--line);box-shadow:0 10px 28px rgba(16,18,21,.10)}
+  #run div{background:rgba(255,255,255,.93);padding:10px 16px 11px;min-width:92px}
+  #run u{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.13em;
+         color:var(--ink-2);text-decoration:none;text-transform:uppercase}
+  #run b{display:block;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:27px;
+         line-height:1.15;letter-spacing:.01em}
+  #run b small{font-size:13px;font-weight:600;color:var(--ink-2);margin-left:3px}
+
+  #progress{position:fixed;left:0;bottom:0;height:3px;width:100%;background:rgba(16,18,21,.08);z-index:5}
+  #bar{height:100%;background:var(--amber);transform-origin:0 50%;transform:scaleX(0)}
+  #hint{position:fixed;right:clamp(22px,3vw,52px);bottom:34px;z-index:5;
+        font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.12em;
+        color:var(--ink-2);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+  #hint em{display:block;width:22px;height:34px;border:1px solid var(--ink-2);border-radius:11px;position:relative}
+  #hint em::after{content:"";position:absolute;left:50%;top:7px;width:2px;height:6px;background:var(--amber-deep);
+                  transform:translateX(-50%);animation:wheel 1.7s ease-in-out infinite}
+  @keyframes wheel{0%,100%{opacity:0;transform:translate(-50%,0)}30%{opacity:1}60%{opacity:0;transform:translate(-50%,11px)}}
+
+  @media (max-width:900px){
+    #copy{width:100%;height:auto;top:auto;bottom:0;justify-content:flex-end;
+          padding-bottom:74px;background:linear-gradient(to top,rgba(242,242,240,.97) 55%,rgba(242,242,240,0))}
+    .chapter{position:absolute;bottom:74px;left:22px;right:22px}
+    .chapter p{max-width:none;font-size:15px}
+    #brand{padding:10px 16px 12px}#brand b{font-size:20px}#brand i{font-size:11px}
+    #run{right:14px;top:auto;bottom:88px;grid-template-columns:repeat(2,auto)}
+    #run div{padding:7px 12px 8px;min-width:78px}#run b{font-size:21px}
+    #hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div id="brand"><b>CAT® CG170B-16</b><i>Biyogaz jeneratör seti · 1 600 ekW</i></div>
+
+<div id="run">
+  <div><u>Devir</u><b id="v-rpm">0</b></div>
+  <div><u>Güç</u><b id="v-kw">0</b></div>
+  <div><u>Frekans</u><b id="v-hz">0</b></div>
+  <div><u>Ateşleme</u><b id="v-fire">0</b></div>
+</div>
+
+<div id="scroller">
+  <div id="stage">
+    <canvas id="scene"></canvas>
+    <svg id="leaders" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="labels"></div>
+  </div>
+  <div style="height:760vh"></div>
+</div>
+
+<div id="copy">
+  <div class="chapter" data-in="0" data-out="0.15">
+    <div class="step">01 — MONTAJLI SET</div>
+    <h2>16 silindir,<br>tek şasi üzerinde</h2>
+    <p>Kutu kesitli derin şasi, 60° V16 motor ve kapalı alternatör muhafazası tek eksende hizalıdır. Kaydırarak seti on dokuz ana grubuna ayırın.</p>
+    <div class="spec">
+      <span>Silindir</span><span>16 · 60° V</span>
+      <span>Çap × strok</span><span>170 × 195 mm</span>
+      <span>Devir</span><span>1 500 dev/dak · 50 Hz</span>
+      <span>Elektrik gücü</span><span>≈ 1 600 ekW</span>
+      <span>Ölçü (U×G×Y)</span><span>8,4 × 2,05 × 2,9 m</span>
+    </div>
+  </div>
+
+  <div class="chapter" data-in="0.15" data-out="0.33">
+    <div class="step">02 — ŞASİ, KARTER, KRANK</div>
+    <h2>Yük yolu: krank → blok → şasi</h2>
+    <p>Krank mili sekiz kollu; her kol iki karşıt silindiri çalıştırır. Titreşim takozları şasiyi temelden ayırdığı için özel kaide gerekmez.</p>
+  </div>
+
+  <div class="chapter" data-in="0.33" data-out="0.48">
+    <div class="step">03 — SİLİNDİR GRUBU</div>
+    <h2>Islak gömlek, tek tek sökülebilir kapak</h2>
+    <p>Her silindirin kendi kapağı ve gömleği var: bir silindirde arıza çıktığında blok yerinden oynatılmadan sadece o grup açılır. Ateşleme kapak ortasındaki bujiden.</p>
+  </div>
+
+  <div class="chapter" data-in="0.48" data-out="0.61">
+    <div class="step">04 — HAVA VE EGZOZ YOLU</div>
+    <h2>Egzoz turboyu, turbo silindiri besler</h2>
+    <p>Hava tepedeki iki dikey filtreden alınır, turbo kompresörleri basar, karışım soğutucu sıcaklığı düşürür. Biyogaz venturi karıştırıcıda oranlanıp V vadisindeki plenuma girer; sıcak taraf parlak izolasyon kılıflı manifoldlarla toplanır.</p>
+  </div>
+
+  <div class="chapter" data-in="0.61" data-out="0.72">
+    <div class="step">05 — GÜÇ AKTARIMI</div>
+    <h2>Volan, kavrama, alternatör, bara kutusu</h2>
+    <p>Tork elastik kavrama ile alternatöre geçer — burulma titreşimi motorda kalır. Dört kutuplu alternatör 1 500 dev/dak’da tam 50 Hz üretir; çıkış baraları muhafazanın üstündeki klemens kutusunda toplanır.</p>
+  </div>
+
+  <div class="chapter" data-in="0.72" data-out="1.01">
+    <div class="step">06 — GERİ MONTAJ VE ÇALIŞMA</div>
+    <h2>Aynı sırayla birleşir ve yüklenir</h2>
+    <p>Parçalar söküldükleri sıranın tersinde yerine oturur, set devreye girer. Kapatmada blok kesite döner: krank döner, pistonlar 45°’de bir ateşler, manifold ısınır, alternatör yükü alır.</p>
+  </div>
+</div>
+
+<div id="hint"><em></em>Kaydırın</div>
+<div id="progress"><div id="bar"></div></div>
+
+<script type="module" src="./cg170b-scene.js"></script>
+</body>
+</html>

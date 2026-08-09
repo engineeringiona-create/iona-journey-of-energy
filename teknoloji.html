@@ -1,0 +1,305 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script>(function(){try{var t=localStorage.getItem('iona-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+<title>IONA - Teknoloji</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="/tailwind-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/styles/base.css">
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<canvas id="webgl-stage"></canvas>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex justify-between items-center px-safe-margin-desktop py-5 transition-all duration-500 hidden md:flex" id="top-nav">
+<a class="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-300" href="/">
+<img src="/images/iona-star-mark.png" alt="" width="36" height="36" class="shrink-0" aria-hidden="true">
+<span class="flex flex-col leading-none">
+<span class="text-[23px] font-extrabold tracking-tight text-[var(--brand)]" style="font-family:Arial,sans-serif">iona</span>
+<span class="font-label-caps text-[8px] tracking-[0.14em] text-[var(--text-muted)] -mt-0.5" data-i18n="nav.tagline">SIMPLY, ENGINEERED</span>
+</span>
+</a>
+<div class="flex items-center gap-6">
+<div class="h-6 w-px bg-[var(--border)]"></div>
+<div class="relative">
+<button class="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="nav-search-toggle" type="button" data-i18n-aria-label="nav.search">
+<span class="material-symbols-outlined text-[20px]">search</span>
+<span class="font-label-caps text-[13px] font-bold tracking-[0.08em]" data-i18n="nav.search">Ara</span>
+</button>
+<div class="hidden absolute top-12 left-1/2 -translate-x-1/2 w-80 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-4" id="nav-search-panel">
+<input class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-lg px-4 py-2.5 text-[14px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" id="nav-search-input" type="text" data-i18n-placeholder="nav.search_placeholder">
+<div class="mt-3 flex flex-col gap-1 max-h-64 overflow-y-auto" id="nav-search-results"></div>
+</div>
+</div>
+<div class="relative">
+<button class="flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="lang-toggle" type="button" aria-label="Dil / Language">
+<span class="material-symbols-outlined text-[20px]">language</span>
+<span class="font-label-caps text-[12px] font-bold tracking-[0.05em]" id="lang-current">TR</span>
+</button>
+<div class="hidden absolute top-12 right-0 w-44 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-2" id="lang-panel">
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="tr">Türkçe</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="en">English</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="de">Deutsch</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="es">Español</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="fr">Français</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="ru">Русский</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="hi">हिन्दी</button>
+</div>
+</div>
+<div class="h-6 w-px bg-[var(--border)]"></div>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/" data-i18n="nav.home">Anasayfa</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--brand)] transition-colors duration-500" href="/teknoloji.html" aria-current="page" data-i18n="nav.services">Hizmetler</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="inline-flex items-center gap-1.5 rounded-full pl-2.5 pr-3.5 py-1.5 font-label-caps text-[12px] tracking-[0.06em] font-bold bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/25 hover:bg-[var(--brand)]/15 hover:border-[var(--brand)]/40 transition-colors duration-300" href="/ionaflux.html"><span class="material-symbols-outlined text-[15px]">bolt</span><span data-i18n="nav.ionaflux">IonaFlux</span></a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="theme-toggle" id="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
+<span class="theme-toggle-knob"><span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span></span>
+</button>
+<a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" href="/iletisim.html">
+<span data-i18n="nav.cta">Teklif Alın</span> <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+</a>
+</div>
+</nav>
+
+<!-- Mobile nav: hamburger + dropdown (desktop nav above is hidden md:flex) -->
+<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex md:hidden justify-between items-center px-safe-margin-mobile py-4" id="mobile-nav">
+<a class="flex items-center gap-2" href="/">
+<img src="/images/iona-star-mark.png" alt="" width="30" height="30" class="shrink-0" aria-hidden="true">
+<span class="text-[19px] font-extrabold tracking-tight text-[var(--brand)]" style="font-family:Arial,sans-serif">iona</span>
+</a>
+<button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
+<span class="material-symbols-outlined text-[26px]" id="mobile-nav-icon">menu</span>
+</button>
+</nav>
+<div class="mobile-nav-panel md:hidden" id="mobile-nav-panel">
+<a class="mobile-nav-link" href="/" data-i18n="nav.home">Anasayfa</a>
+<a class="mobile-nav-link" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="mobile-nav-link is-current" href="/teknoloji.html" aria-current="page" data-i18n="nav.services">Hizmetler</a>
+<a class="mobile-nav-link" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="mobile-nav-link flex items-center gap-2" href="/ionaflux.html"><span class="material-symbols-outlined text-[16px] text-[var(--brand)]">bolt</span><span class="text-[var(--brand)] font-bold" data-i18n="nav.ionaflux">IonaFlux</span></a>
+<a class="mobile-nav-link" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<a class="mobile-nav-cta" href="/iletisim.html" data-i18n="nav.cta">Teklif Alın</a>
+</div>
+
+<!-- 3D Expo: split-screen scroll experience. Left = scrollable machine
+     text blocks. Right = open space where the fixed, transparent canvas
+     (behind everything at rest, lifted above the text mid-flight — see
+     expo-scene.js) shows each machine flying in, assembling, operating,
+     then shrinking away below frame as the next one arrives. -->
+<section class="relative bg-transparent pt-24 md:pt-28" id="expo">
+<div class="px-safe-margin-mobile md:px-safe-margin-desktop">
+<div class="w-full md:max-w-[46%]">
+
+<div class="expo-block flex flex-col justify-start min-h-0 md:min-h-[220vh] py-4 md:py-16" id="expo-agitator" data-machine="agitator">
+<div class="md:sticky md:top-28">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.agitator_eyebrow">Teknoloji · Karıştırma Sistemi</span>
+<h1 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.agitator_title">İleri Mühendislik, Sürdürülebilir Tesisler İçin</h1>
+<p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.agitator_intro">Sıkı fizibilite analizinden anahtar teslim inşaata kadar, sıfır operasyonel kesinti süresiyle özelleştirilmiş biyoenerji sistemleri sunuyoruz.</p>
+<h2 class="font-headline-md text-headline-md mb-stack-sm fade-in-element delay-300 is-visible" data-i18n="services.expo.agitator_subtitle">Twin Karıştırıcı Teknolojisi</h2>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.agitator_body1">Gelişmiş dikey ve yatay ajitasyon teknolojilerimiz ölü bölgeleri ortadan kaldırır ve köpük oluşumunu önler. Bu, mükemmel substrat homojenliği sağlayarak maksimum metan dönüşümü ve daha yüksek enerji verimliliği sunar.</p>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.expo.agitator_body2">Iona'nın özel karıştırma teknolojisi ve sağlam doğrudan katı besleme sistemleriyle tesislerimiz, anaerobik çürütücü içinde %14'e varan kuru madde içeriğinde bile son derece kararlı operasyonlar sağlar.</p>
+</div>
+</div>
+
+<!-- Short handoff gap: machines are never disassembled, only crossfaded
+     (see expo-scene.js), so genset's onEnter is free to fire while the
+     agitator is still fading out — that overlap is the crossfade. Kept
+     just tall enough for one scroll gesture to carry the reader from the
+     end of the Agitator copy into the Genset block. -->
+<div aria-hidden="true" class="min-h-0 md:min-h-[20vh]"></div>
+
+<div class="expo-block flex flex-col justify-start min-h-0 md:min-h-[220vh] py-4 md:py-16" id="expo-genset" data-machine="genset">
+<div class="md:sticky md:top-28">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.genset_eyebrow">Teknoloji · Güç Üretimi</span>
+<h2 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.genset_title">Yüksek Verimli Güç Üretimi</h2>
+<p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.genset_intro">Verimli, sürdürülebilir enerji çözümleri sunan anahtar teslim biyogaz tesisleri inşa ediyoruz.</p>
+<h3 class="font-headline-md text-headline-md mb-stack-sm fade-in-element delay-300 is-visible" data-i18n="services.expo.genset_subtitle">Akıllı Isı ve Enerji Yönetimi</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.genset_body1">Yenilikçi Taşma Sistemimiz (OFT), tamamen "Birleşik Kap" prensibiyle çalışır. Çürüyen madde transferinde yerçekiminden akıllıca yararlanarak mekanik stresi büyük ölçüde azaltır ve pompalama enerji tüketimini %66'ya kadar keser.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.genset_body2">Akıllı ısı dağıtım üniteleri termal enerji kullanımını optimize eder. Tüm Iona tesisleri, akıllı sensörlerle entegre otomatik termal donma önleme koruması içerir.</p>
+</div>
+</div>
+
+<!-- Same short handoff gap as above, between genset and the pump station. -->
+<div aria-hidden="true" class="min-h-0 md:min-h-[20vh]"></div>
+
+<div class="expo-block flex flex-col justify-start min-h-0 md:min-h-[220vh] py-4 md:py-16" id="expo-pump" data-machine="pump">
+<div class="md:sticky md:top-28">
+<span class="font-label-caps text-label-caps text-[#ff751f] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.pump_eyebrow">Teknoloji · Pompa İstasyonu</span>
+<h2 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.pump_title">Kesintisiz Malzeme Transferi</h2>
+<p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.pump_intro">Merkezi Pompa İstasyonumuz (CPS), tesisin her noktasına yüksek katı madde oranında bile darbesiz, kararlı akış sağlar.</p>
+<h3 class="font-headline-md text-headline-md mb-stack-sm fade-in-element delay-300 is-visible" data-i18n="services.expo.pump_subtitle">Helisel Rotor-Stator Teknolojisi</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.pump_body1">Eksantrik rotor, elastomer stator içinde dönerek nabızsız ve sabit debili bir akış üretir. Bu, aşındırıcı ve yüksek viskoziteli substratlarda bile pompa ömrünü uzatır ve bakım sıklığını azaltır.</p>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.expo.pump_body2">Modüler gövde tasarımı sayesinde aşınan tek parça olan stator, tüm hattı sökmeden dakikalar içinde değiştirilebilir — planlı bakımlar dışında sıfır kesinti hedefiyle tasarlandı.</p>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Solutions catalog: real product/technology list from ionaengineering.com/solutions -->
+<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="solutions">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="services.solutions.eyebrow">Ürün &amp; Teknoloji Kataloğu</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="services.solutions.title">Çözümlerimiz</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12 fade-in-element delay-200">
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item1_title">Çürütücü Tasarımı</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item1_desc">Her besleme türü için özelleştirilmiş gelişmiş biyoenerji sistemleri.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item2_title">Karıştırma Teknolojisi</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item2_desc">Maksimum biyogaz verimi için tasarlanmış yüksek verimli karıştırma sistemleri.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item3_title">Merkezi Pompa İstasyonu (CPS)</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item3_desc">Merkezi pompa istasyonları güvenli ve verimli tesis operasyonları sağlar.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item4_title">Enerji Tasarruflu Taşma Sistemi (OFT)</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item4_desc">Yerçekimiyle çalışan taşma sistemleri operasyonel enerji maliyetlerini büyük ölçüde azaltır.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item5_title">Sedimantasyon Tuzağı</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item5_desc">Sedimantasyon tuzakları kapasiteyi korumak için birikintileri sürekli olarak uzaklaştırır.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item6_title">Donmaya ve Tıkanmaya Karşı Koruma</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item6_desc">Otomatik sistemler boru hattı donmasını ve maliyetli tıkanmaları önler.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item7_title">Doğrudan Katı Besleme</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item7_desc">Doğrudan besleme ve yüksek katı madde toleransı verimliliği en üst düzeye çıkarır.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item8_title">Isı Dağıtım Ünitesi (HDU)</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item8_desc">Akıllı ısı dağıtım üniteleri termal enerji kullanımını optimize eder.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item9_title">Gaz Vanası Odası (GVC)</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item9_desc">Yeraltı gaz vanası odaları güvenli, yüksek kaliteli arıtma sağlar.</p>
+</div>
+<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item10_title">Biyogaz Ön Arıtma</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item10_desc">Özelleştirilmiş arıtma çözümleri gaz kalitesini ve sürdürülebilirliği optimize eder.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Performance metrics -->
+<section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section" id="metrics">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="services.metrics.eyebrow">Küresel Performans Metrikleri</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-2xl fade-in-element" data-i18n="services.metrics.title">Küresel Biyoenerji Projesi Büyümesi</h2>
+<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-2xl mb-stack-xl fade-in-element delay-200" data-i18n="services.metrics.body">Yüksek verimli tesis tasarımları ve patentli teknolojilerle Iona Biogas, yenilenebilir enerji üretimini sürekli olarak ölçeklendiriyor.</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 fade-in-element delay-300">
+<div>
+<div class="flex justify-between font-label-caps text-label-caps mb-2"><span data-i18n="services.metrics.item1_label">Metan Verim Verimliliği</span><span class="text-[var(--brand)]">%88</span></div>
+<div class="h-1.5 w-full bg-black/10 rounded-full overflow-hidden"><div class="h-full bg-[var(--brand)] rounded-full" style="width:88%"></div></div>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-label-caps mb-2"><span data-i18n="services.metrics.item2_label">Karbon Ayak İzi Azaltımı</span><span class="text-[var(--brand)]">%79</span></div>
+<div class="h-1.5 w-full bg-black/10 rounded-full overflow-hidden"><div class="h-full bg-[var(--brand)] rounded-full" style="width:79%"></div></div>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-label-caps mb-2"><span data-i18n="services.metrics.item3_label">Operasyonel Tesis Güvenilirliği</span><span class="text-[var(--brand)]">%95</span></div>
+<div class="h-1.5 w-full bg-black/10 rounded-full overflow-hidden"><div class="h-full bg-[var(--brand)] rounded-full" style="width:95%"></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Real facility photos -->
+<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="field-photos">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="services.field.eyebrow">Sahadan Görüntüler</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="services.field.title">Teknolojimiz Gerçek Tesislerde</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 fade-in-element delay-200">
+<div class="rounded-xl overflow-hidden aspect-[4/5] shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)]">
+<img class="w-full h-full object-cover" src="/images/twin-digesters-sunset.jpg" alt="Gün batımında ikiz çürütücü tankları">
+</div>
+<div class="rounded-xl overflow-hidden aspect-[4/5] shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)]">
+<img class="w-full h-full object-cover" src="/images/digester-dome-facility.jpg" alt="Biyogaz çürütücü tesisinin dış görünümü">
+</div>
+<div class="rounded-xl overflow-hidden aspect-[4/5] shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)]">
+<img class="w-full h-full object-cover" src="/images/forest-canopy-aerial.jpg" alt="Yeşil doğa örtüsünün havadan görünümü">
+</div>
+</div>
+</div>
+</section>
+
+<!-- Engineering workflow -->
+<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section bg-decorated" id="workflow">
+<div class="watermark-edge watermark-left" aria-hidden="true"><span>ENGINEERING</span></div>
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="services.workflow.eyebrow">Mühendislik İş Akışı</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="services.workflow.title">Proje Geliştirme Aşamaları</h2>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-12 fade-in-element delay-200">
+<div>
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]" data-i18n="services.workflow.step1_label">Adım 01</span>
+<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="services.workflow.step1_title">Fizibilite ve Analiz</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.workflow.step1_desc">Organik atık potansiyelinizi değerlendiriyor, yerel substrat kullanılabilirliğini analiz ediyor ve gelecekteki biyogaz tesisinizin yatırım geri dönüşünü kesin olarak hesaplıyoruz.</p>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]" data-i18n="services.workflow.step2_label">Adım 02</span>
+<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="services.workflow.step2_title">Gelişmiş Tesis Tasarımı</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.workflow.step2_desc">Mühendislik ekibimiz, atık türünüze özel olarak optimize edilmiş anaerobik çürütme sistemleri tasarlayarak maksimum operasyonel verimlilik ve yapısal dayanıklılık sağlar.</p>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]" data-i18n="services.workflow.step3_label">Adım 03</span>
+<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="services.workflow.step3_title">Anahtar Teslim İnşaat Yönetimi</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.workflow.step3_desc">Tüm inşaat sürecini sıkı kalite kontrolüyle yönetiyoruz. İnşaat mühendisliğinden çürütücü tankı kurulumuna kadar, tesisinizi güvenli ve zamanında teslim ediyoruz.</p>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]" data-i18n="services.workflow.step4_label">Adım 04</span>
+<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="services.workflow.step4_title">Sürekli Biyolojik Destek</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.workflow.step4_desc">Tesisinizin tepe performansında sıfır kesinti süresiyle çalışmasını sağlamak için 7/24 uzaktan izleme, düzenli biyolojik analiz ve teknik bakım sunuyoruz.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Technical FAQ -->
+<section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="faq">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="services.faq.eyebrow">Sık Sorulan Sorular</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="services.faq.title">Sıkça Sorulan Teknik Sorular</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 fade-in-element delay-200">
+<div>
+<h3 class="font-headline-md text-headline-md mb-3" data-i18n="services.faq.q1">Iona karıştırma sistemleri biyogaz verimini nasıl en üst düzeye çıkarır?</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.faq.a1">Gelişmiş dikey ve yatay ajitasyon teknolojilerimiz ölü bölgeleri ortadan kaldırır ve köpük oluşumunu önler. Bu, mükemmel substrat homojenliği sağlayarak maksimum metan dönüşümü ve daha yüksek enerji verimliliği sunar.</p>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md mb-3" data-i18n="services.faq.q2">Sistemleriniz yüksek kuru madde içeriğini kaldırabilir mi?</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.faq.a2">Evet. Iona'nın özel karıştırma teknolojisi ve sağlam doğrudan katı besleme sistemleriyle tesislerimiz, anaerobik çürütücü içinde %14'e varan kuru madde içeriğinde bile son derece kararlı operasyonlar sağlar.</p>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md mb-3" data-i18n="services.faq.q3">Sıfır enerjili taşma sistemi nasıl çalışır?</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.faq.a3">Yenilikçi Taşma Sistemimiz (OFT), tamamen "Birleşik Kap" prensibiyle çalışır. Çürüyen madde transferinde yerçekiminden akıllıca yararlanarak mekanik stresi büyük ölçüde azaltır ve pompalama enerji tüketimini %66'ya kadar keser.</p>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md mb-3" data-i18n="services.faq.q4">Boru hatlarını kışın donmaya karşı hangi önlemler korur?</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.faq.a4">Tüm Iona tesisleri, akıllı sensörlerle entegre otomatik termal Donma Önleme koruması içerir. Sistem, sıfırın altındaki dış ortam sıcaklıklarını otomatik olarak algılar ve donmayı önlemek ve maliyetli kesinti sürelerinden kaçınmak için hat ısıtmasını devreye sokar.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
+<p class="font-label-caps text-label-caps text-[var(--text-muted)] fade-in-element" data-i18n="footer.copyright"></p>
+<div class="flex gap-6 fade-in-element">
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.privacy"></a>
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.terms"></a>
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.impact_report"></a>
+</div>
+</footer>
+
+<script type="module" src="/src/pages/main-teknoloji.js"></script>
+</body></html>

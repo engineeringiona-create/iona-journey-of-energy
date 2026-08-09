@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.impeccable/
+.claude/
+.backups/
+_font-backup-arial-test/

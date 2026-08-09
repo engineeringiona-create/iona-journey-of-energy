@@ -1,0 +1,442 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script>(function(){try{var t=localStorage.getItem('iona-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+<title>IONA - Anasayfa</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="/tailwind-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/styles/base.css">
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- Intro Preloader -->
+<div class="fixed inset-0 z-[100] bg-[var(--bg)] flex items-center justify-center" id="preloader">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-40 h-40 rounded-full blur-3xl" id="preloader-glow"></div>
+<div class="preloader-bubbles" aria-hidden="true">
+<span class="preloader-bubble"></span>
+<span class="preloader-bubble"></span>
+<span class="preloader-bubble"></span>
+<span class="preloader-bubble"></span>
+<span class="preloader-bubble"></span>
+</div>
+<img id="preloader-star" src="/images/iona-star-mark.png" alt="" class="relative w-20 h-20 md:w-24 md:h-24">
+</div>
+</div>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex justify-between items-center px-safe-margin-desktop py-5 transition-all duration-500 hidden md:flex" id="top-nav">
+<a class="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-300" href="/">
+<img src="/images/iona-star-mark.png" alt="" width="36" height="36" class="shrink-0" aria-hidden="true">
+<span class="flex flex-col leading-none">
+<span class="text-[23px] font-extrabold tracking-tight text-[var(--brand)]" style="font-family:Arial,sans-serif">iona</span>
+<span class="font-label-caps text-[8px] tracking-[0.14em] text-[var(--text-muted)] -mt-0.5" data-i18n="nav.tagline">SIMPLY, ENGINEERED</span>
+</span>
+</a>
+<div class="flex items-center gap-6">
+<div class="h-6 w-px bg-[var(--border)]"></div>
+<div class="relative">
+<button class="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="nav-search-toggle" type="button" data-i18n-aria-label="nav.search">
+<span class="material-symbols-outlined text-[20px]">search</span>
+<span class="font-label-caps text-[13px] font-bold tracking-[0.08em]" data-i18n="nav.search">Ara</span>
+</button>
+<div class="hidden absolute top-12 left-1/2 -translate-x-1/2 w-80 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-4" id="nav-search-panel">
+<input class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-lg px-4 py-2.5 text-[14px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" id="nav-search-input" type="text" data-i18n-placeholder="nav.search_placeholder">
+<div class="mt-3 flex flex-col gap-1 max-h-64 overflow-y-auto" id="nav-search-results"></div>
+</div>
+</div>
+<div class="relative">
+<button class="flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="lang-toggle" type="button" aria-label="Dil / Language">
+<span class="material-symbols-outlined text-[20px]">language</span>
+<span class="font-label-caps text-[12px] font-bold tracking-[0.05em]" id="lang-current">TR</span>
+</button>
+<div class="hidden absolute top-12 right-0 w-44 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-2" id="lang-panel">
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="tr">Türkçe</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="en">English</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="de">Deutsch</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="es">Español</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="fr">Français</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="ru">Русский</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="hi">हिन्दी</button>
+</div>
+</div>
+<div class="h-6 w-px bg-[var(--border)]"></div>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--brand)] transition-colors duration-500" href="/" aria-current="page" data-i18n="nav.home">Anasayfa</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="inline-flex items-center gap-1.5 rounded-full pl-2.5 pr-3.5 py-1.5 font-label-caps text-[12px] tracking-[0.06em] font-bold bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/25 hover:bg-[var(--brand)]/15 hover:border-[var(--brand)]/40 transition-colors duration-300" href="/ionaflux.html"><span class="material-symbols-outlined text-[15px]">bolt</span><span data-i18n="nav.ionaflux">IonaFlux</span></a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="theme-toggle" id="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
+<span class="theme-toggle-knob"><span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span></span>
+</button>
+<a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" href="/iletisim.html">
+<span data-i18n="nav.cta">Teklif Alın</span> <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+</a>
+</div>
+</nav>
+
+<!-- Mobile nav: hamburger + dropdown (desktop nav above is hidden md:flex) -->
+<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex md:hidden justify-between items-center px-safe-margin-mobile py-4" id="mobile-nav">
+<a class="flex items-center gap-2" href="/">
+<img src="/images/iona-star-mark.png" alt="" width="30" height="30" class="shrink-0" aria-hidden="true">
+<span class="text-[19px] font-extrabold tracking-tight text-[var(--brand)]" style="font-family:Arial,sans-serif">iona</span>
+</a>
+<button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
+<span class="material-symbols-outlined text-[26px]" id="mobile-nav-icon">menu</span>
+</button>
+</nav>
+<div class="mobile-nav-panel md:hidden" id="mobile-nav-panel">
+<a class="mobile-nav-link is-current" href="/" aria-current="page" data-i18n="nav.home">Anasayfa</a>
+<a class="mobile-nav-link" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="mobile-nav-link" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="mobile-nav-link" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="mobile-nav-link flex items-center gap-2" href="/ionaflux.html"><span class="material-symbols-outlined text-[16px] text-[var(--brand)]">bolt</span><span class="text-[var(--brand)] font-bold" data-i18n="nav.ionaflux">IonaFlux</span></a>
+<a class="mobile-nav-link" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<a class="mobile-nav-cta" href="/iletisim.html" data-i18n="nav.cta">Teklif Alın</a>
+</div>
+
+<!-- Hero: dynamic 3-slide slider -->
+<section class="hero-zone bg-[#0c0f0d] px-safe-margin-mobile md:px-safe-margin-desktop overflow-hidden" id="hero">
+<div class="absolute inset-0 z-0" id="hero-slides">
+<div class="hero-slide absolute inset-0 opacity-100" data-index="0">
+<img class="w-full h-full object-cover" src="/images/hero-facility-aerial.jpg" alt="Iona biyogaz tesisinin havadan görünümü">
+</div>
+<div class="hero-slide absolute inset-0 opacity-0" data-index="1">
+<img class="w-full h-full object-cover" src="/images/pipeline-facility-golden.jpg" alt="Iona biyogaz tesisinin gün batımında havadan görünümü">
+</div>
+<div class="hero-slide absolute inset-0 opacity-0" data-index="2">
+<img class="w-full h-full object-cover" src="/images/twin-digesters-overcast.jpg" alt="Iona ikiz çürütücü tanklarının dış görünümü">
+</div>
+<div class="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/60"></div>
+</div>
+
+<div class="relative z-10 text-center max-w-4xl mx-auto">
+<span class="font-label-caps text-label-caps text-white bg-white/10 border border-white/25 rounded-full px-4 py-2 tracking-widest mb-stack-sm inline-block backdrop-blur-sm" data-i18n="home.hero.badge">20+ Yıllık Deneyim &middot; Yalın Mühendislik</span>
+<h1 id="hero-headline" class="font-display-hero-mobile md:font-display-hero text-display-hero-mobile md:text-display-hero mb-stack-sm tracking-tighter text-white font-bold" data-i18n="home.hero.slide1_title">Biyogaz Çözümleriyle Geleceğe Güç Veriyoruz.</h1>
+<p id="hero-subhead" class="font-body-lg text-body-lg text-white/85 max-w-2xl mx-auto" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
+</div>
+
+<!-- Slider controls -->
+<button aria-label="Önceki" data-i18n-aria-label="home.hero.prev" class="hero-arrow absolute left-4 md:left-10 top-1/2 -translate-y-1/2 z-20 w-11 h-11 md:w-14 md:h-14 rounded-full border border-white/30 text-white flex items-center justify-center hover:bg-white/15 hover:border-white transition-all duration-300" id="hero-prev">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<button aria-label="Sonraki" data-i18n-aria-label="home.hero.next" class="hero-arrow absolute right-4 md:right-10 top-1/2 -translate-y-1/2 z-20 w-11 h-11 md:w-14 md:h-14 rounded-full border border-white/30 text-white flex items-center justify-center hover:bg-white/15 hover:border-white transition-all duration-300" id="hero-next">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<div class="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 font-label-caps text-label-caps text-white/80" id="hero-indicator">
+<span class="text-white" id="hero-indicator-current">01</span>
+<span class="text-white/50">/</span>
+<span id="hero-indicator-total">03</span>
+</div>
+</section>
+
+<!-- About teaser -->
+<section class="relative isolate overflow-hidden bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="about-teaser">
+<div class="blueprint-watermark opacity-[0.03]" aria-hidden="true">
+<svg viewBox="0 0 600 600" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+<path d="M70 480 V260 a150 150 0 0 1 300 0 V480" />
+<ellipse cx="220" cy="480" rx="150" ry="24" />
+<ellipse cx="220" cy="260" rx="150" ry="24" stroke-dasharray="4 5" />
+<path d="M170 262 a50 46 0 0 1 100 0" />
+<line x1="220" y1="88" x2="220" y2="440" />
+<circle cx="220" cy="88" r="14" />
+<line x1="176" y1="380" x2="264" y2="380" />
+<line x1="176" y1="336" x2="264" y2="336" />
+<path d="M370 400 H480 V520 H566" />
+<circle cx="480" cy="460" r="16" />
+<path d="M464 460 L496 444 M464 444 L496 460" />
+<path d="M70 320 H8" />
+<rect x="440" y="120" width="90" height="130" rx="6" />
+<line x1="440" y1="162" x2="530" y2="162" />
+<path d="M370 240 H440" />
+<line x1="70" y1="542" x2="370" y2="542" />
+<line x1="70" y1="532" x2="70" y2="552" />
+<line x1="370" y1="532" x2="370" y2="552" />
+</svg>
+</div>
+<div class="relative z-10 max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+<div class="md:col-span-6 fade-in-element">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="home.about.eyebrow">Hakkımızda</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-lg" data-i18n="home.about.title">Yalın Mühendislik.</h2>
+<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-md mb-stack-md" data-i18n="home.about.body">Iona Biogas, güçlü çevresel sorumlulukla yenilikçi mühendislik çözümleri geliştiren bir enerji şirketidir. Patentli teknolojik ekipmanlarımızla geleneksel biyogaz tesislerinin karşılaştığı zorlukların üstesinden gelerek daha güvenilir ve dayanıklı bir işletme sağlıyoruz.</p>
+<a class="inline-flex items-center gap-2 border-b border-[var(--brand)]/30 pb-1 hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] transition-colors duration-300 font-label-caps text-label-caps" href="/hakkimizda.html">
+                    <span data-i18n="home.about.cta">Devamını Oku</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="md:col-span-5 md:col-start-8 fade-in-element delay-100">
+<p class="font-label-caps text-label-caps text-[var(--text-muted)] leading-loose" data-i18n="home.about.caption">ULUSLARARASI STANDARTLARDA TEKNİK MÜKEMMELLİK, YATIRIMLARI SIFIR KESİNTİ SÜRESİYLE SERTİFİKALI BAŞARI HİKAYELERİNE DÖNÜŞTÜRÜYOR.</p>
+</div>
+</div>
+</section>
+
+<!-- Partner logo marquee: closes the vertical gap between About and Services with an
+     auto-scrolling, grayscale client strip. Item list is duplicated once so the
+     -50% CSS animation loop lands on a repeat with no visible seam. -->
+<section class="bg-[var(--surface-2)] px-safe-margin-mobile md:px-safe-margin-desktop py-10 md:py-14 fade-in-section" id="partners-marquee">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<span class="font-label-caps text-label-caps text-[var(--text-muted)] tracking-widest block text-center mb-7 fade-in-element" data-i18n="home.partners_marquee.label">Güvendiğimiz İş Ortakları</span>
+<div class="logo-marquee">
+<div class="logo-marquee-track">
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">Relians Energy</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">ANKA Biogas</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">ANKA Energy</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">Delvina Gas</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">Biogest GmbH</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">TİGEM</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">Afyon Maden Suyu</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">MAABİR</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">Beuas Energy</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14">WTE-EMEK</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">Relians Energy</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">ANKA Biogas</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">ANKA Energy</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">Delvina Gas</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">Biogest GmbH</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">TİGEM</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">Afyon Maden Suyu</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">MAABİR</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">Beuas Energy</span>
+<span class="logo-marquee-item text-xl md:text-2xl font-semibold tracking-tight mx-10 md:mx-14" aria-hidden="true">WTE-EMEK</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Services / Achievements: circular cards -->
+<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="services-highlight">
+<div class="max-w-[theme(spacing.container-max)] mx-auto text-center">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="home.services.eyebrow">Neler Sunuyoruz</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl mx-auto fade-in-element" data-i18n="home.services.title">Yüksek Kaliteli Biyogaz Tesisleri</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-14">
+<div class="service-card spotlight-card card-edge-accent flex flex-col items-center text-center border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-6 shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] group">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="/images/power-cat-gensets.jpg" alt="Iona biyogaz tesisinde CAT gaz jeneratör setleri">
+</div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="home.services.card1_title">Uzaktan İzleme ve Yönetim</h3>
+<p class="text-body-md text-[var(--text-muted)] max-w-xs mb-4" data-i18n="home.services.card1_desc">Uzaktan tesis yönetimini mümkün kılan akıllı teknolojiler sunuyoruz.</p>
+<a class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)] transition-colors duration-300 link-underline" href="/teknoloji.html">
+<span data-i18n="common.details_cta">Detaylı Bilgi</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="service-card spotlight-card card-edge-accent flex flex-col items-center text-center border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-6 shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] group">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="/images/digestion-tank-interior.jpg" alt="Bir Iona anaerobik çürütücü tankının içi">
+</div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="home.services.card2_title">Proses Kontrol Sistemleri</h3>
+<p class="text-body-md text-[var(--text-muted)] max-w-xs mb-4" data-i18n="home.services.card2_desc">Maksimum işletme verimliliği sağlayan gelişmiş proses kontrolü uyguluyoruz.</p>
+<a class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)] transition-colors duration-300 link-underline" href="/teknoloji.html">
+<span data-i18n="common.details_cta">Detaylı Bilgi</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="service-card spotlight-card card-edge-accent flex flex-col items-center text-center border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-6 shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] group">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="/images/waste-construction.jpg" alt="Iona biyogaz tesisinde çürütücü inşaatı">
+</div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="home.services.card3_title">Anahtar Teslim Biyogaz Tesisleri</h3>
+<p class="text-body-md text-[var(--text-muted)] max-w-xs mb-4" data-i18n="home.services.card3_desc">Verimli, sürdürülebilir enerji çözümleri sunan anahtar teslim biyogaz tesisleri inşa ediyoruz.</p>
+<a class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)] transition-colors duration-300 link-underline" href="/teknoloji.html">
+<span data-i18n="common.details_cta">Detaylı Bilgi</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Why Choose Us: split layout, sticky left + interactive accordion right -->
+<section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section" id="why-choose-us">
+<div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+<div class="md:sticky md:top-32 self-start fade-in-element">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="home.why.eyebrow">Neden Iona</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-md" data-i18n="home.why.title">Neden Bizi Seçmelisiniz?</h2>
+<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-md mb-stack-md" data-i18n="home.why.body">Mühendislik uzmanlığımızı ve yenilikçi teknolojiyi bir araya getirerek dünya genelinde yüksek verimli, güvenilir ve sürdürülebilir biyogaz çözümleri sunuyoruz.</p>
+<a class="inline-block font-label-caps text-label-caps bg-[var(--brand)] text-white px-8 py-4 hover:bg-[var(--brand-hover)] transition-colors duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)]" href="/hakkimizda.html#why-us">
+<span data-i18n="common.more_cta">Daha Fazla</span>
+</a>
+</div>
+<div class="fade-in-element delay-100">
+<div class="accordion-item spotlight-card is-active border-t border-b border-[var(--border-strong)] px-6 md:px-8 py-6">
+<div class="flex items-center justify-between gap-6 cursor-pointer">
+<div class="flex items-center gap-6">
+<span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">01</span>
+<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion1_title">Akıllı Teknoloji</h3>
+</div>
+<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+</div>
+<div class="accordion-row">
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion1_desc">Maksimum verimlilik için gelişmiş otomasyon sistemleri entegre ediyoruz.</p></div>
+</div>
+</div>
+<div class="accordion-item spotlight-card border-b border-[var(--border-strong)] px-6 md:px-8 py-6">
+<div class="flex items-center justify-between gap-6 cursor-pointer">
+<div class="flex items-center gap-6">
+<span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">02</span>
+<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion2_title">Operasyonel Maliyet Tasarrufu</h3>
+</div>
+<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+</div>
+<div class="accordion-row">
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion2_desc">Optimize edilmiş tesislerle işletme maliyetlerini düşürüyoruz.</p></div>
+</div>
+</div>
+<div class="accordion-item spotlight-card border-b border-[var(--border-strong)] px-6 md:px-8 py-6">
+<div class="flex items-center justify-between gap-6 cursor-pointer">
+<div class="flex items-center gap-6">
+<span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">03</span>
+<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion3_title">Kesintisiz Üretim</h3>
+</div>
+<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+</div>
+<div class="accordion-row">
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion3_desc">Gelişmiş tasarımlarımız sürekli ve kesintisiz getiriyi garanti eder.</p></div>
+</div>
+</div>
+<div class="accordion-item spotlight-card border-b border-[var(--border-strong)] px-6 md:px-8 py-6">
+<div class="flex items-center justify-between gap-6 cursor-pointer">
+<div class="flex items-center gap-6">
+<span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">04</span>
+<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion4_title">7/24 Destek</h3>
+</div>
+<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+</div>
+<div class="accordion-row">
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion4_desc">Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.</p></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 3D Digital Twin: a general company feature (interactive facility
+     model), not part of IonaFlux software — kept fully decoupled from
+     the IonaFlux spotlight section below (own id, own mount point, own
+     copy). Section uses the same theme-aware surface tokens as the
+     rest of the page (var(--surface) etc.). React/R3F scene
+     (src/components/DigitalTwin/GltfTwinScene.jsx) mounted via
+     src/components/DigitalTwin/mount.jsx into #iona-digital-twin-root,
+     lazily (IntersectionObserver) so the React/R3F/drei/gsap graph
+     stays out of the critical path for visitors who never scroll here.
+     Loads the real facility scan at public/models/iona-tesis-3d.glb,
+     applies a uniform matte "clay" material to every mesh, and lets
+     visitors click any of the plant's 9 major structures (both
+     digesters, both engine rooms, pump room, SCADA room, both feed
+     pools, site piping) to fly the camera in and show a mock data
+     card; clicking the background resets to the bird's-eye view.
+     NOTE: two older, now-unwired builds remain in the repo on purpose
+     (kept until confirmed safe to delete, not removed automatically):
+     DigitalTwinScene.jsx (earlier React/R3F version, hand-built
+     procedural stations, no real GLB) and mount-model-viewer.js
+     (a Google <model-viewer> version that briefly replaced the React
+     scene before the real GLB made the click/zoom/data-card behavior
+     below possible again). -->
+<section class="relative isolate overflow-hidden bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 fade-in-section" id="digital-twin">
+<div class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full opacity-40" style="background:radial-gradient(circle,rgba(34,112,60,0.18),transparent 70%)" aria-hidden="true"></div>
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto text-center mb-stack-xl fade-in-element">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="home.digitaltwin.eyebrow">Dijital İkiz</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-[var(--text)] mb-stack-sm max-w-2xl mx-auto" data-i18n="home.digitaltwin.title">Tesisimizi Üç Boyutlu Keşfedin.</h2>
+<p class="text-body-md text-[var(--text-muted)] max-w-xl mx-auto" data-i18n="home.digitaltwin.body">Bir Iona biyogaz tesisinin bileşenlerini interaktif 3D modelde inceleyin; her bileşene tıklayarak teknik detaylarını görün.</p>
+</div>
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto fade-in-element delay-200 rounded-xl overflow-hidden border border-[var(--border)]">
+<div id="iona-digital-twin-root" class="w-full aspect-video min-h-[600px]"></div>
+</div>
+</section>
+
+<!-- IonaFlux product spotlight: deliberately NOT the site's light section
+     chrome. IonaFlux is a standalone software product, not a service
+     line, so this section stays visually separated from the corporate
+     page around it — a fixed dark surface (independent of the site's
+     light/dark toggle), light text, and the vivid product green as the
+     one accent, distinct from the corporate brand-orange CTA color used
+     everywhere else on this page. -->
+<section class="relative isolate overflow-hidden bg-[#0b0f0c] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 fade-in-section" id="ionaflux-teaser">
+<div class="pointer-events-none absolute -top-32 right-0 w-[560px] h-[560px] rounded-full opacity-40" style="background:radial-gradient(circle,rgba(63,174,102,0.18),transparent 70%)" aria-hidden="true"></div>
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-12 items-center">
+<div class="max-w-lg fade-in-element">
+<span class="inline-flex items-center gap-2 mb-6">
+<img src="/images/iona-star-mark.png" alt="" width="20" height="20" class="shrink-0" aria-hidden="true">
+<span class="text-[17px] font-extrabold tracking-tight" style="font-family:Arial,sans-serif"><span class="text-white">iona</span><span style="color:#3fae66">flux</span></span>
+</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm text-white" data-i18n="home.ionaflux.title">Tesisinizin Dijital İkizi: IonaFlux.</h2>
+<p class="text-body-md mb-stack-md max-w-md" style="color:#c2cac3" data-i18n="home.ionaflux.body">IonaFlux, Iona mühendisliği tarafından geliştirilen ve müşterilerimize teslim edilen dijital işletme platformudur. Canlı SCADA verisi, arıza yönetimi ve saha raporlaması tek panelde birleşir.</p>
+<a class="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] transition-transform duration-150 ease-out active:scale-[0.97]" style="background:#3fae66;color:#04160a" href="/ionaflux.html" data-i18n="home.ionaflux.cta">IonaFlux'u Keşfedin</a>
+</div>
+<div class="fade-in-element delay-200 rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.12)">
+<img class="w-full h-auto" src="/images/ionaflux/twin.jpg" alt="IonaFlux dijital ikiz paneli: 2D tesis haritası, 3D dijital ikiz, trendler ve raporlar">
+</div>
+</div>
+</section>
+
+<!-- Navigation cards to the other pages -->
+<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="explore">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="home.explore.eyebrow">Keşfedin</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="home.explore.title">Iona'yı Daha Yakından Tanıyın</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 fade-in-element delay-200">
+<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/teknoloji.html">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">Hizmetler</span>
+<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card1_title">İleri Mühendislik, Sürdürülebilir Tesisler İçin</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card1_desc">Çürütücü tasarımından karıştırma teknolojisine, ürün kataloğumuzu ve mühendislik iş akışımızı keşfedin.</p>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+</a>
+<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/etki.html">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">Sektörler</span>
+<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card2_title">Küresel Ölçekte Kanıtlanmış Etki</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card2_desc">Hizmet verdiğimiz sektörleri ve küresel teknoloji ortaklıklarımızı görün.</p>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+</a>
+<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/ionaflux.html">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">IonaFlux</span>
+<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card4_title">Tesisiniz İçin Dijital İkiz</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card4_desc">Müşterilerimize teslim ettiğimiz kendi yazılımımızı, canlı SCADA ve arıza yönetimini keşfedin.</p>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+</a>
+<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/iletisim.html">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">İletişim</span>
+<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card3_title">Projenizi Konuşalım</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card3_desc">Mühendislik ekibimizle iletişime geçin, projenize özel bir teklif alın.</p>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+</a>
+</div>
+</div>
+</section>
+
+<!-- Stats -->
+<section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="stats">
+<div class="max-w-[theme(spacing.container-max)] mx-auto text-center">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-x-10 gap-y-10 fade-in-element">
+<div class="flex flex-col items-center">
+<span class="font-headline-md text-headline-md text-[var(--brand)]">20+</span>
+<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.experience_label">Yıllık Deneyim</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-headline-md text-headline-md text-[var(--brand)]">100+</span>
+<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.projects_label">Tamamlanan Proje</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-headline-md text-headline-md text-[var(--brand)]">2</span>
+<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.offices_label">Dünya Genelinde Ofis</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-headline-md text-headline-md text-[var(--brand)]">50+</span>
+<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.engineers_label">Mühendis</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
+<p class="font-label-caps text-label-caps text-[var(--text-muted)] fade-in-element" data-i18n="footer.copyright"></p>
+<div class="flex gap-6 fade-in-element">
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.privacy"></a>
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.terms"></a>
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.impact_report"></a>
+</div>
+</footer>
+
+<script type="module" src="/src/pages/main-anasayfa.js"></script>
+<script type="module" src="/src/components/DigitalTwin/mount.jsx"></script>
+</body></html>

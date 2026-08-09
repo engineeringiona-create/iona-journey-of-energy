@@ -1,0 +1,177 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script>(function(){try{var t=localStorage.getItem('iona-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+<title>IONA - İletişim</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="/tailwind-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/styles/base.css">
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex justify-between items-center px-safe-margin-desktop py-5 transition-all duration-500 hidden md:flex" id="top-nav">
+<a class="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-300" href="/">
+<img src="/images/iona-star-mark.png" alt="" width="36" height="36" class="shrink-0" aria-hidden="true">
+<span class="flex flex-col leading-none">
+<span class="text-[23px] font-extrabold tracking-tight text-[var(--brand)]" style="font-family:Arial,sans-serif">iona</span>
+<span class="font-label-caps text-[8px] tracking-[0.14em] text-[var(--text-muted)] -mt-0.5" data-i18n="nav.tagline">SIMPLY, ENGINEERED</span>
+</span>
+</a>
+<div class="flex items-center gap-6">
+<div class="h-6 w-px bg-[var(--border)]"></div>
+<div class="relative">
+<button class="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="nav-search-toggle" type="button" data-i18n-aria-label="nav.search">
+<span class="material-symbols-outlined text-[20px]">search</span>
+<span class="font-label-caps text-[13px] font-bold tracking-[0.08em]" data-i18n="nav.search">Ara</span>
+</button>
+<div class="hidden absolute top-12 left-1/2 -translate-x-1/2 w-80 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-4" id="nav-search-panel">
+<input class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-lg px-4 py-2.5 text-[14px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" id="nav-search-input" type="text" data-i18n-placeholder="nav.search_placeholder">
+<div class="mt-3 flex flex-col gap-1 max-h-64 overflow-y-auto" id="nav-search-results"></div>
+</div>
+</div>
+<div class="relative">
+<button class="flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="lang-toggle" type="button" aria-label="Dil / Language">
+<span class="material-symbols-outlined text-[20px]">language</span>
+<span class="font-label-caps text-[12px] font-bold tracking-[0.05em]" id="lang-current">TR</span>
+</button>
+<div class="hidden absolute top-12 right-0 w-44 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-2" id="lang-panel">
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="tr">Türkçe</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="en">English</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="de">Deutsch</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="es">Español</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="fr">Français</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="ru">Русский</button>
+<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="hi">हिन्दी</button>
+</div>
+</div>
+<div class="h-6 w-px bg-[var(--border)]"></div>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/" data-i18n="nav.home">Anasayfa</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="inline-flex items-center gap-1.5 rounded-full pl-2.5 pr-3.5 py-1.5 font-label-caps text-[12px] tracking-[0.06em] font-bold bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/25 hover:bg-[var(--brand)]/15 hover:border-[var(--brand)]/40 transition-colors duration-300" href="/ionaflux.html"><span class="material-symbols-outlined text-[15px]">bolt</span><span data-i18n="nav.ionaflux">IonaFlux</span></a>
+<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--brand)] transition-colors duration-500" href="/iletisim.html" aria-current="page" data-i18n="nav.contact">İletişim</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="theme-toggle" id="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
+<span class="theme-toggle-knob"><span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span></span>
+</button>
+<a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" href="#contact-form">
+<span data-i18n="nav.cta">Teklif Alın</span> <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+</a>
+</div>
+</nav>
+
+<!-- Mobile nav: hamburger + dropdown (desktop nav above is hidden md:flex) -->
+<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex md:hidden justify-between items-center px-safe-margin-mobile py-4" id="mobile-nav">
+<a class="flex items-center gap-2" href="/">
+<img src="/images/iona-star-mark.png" alt="" width="30" height="30" class="shrink-0" aria-hidden="true">
+<span class="text-[19px] font-extrabold tracking-tight text-[var(--brand)]" style="font-family:Arial,sans-serif">iona</span>
+</a>
+<button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
+<span class="material-symbols-outlined text-[26px]" id="mobile-nav-icon">menu</span>
+</button>
+</nav>
+<div class="mobile-nav-panel md:hidden" id="mobile-nav-panel">
+<a class="mobile-nav-link" href="/" data-i18n="nav.home">Anasayfa</a>
+<a class="mobile-nav-link" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="mobile-nav-link" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="mobile-nav-link" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="mobile-nav-link flex items-center gap-2" href="/ionaflux.html"><span class="material-symbols-outlined text-[16px] text-[var(--brand)]">bolt</span><span class="text-[var(--brand)] font-bold" data-i18n="nav.ionaflux">IonaFlux</span></a>
+<a class="mobile-nav-link is-current" href="/iletisim.html" aria-current="page" data-i18n="nav.contact">İletişim</a>
+<a class="mobile-nav-cta" href="#contact-form" data-i18n="nav.cta">Teklif Alın</a>
+</div>
+
+<!-- Hero -->
+<section class="hero-zone bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop overflow-hidden fade-in-section" id="contact-hero">
+<div class="absolute inset-0 pointer-events-none z-0">
+<img class="parallax-media" src="/images/waste-construction.jpg" alt="Iona biyogaz tesisinde çürütücü inşaatı">
+<div class="hero-photo-scrim"></div>
+</div>
+<div class="max-w-3xl relative z-10 mx-auto text-center">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="contact.hero.eyebrow">İletişim</span>
+<h1 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100" data-i18n="contact.hero.title">Bize Ulaşın</h1>
+<p class="font-body-lg text-body-lg text-[var(--text-muted)] max-w-2xl mx-auto mb-stack-lg fade-in-element delay-200" data-i18n="contact.hero.body">Projenizi konuşmaya hazırız. Fizibilite çalışmasından anahtar teslim inşaata kadar, mühendislik ekibimiz sorularınızı yanıtlamak için burada.</p>
+<svg class="process-illustration fade-in-element delay-300" viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<ellipse class="illus-line" cx="70" cy="42" rx="44" ry="13" />
+<line class="illus-line" x1="26" y1="42" x2="26" y2="148" />
+<line class="illus-line" x1="114" y1="42" x2="114" y2="148" />
+<path class="illus-line" d="M26,148 a44,13 0 0 0 88,0" />
+<ellipse class="illus-line-soft" cx="70" cy="80" rx="44" ry="12" stroke-dasharray="3 5" />
+<circle class="illus-bubble" cx="56" cy="128" r="3.5" />
+<circle class="illus-bubble" cx="72" cy="128" r="3" />
+<circle class="illus-bubble" cx="86" cy="128" r="4" />
+<path class="illus-line" d="M114,90 H260 V55 H420 V90 H540" />
+<path class="illus-flow" d="M114,90 H260 V55 H420 V90 H540" />
+<circle class="illus-ping" cx="560" cy="90" r="15" />
+<circle class="illus-ping" cx="560" cy="90" r="15" />
+<circle class="illus-node" cx="560" cy="90" r="18" />
+<path class="illus-mark" transform="translate(543.5,73.5) scale(0.33)" d="M50,6 C59.899,40.101 59.899,40.101 94,50 C59.899,59.899 59.899,59.899 50,94 C40.101,59.899 40.101,59.899 6,50 C40.101,40.101 40.101,40.101 50,6 Z M50,6 Q47.8,28 50,50 Q52.2,28 50,6 Z M94,50 Q72,47.8 50,50 Q72,52.2 94,50 Z M50,94 Q52.2,72 50,50 Q47.8,72 50,94 Z M6,50 Q28,52.2 50,50 Q28,47.8 6,50 Z" fill-rule="evenodd" />
+</svg>
+</div>
+<a class="scroll-cue" href="#contact-info" aria-label="Aşağı kaydırın" data-i18n-aria-label="contact.hero.scroll_cue">
+<span class="material-symbols-outlined">keyboard_arrow_down</span>
+</a>
+</section>
+
+<!-- Contact info cards -->
+<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="contact-info">
+<div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 fade-in-element delay-100">
+<div class="card-interactive spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-8">
+<div class="w-11 h-11 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center mb-5"><span class="material-symbols-outlined">location_on</span></div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="contact.info.address_title">Adres</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="contact.info.address_body">Kırkkonaklar Mah. 358. Sok. 13/5<br>Çankaya, Ankara / Türkiye</p>
+</div>
+<div class="card-interactive spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-8">
+<div class="w-11 h-11 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center mb-5"><span class="material-symbols-outlined">call</span></div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="contact.info.phone_title">Telefon</h3>
+<p class="text-body-md text-[var(--text-muted)]"><a class="link-underline" href="tel:+905402464662">+90 540 246 4662</a></p>
+</div>
+<div class="card-interactive spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-8">
+<div class="w-11 h-11 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center mb-5"><span class="material-symbols-outlined">mail</span></div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="contact.info.email_title">E-posta</h3>
+<p class="text-body-md text-[var(--text-muted)]"><a class="link-underline" href="mailto:info@ionaengineering.com">info@ionaengineering.com</a></p>
+</div>
+</div>
+</section>
+
+<!-- Contact form -->
+<section class="relative bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section bg-decorated" id="contact-form">
+<div class="watermark-edge watermark-right" aria-hidden="true"><span>CONTACT</span></div>
+<div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<div class="md:col-span-5 fade-in-element">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="contact.form.eyebrow">Teklif Alın</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-md" data-i18n="contact.form.title">Projenizi Anlatın</h2>
+<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-md" data-i18n="contact.form.body">Formu doldurun; e-posta uygulamanız otomatik olarak açılacak ve mesajınız doğrudan mühendislik ekibimize iletilecektir.</p>
+</div>
+<div class="md:col-span-6 md:col-start-7 fade-in-element delay-100">
+<form class="flex flex-col gap-5" id="contact-mail-form">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<input class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" type="text" name="name" placeholder="Adınız Soyadınız" data-i18n-placeholder="contact.form.name_placeholder" required>
+<input class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" type="email" name="email" placeholder="E-posta Adresiniz" data-i18n-placeholder="contact.form.email_placeholder" required>
+</div>
+<input class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" type="text" name="subject" placeholder="Konu" data-i18n-placeholder="contact.form.subject_placeholder">
+<textarea class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300 resize-none" name="message" rows="4" placeholder="Projeniz hakkında kısaca bilgi verin" data-i18n-placeholder="contact.form.message_placeholder" required></textarea>
+<button class="self-start font-label-caps text-label-caps bg-[var(--brand)] text-white px-8 py-4 rounded-none hover:bg-[var(--brand-hover)] transition-colors duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] hover:brightness-105 transition-all mt-2" type="submit">
+<span data-i18n="contact.form.submit">Mesajı Gönder</span>
+</button>
+</form>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
+<p class="font-label-caps text-label-caps text-[var(--text-muted)] fade-in-element" data-i18n="footer.copyright"></p>
+<div class="flex gap-6 fade-in-element">
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.privacy"></a>
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.terms"></a>
+<a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.impact_report"></a>
+</div>
+</footer>
+
+<script type="module" src="/src/pages/main-iletisim.js"></script>
+</body></html>

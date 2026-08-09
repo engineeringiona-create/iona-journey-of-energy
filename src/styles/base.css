@@ -1,0 +1,777 @@
+/* ---------------------------------------------------------------
+   Theme tokens. One brand green (#22703c) and one brand orange
+   (#ff751f) run through the whole site; only --brand itself swaps
+   to a brighter tint in dark mode; text/orange/surfaces adapt via
+   the rest of the variables below. Toggled by .dark on <html>
+   (see common.js initThemeToggle) — the class is applied by an
+   inline head script on every page before first paint to avoid a
+   light-mode flash.
+---------------------------------------------------------------- */
+:root {
+    --bg: #f7f6f1;
+    --surface: #ffffff;
+    --surface-2: #f2f0ea;
+    --text: #14181a;
+    --text-muted: #565f58;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.1);
+    --nav-bg: rgba(255, 255, 255, 0.62);
+    --brand: #22703c;
+    --brand-hover: #2c8a4a;
+    --brand-orange: #ff751f;
+    --shadow-ambient: rgba(20, 24, 20, 0.25);
+    /* The sitewide section-background alternation token: every content
+       section is either var(--surface) ("pure white") or this ("soft
+       off-white"), never two of the same tone back to back. Kept as its
+       own variable (distinct from --surface-2) because its light value
+       is a specific #f9fafb, not the warmer #f2f0ea --surface-2 already
+       used for cards/inputs. */
+    --section-alt: #f9fafb;
+    /* Green stays out of large section fills entirely now (that read as
+       a big washed-out block, not a brand accent) — --border-green is
+       the only surviving brand-tinted token, kept for thin top-border
+       hairlines on the handful of sections that want a quiet "green"
+       marker without tinting the whole background. */
+    --border-green: color-mix(in srgb, var(--brand) 24%, transparent);
+}
+
+:root.dark {
+    --bg: #0e1210;
+    --surface: #171b18;
+    --surface-2: #1a1f1b;
+    --text: #eef1ec;
+    --text-muted: #98a69b;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --nav-bg: rgba(14, 18, 16, 0.68);
+    --brand: #3fae66;
+    --brand-hover: #57c47c;
+    --brand-orange: #ff8a3d;
+    --shadow-ambient: rgba(0, 0, 0, 0.55);
+    --section-alt: var(--surface-2);
+    --border-green: color-mix(in srgb, var(--brand) 34%, transparent);
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background-color 400ms ease, color 400ms ease;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.glass-blur {
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    background: var(--nav-bg);
+    transition: background-color 400ms ease;
+}
+
+/* ---------------- Mobile nav (hamburger + dropdown panel) ----------------
+   A separate, self-contained bar shown only below the md breakpoint.
+   The desktop nav (#top-nav) stays `hidden md:flex` and never renders
+   here, so there's no id collision with its search/language/theme
+   widgets — this bar only needs the logo, a menu toggle, and links. */
+.mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--text);
+}
+
+.mobile-nav-panel {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    z-index: 49;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: max-height 400ms ease, opacity 300ms ease, transform 300ms ease;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 25px 60px -25px rgba(20, 24, 20, 0.35);
+}
+
+.mobile-nav-panel.is-open {
+    max-height: 520px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-nav-link {
+    display: block;
+    padding: 16px 24px;
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    transition: color 300ms ease;
+}
+
+.mobile-nav-link.is-current {
+    color: var(--brand);
+}
+
+.mobile-nav-cta {
+    display: block;
+    margin: 16px 24px 20px;
+    padding: 14px;
+    border-radius: 999px;
+    text-align: center;
+    background: var(--brand-orange);
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-nav-panel { transition: none; }
+}
+
+/* ---------------- Theme toggle switch ---------------- */
+.theme-toggle {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 400ms ease, border-color 400ms ease;
+}
+
+.theme-toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    transition: transform 450ms cubic-bezier(0.65, 0, 0.35, 1), background-color 400ms ease;
+}
+
+:root.dark .theme-toggle-knob {
+    transform: translateX(24px);
+}
+
+.theme-toggle-knob .material-symbols-outlined {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.fade-in-element {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 800ms ease-out, transform 800ms ease-out;
+}
+
+.fade-in-element.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+
+/* Full-screen fixed WebGL backdrop. Only teknoloji.html and etki.html
+   instantiate a renderer against this canvas; other pages simply don't
+   include the <canvas id="webgl-stage"> element. */
+#webgl-stage {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* The dramatic top zone on 3D-hosting pages where the model is the focal
+   point. Below it, content flows naturally (not viewport-locked) so long
+   technical copy has room to breathe. */
+.hero-zone {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 128px;
+}
+
+.parallax-media {
+    position: absolute;
+    top: -12%;
+    left: 0;
+    width: 100%;
+    height: 124%;
+    object-fit: cover;
+    object-position: center;
+    will-change: transform;
+}
+
+.reveal-mask {
+    clip-path: inset(0 0 100% 0);
+}
+
+/* "Why Choose Us" accordion (index.html). Expands on hover *or* on a
+   click-toggled .is-active class, so it behaves the same on touch
+   devices that have no hover state. */
+.accordion-item {
+    cursor: pointer;
+    background-color: transparent;
+    transition: background-color 400ms ease;
+}
+
+.accordion-item:hover,
+.accordion-item.is-active {
+    background-color: #14181a;
+}
+
+.accordion-item .accordion-title,
+.accordion-item .accordion-icon {
+    color: var(--text);
+    transition: color 400ms ease, transform 400ms ease;
+}
+
+.accordion-item:hover .accordion-title,
+.accordion-item.is-active .accordion-title,
+.accordion-item:hover .accordion-icon,
+.accordion-item.is-active .accordion-icon {
+    color: #ffffff;
+}
+
+.accordion-item:hover .accordion-icon,
+.accordion-item.is-active .accordion-icon {
+    transform: rotate(45deg);
+}
+
+.accordion-item .accordion-number {
+    transition: color 400ms ease;
+}
+
+.accordion-item:hover .accordion-number,
+.accordion-item.is-active .accordion-number {
+    color: var(--brand);
+}
+
+.accordion-item .accordion-row {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 450ms ease;
+}
+
+.accordion-item:hover .accordion-row,
+.accordion-item.is-active .accordion-row {
+    grid-template-rows: 1fr;
+}
+
+.accordion-item .accordion-row > div {
+    overflow: hidden;
+}
+
+.accordion-item .accordion-desc {
+    color: #b7c2bb;
+}
+
+/* ---------------- Industrial Elegance ----------------
+   Replaces an earlier blurred-glow/grid experiment that read as
+   muddy and too subtle to register. Three sharp, literal devices
+   instead:
+   - .bg-alt: legacy alternating section tone (var(--surface-2)).
+     Superseded sitewide by the --section-alt token + .blueprint-watermark
+     /.bg-ghost-text pair below, kept only so nothing that already
+     references it breaks.
+   - the fixed left-edge rule (plain markup, not a class — see any
+     page's <body>) — one hairline down the whole layout.
+   - .watermark-edge / .bg-ghost-text: two flavors of the same idea, a
+     massive, near-invisible word sitting behind real content (pinned to
+     a section edge, or centered full-bleed respectively). Both run
+     through isolation + a negative z-index layer. Used only on About/
+     Services-style sections, never on dense grids. */
+.bg-alt {
+    background-color: var(--surface-2) !important;
+}
+
+.bg-decorated {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.watermark-edge {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 15vw;
+    min-width: 160px;
+    max-width: 260px;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.watermark-edge.watermark-left { left: -3vw; }
+.watermark-edge.watermark-right { right: -3vw; }
+
+.watermark-edge span {
+    writing-mode: vertical-rl;
+    text-orientation: sideways;
+    font-family: Arial, sans-serif;
+    font-weight: 800;
+    font-size: clamp(4rem, 15vw, 13rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    opacity: 0.03;
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* Giant centered ghost word, full-bleed rather than edge-pinned — the
+   horizontal counterpart to .watermark-edge. Markup pattern:
+   <section class="... bg-decorated"><div class="bg-ghost-text" aria-hidden="true"><span>WORD</span></div>... */
+.bg-ghost-text {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.bg-ghost-text span {
+    font-family: Arial, sans-serif;
+    font-weight: 800;
+    font-size: clamp(5rem, 15vw, 15rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    opacity: 0.03;
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* ---------------- Blueprint watermark ----------------
+   A faint line-art engineering drawing pinned behind a section's
+   text content. Distinct from .watermark-edge (a giant rotated word
+   pinned to a viewport edge) — this one is a full illustrative
+   diagram, centered/scaled to sit quietly behind copy at opacity-[0.03]
+   so it reads as texture, not decoration. stroke="currentColor" so it
+   follows --text and stays correct in dark mode automatically. */
+.blueprint-watermark {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.blueprint-watermark svg {
+    width: clamp(420px, 46vw, 760px);
+    height: auto;
+    transform: translateX(18%);
+    color: var(--text);
+}
+
+/* ---------------- Infinite logo marquee ----------------
+   Bridges the dead vertical gap between the Hakkımızda and Neler
+   Sunuyoruz sections on the homepage with a continuous, grayscale
+   partner/client strip. The track's item list is duplicated once in
+   markup so the -50% animation loop point lands exactly on a repeat,
+   with no visible seam or jump. Pauses on hover/focus so the names
+   stay readable, and honors prefers-reduced-motion. */
+.logo-marquee {
+    position: relative;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.logo-marquee-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: logo-marquee-scroll 32s linear infinite;
+}
+
+.logo-marquee:hover .logo-marquee-track,
+.logo-marquee:focus-within .logo-marquee-track {
+    animation-play-state: paused;
+}
+
+@keyframes logo-marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.logo-marquee-item {
+    color: var(--text-muted);
+    opacity: 0.55;
+    transition: opacity 400ms ease, color 400ms ease;
+    white-space: nowrap;
+}
+
+.logo-marquee-item:hover {
+    color: var(--brand);
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .logo-marquee-track {
+        animation: none;
+    }
+}
+
+/* ---------------- Shared micro-interactions ---------------- */
+
+/* Underline that grows in from the left on hover, instead of a
+   static border. Used on inline text links site-wide. */
+.link-underline {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 450ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.link-underline:hover::after {
+    transform: scaleX(1);
+}
+
+/* Primary nav only: the underline pops in brand orange rather than
+   following currentColor (green, same as the hover text). Every other
+   .link-underline usage sitewide (CTAs, footer, body copy) is untouched —
+   this is a deliberate, scoped accent so orange reads as "navigation",
+   not sprinkled everywhere. */
+#top-nav .link-underline::after {
+    background: var(--brand-orange);
+}
+
+/* ---------------- Card hover spotlight ----------------
+   Vercel/Linear-style: a soft, strictly local highlight that only
+   exists inside the specific card the cursor is over — never a
+   page-wide glow. initCardSpotlight() (common.js) writes the cursor's
+   position *relative to the card* into --spot-x/--spot-y as the visitor
+   moves over it; everything else here is static CSS, so the per-frame
+   cost is just those two custom-property writes.
+
+   Deliberately neutral: white/silver in dark mode, a soft dark tint in
+   light mode — no brand green/orange. This is a surface highlight, not
+   a glow effect, so it must read as clean and colorless.
+
+   Two layers, both fade in/out together via .is-hovering:
+   - ::before: the soft radial wash across the card's fill.
+   - ::after: the same radial gradient rendered as a 1px border via the
+     padding+mask-exclude trick, so only the edge nearest the cursor
+     "lights up" rather than the whole border. */
+.spotlight-card {
+    position: relative;
+    isolation: isolate;
+}
+
+.spotlight-card::before,
+.spotlight-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 400ms ease;
+    pointer-events: none;
+}
+
+.spotlight-card::before {
+    z-index: 1;
+    background: radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(20, 24, 20, 0.05), transparent 70%);
+}
+
+:root.dark .spotlight-card::before {
+    background: radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255, 255, 255, 0.06), transparent 70%);
+}
+
+.spotlight-card::after {
+    z-index: 2;
+    padding: 1px;
+    background: radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(20, 24, 20, 0.35), transparent 70%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+:root.dark .spotlight-card::after {
+    background: radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255, 255, 255, 0.55), transparent 70%);
+}
+
+.spotlight-card.is-hovering::before,
+.spotlight-card.is-hovering::after {
+    opacity: 1;
+}
+
+/* Card lift: subtle rise + deepened shadow + brand-tinted border. */
+.card-interactive {
+    transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 400ms ease, border-color 400ms ease;
+}
+
+.card-interactive:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px -30px var(--shadow-ambient);
+    border-color: var(--brand);
+}
+
+/* Orange micro-border: a 2px left edge that reveals on hover, the
+   "highlight" half of the orange-accent pass (nav underline is the
+   other half). The border is always reserved at 0-alpha, never
+   0-width, so it never shifts layout when it appears. Additive — pairs
+   with .spotlight-card/.card-interactive on the same element. */
+.card-edge-accent {
+    border-left: 2px solid transparent;
+    transition: border-color 400ms ease;
+}
+
+.card-edge-accent:hover {
+    border-left-color: var(--brand-orange);
+}
+
+/* A handful of cards carry a green icon badge instead of the default
+   orange one (etki.html's partner-category grid) — their edge-accent
+   should light up to match, not clash with the orange default above. */
+.card-edge-accent.is-brand:hover {
+    border-left-color: var(--brand);
+}
+
+/* Intro preloader: follows the active light/dark theme via var(--bg)/var(--brand)
+   (set on <html> before first paint, see index.html's inline script) instead of
+   fixed hex values, so it never flashes the wrong palette. The bubble field is a
+   light biogas motif — gas rising off a digester — that loops under the mark
+   for as long as the preloader is visible. */
+#preloader-glow {
+    background-color: var(--brand);
+    opacity: 0.22;
+}
+
+:root.dark #preloader-glow {
+    opacity: 0.3;
+}
+
+.preloader-bubbles {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.preloader-bubble {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: var(--brand);
+    opacity: 0;
+    animation: preloader-rise 2.8s ease-in infinite;
+}
+
+.preloader-bubble:nth-child(1) { left: 34%; width: 5px; height: 5px; animation-delay: 0s; }
+.preloader-bubble:nth-child(2) { left: 47%; width: 7px; height: 7px; animation-delay: 0.55s; }
+.preloader-bubble:nth-child(3) { left: 58%; width: 4px; height: 4px; animation-delay: 1.05s; }
+.preloader-bubble:nth-child(4) { left: 41%; width: 6px; height: 6px; animation-delay: 1.6s; }
+.preloader-bubble:nth-child(5) { left: 63%; width: 5px; height: 5px; animation-delay: 2.1s; }
+
+@keyframes preloader-rise {
+    0% { transform: translateY(0) scale(0.6); opacity: 0; }
+    18% { opacity: 0.75; }
+    80% { opacity: 0.35; }
+    100% { transform: translateY(-92px) scale(1.1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .preloader-bubble {
+        animation: none;
+        opacity: 0;
+    }
+}
+
+/* Scrim for hero sections that sit a full-bleed photo behind centered text
+   (etki.html). Built with color-mix() directly in CSS rather than Tailwind's
+   arbitrary-value opacity modifier on a var() (bg-[var(--bg)]/78), which the
+   Tailwind CDN's runtime JIT can't reliably resolve into an alpha channel —
+   that left the photo showing through almost unfiltered behind dark text.
+   Strongest right where the vertically-centered heading sits (channel is
+   heavier at 45-60% than at the very top/bottom). */
+.hero-photo-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--bg) 80%, transparent) 0%,
+        color-mix(in srgb, var(--bg) 92%, transparent) 45%,
+        color-mix(in srgb, var(--bg) 94%, transparent) 65%,
+        var(--bg) 100%);
+}
+
+/* Scroll cue: sits pinned to the bottom-center of a hero-zone (position:
+   relative already) to signal there's more below a tall, mostly-empty
+   viewport-height hero, e.g. iletisim.html's contact-hero. */
+.scroll-cue {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 9999px;
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    animation: scroll-cue-bounce 2.2s ease-in-out infinite;
+    transition: color 300ms ease, border-color 300ms ease;
+}
+
+.scroll-cue:hover {
+    color: var(--brand);
+    border-color: var(--brand);
+}
+
+@keyframes scroll-cue-bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-cue {
+        animation: none;
+    }
+}
+
+/* Process illustration: digester -> flowing gas -> energy node, used to give
+   the otherwise copy-only contact hero (iletisim.html) something alive to
+   look at instead of a static watermark trace. */
+.process-illustration {
+    width: min(100%, 560px);
+    margin: 0 auto;
+    color: var(--brand);
+}
+
+.process-illustration .illus-line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    opacity: 0.38;
+}
+
+.process-illustration .illus-line-soft {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    opacity: 0.2;
+}
+
+.process-illustration .illus-flow {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 7 11;
+    opacity: 0.75;
+    animation: illus-flow-move 2.6s linear infinite;
+}
+
+.process-illustration .illus-bubble {
+    fill: currentColor;
+    opacity: 0;
+    animation: illus-bubble-rise 3.2s ease-in infinite;
+}
+
+.process-illustration .illus-bubble:nth-child(1) { animation-delay: 0s; }
+.process-illustration .illus-bubble:nth-child(2) { animation-delay: 1.1s; }
+.process-illustration .illus-bubble:nth-child(3) { animation-delay: 2.1s; }
+
+.process-illustration .illus-node {
+    fill: var(--bg);
+    stroke: currentColor;
+    stroke-width: 1.5;
+    opacity: 0.7;
+}
+
+.process-illustration .illus-mark {
+    fill: currentColor;
+    opacity: 0.9;
+}
+
+.process-illustration .illus-ping {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: illus-ping 2.8s ease-out infinite;
+}
+
+.process-illustration .illus-ping:nth-child(2) {
+    animation-delay: 0.9s;
+}
+
+@keyframes illus-flow-move {
+    to { stroke-dashoffset: -36; }
+}
+
+@keyframes illus-bubble-rise {
+    0% { transform: translateY(0); opacity: 0; }
+    20% { opacity: 0.55; }
+    80% { opacity: 0.2; }
+    100% { transform: translateY(-52px); opacity: 0; }
+}
+
+@keyframes illus-ping {
+    0% { transform: scale(0.55); opacity: 0.55; }
+    100% { transform: scale(1.9); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .process-illustration .illus-flow,
+    .process-illustration .illus-bubble,
+    .process-illustration .illus-ping {
+        animation: none;
+        opacity: 0;
+    }
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARMA MIX TWIN — Scroll ile parçalarına ayrılan 3B görünüm</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#c0141c; --red-deep:#8d0f16;
+    --ink:#14171a; --ink-2:#4b5158; --line:#dfe1e4;
+    --paper:#f4f4f2;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:auto}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font-family:"Barlow",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--red);text-decoration:none}
+  a:hover{color:var(--red-deep)}
+
+  #scroller{position:relative}
+  #stage{position:sticky;top:0;height:100svh;width:100%;overflow:hidden;
+         background:
+           radial-gradient(120% 90% at 62% 12%, #ffffff 0%, #f2f2f0 42%, #e4e5e4 78%, #d7d9d9 100%);}
+  #scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .leader{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:3 3}
+  #labels{position:absolute;inset:0;pointer-events:none}
+  .lbl{position:absolute;top:0;left:0;display:flex;align-items:center;gap:8px;
+       background:rgba(255,255,255,.86);backdrop-filter:blur(6px);
+       border:1px solid var(--line);border-left:3px solid var(--red);
+       padding:6px 11px 6px 9px;white-space:nowrap;opacity:0;
+       box-shadow:0 6px 18px rgba(20,23,26,.08)}
+  .lbl-i{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--red);letter-spacing:.04em}
+  .lbl-t{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:16px;
+         letter-spacing:.02em;text-transform:uppercase}
+
+  /* fixed reading column */
+  #copy{position:fixed;left:0;top:0;height:100svh;width:min(430px,38vw);
+        padding:clamp(28px,5vh,64px) clamp(22px,3vw,52px);
+        display:flex;flex-direction:column;justify-content:center;pointer-events:none;z-index:3}
+  .chapter{position:absolute;left:clamp(22px,3vw,52px);right:clamp(22px,3vw,52px);
+           opacity:0;transition:none;will-change:opacity,transform}
+  .step{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;
+        color:var(--red);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .step::after{content:"";height:1px;flex:1;background:var(--line)}
+  .chapter h2{font-family:"Barlow Condensed",sans-serif;font-weight:700;
+              font-size:clamp(30px,3.4vw,46px);line-height:1.02;margin:0 0 14px;
+              letter-spacing:-.01em;text-transform:uppercase;text-wrap:balance}
+  .chapter p{margin:0;font-size:16.5px;line-height:1.62;color:var(--ink-2);max-width:36ch;text-wrap:pretty}
+  .spec{display:grid;grid-template-columns:auto auto;gap:6px 22px;margin-top:22px;
+        font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink)}
+  .spec span:nth-child(odd){color:var(--ink-2)}
+
+  /* brand block */
+  #brand{position:fixed;left:clamp(22px,3vw,52px);top:clamp(24px,4vh,40px);z-index:4;
+         background:var(--red-deep);color:#fff;padding:14px 22px 16px}
+  #brand b{display:block;font-family:"Barlow Condensed",sans-serif;font-weight:700;
+           font-size:26px;letter-spacing:.01em;line-height:1}
+  #brand i{display:block;font-size:13px;font-style:italic;opacity:.9;margin-top:4px}
+
+  /* progress + hint */
+  #progress{position:fixed;left:0;bottom:0;height:3px;width:100%;background:rgba(20,23,26,.08);z-index:5}
+  #bar{height:100%;background:var(--red);transform-origin:0 50%;transform:scaleX(0)}
+  #hint{position:fixed;right:clamp(22px,3vw,52px);bottom:34px;z-index:5;
+        font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.12em;
+        color:var(--ink-2);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+  #hint em{display:block;width:22px;height:34px;border:1px solid var(--ink-2);border-radius:11px;position:relative}
+  #hint em::after{content:"";position:absolute;left:50%;top:7px;width:2px;height:6px;background:var(--red);
+                  transform:translateX(-50%);animation:wheel 1.7s ease-in-out infinite}
+  @keyframes wheel{0%,100%{opacity:0;transform:translate(-50%,0)}30%{opacity:1}60%{opacity:0;transform:translate(-50%,11px)}}
+
+  @media (max-width:900px){
+    #copy{width:100%;height:auto;top:auto;bottom:0;justify-content:flex-end;
+          padding-bottom:74px;background:linear-gradient(to top,rgba(244,244,242,.97) 55%,rgba(244,244,242,0))}
+    .chapter{position:absolute;bottom:74px;left:22px;right:22px}
+    .chapter p{max-width:none;font-size:15px}
+    #brand{padding:10px 16px 12px}#brand b{font-size:20px}#brand i{font-size:11px}
+    #hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div id="brand"><b>ARMA MIX TWIN</b><i>Tavan montajlı çift pervaneli karıştırıcı</i></div>
+
+<div id="scroller">
+  <div id="stage">
+    <canvas id="scene"></canvas>
+    <svg id="leaders" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="labels"></div>
+  </div>
+  <!-- scroll length: 7 viewport heights of travel -->
+  <div style="height:640vh"></div>
+</div>
+
+<div id="copy">
+  <div class="chapter" data-in="0" data-out="0.15">
+    <div class="step">01 — MONTAJLI ÜNİTE</div>
+    <h2>Tek parça gibi görünür,<br>13 parçadan oluşur</h2>
+    <p>Tavana tek plakayla bağlanan, motorundan pervanesine kadar servis edilebilir bir karıştırıcı. Kaydırarak üniteyi parçalarına ayırın.</p>
+    <div class="spec">
+      <span>Toplam uzunluk</span><span>≈ 5 100 mm</span>
+      <span>Pervane</span><span>2 × 3 kanat</span>
+      <span>Montaj</span><span>Tavan / konsol</span>
+    </div>
+  </div>
+
+  <div class="chapter" data-in="0.15" data-out="0.36">
+    <div class="step">02 — TAHRİK GRUBU</div>
+    <h2>Motor, kaplin ve tahrik gövdesi</h2>
+    <p>Motor kuru tarafta kalır. Kaplin muhafazası açıldığında motor, mili sökmeden tek başına değiştirilebilir — sahada en sık ihtiyaç duyulan müdahale budur.</p>
+  </div>
+
+  <div class="chapter" data-in="0.36" data-out="0.55">
+    <div class="step">03 — SIZDIRMAZLIK SINIRI</div>
+    <h2>Plaka ıslak ve kuru tarafı ayırır</h2>
+    <p>Çift etkili mekanik salmastra, tank içindeki sıvıyı yataklardan izole eder. Flanş cıvataları sökülünce tüm ıslak grup tavan plakasından ayrılır.</p>
+  </div>
+
+  <div class="chapter" data-in="0.55" data-out="0.72">
+    <div class="step">04 — MİL VE PERVANELER</div>
+    <h2>İki kademeli mil, iki farklı akış</h2>
+    <p>Mil kaplinden ikiye ayrılır; böylece 5 metrelik ünite dar kapaklardan geçirilebilir. Üst pervane katmanları karıştırır, biraz daha büyük olan alt pervane tabandaki çökeltiyi kaldırır.</p>
+  </div>
+
+  <div class="chapter" data-in="0.72" data-out="1.01">
+    <div class="step">05 — GERİ MONTAJ</div>
+    <h2>Aynı sırayla, tersten birleşir</h2>
+    <p>Parçalar söküldükleri sıranın tersinde yerine oturur ve pervaneler dönmeye başlar. Montaj sırası: plaka → salmastra → tahrik → mil → pervaneler → motor.</p>
+  </div>
+</div>
+
+<div id="hint"><em></em>Kaydırın</div>
+<div id="progress"><div id="bar"></div></div>
+
+<script type="module" src="./explode-scene.js"></script>
+</body>
+</html>

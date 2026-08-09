@@ -1,0 +1,374 @@
+<!DOCTYPE html><html class="dark scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>IONA - The Journey of Energy</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-bright": "#3a3939",
+                "on-secondary-fixed": "#1a1c1c",
+                "surface-variant": "#353534",
+                "glow-green": "rgba(76, 175, 80, 0.15)",
+                "on-secondary": "#2f3131",
+                "on-primary-container": "#003c0b",
+                "on-secondary-fixed-variant": "#454747",
+                "primary-container": "#4caf50",
+                "inverse-on-surface": "#313030",
+                "surface-container-low": "#1c1b1b",
+                "secondary-container": "#454747",
+                "outline": "#899484",
+                "surface-container-highest": "#353534",
+                "surface-container": "#201f1f",
+                "secondary-fixed-dim": "#c6c6c7",
+                "surface-tint": "#78dc77",
+                "text-muted": "#888888",
+                "on-tertiary-container": "#690034",
+                "primary-fixed": "#94f990",
+                "error-container": "#93000a",
+                "surface-elevated": "#141414",
+                "on-surface-variant": "#becab9",
+                "tertiary-fixed-dim": "#ffb1c7",
+                "on-primary": "#00390a",
+                "primary": "#78dc77",
+                "secondary-fixed": "#e2e2e2",
+                "on-error": "#690005",
+                "error": "#ffb4ab",
+                "surface-container-high": "#2a2a2a",
+                "on-primary-fixed": "#002204",
+                "on-background": "#e5e2e1",
+                "outline-variant": "#3f4a3c",
+                "on-tertiary-fixed-variant": "#861948",
+                "secondary": "#c6c6c7",
+                "on-tertiary": "#650032",
+                "on-error-container": "#ffdad6",
+                "tertiary-fixed": "#ffd9e2",
+                "on-surface": "#e5e2e1",
+                "on-tertiary-fixed": "#3e001c",
+                "surface-container-lowest": "#0e0e0e",
+                "surface-dim": "#131313",
+                "background": "#131313",
+                "tertiary-container": "#f26f9d",
+                "tertiary": "#ffb1c7",
+                "surface": "#131313",
+                "on-primary-fixed-variant": "#005313",
+                "primary-fixed-dim": "#78dc77",
+                "inverse-surface": "#e5e2e1",
+                "inverse-primary": "#006e1c",
+                "on-secondary-container": "#b4b5b5"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "gutter": "32px",
+                "element-gap": "24px",
+                "section-gap": "160px",
+                "edge-margin": "80px",
+                "container-max": "1440px",
+                "safe-margin-desktop": "80px",
+                "stack-xl": "120px",
+                "safe-margin-mobile": "24px",
+                "stack-sm": "16px",
+                "section-padding": "10vh",
+                "stack-md": "40px"
+        },
+        "fontFamily": {
+                "label-caps": [
+                        "Arial"
+                ],
+                "headline-md": [
+                        "Arial"
+                ],
+                "headline-lg-mobile": [
+                        "Arial"
+                ],
+                "headline-lg": [
+                        "Arial"
+                ],
+                "body-md": [
+                        "Arial"
+                ],
+                "display-hero": [
+                        "Arial"
+                ],
+                "body-lg": [
+                        "Arial"
+                ],
+                "display-hero-mobile": [
+                        "Arial"
+                ]
+        },
+        "fontSize": {
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "100%",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-md": [
+                        "32px",
+                        {
+                                "lineHeight": "140%",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "40px",
+                        {
+                                "lineHeight": "120%",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "64px",
+                        {
+                                "lineHeight": "120%",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "160%",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-hero": [
+                        "120px",
+                        {
+                                "lineHeight": "110%",
+                                "letterSpacing": "-0.04em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg": [
+                        "20px",
+                        {
+                                "lineHeight": "160%",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-hero-mobile": [
+                        "56px", 
+                        { 
+                                "lineHeight": "110%", 
+                                "letterSpacing": "-0.02em", 
+                                "fontWeight": "800" 
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body { background-color: #0a0a0a; color: #e5e2e1; overflow-x: hidden; scroll-snap-type: y mandatory; }
+        .scene { height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .glass-blur { backdrop-filter: blur(60px); -webkit-backdrop-filter: blur(60px); background: rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar { display: none; }
+        
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 800ms ease-out, transform 800ms ease-out;
+        }
+        
+        .fade-in-element.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-on-surface font-body-md antialiased selection:bg-[#4caf50] selection:text-white">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-transparent backdrop-blur-3xl flex justify-between items-center px-safe-margin-desktop py-6 transition-all duration-500 hidden md:flex" id="top-nav">
+<a class="hover:opacity-100 transition-opacity duration-300 scale-95 transition-transform duration-500 mix-blend-difference" href="#">
+<img alt="IONA" class="h-8" src="https://lh3.googleusercontent.com/aida/AP1WRLsTtU4cxdkZrVxpFiUPu2UNShxJp8CNKgfDlmjKHGlr1CiSVZZj3JhQZsTGqw_wPqmeBQDWizA92fMZYJha2oo1zGMFrHj8DttcGnMfxPydjSel7a8siAwGv_74Ga-G4H2D0cezBS7yqugt_eVP3qTkfLYLHeZoJg2CJ6DE84xHJQGAhatjxEU171hmxoxe-AjCCW8GzauKI_9q7y5MdCjbntGVFY_rXmwRylF0LqB-dvfszKwMWLCmWJ30">
+</a>
+<div class="flex gap-8 items-center">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-[#4caf50] transition-colors duration-500" href="#">Technology</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-[#4caf50] transition-colors duration-500" href="#">Impact</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-[#4caf50] transition-colors duration-500" href="#">Vision</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-[#4caf50] transition-colors duration-500" href="#">Partners</a>
+</div>
+<button class="font-label-caps text-label-caps bg-[#4caf50] text-white px-8 py-4 rounded-none hover:bg-[#4caf50]/80 transition-colors duration-300 hover:shadow-[0_0_20px_rgba(76,175,80,0.4)] hover:brightness-110 transition-all">
+            Get a Quote
+        </button>
+</nav>
+<!-- SideNavBar -->
+<nav class="fixed right-8 top-1/2 -translate-y-1/2 z-50 bg-transparent flex flex-col gap-6 items-center mix-blend-difference hidden md:flex" id="side-nav">
+<div class="flex flex-col gap-2 items-center mb-4">
+<span class="text-[#4caf50] font-bold font-label-caps text-label-caps tracking-widest text-center">IONA<br><span class="text-[8px] text-white/50">Renewable Biogas</span></span>
+</div>
+<a aria-label="Home" class="rounded-full transition-all duration-300 bg-white/20 w-2 h-2" data-target="hero" href="#hero"></a>
+<a aria-label="Source" class="rounded-full hover:bg-[#4caf50] transition-all duration-300 bg-white/20 w-2 h-2" data-target="waste" href="#waste"></a>
+<a aria-label="Process" class="rounded-full hover:bg-[#4caf50] transition-all duration-300 bg-white/20 w-2 h-2" data-target="digestion" href="#digestion"></a>
+<a aria-label="Output" class="rounded-full hover:bg-[#4caf50] transition-all duration-300 bg-white/20 w-2 h-2" data-target="pipeline" href="#pipeline"></a>
+<a aria-label="Contact" class="rounded-full hover:bg-[#4caf50] transition-all duration-300 bg-[#4caf50] w-3 h-3 scale-125" data-target="power" href="#power"></a>
+</nav>
+<!-- Scene 1: Hero -->
+<section class="scene px-safe-margin-mobile md:px-safe-margin-desktop fade-in-section" id="hero">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter h-full items-center">
+<div class="md:col-span-12 flex flex-col items-center justify-center text-center z-10">
+<h1 class="font-display-hero-mobile md:font-display-hero text-display-hero-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element is-visible">The Journey of Energy</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-stack-xl fade-in-element delay-200 is-visible">Witness the transformation from pure waste to absolute power.</p>
+</div>
+<!-- Central space reserved for 3D -->
+<div class="absolute inset-0 pointer-events-none z-0">
+<!-- 3D Placeholder -->
+</div>
+</div>
+</section>
+<!-- Scene 2: Waste Reception -->
+<section class="scene px-safe-margin-mobile md:px-safe-margin-desktop bg-[#0a0a0a] fade-in-section" id="waste">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter h-full items-center">
+<div class="md:col-span-5 md:col-start-2 z-10">
+<span class="font-label-caps text-label-caps text-[#4caf50] tracking-widest block mb-4 fade-in-element is-visible">Phase 01 — Collection</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm fade-in-element is-visible">Nature's Waste, Arriving</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mb-stack-md fade-in-element delay-200 is-visible">The raw potential. Organic matter collected at scale, ready to begin the ultimate transformation process.</p>
+<a class="inline-flex items-center gap-2 border-b border-[#4caf50]/30 pb-1 hover:border-[#4caf50] hover:text-[#4caf50] transition-colors duration-300 font-label-caps text-label-caps fade-in-element delay-400 is-visible" href="#">
+                    Explore Sourcing <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="md:col-span-6 relative h-1/2 md:h-3/4 flex items-center justify-center fade-in-element delay-100 is-visible">
+<!-- 3D Space Right -->
+<div class="w-full h-full flex items-center justify-center opacity-20">
+<span class="font-label-caps text-label-caps">[3D Truck Model Space]</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Scene 3: Digestion Process -->
+<section class="scene px-safe-margin-mobile md:px-safe-margin-desktop bg-[#0a0a0a] fade-in-section" id="digestion">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter h-full items-center">
+<div class="md:col-span-6 order-2 md:order-1 relative h-1/2 md:h-3/4 flex items-center justify-center fade-in-element delay-100 is-visible">
+<!-- 3D Space Left -->
+<div class="w-full h-full flex items-center justify-center opacity-20">
+<span class="font-label-caps text-label-caps">[3D Mixer Model Space]</span>
+</div>
+</div>
+<div class="md:col-span-5 md:col-start-8 order-1 md:order-2 z-10 text-right md:text-left">
+<span class="font-label-caps text-label-caps text-[#4caf50] tracking-widest block mb-4 fade-in-element is-visible">Phase 02 — Conversion</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm fade-in-element is-visible">Biological Power Activated</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mb-stack-md ml-auto md:ml-0 fade-in-element delay-200 is-visible">Anaerobic digestion at an industrial scale. Microorganisms break down organic matter in an oxygen-free void, releasing high-yield biogas.</p>
+<a class="inline-flex items-center gap-2 border-b border-[#4caf50]/30 pb-1 hover:border-[#4caf50] hover:text-[#4caf50] transition-colors duration-300 font-label-caps text-label-caps fade-in-element delay-400 is-visible" href="#">
+                    View Process <span class="material-symbols-outlined text-[16px]">science</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Scene 4: Pipeline -->
+<section class="scene px-safe-margin-mobile md:px-safe-margin-desktop bg-[#0a0a0a] fade-in-section" id="pipeline">
+<div class="flex flex-col items-center justify-center h-full text-center z-10 relative">
+<span class="font-label-caps text-label-caps text-[#4caf50] tracking-widest block mb-4 fade-in-element is-visible">Phase 03 — Transmission</span>
+<h2 class="font-display-hero-mobile md:font-headline-lg text-display-hero-mobile md:text-headline-lg mb-stack-xl max-w-4xl mx-auto fade-in-element is-visible">The Flow of Power</h2>
+<div class="w-full max-w-5xl h-64 flex items-center justify-center relative overflow-hidden fade-in-element delay-200 is-visible">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#4caf50]/10 to-transparent animate-pulse"></div>
+<span class="font-label-caps text-label-caps text-[#4caf50]/40 z-10">[Cinematic Pipeline Visualization]</span>
+</div>
+</div>
+</section>
+<!-- Scene 5: Power Generation -->
+<section class="scene px-safe-margin-mobile md:px-safe-margin-desktop bg-[#0a0a0a] relative fade-in-section" id="power">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter h-full items-end pb-stack-xl relative z-10">
+<div class="md:col-span-12 text-center">
+<span class="font-label-caps text-label-caps text-[#4caf50] tracking-widest block mb-4 fade-in-element is-visible">Phase 04 — Realization</span>
+<h2 class="font-display-hero-mobile md:font-display-hero text-display-hero-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element is-visible">Sustainable Energy Born</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-stack-md fade-in-element delay-200 is-visible">The final synthesis. Pure, renewable electricity fed directly into the grid, closing the loop.</p>
+<button class="font-label-caps text-label-caps bg-transparent border border-[#4caf50] text-[#4caf50] px-10 py-4 hover:bg-[#4caf50] hover:text-white transition-all duration-300 fade-in-element delay-400 is-visible hover:shadow-[0_0_20px_rgba(76,175,80,0.4)] hover:brightness-110">
+                    Connect With Us
+                </button>
+</div>
+</div>
+<!-- Large Engine Model Space -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 mt-32 fade-in-element delay-200 is-visible">
+<div class="w-2/3 h-1/2 flex items-center justify-center opacity-10">
+<span class="font-label-caps text-label-caps">[Massive Engine 3D Space]</span>
+</div>
+</div>
+<!-- Footer Overlay -->
+<footer class="absolute bottom-0 w-full py-stack-md flex flex-col md:flex-row justify-between items-center px-safe-margin-desktop gap-stack-sm z-50 fade-in-element delay-300 is-visible">
+<p class="font-label-caps text-label-caps text-outline">© 2024 IONA SUSTAINABILITY. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-6">
+<a class="font-label-caps text-label-caps text-outline hover:text-[#4caf50] transition-colors duration-500 opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-label-caps text-label-caps text-outline hover:text-[#4caf50] transition-colors duration-500 opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="font-label-caps text-label-caps text-outline hover:text-[#4caf50] transition-colors duration-500 opacity-80 hover:opacity-100" href="#">Environmental Impact Report</a>
+</div>
+</footer>
+</section>
+<script>
+        // Simple Intersection Observer for SideNav active state
+        const sections = document.querySelectorAll('.scene');
+        const navDots = document.querySelectorAll('#side-nav a');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    
+                    navDots.forEach(dot => {
+                        dot.classList.remove('bg-[#4caf50]', 'w-3', 'h-3', 'scale-125');
+                        dot.classList.add('bg-white/20', 'w-2', 'h-2');
+                        
+                        if (dot.getAttribute('data-target') === id) {
+                            dot.classList.remove('bg-white/20', 'w-2', 'h-2');
+                            dot.classList.add('bg-[#4caf50]', 'w-3', 'h-3', 'scale-125');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Intersection Observer for scroll-triggered fade-in animations
+        const fadeSections = document.querySelectorAll('.fade-in-section');
+        const fadeObserverOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const elements = entry.target.querySelectorAll('.fade-in-element');
+                    elements.forEach(el => el.classList.add('is-visible'));
+                }
+            });
+        }, fadeObserverOptions);
+
+        fadeSections.forEach(section => {
+            fadeObserver.observe(section);
+        });
+    </script>
+
+
+</body></html>
