@@ -5,8 +5,7 @@
 <title>IONA - IonaFlux</title>
 <meta name="description" content="IonaFlux: Iona müşterilerine teslim edilen biyogaz tesisi dijital ikizi. Canlı SCADA verisi, arıza yönetimi, QR ile makine tanısı ve saha operasyonları tek panelde.">
 <link rel="icon" type="image/png" href="/favicon.png">
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="/tailwind-config.js"></script>
+<link rel="stylesheet" href="/src/styles/tailwind.css">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/base.css">
@@ -57,8 +56,8 @@
 <a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
 </div>
 <div class="flex items-center gap-6">
-<button class="theme-toggle" id="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
-<span class="theme-toggle-knob"><span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span></span>
+<button class="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
+<span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
 </button>
 <a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" href="/iletisim.html">
 <span data-i18n="nav.cta">Teklif Alın</span> <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
@@ -83,6 +82,12 @@
 <a class="mobile-nav-link" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
 <a class="mobile-nav-link is-current flex items-center gap-2" href="/ionaflux.html" aria-current="page"><span class="material-symbols-outlined text-[16px] text-[var(--brand)]">bolt</span><span class="text-[var(--brand)] font-bold" data-i18n="nav.ionaflux">IonaFlux</span></a>
 <a class="mobile-nav-link" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+<span class="font-body-md text-[15px] text-[var(--text)]" data-i18n="nav.theme_toggle">Karanlık modu değiştir</span>
+<button class="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
+<span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
+</button>
+</div>
 <a class="mobile-nav-cta" href="/iletisim.html" data-i18n="nav.cta">Teklif Alın</a>
 </div>
 

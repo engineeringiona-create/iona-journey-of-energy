@@ -4,8 +4,7 @@
 <script>(function(){try{var t=localStorage.getItem('iona-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
 <title>IONA - Teknoloji</title>
 <link rel="icon" type="image/png" href="/favicon.png">
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="/tailwind-config.js"></script>
+<link rel="stylesheet" href="/src/styles/tailwind.css">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/base.css">
@@ -57,8 +56,8 @@
 <a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
 </div>
 <div class="flex items-center gap-6">
-<button class="theme-toggle" id="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
-<span class="theme-toggle-knob"><span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span></span>
+<button class="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
+<span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
 </button>
 <a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" href="/iletisim.html">
 <span data-i18n="nav.cta">Teklif Alın</span> <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
@@ -83,6 +82,12 @@
 <a class="mobile-nav-link" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
 <a class="mobile-nav-link flex items-center gap-2" href="/ionaflux.html"><span class="material-symbols-outlined text-[16px] text-[var(--brand)]">bolt</span><span class="text-[var(--brand)] font-bold" data-i18n="nav.ionaflux">IonaFlux</span></a>
 <a class="mobile-nav-link" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+<span class="font-body-md text-[15px] text-[var(--text)]" data-i18n="nav.theme_toggle">Karanlık modu değiştir</span>
+<button class="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
+<span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
+</button>
+</div>
 <a class="mobile-nav-cta" href="/iletisim.html" data-i18n="nav.cta">Teklif Alın</a>
 </div>
 
@@ -147,46 +152,136 @@
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="services.solutions.eyebrow">Ürün &amp; Teknoloji Kataloğu</span>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="services.solutions.title">Çözümlerimiz</h2>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12 fade-in-element delay-200">
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 fade-in-element delay-200">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">propane_tank</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item1_title">Çürütücü Tasarımı</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item1_desc">Her besleme türü için özelleştirilmiş gelişmiş biyoenerji sistemleri.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item1_desc">Her tesisin besleme profiline özel olarak mühendislik edilen anaerobik çürütücü sistemleri tasarlıyoruz. %14'e varan kuru madde oranında dahi kararlı çalışan, sahaya özel geometri ve hassas ısıtma sistemleriyle organik ayrışmayı hızlandıran çözümler sunuyoruz.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item1_feat1">Optimum Doluluk Seviyesi: %70–80 kapasite aralığı</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item1_feat2">Hidrolik Bekletme Süresi (HRT): 20–30 gün</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item1_feat3">Organik Yükleme Oranı: 2–4 kg UKM/m³/gün</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item1_feat4">%14'e varan kuru madde oranında kararlı çalışma</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">autorenew</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item2_title">Karıştırma Teknolojisi</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item2_desc">Maksimum biyogaz verimi için tasarlanmış yüksek verimli karıştırma sistemleri.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item2_desc">20 yılı aşkın saha tecrübesiyle geliştirdiğimiz karıştırma sistemleri, her besleme tipine göre özelleştirilir. Biyogaz verimini, tesis güvenliğini ve enerji tasarrufunu aynı anda optimize eden mühendislik çözümleri sunuyoruz.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item2_feat1">Tam substrat homojenliği, sıfır ölü bölge</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item2_feat2">Yüzey kabuğu (scum) oluşumunun önlenmesi</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item2_feat3">Optimize karıştırıcı konumlandırma ile düşük enerji tüketimi</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item2_feat4">Maksimum günlük metan verimi</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">plumbing</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item3_title">Merkezi Pompa İstasyonu (CPS)</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item3_desc">Merkezi pompa istasyonları güvenli ve verimli tesis operasyonları sağlar.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item3_desc">Tesisin tüm pompa ve kontrol birimlerini tek bir merkezde topluyoruz. Bu yapı, boru hattı mesafelerini ve olası kaçak noktalarını azaltırken, üretimi durdurmadan bakım yapılabilen yedekli bir işletme modeli sağlıyor.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item3_feat1">Tüm pompa ve kontrol üniteleri tek lokasyonda</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item3_feat2">Yedekli (redundant) çalışma — kesintisiz üretim</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item3_feat3">Kısaltılmış boru hatları, azaltılmış kaçak riski</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item3_feat4">Hızlı müdahale, düşük servis maliyeti</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">water_drop</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item4_title">Enerji Tasarruflu Taşma Sistemi (OFT)</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item4_desc">Yerçekimiyle çalışan taşma sistemleri operasyonel enerji maliyetlerini büyük ölçüde azaltır.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item4_desc">Çürütücüler ile digestat çukurları arasında yerçekimi prensibiyle çalışan, dışarıdan enerji gerektirmeyen yenilikçi bir taşma sistemi geliştirdik. "Birleşik Kap" prensibiyle çalışan sistem, geleneksel pompalama yöntemlerine sürdürülebilir bir alternatif sunar.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item4_feat1">Pompalama enerjisinde %66'ya varan tasarruf</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item4_feat2">Az hareketli parça, düşük mekanik stres</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item4_feat3">Kesintisiz ve akıcı malzeme transferi</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item4_feat4">Minimum bakım ihtiyacı, uzun sistem ömrü</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">layers</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item5_title">Sedimantasyon Tuzağı</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item5_desc">Sedimantasyon tuzakları kapasiteyi korumak için birikintileri sürekli olarak uzaklaştırır.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item5_desc">Çürütücü içindeki inorganik madde ve tortu birikimini sürekli olarak yöneterek tesisin uzun vadeli performansını koruyoruz. Sistem, aktif hacim kaybını önler ve iç temizlik müdahalesi gerektirmeden optimum çalışmayı sürdürür.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item5_feat1">İnorganik madde birikiminin önlenmesi, tam kapasite koruma</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item5_feat2">İç temizlik nedeniyle duruşların ortadan kaldırılması</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item5_feat3">Otomatik tortu izolasyonu ile ekipman hasarının önlenmesi</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item5_feat4">Tesis ömrü boyunca maksimum süreklilik</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">ac_unit</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item6_title">Donmaya ve Tıkanmaya Karşı Koruma</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item6_desc">Otomatik sistemler boru hattı donmasını ve maliyetli tıkanmaları önler.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item6_desc">Boru hatlarında olası tıkanmaları anlık olarak tespit edip otomatik temizleyen, aynı zamanda düşük sıcaklıklarda donmaya karşı ısıl koruma sağlayan entegre bir sistem sunuyoruz. Zorlu iklim koşullarında bile kesintisiz işletme garantisi veriyoruz.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item6_feat1">Anlık sensörle tıkanma tespiti, otomatik hava/su temizleme</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item6_feat2">Sedimantasyon Tuzağı ve Taşma (OFT) hatlarında özel koruma</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item6_feat3">Dış sıcaklığa duyarlı otomatik donma önleme</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item6_feat4">Sıfır altı iklimlerde kesintisiz işletme</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">conveyor_belt</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item7_title">Doğrudan Katı Besleme</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item7_desc">Doğrudan besleme ve yüksek katı madde toleransı verimliliği en üst düzeye çıkarır.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item7_desc">Biyokütle malzemelerin ön işlem gerektirmeden doğrudan çürütücüye beslenmesini sağlıyoruz. Bu sistem, ön karıştırma ve ek pompalama ihtiyacını ortadan kaldırarak hem enerji tasarrufu hem de operasyonel kolaylık sunar.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item7_feat1">%14'e varan kuru madde toleransı</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item7_feat2">Taş, ahşap ve ağır yabancı madde ayrıştırma</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item7_feat3">Akıllı otomasyonla dozaj ve besleme zamanlaması</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item7_feat4">Aşınmaya dayanıklı ağır hizmet tipi besleme ekipmanı</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">device_thermostat</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item8_title">Isı Dağıtım Ünitesi (HDU)</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item8_desc">Akıllı ısı dağıtım üniteleri termal enerji kullanımını optimize eder.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item8_desc">Tesisteki tüm ısı kaynaklarını tek bir merkezde toplayıp, gereken ısıyı gereken yere hassas şekilde dağıtan akıllı termal yönetim sistemi. SCADA ile tam entegre çalışarak yıl boyu kararlı çürütücü sıcaklığı sağlar.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item8_feat1">Hassas termal hesaplama, ihtiyaç kadar ısı dağıtımı</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item8_feat2">Tam SCADA entegrasyonu, uzaktan izleme</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item8_feat3">Kompakt tasarım, otomatik ısı dengeleme</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item8_feat4">İç ve dış ısı kaynaklarının tek merkezde birleşimi</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">shield</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item9_title">Gaz Vanası Odası (GVC)</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item9_desc">Yeraltı gaz vanası odaları güvenli, yüksek kaliteli arıtma sağlar.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item9_desc">Çürütücüden çıkan biyogazı soğutarak proses güvenliğini artıran, yeraltına yerleştirilmiş bir sistemdir. Genleşme odasında mekanik nem giderme ve filtrasyon uygulayarak, dışarıdan enerji harcamadan gaz kalitesini yükseltir.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item9_feat1">Enerji harcamadan çalışan nem giderme ve filtrasyon</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item9_feat2">Çift membranlı gaz tutucular ve gelişmiş emniyet vanaları</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item9_feat3">Aşırı basınç ve vakuma karşı yapısal koruma</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item9_feat4">Rüzgar ve kar yüküne dayanıklı, uzun ömürlü malzeme</span></li>
+</ul>
 </div>
-<div class="spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-6 transition-transform duration-300 hover:-translate-y-0.5">
+<div class="spotlight-card card-edge-accent flex flex-col items-start border border-[var(--border)] rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1">
+<div class="w-14 h-14 rounded-2xl bg-[var(--brand)]/10 border border-[var(--brand)]/20 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[28px] text-[var(--brand)]" aria-hidden="true">filter_alt</span>
+</div>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.solutions.item10_title">Biyogaz Ön Arıtma</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.solutions.item10_desc">Özelleştirilmiş arıtma çözümleri gaz kalitesini ve sürdürülebilirliği optimize eder.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.solutions.item10_desc">Ham biyogazı çok aşamalı arıtma süreciyle yüksek kaliteli biyometana dönüştürüyoruz. Nem giderme, H₂S ve CO₂ arıtımı içeren süreç, her tesisin besleme ve çıktı ihtiyacına göre özelleştiriliyor.</p>
+<ul class="flex flex-col gap-2 w-full">
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item10_feat1">Gelişmiş nem giderme (soğutma / genleşme sistemi)</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item10_feat2">H₂S ve CO₂ arıtımı ile ekipman korozyonunun önlenmesi</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item10_feat3">Gaz Vanası Odası (GVC) entegrasyonu</span></li>
+<li class="flex items-start gap-2.5 text-sm leading-snug text-[var(--text-muted)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand)]" aria-hidden="true"></span><span data-i18n="services.solutions.item10_feat4">Sahaya özel arıtma ünitesi tasarımı</span></li>
+</ul>
 </div>
 </div>
 </div>

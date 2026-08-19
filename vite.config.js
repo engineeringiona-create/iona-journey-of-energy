@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  base: '/',
   plugins: [react()],
   server: {
     port: 5173,
@@ -22,7 +23,8 @@ export default defineConfig({
         teknoloji: resolve(__dirname, 'teknoloji.html'),
         etki: resolve(__dirname, 'etki.html'),
         iletisim: resolve(__dirname, 'iletisim.html'),
-        ionaflux: resolve(__dirname, 'ionaflux.html')
+        ionaflux: resolve(__dirname, 'ionaflux.html'),
+        admin: resolve(__dirname, 'admin.html')
       }
     }
   }

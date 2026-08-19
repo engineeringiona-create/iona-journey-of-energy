@@ -25,6 +25,28 @@ const ASSEMBLE_DURATION = 1.7;
 const SHAKE_POS_AMP = 0.012;
 const SHAKE_ROT_AMP = 0.006;
 
+/* Largest of the three buildRig() targetRadius values below (agitator
+   5.6, genset 6.8, pump 6.2) — genset is the biggest. The camera is one
+   shared object for all three machines, so its mobile distance has to
+   clear whichever one is currently on screen; sizing off the largest
+   keeps all three safely inside frame instead of tuning per-machine. */
+const MOBILE_FIT_RADIUS = 6.8;
+const MOBILE_FIT_MARGIN = 1.15;
+
+/* The old mobile camera (fixed z=22, fov=40) never accounted for the
+   phone's actual aspect ratio — on a typical portrait screen (aspect
+   ~0.46) that distance only leaves enough half-frustum width to fit
+   about half of MOBILE_FIT_RADIUS, so the genset's sides were cropped
+   off-screen on real phones. This fits distance to whichever of
+   height/width is the tighter constraint at the live aspect, same
+   approach as GltfTwinScene.jsx's frameBox for the homepage hero. */
+function mobileCameraDistance(fovDeg, aspect) {
+  const fov = fovDeg * (Math.PI / 180);
+  const distanceForHeight = MOBILE_FIT_RADIUS / Math.tan(fov / 2);
+  const distanceForWidth = MOBILE_FIT_RADIUS / (Math.tan(fov / 2) * aspect);
+  return Math.max(distanceForHeight, distanceForWidth) * MOBILE_FIT_MARGIN;
+}
+
 function armMachine(mode) {
   mode.parts.forEach((part) => {
     const o = part.object;
@@ -43,8 +65,9 @@ function playAssemble(mode, canvas, updateStacking) {
   updateStacking();
 
   const tl = gsap.timeline({
-    onComplete: () => { mode.assembled = true; mode.playing = false; updateStacking(); }
+    onComplete: () => { mode.assembled = true; mode.playing = false; mode.assembleTl = null; updateStacking(); }
   });
+  mode.assembleTl = tl;
 
   tl.to(mode.materials, { opacity: 1, duration: 1.0, ease: 'power1.out' }, 0);
   tl.to(mode.outer.position, { x: mode.base.x, y: mode.base.y, z: 0, duration: ASSEMBLE_DURATION, ease: 'power3.out' }, 0.1);
@@ -69,6 +92,25 @@ function playAssemble(mode, canvas, updateStacking) {
   }, 0.15);
 }
 
+/* Instantly (no tween) snaps a machine to its fully-assembled resting
+   pose — parts home, opacity 1, outer at base/scale 1. Used only when
+   leaveSection interrupts a still-mid-cinematic machine (see below): we
+   want the *retreat* tween to start from a clean assembled state, not
+   from wherever the assemble cinematic happened to be paused, which
+   would either jump-cut mid-flight parts or tween an incomplete pose
+   into the retreat and look broken either way. */
+function snapAssembled(mode) {
+  mode.parts.forEach((part) => {
+    const o = part.object;
+    if (o.userData.home) o.position.copy(o.userData.home);
+  });
+  mode.materials.forEach((m) => { m.opacity = 1; });
+  mode.outer.position.set(mode.base.x, mode.base.y, 0);
+  mode.outer.scale.setScalar(1);
+  mode.spin.rotation.y = mode.baseRotationY;
+  if (mode.heatMaterials) mode.heatMaterials.forEach((m) => { m.emissiveIntensity = 0.85; });
+}
+
 /* Hand-off between machines is a retreat/return in scale + position, not
    an opacity dissolve — the leaving machine shrinks and drops away below
    frame instead of fading in place. mode.base is the same Vector2 the
@@ -86,6 +128,26 @@ function enterSection(mode) {
 }
 
 function leaveSection(mode, updateStacking) {
+  /* A machine that's still mid-first-time-assembly (playing:true,
+     assembled:false) used to make this whole function a no-op — the
+     old `if (!mode.assembled) return;` guard fired, so scrolling away
+     fast during the ~1.7s assemble cinematic couldn't interrupt it: the
+     GSAP timeline kept running untouched in the background and the
+     machine would pop up fully grown wherever it happened to finish,
+     often while a different machine had since assembled in nearly the
+     same spot — the reported "models interpenetrate, have to wait for
+     it to fully settle" bug. Now an in-progress assemble gets killed
+     and the machine snapped straight to its assembled pose (see
+     snapAssembled) before the normal retreat tween runs, so a leave
+     signal always immediately starts pulling the machine away, in
+     every state. */
+  if (mode.playing) {
+    mode.assembleTl?.kill();
+    mode.assembleTl = null;
+    mode.playing = false;
+    mode.assembled = true;
+    snapAssembled(mode);
+  }
   if (!mode.assembled) return;
   mode.retreating = true;
   gsap.to(mode.outer.scale, {
@@ -187,10 +249,15 @@ export function initExpoScene(canvas) {
      sitting there fully assembled, dragging it above the text too. So
      entering any machine explicitly retreats every other still-forward
      machine first, instead of relying on that machine's own onLeave to
-     have already fired. */
+     have already fired.
+     Also checks `m.playing`, not just `m.assembled` — a machine mid its
+     one-time assemble cinematic used to be skipped here entirely (this
+     condition was the other half of the fast-scroll overlap bug: even
+     though leaveSection can now interrupt a playing machine, this loop
+     never called it for one, since `m.assembled` was still false). */
   function retreatOthers(except) {
     [agMode, gsMode, pmMode].forEach((m) => {
-      if (m !== except && m.assembled && !m.retreating) leaveSection(m, updateCanvasStacking);
+      if (m !== except && (m.assembled || m.playing) && !m.retreating) leaveSection(m, updateCanvasStacking);
     });
   }
 
@@ -203,7 +270,7 @@ export function initExpoScene(canvas) {
     gsMode.homeX = gsBase.x; gsMode.homeY = gsBase.y;
     pmMode.homeX = pmBase.x; pmMode.homeY = pmBase.y;
     camera.fov = mobile ? 40 : 32;
-    camera.position.z = mobile ? 22 : 16;
+    camera.position.z = mobile ? mobileCameraDistance(camera.fov, window.innerWidth / window.innerHeight) : 16;
     camera.updateProjectionMatrix();
     if (!agMode.assembled && !agMode.playing) armMachine(agMode);
     if (!gsMode.assembled && !gsMode.playing) armMachine(gsMode);

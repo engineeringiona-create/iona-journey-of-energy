@@ -19,28 +19,40 @@ export function initFadeIn() {
 
 /* Light/dark toggle. The initial .dark class is already applied by an
    inline head script (before first paint, using localStorage or the OS
-   preference) — this just wires the switch in the nav to flip it,
+   preference) — this just wires the switch(es) in the nav to flip it,
    persist the choice, and broadcast a 'themechange' event on
-   `document` so any page running a Three.js scene can re-light it. */
-export function initThemeToggle() {
-  const toggle = document.getElementById('theme-toggle');
-  if (!toggle) return;
+   `document` so any page running a Three.js scene can re-light it.
 
-  const icon = document.getElementById('theme-toggle-icon');
+   Was a single #theme-toggle/#theme-toggle-icon ID pair — the desktop
+   nav's own switch. The mobile nav had no toggle at all (client
+   reported "no dark/light mode option" — true on mobile specifically,
+   since the only switch lived in the desktop-only nav bar, hidden
+   below the md breakpoint). Now queries every .theme-toggle button on
+   the page (desktop nav's + the new one in #mobile-nav-panel) so both
+   flip together and stay in sync, whichever one gets tapped. */
+export function initThemeToggle() {
+  const toggles = document.querySelectorAll('.theme-toggle');
+  if (!toggles.length) return;
+
   const root = document.documentElement;
 
   const sync = () => {
     const dark = root.classList.contains('dark');
-    toggle.setAttribute('aria-checked', String(dark));
-    if (icon) icon.textContent = dark ? 'dark_mode' : 'light_mode';
+    toggles.forEach((toggle) => {
+      toggle.setAttribute('aria-checked', String(dark));
+      const icon = toggle.querySelector('.theme-toggle-icon');
+      if (icon) icon.textContent = dark ? 'dark_mode' : 'light_mode';
+    });
   };
   sync();
 
-  toggle.addEventListener('click', () => {
-    const dark = root.classList.toggle('dark');
-    try { localStorage.setItem('iona-theme', dark ? 'dark' : 'light'); } catch (e) { /* private mode etc. */ }
-    sync();
-    document.dispatchEvent(new CustomEvent('themechange', { detail: { dark } }));
+  toggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const dark = root.classList.toggle('dark');
+      try { localStorage.setItem('iona-theme', dark ? 'dark' : 'light'); } catch (e) { /* private mode etc. */ }
+      sync();
+      document.dispatchEvent(new CustomEvent('themechange', { detail: { dark } }));
+    });
   });
 }
 

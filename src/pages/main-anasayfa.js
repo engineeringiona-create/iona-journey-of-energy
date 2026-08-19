@@ -36,87 +36,73 @@ function runPreloader() {
 }
 runPreloader();
 
-/* ---------------- Hero slider ----------------
-   Slide copy comes from the active i18n dictionary (home.hero.slideN_*)
-   instead of a hardcoded array, so it re-renders in the new language
-   when the visitor switches. */
-function initHeroSlider() {
-  const slides = document.querySelectorAll('.hero-slide');
-  const headline = document.getElementById('hero-headline');
-  const subhead = document.getElementById('hero-subhead');
-  const indicatorCurrent = document.getElementById('hero-indicator-current');
-  const prevBtn = document.getElementById('hero-prev');
-  const nextBtn = document.getElementById('hero-next');
-  if (!slides.length || !headline) return;
+/* ---------------- Hero: 3D twin drill-down + mobile activation ----------------
+   The hero canvas + click/zoom logic live in React (GltfTwinScene.jsx);
+   the title/badge overlay is plain markup here. Two independent things
+   both want to control #hero-copy's opacity, so they're combined into
+   one function instead of two separate listeners fighting the same
+   inline style:
+   1. GltfTwinScene dispatches 'twinlevelchange' whenever its internal
+      currentLevel state changes (0 overview / >0 focused) — the copy
+      should be out of the way whenever a structure is focused.
+   2. On mobile, #mobile-3d-cta "activates" the twin (see below) — the
+      copy should also be out of the way for as long as that's active,
+      independent of currentLevel.
+   syncHeroCopy() applies both conditions together so neither one can
+   silently undo the other (e.g. drilling into a structure while
+   mobile-activated, then backing out, must NOT bring the copy back
+   since mobile activation is still on).
 
-  function buildContent(dict) {
-    return [1, 2, 3].map((n) => ({
-      headline: dict[`home.hero.slide${n}_title`] || '',
-      subhead: dict[`home.hero.slide${n}_sub`] || ''
-    }));
+   Mobile 3D activation: #iona-digital-twin-root is visible everywhere
+   now (faded/non-interactive by default on mobile — see the `@media
+   (max-width: 767px)` rule in base.css), not gated behind a separate
+   full-screen modal. #mobile-3d-cta brings it to full opacity +
+   pointer-events and reveals #mobile-3d-close; 'mobiletwinactivate' is
+   dispatched for GltfTwinScene's own small zoom-in cue on activation
+   (see Rig in GltfTwinScene.jsx). No manual mount call needed here —
+   the container's already laid out/in-viewport on mobile now, so
+   mount.jsx's own IntersectionObserver mounts it the same way it does
+   on desktop. */
+function initHeroTwin() {
+  const hero = document.getElementById('hero');
+  const copy = document.getElementById('hero-copy');
+  const cta = document.getElementById('mobile-3d-cta');
+  const closeBtn = document.getElementById('mobile-3d-close');
+  if (!hero || !copy) return;
+
+  let twinLevel = 0;
+  let mobileActive = false;
+
+  function syncHeroCopy() {
+    copy.style.opacity = twinLevel === 0 && !mobileActive ? '1' : '0';
   }
 
-  let content = buildContent(window.__ionaDict || {});
-  let current = 0;
-  let timer = null;
-  let animating = false;
-
-  function renderText(index, animate = true) {
-    if (!animate) {
-      headline.textContent = content[index].headline;
-      subhead.textContent = content[index].subhead;
-      return;
-    }
-    const tl = gsap.timeline();
-    tl.to([headline, subhead], {
-      y: -24, opacity: 0, duration: 0.4, ease: 'power2.in', stagger: 0.05
-    });
-    tl.call(() => {
-      headline.textContent = content[index].headline;
-      subhead.textContent = content[index].subhead;
-    });
-    tl.fromTo([headline, subhead], {
-      y: 24, opacity: 0
-    }, {
-      y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', stagger: 0.08,
-      onComplete: () => { animating = false; }
-    });
-  }
-
-  function goTo(index) {
-    if (animating || index === current) return;
-    animating = true;
-    const nextIndex = (index + slides.length) % slides.length;
-    const outgoing = slides[current];
-    const incoming = slides[nextIndex];
-
-    gsap.to(outgoing, { opacity: 0, duration: 0.9, ease: 'power2.inOut' });
-    gsap.to(incoming, { opacity: 1, duration: 0.9, ease: 'power2.inOut' });
-    renderText(nextIndex);
-
-    indicatorCurrent.textContent = String(nextIndex + 1).padStart(2, '0');
-    current = nextIndex;
-  }
-
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
-
-  function startAutoplay() {
-    clearInterval(timer);
-    timer = setInterval(next, 6000);
-  }
-
-  nextBtn?.addEventListener('click', () => { next(); startAutoplay(); });
-  prevBtn?.addEventListener('click', () => { prev(); startAutoplay(); });
-
-  document.addEventListener('i18nchange', (e) => {
-    content = buildContent(e.detail.dict);
-    renderText(current, false);
+  document.addEventListener('twinlevelchange', (e) => {
+    twinLevel = e.detail.level;
+    syncHeroCopy();
   });
 
-  startAutoplay();
+  if (cta && closeBtn) {
+    cta.addEventListener('click', () => {
+      mobileActive = true;
+      hero.classList.add('twin-active');
+      syncHeroCopy();
+      document.dispatchEvent(new CustomEvent('mobiletwinactivate'));
+    });
+    closeBtn.addEventListener('click', () => {
+      mobileActive = false;
+      hero.classList.remove('twin-active');
+      syncHeroCopy();
+    });
+    window.matchMedia('(min-width: 768px)').addEventListener('change', (e) => {
+      if (!e.matches || !mobileActive) return;
+      mobileActive = false;
+      hero.classList.remove('twin-active');
+      syncHeroCopy();
+    });
+  }
 }
-initHeroSlider();
+initHeroTwin();
 
 /* ---------------- Services: stagger fade-in on scroll ---------------- */
 function initServiceCards() {
