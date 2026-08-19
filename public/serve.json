@@ -1,6 +1,12 @@
 {
   "cleanUrls": false,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/teknoloji", "destination": "/teknoloji.html" },
+    { "source": "/hakkimizda", "destination": "/hakkimizda.html" },
+    { "source": "/etki", "destination": "/etki.html" },
+    { "source": "/iletisim", "destination": "/iletisim.html" },
+    { "source": "/ionaflux", "destination": "/ionaflux.html" },
+    { "source": "/admin", "destination": "/admin.html" }
   ]
 }
