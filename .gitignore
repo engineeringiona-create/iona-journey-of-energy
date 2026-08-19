@@ -4,3 +4,5 @@ dist/
 .claude/
 .backups/
 _font-backup-arial-test/
+.env
+.env.local

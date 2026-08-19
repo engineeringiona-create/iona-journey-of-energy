@@ -4,6 +4,9 @@
    attribute; switching language re-fetches that language's JSON
    dictionary and rewrites every tagged node in place. */
 
+import { getSupabase } from './lib/supabaseClient.js';
+import { readLocalContent } from './lib/localContent.js';
+
 export const LANGS = [
   { code: 'tr', label: 'Türkçe' },
   { code: 'en', label: 'English' },
@@ -16,6 +19,34 @@ export const LANGS = [
 
 const dictCache = {};
 
+/* DB-sourced overrides are untrusted (the admin editor's write path has
+   no real auth behind it yet — see src/components/Admin/auth.js), but
+   applyDict() renders dict values via innerHTML because two hardcoded
+   keys intentionally carry <br> tags. Escaping here keeps that innerHTML
+   behavior for the trusted hardcoded JSON while stopping a DB row from
+   ever injecting live HTML/script into the page. */
+function escapeHtml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function fetchContentOverrides(lang) {
+  const supabase = getSupabase();
+  if (!supabase) {
+    const local = readLocalContent(lang);
+    if (!local) return null;
+    return Object.fromEntries(Object.entries(local).map(([key, value]) => [key, escapeHtml(value)]));
+  }
+  try {
+    const { data, error } = await supabase.from('site_content').select('*').eq('id', 'home').maybeSingle();
+    if (error || !data || !data.content || !data.content[lang]) return null;
+    return Object.fromEntries(
+      Object.entries(data.content[lang]).map(([key, value]) => [key, escapeHtml(value)])
+    );
+  } catch (e) {
+    return null;
+  }
+}
+
 function loadDict(lang) {
   if (dictCache[lang]) return dictCache[lang];
   const loaders = {
@@ -27,7 +58,12 @@ function loadDict(lang) {
     ru: () => import('./i18n/ru.json'),
     hi: () => import('./i18n/hi.json')
   };
-  const p = (loaders[lang] || loaders.tr)().then((m) => m.default || m);
+  const p = (loaders[lang] || loaders.tr)()
+    .then((m) => m.default || m)
+    .then(async (base) => {
+      const overrides = await fetchContentOverrides(lang);
+      return overrides ? { ...base, ...overrides } : base;
+    });
   dictCache[lang] = p;
   return p;
 }
