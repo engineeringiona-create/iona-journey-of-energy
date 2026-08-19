@@ -6,6 +6,7 @@
 
 import { getSupabase } from './lib/supabaseClient.js';
 import { readLocalContent } from './lib/localContent.js';
+import { pageIdForPath } from './lib/pages.js';
 
 export const LANGS = [
   { code: 'tr', label: 'Türkçe' },
@@ -30,14 +31,16 @@ function escapeHtml(str) {
 }
 
 async function fetchContentOverrides(lang) {
+  const pageId = pageIdForPath(window.location.pathname);
   const supabase = getSupabase();
   if (!supabase) {
     const local = readLocalContent(lang);
     if (!local) return null;
     return Object.fromEntries(Object.entries(local).map(([key, value]) => [key, escapeHtml(value)]));
   }
+  if (!pageId) return null;
   try {
-    const { data, error } = await supabase.from('site_content').select('*').eq('id', 'home').maybeSingle();
+    const { data, error } = await supabase.from('site_content').select('*').eq('id', pageId).maybeSingle();
     if (error || !data || !data.content || !data.content[lang]) return null;
     return Object.fromEntries(
       Object.entries(data.content[lang]).map(([key, value]) => [key, escapeHtml(value)])

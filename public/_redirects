@@ -1,1 +1,6 @@
-/*  /index.html  200
+# This is a multi-page static site (each nav link is a real built
+# HTML file — see rollupOptions.input in vite.config.js), not a
+# single-page app. No catch-all rewrite here on purpose: a blanket
+# "/* /index.html 200" rule used to make every nav link resolve back
+# to the homepage on Railway, since the static host applied it before
+# checking whether the requested file already existed.

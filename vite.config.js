@@ -18,7 +18,7 @@ export default defineConfig({
     assetsDir: 'assets',
     rollupOptions: {
       input: {
-        anasayfa: resolve(__dirname, 'index.html'),
+        main: resolve(__dirname, 'index.html'),
         hakkimizda: resolve(__dirname, 'hakkimizda.html'),
         teknoloji: resolve(__dirname, 'teknoloji.html'),
         etki: resolve(__dirname, 'etki.html'),
