@@ -2,11 +2,13 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
+import { initQuoteModal } from '../lib/quoteModal.js';
 import { initExpoScene } from '../three/expo-scene.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
 initLangSwitcher();
+initQuoteModal();
 initFadeIn();
 initThemeToggle();
 initSiteSearch();

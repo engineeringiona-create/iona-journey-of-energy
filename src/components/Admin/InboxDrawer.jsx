@@ -65,16 +65,21 @@ export default function InboxDrawer({ onClose, onToast }) {
           {supabase && !loading && rows.length === 0 && (
             <p className="p-5 text-[13px] text-white/50">Henüz mesaj yok.</p>
           )}
-          {rows.map((row) => (
+          {rows.map((row) => {
+            const isQuote = row.page_source === 'teklif_talebi';
+            return (
             <div key={row.id} className={`p-4 border-b border-white/5 ${row.is_read ? 'opacity-60' : ''}`}>
-              <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
                 <span className="text-[13px] font-bold text-white flex items-center gap-2">
                   {!row.is_read && <span className="h-2 w-2 rounded-full bg-sky-400 shrink-0" />}
                   {row.name}
                 </span>
                 <span className="text-[11px] text-white/40 shrink-0">{new Date(row.created_at).toLocaleString('tr-TR')}</span>
               </div>
-              <p className="text-[12px] text-white/50 mb-1">{row.email} — {row.subject || 'Teklif Talebi'}</p>
+              <span className={`inline-block text-[10px] font-bold tracking-[0.04em] px-2 py-0.5 rounded-full mb-1.5 ${isQuote ? 'bg-orange-500/15 text-orange-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
+                {isQuote ? 'Teklif Talebi' : 'İletişim Mesajı'}
+              </span>
+              <p className="text-[12px] text-white/50 mb-1">{row.email}{row.phone ? ` · ${row.phone}` : ''}{row.subject ? ` — ${row.subject}` : ''}</p>
               <p className="text-[13px] text-white/80 whitespace-pre-wrap mb-3">{row.message}</p>
               <div className="flex gap-3">
                 {!row.is_read && (
@@ -87,7 +92,8 @@ export default function InboxDrawer({ onClose, onToast }) {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

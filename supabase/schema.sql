@@ -114,3 +114,20 @@ create policy "public insert page_views" on page_views
 
 create policy "public read page_views" on page_views
   for select using (true);
+
+-- Phase 36: the "Teklif Alın" quote-request modal writes into the same
+-- contact_submissions table as the iletisim.html contact form (Phase
+-- 33), distinguished by page_source, so the admin Inbox can badge them
+-- separately. Both columns are additive/idempotent — safe to re-run
+-- this whole file against an existing database.
+alter table contact_submissions add column if not exists phone text;
+alter table contact_submissions add column if not exists page_source text not null default 'iletisim';
+
+-- Phase 37: star/note metadata on revision snapshots, editable from the
+-- admin "Geçmiş" modal. Needed an update policy on this table for the
+-- first time — it previously only had insert + select.
+alter table site_content_revisions add column if not exists is_starred boolean not null default false;
+alter table site_content_revisions add column if not exists note text;
+
+create policy "public update site_content_revisions" on site_content_revisions
+  for update using (true) with check (true);
