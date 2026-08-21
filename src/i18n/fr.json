@@ -241,6 +241,7 @@
   "contact.form.name_placeholder": "Nom et prénom",
   "contact.form.email_placeholder": "Votre adresse e-mail",
   "contact.form.subject_placeholder": "Sujet",
+  "contact.form.phone_placeholder": "Votre Numéro de Téléphone",
   "contact.form.message_placeholder": "Décrivez brièvement votre projet",
   "contact.form.submit": "Envoyer le message",
 

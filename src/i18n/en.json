@@ -252,6 +252,7 @@
   "contact.form.name_placeholder": "Full Name",
   "contact.form.email_placeholder": "Email Address",
   "contact.form.subject_placeholder": "Subject",
+  "contact.form.phone_placeholder": "Your Phone Number",
   "contact.form.message_placeholder": "Briefly describe your project",
   "contact.form.submit": "Send Message",
 

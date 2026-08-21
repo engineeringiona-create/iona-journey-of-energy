@@ -293,6 +293,7 @@
   "contact.form.name_placeholder": "Adınız Soyadınız",
   "contact.form.email_placeholder": "E-posta Adresiniz",
   "contact.form.subject_placeholder": "Konu",
+  "contact.form.phone_placeholder": "Telefon Numaranız",
   "contact.form.message_placeholder": "Projeniz hakkında kısaca bilgi verin",
   "contact.form.submit": "Mesajı Gönder",
 

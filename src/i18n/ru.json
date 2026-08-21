@@ -241,6 +241,7 @@
   "contact.form.name_placeholder": "Ваше имя и фамилия",
   "contact.form.email_placeholder": "Ваш адрес эл. почты",
   "contact.form.subject_placeholder": "Тема",
+  "contact.form.phone_placeholder": "Ваш Номер Телефона",
   "contact.form.message_placeholder": "Кратко опишите ваш проект",
   "contact.form.submit": "Отправить сообщение",
 

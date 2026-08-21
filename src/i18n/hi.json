@@ -241,6 +241,7 @@
   "contact.form.name_placeholder": "आपका पूरा नाम",
   "contact.form.email_placeholder": "आपका ई-मेल पता",
   "contact.form.subject_placeholder": "विषय",
+  "contact.form.phone_placeholder": "आपका फ़ोन नंबर",
   "contact.form.message_placeholder": "अपनी परियोजना के बारे में संक्षेप में जानकारी दें",
   "contact.form.submit": "संदेश भेजें",
 
