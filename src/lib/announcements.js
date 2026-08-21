@@ -1,4 +1,3 @@
-const SESSION_KEY = 'iona-announcements-popup-seen';
 const OVERLAY_ID = 'iona-announcements-popup';
 const STYLE_ID = 'iona-announcements-popup-style';
 
@@ -59,23 +58,28 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-/* Homepage-only, once per browser session — sessionStorage, not
-   localStorage, so a returning visitor days later still sees it again,
-   just not on every page load within one visit. Shows every
-   announcement flagged showInPopup as a single-card-at-a-time carousel
-   (content swap + fade, not a real sliding track). */
+/* Homepage-only: shows every announcement flagged showInPopup as a
+   single-card-at-a-time carousel. Fires on every homepage load (Phase
+   40 — the earlier once-per-session sessionStorage gate made the popup
+   look "broken" during review since a tab that had already shown/closed
+   it wouldn't show it again on reload) — just delegates straight into
+   the shared opener also used by duyurular.html's card click-through. */
 export function applyAnnouncementPopup(list, pageId) {
   if (pageId !== 'home' || !Array.isArray(list)) return;
   const cards = list.filter((a) => a.showInPopup && a.title);
-  if (cards.length === 0) return;
-  try {
-    if (sessionStorage.getItem(SESSION_KEY) === 'true') return;
-  } catch (e) {
-    /* private mode etc — fall through and show it anyway */
-  }
+  openAnnouncementModal(cards, 0);
+}
+
+/* Shared wide "liquid glass" carousel modal: mounts `cards` (any list of
+   announcement objects — title/description/date/category/bannerImage/
+   ctaEnabled/ctaText/ctaLink) starting at `startIndex`. Used both for
+   the homepage auto-popup above and duyurular.html's per-card
+   click-through, so the two never drift into two different modals. */
+export function openAnnouncementModal(cards, startIndex = 0) {
+  if (!Array.isArray(cards) || cards.length === 0) return;
 
   injectStyles();
-  let index = 0;
+  let index = Math.min(Math.max(startIndex, 0), cards.length - 1);
 
   const overlay = document.createElement('div');
   overlay.id = OVERLAY_ID;
@@ -93,8 +97,13 @@ export function applyAnnouncementPopup(list, pageId) {
 
   function close() {
     overlay.remove();
-    try { sessionStorage.setItem(SESSION_KEY, 'true'); } catch (e) { /* private mode etc. */ }
+    document.removeEventListener('keydown', onKeydown);
   }
+
+  function onKeydown(e) {
+    if (e.key === 'Escape') close();
+  }
+  document.addEventListener('keydown', onKeydown);
 
   function go(next) {
     if (next === index) return;
