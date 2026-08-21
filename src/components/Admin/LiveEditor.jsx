@@ -64,6 +64,22 @@ async function saveGlobalBucket(id, patch) {
   return error;
 }
 
+/* Fire-and-forget: a failed/unreachable revisions insert must never
+   block or fail the save the user actually asked for, so this is never
+   awaited by its callers — the try/catch just keeps a real network
+   rejection (not only a resolved {error}) from surfacing as an
+   unhandled promise rejection. */
+async function saveRevisionSnapshot(pageId, content) {
+  try {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    const { error } = await supabase.from('site_content_revisions').insert({ page_id: pageId, content });
+    if (error) console.warn('[IONA Admin] Geçmiş kaydı oluşturulamadı:', error.message);
+  } catch (e) {
+    console.warn('[IONA Admin] Geçmiş kaydı oluşturulamadı:', e.message);
+  }
+}
+
 export default function LiveEditor({ onLogout }) {
   const iframeRef = useRef(null);
   const cleanupRef = useRef(null);
@@ -95,7 +111,7 @@ export default function LiveEditor({ onLogout }) {
 
   const currentPage = PAGES.find((p) => p.id === selectedPage) || PAGES[0];
 
-  const showToast = useCallback((type, message) => setToast({ type, message, id: Date.now() }), []);
+  const showToast = useCallback((type, message, duration) => setToast({ type, message, duration, id: Date.now() }), []);
 
   useEffect(() => {
     (async () => {
@@ -297,7 +313,6 @@ export default function LiveEditor({ onLogout }) {
     const hasImageEdits = Object.keys(imageEdits).length > 0;
     const hasSeoEdits = Object.keys(seoEdits).length > 0;
     const hasSectionEdits = Object.keys(sectionEdits).length > 0;
-    if (!hasTextEdits && !hasImageEdits && !hasSeoEdits && !hasSectionEdits) return;
 
     const supabase = getSupabase();
     if (!supabase) {
@@ -306,19 +321,13 @@ export default function LiveEditor({ onLogout }) {
       if (hasImageEdits) writeLocalImages(currentPage.id, imageEdits);
       if (hasSeoEdits) writeLocalBucket(`seo:${currentPage.id}`, seoEdits);
       if (hasSectionEdits) writeLocalBucket(`sections:${currentPage.id}`, sectionEdits);
-      /* Merge saved edits into the "originals" baselines so reopening a
-         modal right after a save shows what was just saved, not stale
-         pre-edit values — nothing reloads the iframe after a save, so
-         these refs would otherwise never pick up the change. */
-      seoOriginalsRef.current = { ...seoOriginalsRef.current, ...seoEdits };
-      Object.entries(imageEdits).forEach(([key, patch]) => {
-        imageOriginalsRef.current[key] = { ...(imageOriginalsRef.current[key] || {}), ...patch };
-      });
       setSaveError('Supabase bağlı değil — .env dosyasına VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY ekleyin.');
       setEdits({});
       setImageEdits({});
       setSeoEdits({});
       setSectionEdits({});
+      setReady(false);
+      iframeRef.current?.contentWindow?.location.reload();
       return;
     }
 
@@ -363,25 +372,19 @@ export default function LiveEditor({ onLogout }) {
       return;
     }
 
-    /* Best-effort revision snapshot — a failed insert here never blocks
-       or fails the save the user actually asked for. */
-    supabase.from('site_content_revisions').insert({ page_id: currentPage.id, content: payload }).then(({ error: revError }) => {
-      if (revError) console.warn('[IONA Admin] Geçmiş kaydı oluşturulamadı:', revError.message);
-    });
-
-    /* Same stale-baseline fix as the local-fallback branch above — no
-       iframe reload happens after a Supabase save either. */
-    seoOriginalsRef.current = { ...seoOriginalsRef.current, ...seoEdits };
-    Object.entries(imageEdits).forEach(([key, patch]) => {
-      imageOriginalsRef.current[key] = { ...(imageOriginalsRef.current[key] || {}), ...patch };
-    });
+    saveRevisionSnapshot(currentPage.id, payload);
 
     setEdits({});
     setImageEdits({});
     setSeoEdits({});
     setSectionEdits({});
     setSaved(true);
-    showToast('success', 'Değişiklikler kaydedildi.');
+    /* Reload so the iframe re-runs the site's own i18n pipeline against
+       what's actually in the DB now — the definitive way to confirm the
+       save really took, rather than trusting in-memory DOM mutations. */
+    setReady(false);
+    iframeRef.current?.contentWindow?.location.reload();
+    showToast('success', 'Değişiklikler kaydedildi.', 1000);
   }
 
   async function handleReset() {
@@ -436,6 +439,7 @@ export default function LiveEditor({ onLogout }) {
       showToast('error', error.message);
       return;
     }
+    saveRevisionSnapshot(currentPage.id, content);
     setPanel(null);
     showToast('success', 'Sürüm geri yüklendi.');
     setEdits({});
@@ -552,7 +556,7 @@ export default function LiveEditor({ onLogout }) {
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving || editCount === 0}
+            disabled={saving}
             className="font-label-caps text-[12px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white px-4 py-2 rounded-full hover:brightness-110 transition-all duration-300 disabled:opacity-40 disabled:pointer-events-none"
           >
             {saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
