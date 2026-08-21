@@ -1,9 +1,32 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSupabase } from '../../lib/supabaseClient.js';
 import { writeLocalContent } from '../../lib/localContent.js';
+import { writeLocalImages, clearLocalImages } from '../../lib/imageContent.js';
+import { readLocalBucket, writeLocalBucket } from '../../lib/adminStore.js';
 import { PAGES, pageIdForPath } from '../../lib/pages.js';
+import ImageSettingsModal from './ImageSettingsModal.jsx';
+import Toast from './Toast.jsx';
+import InboxDrawer from './InboxDrawer.jsx';
+import SeoModal from './SeoModal.jsx';
+import ThemeModal from './ThemeModal.jsx';
+import SectionsPanel from './SectionsPanel.jsx';
+import AnnouncementModal from './AnnouncementModal.jsx';
+import HistoryDropdown from './HistoryDropdown.jsx';
 
 const STYLE_ID = 'iona-admin-editor-style';
+const VIEWPORTS = [
+  { id: 'desktop', label: 'Masaüstü', width: '100%' },
+  { id: 'tablet', label: 'Tablet', width: '768px' },
+  { id: 'mobile', label: 'Mobil', width: '390px' }
+];
+const TOOLS = [
+  { id: 'inbox', label: 'Gelen Kutusu', icon: 'mail' },
+  { id: 'seo', label: 'SEO', icon: 'travel_explore' },
+  { id: 'theme', label: 'Tema', icon: 'palette' },
+  { id: 'sections', label: 'Bölümler', icon: 'visibility' },
+  { id: 'announcement', label: 'Duyuru Bandı', icon: 'campaign' },
+  { id: 'history', label: 'Geçmiş', icon: 'history' }
+];
 
 function injectEditorStyles(doc) {
   if (doc.getElementById(STYLE_ID)) return;
@@ -17,27 +40,98 @@ function injectEditorStyles(doc) {
       background: rgba(16, 185, 129, 0.08);
       border-radius: 2px;
     }
+    .iona-edit-mode [data-img-key] { pointer-events: auto; cursor: pointer; }
+    .iona-edit-mode .iona-admin-image-editable { outline-offset: 2px; }
+    .iona-edit-mode .iona-admin-image-editable:hover { outline: 2px dashed #38bdf8; }
+    .iona-edit-mode .iona-admin-image-editable.iona-admin-image-active { outline: 2px solid #38bdf8; }
   `;
   doc.head.appendChild(style);
+}
+
+/* Theme + announcement live in their own site_content rows (id "theme" /
+   "announcement") since they're site-wide, not tied to whichever page is
+   currently open in the editor — so they persist independently of the
+   page-scoped "Değişiklikleri Kaydet" button, right when their modal closes. */
+async function saveGlobalBucket(id, patch) {
+  const supabase = getSupabase();
+  if (!supabase) {
+    writeLocalBucket(id, patch);
+    return null;
+  }
+  const { data: existing } = await supabase.from('site_content').select('content').eq('id', id).maybeSingle();
+  const content = { ...(existing?.content || {}), ...patch };
+  const { error } = await supabase.from('site_content').upsert({ id, content, updated_at: new Date().toISOString() });
+  return error;
 }
 
 export default function LiveEditor({ onLogout }) {
   const iframeRef = useRef(null);
   const cleanupRef = useRef(null);
   const modeRef = useRef('edit');
+  const imageElRef = useRef(null);
+  const imageOriginalsRef = useRef({});
+  const seoOriginalsRef = useRef({});
+  const sectionsListRef = useRef([]);
   const [edits, setEdits] = useState({});
+  const [imageEdits, setImageEdits] = useState({});
+  const [seoEdits, setSeoEdits] = useState({});
+  const [sectionEdits, setSectionEdits] = useState({});
+  const [themeEdits, setThemeEdits] = useState({});
+  const [announcementEdits, setAnnouncementEdits] = useState({});
+  const [globalSettings, setGlobalSettings] = useState({ theme: {}, announcement: {} });
+  const [activeImageKey, setActiveImageKey] = useState(null);
+  const [imagePosition, setImagePosition] = useState(null);
+  const [panel, setPanel] = useState(null);
   const [lang, setLangState] = useState('tr');
   const [selectedPage, setSelectedPage] = useState(PAGES[0].id);
   const [mode, setMode] = useState('edit');
+  const [viewport, setViewport] = useState('desktop');
   const [ready, setReady] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [toast, setToast] = useState(null);
 
   const currentPage = PAGES.find((p) => p.id === selectedPage) || PAGES[0];
 
+  const showToast = useCallback((type, message) => setToast({ type, message, id: Date.now() }), []);
+
+  useEffect(() => {
+    (async () => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        setGlobalSettings({ theme: readLocalBucket('theme') || {}, announcement: readLocalBucket('announcement') || {} });
+        return;
+      }
+      const { data } = await supabase.from('site_content').select('id,content').in('id', ['theme', 'announcement']);
+      setGlobalSettings({
+        theme: data?.find((r) => r.id === 'theme')?.content || {},
+        announcement: data?.find((r) => r.id === 'announcement')?.content || {}
+      });
+    })();
+  }, []);
+
   const recordEdit = useCallback((key, value) => {
     setEdits((current) => ({ ...current, [key]: value }));
+    setSaved(false);
+  }, []);
+
+  const recordImageEdit = useCallback((key, patch) => {
+    setImageEdits((current) => ({ ...current, [key]: { ...(current[key] || {}), ...patch } }));
+    setSaved(false);
+  }, []);
+
+  const recordSeoEdit = useCallback((patch) => {
+    setSeoEdits((current) => ({ ...current, ...patch }));
+    setSaved(false);
+  }, []);
+
+  const recordSectionEdit = useCallback((id, hidden) => {
+    setSectionEdits((current) => ({ ...current, [id]: hidden }));
+    const doc = iframeRef.current?.contentDocument;
+    const el = doc?.getElementById(id);
+    if (el) el.style.display = hidden ? 'none' : '';
     setSaved(false);
   }, []);
 
@@ -45,10 +139,45 @@ export default function LiveEditor({ onLogout }) {
     const doc = iframeRef.current?.contentDocument;
     if (!doc) return;
 
+    setActiveImageKey(null);
     injectEditorStyles(doc);
     doc.documentElement.classList.toggle('iona-edit-mode', modeRef.current === 'edit');
     setLangState(doc.documentElement.lang || 'tr');
     doc.querySelectorAll('[data-i18n]').forEach((el) => el.classList.add('iona-admin-editable'));
+
+    imageOriginalsRef.current = {};
+    doc.querySelectorAll('[data-img-key]').forEach((el) => {
+      el.classList.add('iona-admin-image-editable');
+      const key = el.dataset.imgKey;
+      const isImg = el.tagName === 'IMG';
+      const cs = doc.defaultView.getComputedStyle(el);
+      const posSource = isImg ? cs.objectPosition : cs.backgroundPosition;
+      const [posX, posY] = posSource.split(' ').map((v) => parseFloat(v) || 50);
+      const scaleMatch = /scale\(([\d.]+)\)/.exec(el.style.transform || '');
+      let bgSrc = '';
+      if (!isImg) {
+        const match = /url\((['"]?)(.*?)\1\)/.exec(cs.backgroundImage || '');
+        bgSrc = match ? match[2] : '';
+      }
+      imageOriginalsRef.current[key] = {
+        src: isImg ? (el.currentSrc || el.src) : bgSrc,
+        isBackground: !isImg,
+        posX,
+        posY,
+        scale: scaleMatch ? parseFloat(scaleMatch[1]) : 1,
+        isParallax: el.classList.contains('parallax-media')
+      };
+    });
+
+    seoOriginalsRef.current = {
+      title: doc.title || '',
+      description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+      ogImage: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || ''
+    };
+    sectionsListRef.current = Array.from(doc.querySelectorAll('section[id]')).map((el) => ({
+      id: el.id,
+      hidden: el.style.display === 'none'
+    }));
 
     const loadedPageId = pageIdForPath(iframeRef.current.contentWindow.location.pathname);
     if (loadedPageId) setSelectedPage((current) => (current === loadedPageId ? current : loadedPageId));
@@ -75,8 +204,33 @@ export default function LiveEditor({ onLogout }) {
       activeEl = null;
     }
 
+    function openImageModal(el) {
+      const key = el.dataset.imgKey;
+      imageElRef.current = el;
+      const iframeRect = iframeRef.current.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const MODAL_W = 280;
+      const MODAL_H = 420;
+      let top = iframeRect.top + elRect.top;
+      let left = iframeRect.left + elRect.right + 12;
+      if (left + MODAL_W > window.innerWidth) left = iframeRect.left + elRect.left - MODAL_W - 12;
+      if (left < 8) left = 8;
+      top = Math.min(Math.max(top, 8), window.innerHeight - MODAL_H - 8);
+      setImagePosition({ top, left });
+      doc.querySelectorAll('.iona-admin-image-active').forEach((n) => n.classList.remove('iona-admin-image-active'));
+      el.classList.add('iona-admin-image-active');
+      setActiveImageKey(key);
+    }
+
     function onClick(e) {
       if (modeRef.current === 'navigate') return;
+      const imgTarget = e.target.closest('[data-img-key]');
+      if (imgTarget) {
+        e.preventDefault();
+        e.stopPropagation();
+        openImageModal(imgTarget);
+        return;
+      }
       if (e.target.closest('a')) e.preventDefault();
       const el = e.target.closest('[data-i18n]');
       if (!el || el.isContentEditable) return;
@@ -126,6 +280,11 @@ export default function LiveEditor({ onLogout }) {
   function handlePageChange(nextPageId) {
     if (nextPageId === selectedPage) return;
     setEdits({});
+    setImageEdits({});
+    setSeoEdits({});
+    setSectionEdits({});
+    setActiveImageKey(null);
+    setPanel(null);
     setSaved(false);
     setSaveError('');
     setReady(false);
@@ -134,14 +293,24 @@ export default function LiveEditor({ onLogout }) {
 
   async function handleSave() {
     setSaveError('');
-    if (Object.keys(edits).length === 0) return;
+    const hasTextEdits = Object.keys(edits).length > 0;
+    const hasImageEdits = Object.keys(imageEdits).length > 0;
+    const hasSeoEdits = Object.keys(seoEdits).length > 0;
+    const hasSectionEdits = Object.keys(sectionEdits).length > 0;
+    if (!hasTextEdits && !hasImageEdits && !hasSeoEdits && !hasSectionEdits) return;
 
     const supabase = getSupabase();
     if (!supabase) {
       console.warn('[IONA Admin] Supabase yapılandırılmamış (.env eksik) — değişiklik veritabanına yazılmadı.');
-      console.log(`[IONA Admin] ${currentPage.label} metin değişiklikleri:`, { lang, edits });
-      writeLocalContent(lang, edits);
+      if (hasTextEdits) writeLocalContent(lang, edits);
+      if (hasImageEdits) writeLocalImages(currentPage.id, imageEdits);
+      if (hasSeoEdits) writeLocalBucket(`seo:${currentPage.id}`, seoEdits);
+      if (hasSectionEdits) writeLocalBucket(`sections:${currentPage.id}`, sectionEdits);
       setSaveError('Supabase bağlı değil — .env dosyasına VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY ekleyin.');
+      setEdits({});
+      setImageEdits({});
+      setSeoEdits({});
+      setSectionEdits({});
       return;
     }
 
@@ -156,11 +325,21 @@ export default function LiveEditor({ onLogout }) {
     if (fetchError) {
       setSaving(false);
       setSaveError(fetchError.message);
+      showToast('error', fetchError.message);
       return;
     }
 
     const payload = { ...(existing?.content || {}) };
-    payload[lang] = { ...(payload[lang] || {}), ...edits };
+    if (hasTextEdits) payload[lang] = { ...(payload[lang] || {}), ...edits };
+    if (hasImageEdits) {
+      const mergedImages = { ...(payload.images || {}) };
+      Object.entries(imageEdits).forEach(([key, patch]) => {
+        mergedImages[key] = { ...(mergedImages[key] || {}), ...patch };
+      });
+      payload.images = mergedImages;
+    }
+    if (hasSeoEdits) payload.seo = { ...(payload.seo || {}), ...seoEdits };
+    if (hasSectionEdits) payload.sections = { ...(payload.sections || {}), ...sectionEdits };
 
     const { error } = await supabase.from('site_content').upsert({
       id: currentPage.id,
@@ -172,25 +351,126 @@ export default function LiveEditor({ onLogout }) {
     if (error) {
       console.error('[IONA Admin] Kaydetme hatası:', error);
       setSaveError(error.message);
+      showToast('error', error.message);
       return;
     }
+
+    /* Best-effort revision snapshot — a failed insert here never blocks
+       or fails the save the user actually asked for. */
+    supabase.from('site_content_revisions').insert({ page_id: currentPage.id, content: payload }).then(({ error: revError }) => {
+      if (revError) console.warn('[IONA Admin] Geçmiş kaydı oluşturulamadı:', revError.message);
+    });
+
     setEdits({});
+    setImageEdits({});
+    setSeoEdits({});
+    setSectionEdits({});
     setSaved(true);
+    showToast('success', 'Değişiklikler kaydedildi.');
   }
 
-  const editCount = Object.keys(edits).length;
+  async function handleReset() {
+    const ok = window.confirm(
+      `${currentPage.label} sayfasındaki TÜM metin, görsel, SEO ve bölüm değişiklikleri varsayılana sıfırlansın mı? Bu işlem geri alınamaz.`
+    );
+    if (!ok) return;
+
+    setResetting(true);
+    const supabase = getSupabase();
+    if (supabase) {
+      const { error } = await supabase
+        .from('site_content')
+        .upsert({ id: currentPage.id, content: {}, updated_at: new Date().toISOString() });
+      setResetting(false);
+      if (error) {
+        showToast('error', error.message);
+        return;
+      }
+      showToast('success', `${currentPage.label} varsayılana sıfırlandı.`);
+    } else {
+      clearLocalImages(currentPage.id);
+      setResetting(false);
+      showToast(
+        'success',
+        'Bu tarayıcıdaki görsel değişiklikleri temizlendi. (Not: Supabase bağlı olmadığından diğer değişiklikler bu tarayıcıda sıfırlanamıyor.)'
+      );
+    }
+
+    setEdits({});
+    setImageEdits({});
+    setSeoEdits({});
+    setSectionEdits({});
+    setSaved(false);
+    setActiveImageKey(null);
+    setPanel(null);
+    setReady(false);
+    iframeRef.current?.contentWindow?.location.reload();
+  }
+
+  async function handleRestoreRevision(content) {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    const { error } = await supabase
+      .from('site_content')
+      .upsert({ id: currentPage.id, content, updated_at: new Date().toISOString() });
+    if (error) {
+      showToast('error', error.message);
+      return;
+    }
+    setPanel(null);
+    showToast('success', 'Sürüm geri yüklendi.');
+    setEdits({});
+    setImageEdits({});
+    setSeoEdits({});
+    setSectionEdits({});
+    setReady(false);
+    iframeRef.current?.contentWindow?.location.reload();
+  }
+
+  async function closeThemeModal() {
+    if (Object.keys(themeEdits).length > 0) {
+      const error = await saveGlobalBucket('theme', themeEdits);
+      if (error) showToast('error', error.message);
+      else {
+        setGlobalSettings((g) => ({ ...g, theme: { ...g.theme, ...themeEdits } }));
+        showToast('success', 'Tema kaydedildi.');
+      }
+      setThemeEdits({});
+    }
+    setPanel(null);
+  }
+
+  async function closeAnnouncementModal() {
+    if (Object.keys(announcementEdits).length > 0) {
+      const error = await saveGlobalBucket('announcement', announcementEdits);
+      if (error) showToast('error', error.message);
+      else {
+        setGlobalSettings((g) => ({ ...g, announcement: { ...g.announcement, ...announcementEdits } }));
+        showToast('success', 'Duyuru bandı kaydedildi.');
+      }
+      setAnnouncementEdits({});
+    }
+    setPanel(null);
+  }
+
+  const editCount =
+    Object.keys(edits).length + Object.keys(imageEdits).length + Object.keys(seoEdits).length + Object.keys(sectionEdits).length;
+  const activeImageOriginal = activeImageKey ? imageOriginalsRef.current[activeImageKey] : null;
+  const activeImageInitial = activeImageOriginal
+    ? { ...activeImageOriginal, ...(imageEdits[activeImageKey] || {}) }
+    : null;
 
   return (
     <div className="fixed inset-0 flex flex-col bg-[#0e1210]">
       <header className="h-14 shrink-0 z-10 flex items-center justify-between px-6 bg-[#171b18] border-b border-white/10 gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <img src="/images/iona-star-mark.png" alt="" width="22" height="22" />
+        <div className="flex items-center gap-3 min-w-0 overflow-x-auto">
+          <img src="/images/iona-star-mark.png" alt="" width="22" height="22" className="shrink-0" />
           <span className="text-[14px] font-extrabold tracking-tight text-white shrink-0">IONA Live Editor</span>
           <span className="h-4 w-px bg-white/15 shrink-0" />
           <select
             value={selectedPage}
             onChange={(e) => handlePageChange(e.target.value)}
-            className="bg-[#0e1210] border border-white/15 text-white text-[12px] font-bold rounded-full px-3 py-1.5 focus:outline-none focus:border-emerald-400"
+            className="bg-[#0e1210] border border-white/15 text-white text-[12px] font-bold rounded-full px-3 py-1.5 focus:outline-none focus:border-emerald-400 shrink-0"
           >
             {PAGES.map((p) => (
               <option key={p.id} value={p.id}>{p.label}</option>
@@ -209,13 +489,47 @@ export default function LiveEditor({ onLogout }) {
               Gezin
             </span>
           </button>
+          <div className="flex items-center gap-1 rounded-full bg-white/5 border border-white/10 p-1 shrink-0">
+            {VIEWPORTS.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setViewport(v.id)}
+                title={v.label}
+                className={`px-3 py-1 rounded-full font-label-caps text-[11px] font-bold tracking-[0.06em] transition-colors duration-200 ${viewport === v.id ? 'bg-sky-500 text-black' : 'text-white/50'}`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-0.5 rounded-full bg-white/5 border border-white/10 p-1 shrink-0">
+            {TOOLS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setPanel(t.id)}
+                title={t.label}
+                className={`p-1.5 rounded-full transition-colors duration-200 ${panel === t.id ? 'bg-sky-500 text-black' : 'text-white/60 hover:text-white hover:bg-white/10'}`}
+              >
+                <span className="material-symbols-outlined text-[18px] block leading-none">{t.icon}</span>
+              </button>
+            ))}
+          </div>
           {editCount > 0 && (
-            <span className="font-label-caps text-[11px] font-bold text-white/50 truncate">{editCount} değişiklik</span>
+            <span className="font-label-caps text-[11px] font-bold text-white/50 truncate shrink-0">{editCount} değişiklik</span>
           )}
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {saveError && <span className="text-[12px] text-red-400 max-w-xs truncate" title={saveError}>{saveError}</span>}
           {saved && !saveError && <span className="text-[12px] text-emerald-400">Kaydedildi</span>}
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={resetting}
+            className="font-label-caps text-[12px] font-bold tracking-[0.06em] text-red-400/80 hover:text-red-400 transition-colors duration-300 disabled:opacity-40 disabled:pointer-events-none"
+          >
+            {resetting ? 'Sıfırlanıyor...' : 'Varsayılana Sıfırla'}
+          </button>
           <button
             type="button"
             onClick={handleSave}
@@ -234,20 +548,92 @@ export default function LiveEditor({ onLogout }) {
         </div>
       </header>
 
-      <div className="relative flex-1">
-        {!ready && (
-          <div className="absolute inset-0 flex items-center justify-center text-[14px] text-white/60">
-            Yükleniyor...
-          </div>
-        )}
-        <iframe
-          ref={iframeRef}
-          src={currentPage.path}
-          title={`IONA ${currentPage.label} - Canlı Düzenleyici`}
-          onLoad={handleLoad}
-          className="w-full h-full border-0 bg-white"
-        />
+      <div className="relative flex-1 overflow-auto flex justify-center bg-[#0a0d0b] py-4">
+        <div
+          style={{ width: VIEWPORTS.find((v) => v.id === viewport)?.width }}
+          className="relative h-full max-w-full shrink-0 transition-[width] duration-300 ease-out shadow-2xl"
+        >
+          {!ready && (
+            <div className="absolute inset-0 flex items-center justify-center text-[14px] text-white/60">
+              Yükleniyor...
+            </div>
+          )}
+          <iframe
+            ref={iframeRef}
+            src={currentPage.path}
+            title={`IONA ${currentPage.label} - Canlı Düzenleyici`}
+            onLoad={handleLoad}
+            className="w-full h-full border-0 bg-white"
+          />
+        </div>
       </div>
+
+      {activeImageKey && activeImageInitial && imagePosition && (
+        <ImageSettingsModal
+          imgKey={activeImageKey}
+          pageId={currentPage.id}
+          position={imagePosition}
+          initial={activeImageInitial}
+          targetEl={imageElRef.current}
+          onChange={(patch) => recordImageEdit(activeImageKey, patch)}
+          onClose={() => setActiveImageKey(null)}
+          onToast={showToast}
+        />
+      )}
+
+      {panel === 'inbox' && <InboxDrawer onClose={() => setPanel(null)} onToast={showToast} />}
+
+      {panel === 'seo' && (
+        <SeoModal
+          pageId={currentPage.id}
+          pageLabel={currentPage.label}
+          initial={{ ...seoOriginalsRef.current, ...seoEdits }}
+          onChange={recordSeoEdit}
+          onClose={() => setPanel(null)}
+          onToast={showToast}
+        />
+      )}
+
+      {panel === 'theme' && (
+        <ThemeModal
+          initial={{ ...globalSettings.theme, ...themeEdits }}
+          doc={iframeRef.current?.contentDocument}
+          onChange={(patch) => setThemeEdits((current) => ({ ...current, ...patch }))}
+          onClose={closeThemeModal}
+        />
+      )}
+
+      {panel === 'sections' && (
+        <SectionsPanel
+          sections={sectionsListRef.current.map((s) => ({ id: s.id, hidden: sectionEdits[s.id] ?? s.hidden }))}
+          onToggle={recordSectionEdit}
+          onClose={() => setPanel(null)}
+        />
+      )}
+
+      {panel === 'announcement' && (
+        <AnnouncementModal
+          initial={{ ...globalSettings.announcement, ...announcementEdits }}
+          onChange={(patch) => setAnnouncementEdits((current) => ({ ...current, ...patch }))}
+          onClose={closeAnnouncementModal}
+        />
+      )}
+
+      {panel === 'history' && (
+        <HistoryDropdown
+          pageId={currentPage.id}
+          pageLabel={currentPage.label}
+          onRestore={handleRestoreRevision}
+          onFactoryReset={() => {
+            setPanel(null);
+            handleReset();
+          }}
+          onClose={() => setPanel(null)}
+          onToast={showToast}
+        />
+      )}
+
+      <Toast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

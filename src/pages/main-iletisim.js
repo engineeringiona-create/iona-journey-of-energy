@@ -1,5 +1,6 @@
 import { initFadeIn, initThemeToggle, initSiteSearch, initCardSpotlight, initMobileNav } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
+import { getSupabase } from '../lib/supabaseClient.js';
 
 await initI18n();
 initLangSwitcher();
@@ -9,9 +10,11 @@ initSiteSearch();
 initMobileNav();
 initCardSpotlight();
 
-/* No backend on this static site, so the form composes a real email
-   in the visitor's own mail client instead of pretending to submit
-   somewhere. */
+/* No real backend on this static site, so the form's primary path is
+   still composing an email in the visitor's own mail client. Phase 33
+   adds a best-effort Supabase insert alongside it purely so the admin
+   Inbox drawer has something to show — it never blocks or delays the
+   mailto: fallback, even if Supabase is unreachable or unconfigured. */
 const form = document.getElementById('contact-mail-form');
 form?.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -20,6 +23,14 @@ form?.addEventListener('submit', (e) => {
   const email = data.get('email') || '';
   const subject = data.get('subject') || 'Teklif Talebi';
   const message = data.get('message') || '';
+
+  const supabase = getSupabase();
+  if (supabase) {
+    supabase.from('contact_submissions').insert({ name, email, subject, message }).then(({ error }) => {
+      if (error) console.warn('[IONA] Gelen kutusuna kayıt başarısız:', error.message);
+    });
+  }
+
   const body = `Ad Soyad: ${name}\nE-posta: ${email}\n\n${message}`;
   window.location.href = `mailto:info@ionaengineering.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });

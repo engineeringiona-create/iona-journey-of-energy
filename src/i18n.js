@@ -6,6 +6,9 @@
 
 import { getSupabase } from './lib/supabaseClient.js';
 import { readLocalContent } from './lib/localContent.js';
+import { readLocalImages } from './lib/imageContent.js';
+import { readLocalBucket } from './lib/adminStore.js';
+import { applyAnnouncementBar } from './lib/announcementBar.js';
 import { pageIdForPath } from './lib/pages.js';
 
 export const LANGS = [
@@ -30,10 +33,93 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/* Applies saved image overrides (upload replacement + crop position +
+   zoom) from the site_content row's "images" bucket — a sibling of the
+   per-lang buckets, not itself lang-keyed, since a photo swap/crop
+   applies the same regardless of which language is active. Src values
+   go straight to el.src (never innerHTML), so no escaping/injection
+   surface here the way applyDict() has for text. */
+function applyImageOverrides(images) {
+  if (!images) return;
+  document.querySelectorAll('[data-img-key]').forEach((el) => {
+    const patch = images[el.dataset.imgKey];
+    if (!patch) return;
+    const isImg = el.tagName === 'IMG';
+    if (patch.src) {
+      if (isImg) el.src = patch.src;
+      else el.style.backgroundImage = `url(${JSON.stringify(patch.src).slice(1, -1)})`;
+    }
+    if (patch.posX !== undefined && patch.posY !== undefined) {
+      if (isImg) el.style.objectPosition = `${patch.posX}% ${patch.posY}%`;
+      else el.style.backgroundPosition = `${patch.posX}% ${patch.posY}%`;
+    }
+    /* .parallax-media elements have their transform driven every scroll
+       tick by GSAP (see initParallax() in common.js) — writing a scale()
+       here would just get clobbered on the next tick, so skip it. */
+    if (patch.scale !== undefined && !el.classList.contains('parallax-media')) {
+      el.style.transform = patch.scale !== 1 ? `scale(${patch.scale})` : '';
+    }
+  });
+}
+
+/* Section visibility (Phase 33): content.sections is { [sectionId]: true }
+   where the key is the section element's own existing DOM id — every
+   <section> on this site already carries one, so no new markup/attribute
+   is needed. true means "hidden". */
+function applySectionVisibility(sections) {
+  if (!sections) return;
+  Object.entries(sections).forEach(([id, hidden]) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = hidden ? 'none' : '';
+  });
+}
+
+/* SEO overrides (Phase 33): content.seo = { title, description, ogImage }.
+   Injected directly into <head> — title via document.title, the rest via
+   upserted <meta> tags (created on the fly since most pages don't ship a
+   description/OG meta tag by default). */
+function applySeoOverrides(seo) {
+  if (!seo) return;
+  if (seo.title) document.title = seo.title;
+  if (seo.description) upsertMeta('name', 'description', seo.description);
+  if (seo.ogImage) upsertMeta('property', 'og:image', seo.ogImage);
+  if (seo.title) upsertMeta('property', 'og:title', seo.title);
+}
+
+function upsertMeta(attr, key, content) {
+  let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+
+/* Live theme accent (Phase 33): a single injected <style> overriding
+   --color-accent plus the two CSS vars that actually drive buttons/CTAs/
+   glows across the site (--brand, --brand-orange — see DESIGN.md), in
+   both the light and dark root blocks, so the picked color shows up
+   regardless of the visitor's theme mode. */
+const THEME_STYLE_ID = 'iona-theme-vars';
+function applyThemeOverrides(theme) {
+  if (!theme || !theme.accent) return;
+  let style = document.getElementById(THEME_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = THEME_STYLE_ID;
+    document.head.appendChild(style);
+  }
+  style.textContent = `:root, :root.dark { --color-accent: ${theme.accent}; --brand: ${theme.accent}; --brand-orange: ${theme.accent}; }`;
+}
+
 async function fetchContentOverrides(lang) {
   const pageId = pageIdForPath(window.location.pathname);
   const supabase = getSupabase();
   if (!supabase) {
+    applyImageOverrides(readLocalImages(pageId));
+    applySectionVisibility(readLocalBucket(`sections:${pageId}`));
+    applySeoOverrides(readLocalBucket(`seo:${pageId}`));
     const local = readLocalContent(lang);
     if (!local) return null;
     return Object.fromEntries(Object.entries(local).map(([key, value]) => [key, escapeHtml(value)]));
@@ -41,12 +127,38 @@ async function fetchContentOverrides(lang) {
   if (!pageId) return null;
   try {
     const { data, error } = await supabase.from('site_content').select('*').eq('id', pageId).maybeSingle();
-    if (error || !data || !data.content || !data.content[lang]) return null;
+    if (error || !data || !data.content) return null;
+    applyImageOverrides(data.content.images);
+    applySectionVisibility(data.content.sections);
+    applySeoOverrides(data.content.seo);
+    if (!data.content[lang]) return null;
     return Object.fromEntries(
       Object.entries(data.content[lang]).map(([key, value]) => [key, escapeHtml(value)])
     );
   } catch (e) {
     return null;
+  }
+}
+
+/* Global (non-page-scoped) admin buckets: theme accent + announcement
+   bar live in their own site_content rows (id "theme" / "announcement")
+   since they apply site-wide, not per page. Fire-and-forget from
+   initI18n() — a slow/failed fetch just means no theme/banner override
+   shows up, never blocks the rest of the page. */
+async function applyGlobalOverrides() {
+  const supabase = getSupabase();
+  if (!supabase) {
+    applyThemeOverrides(readLocalBucket('theme'));
+    applyAnnouncementBar(readLocalBucket('announcement'));
+    return;
+  }
+  try {
+    const { data, error } = await supabase.from('site_content').select('id,content').in('id', ['theme', 'announcement']);
+    if (error || !data) return;
+    applyThemeOverrides(data.find((r) => r.id === 'theme')?.content);
+    applyAnnouncementBar(data.find((r) => r.id === 'announcement')?.content);
+  } catch (e) {
+    /* no theme/banner override, page still works fine */
   }
 }
 
@@ -105,6 +217,7 @@ export async function initI18n() {
   window.__ionaLang = lang;
   window.__ionaDict = dict;
   applyDict(dict);
+  applyGlobalOverrides();
   document.dispatchEvent(new CustomEvent('i18nready', { detail: { lang, dict } }));
   return dict;
 }
