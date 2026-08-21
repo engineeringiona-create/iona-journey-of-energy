@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
+import ModalFooter from './ModalFooter.jsx';
 
 const GRID_POINTS = [
   [0, 0], [50, 0], [100, 0],
@@ -14,6 +15,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
   const [previewSrc, setPreviewSrc] = useState(initial.src || '');
   const [uploading, setUploading] = useState(false);
   const panelRef = useRef(null);
+  const draftRef = useRef({});
 
   const isParallax = !!initial.isParallax;
   const isBackground = !!initial.isBackground;
@@ -21,10 +23,10 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
 
   useEffect(() => {
     function onKeyDown(e) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleCancel();
     }
     function onPointerDown(e) {
-      if (panelRef.current && !panelRef.current.contains(e.target)) onClose();
+      if (panelRef.current && !panelRef.current.contains(e.target)) handleCancel();
     }
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('mousedown', onPointerDown);
@@ -32,23 +34,28 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('mousedown', onPointerDown);
     };
-  }, [onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  /* Live-mutates the iframe element as the admin drags — pure visual
+     preview, not a commit. The draft only reaches the parent's
+     editCount / "Değişiklikleri Kaydet" pipeline when Uygula is pressed;
+     Vazgeç/Escape/outside-click reverts targetEl back to `initial`. */
   function applyPosition(nextX, nextY) {
     setPosX(nextX);
     setPosY(nextY);
+    draftRef.current = { ...draftRef.current, posX: nextX, posY: nextY };
     if (targetEl) {
       const value = `${nextX}% ${nextY}%`;
       if (isBackground) targetEl.style.backgroundPosition = value;
       else targetEl.style.objectPosition = value;
     }
-    onChange({ posX: nextX, posY: nextY });
   }
 
   function applyScale(next) {
     setScale(next);
+    draftRef.current = { ...draftRef.current, scale: next };
     if (targetEl) targetEl.style.transform = next !== 1 ? `scale(${next})` : '';
-    onChange({ scale: next });
   }
 
   async function handleFile(e) {
@@ -66,13 +73,34 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
       onToast('error', result.error);
       return;
     }
+    draftRef.current = { ...draftRef.current, src: result.url };
     if (targetEl) {
       if (isBackground) targetEl.style.backgroundImage = `url(${JSON.stringify(result.url).slice(1, -1)})`;
       else targetEl.src = result.url;
     }
     setPreviewSrc(result.url);
-    onChange({ src: result.url });
     onToast('success', 'Görsel yüklendi.');
+  }
+
+  function handleApply() {
+    if (Object.keys(draftRef.current).length > 0) onChange(draftRef.current);
+    onToast('success', 'Görsel Ayarları Uygulandı ✓', 1500);
+    onClose();
+  }
+
+  function handleCancel() {
+    if (targetEl) {
+      const value = `${initial.posX ?? 50}% ${initial.posY ?? 50}%`;
+      if (isBackground) {
+        targetEl.style.backgroundPosition = value;
+        if (initial.src) targetEl.style.backgroundImage = `url(${JSON.stringify(initial.src).slice(1, -1)})`;
+      } else {
+        targetEl.style.objectPosition = value;
+        if (initial.src) targetEl.src = initial.src;
+      }
+      targetEl.style.transform = initial.scale && initial.scale !== 1 ? `scale(${initial.scale})` : '';
+    }
+    onClose();
   }
 
   return (
@@ -83,7 +111,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
     >
       <div className="flex items-center justify-between mb-3">
         <span className="font-label-caps text-[11px] font-bold tracking-[0.06em] text-sky-400">Görsel Ayarları</span>
-        <button type="button" onClick={onClose} className="text-white/40 hover:text-white text-[16px] leading-none">×</button>
+        <button type="button" onClick={handleCancel} className="text-white/40 hover:text-white text-[16px] leading-none">×</button>
       </div>
 
       <div className="rounded-lg overflow-hidden aspect-[16/10] bg-black/40 mb-3">
@@ -167,6 +195,8 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
           </div>
         </>
       )}
+
+      <ModalFooter onApply={handleApply} onCancel={handleCancel} />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ModalFooter from './ModalFooter.jsx';
 
 /* The site's real documented brand colors (DESIGN.md / base.css :root) —
    used both as this modal's defaults when nothing's been overridden yet,
@@ -30,31 +31,45 @@ function applyPreview(doc, colors) {
   }`;
 }
 
-export default function ThemeModal({ initial, doc, onChange, onClose }) {
-  const [colors, setColors] = useState({
+export default function ThemeModal({ initial, doc, onChange, onClose, onToast }) {
+  const initialColors = {
     brand: initial.brand || ORIGINAL.brand,
     cta: initial.cta || ORIGINAL.cta,
     surface: initial.surface || ORIGINAL.surface
-  });
+  };
+  const [colors, setColors] = useState(initialColors);
 
-  function apply(patch) {
+  /* Live-previews into the iframe's own head as colors are picked —
+     visual only, not a commit. The draft only reaches the parent's
+     editCount / "Değişiklikleri Kaydet" pipeline when Uygula is pressed. */
+  function preview(patch) {
     const next = { ...colors, ...patch };
     setColors(next);
-    onChange(patch);
     applyPreview(doc, next);
   }
 
   function restoreOriginal() {
-    apply(ORIGINAL);
+    preview(ORIGINAL);
+  }
+
+  function handleApply() {
+    onChange(colors);
+    onToast('success', 'Tema Uygulandı ✓', 1500);
+    onClose();
+  }
+
+  function handleCancel() {
+    applyPreview(doc, initialColors);
+    onClose();
   }
 
   return (
-    <div className="fixed inset-0 z-[55] flex items-center justify-center" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[55] flex items-center justify-center" onMouseDown={(e) => e.target === e.currentTarget && handleCancel()}>
       <div className="absolute inset-0 bg-black/50" />
       <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#171b18] p-5">
         <div className="flex items-center justify-between mb-4">
           <span className="font-label-caps text-[13px] font-bold tracking-[0.06em] text-white">Tema — Renk Paleti</span>
-          <button type="button" onClick={onClose} className="text-white/40 hover:text-white text-[18px] leading-none">×</button>
+          <button type="button" onClick={handleCancel} className="text-white/40 hover:text-white text-[18px] leading-none">×</button>
         </div>
 
         <div className="flex flex-col gap-4 mb-4">
@@ -63,7 +78,7 @@ export default function ThemeModal({ initial, doc, onChange, onClose }) {
               <input
                 type="color"
                 value={colors[f.key]}
-                onChange={(e) => apply({ [f.key]: e.target.value })}
+                onChange={(e) => preview({ [f.key]: e.target.value })}
                 className="h-10 w-14 shrink-0 rounded-lg border border-white/10 bg-transparent cursor-pointer"
               />
               <div className="min-w-0">
@@ -81,6 +96,8 @@ export default function ThemeModal({ initial, doc, onChange, onClose }) {
         >
           Orijinal Renklere Dön (Yeşil &amp; Turuncu)
         </button>
+
+        <ModalFooter onApply={handleApply} onCancel={handleCancel} />
       </div>
     </div>
   );

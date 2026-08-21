@@ -1,16 +1,24 @@
 import { useState } from 'react';
+import ModalFooter from './ModalFooter.jsx';
 
 function makeId() {
   return `pin_${Date.now()}_${Math.round(Math.random() * 1000)}`;
 }
 
-export default function HotspotsModal({ initial, onChange, onClose }) {
+export default function HotspotsModal({ initial, onChange, onClose, onToast }) {
   const [list, setList] = useState(initial.list || []);
   const [activeId, setActiveId] = useState(list[0]?.id || null);
 
+  /* Local draft only — reaches the parent's editCount / "Değişiklikleri
+     Kaydet" pipeline once, when Uygula is pressed. */
   function commit(nextList) {
     setList(nextList);
-    onChange({ list: nextList });
+  }
+
+  function handleApply() {
+    onChange({ list });
+    onToast('success', '3D Bilgi Noktaları Uygulandı ✓', 1500);
+    onClose();
   }
 
   function addPin() {
@@ -108,6 +116,8 @@ export default function HotspotsModal({ initial, onChange, onClose }) {
             </button>
           </div>
         )}
+
+        <ModalFooter onApply={handleApply} onCancel={onClose} />
       </div>
     </div>
   );

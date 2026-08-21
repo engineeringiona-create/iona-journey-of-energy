@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
+import ModalFooter from './ModalFooter.jsx';
 
 function makeId() {
   return `ann_${Date.now()}_${Math.round(Math.random() * 1000)}`;
@@ -25,9 +26,16 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
   const [activeId, setActiveId] = useState((initial.list || [])[0]?.id || null);
   const [uploading, setUploading] = useState(false);
 
+  /* Local draft only — reaches the parent's editCount / "Değişiklikleri
+     Kaydet" pipeline once, when Uygula is pressed. */
   function commit(nextList) {
     setList(nextList);
-    onChange({ list: nextList });
+  }
+
+  function handleApply() {
+    onChange({ list });
+    onToast('success', 'Duyurular Uygulandı ✓', 1500);
+    onClose();
   }
 
   function addItem() {
@@ -219,6 +227,8 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
             </div>
           )}
         </div>
+
+        <ModalFooter onApply={handleApply} onCancel={onClose} />
       </div>
     </div>
   );

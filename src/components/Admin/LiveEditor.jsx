@@ -344,6 +344,30 @@ export default function LiveEditor({ onLogout }) {
     doc?.querySelector(`[data-lang="${code}"]`)?.click();
   }
 
+  /* The three global (non-page-scoped) modals converted to "Uygula" in
+     Phase 38 no longer save-on-close — their drafts sit in *Edits state
+     just like the page-scoped ones, and now flush together with the
+     page content whenever "Değişiklikleri Kaydet" runs. */
+  async function flushGlobalEdits() {
+    const buckets = [
+      ['theme', themeEdits, setThemeEdits],
+      ['hotspots', hotspotsEdits, setHotspotsEdits],
+      ['announcements', announcementsEdits, setAnnouncementsEdits]
+    ].filter(([, bucketEdits]) => Object.keys(bucketEdits).length > 0);
+    if (buckets.length === 0) return;
+    await Promise.all(
+      buckets.map(async ([key, bucketEdits, setBucketEdits]) => {
+        const error = await saveGlobalBucket(key, bucketEdits);
+        if (error) {
+          showToast('error', error.message);
+          return;
+        }
+        setGlobalSettings((g) => ({ ...g, [key]: { ...g[key], ...bucketEdits } }));
+        setBucketEdits({});
+      })
+    );
+  }
+
   function handlePageChange(nextPageId) {
     if (nextPageId === selectedPage) return;
     setEdits({});
@@ -372,6 +396,7 @@ export default function LiveEditor({ onLogout }) {
       if (hasImageEdits) writeLocalImages(currentPage.id, imageEdits);
       if (hasSeoEdits) writeLocalBucket(`seo:${currentPage.id}`, seoEdits);
       if (hasSectionEdits) writeLocalBucket(`sections:${currentPage.id}`, sectionEdits);
+      await flushGlobalEdits();
       setSaveError('Supabase bağlı değil — .env dosyasına VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY ekleyin.');
       setEdits({});
       setImageEdits({});
@@ -428,6 +453,7 @@ export default function LiveEditor({ onLogout }) {
     }
 
     saveRevisionSnapshot(currentPage.id, payload);
+    await flushGlobalEdits();
 
     setEdits({});
     setImageEdits({});
@@ -505,19 +531,6 @@ export default function LiveEditor({ onLogout }) {
     iframeRef.current?.contentWindow?.location.reload();
   }
 
-  async function closeThemeModal() {
-    if (Object.keys(themeEdits).length > 0) {
-      const error = await saveGlobalBucket('theme', themeEdits);
-      if (error) showToast('error', error.message);
-      else {
-        setGlobalSettings((g) => ({ ...g, theme: { ...g.theme, ...themeEdits } }));
-        showToast('success', 'Tema kaydedildi.');
-      }
-      setThemeEdits({});
-    }
-    setPanel(null);
-  }
-
   async function closeAnnouncementModal() {
     if (Object.keys(announcementEdits).length > 0) {
       const error = await saveGlobalBucket('announcement', announcementEdits);
@@ -531,35 +544,15 @@ export default function LiveEditor({ onLogout }) {
     setPanel(null);
   }
 
-  async function closeHotspotsModal() {
-    if (Object.keys(hotspotsEdits).length > 0) {
-      const error = await saveGlobalBucket('hotspots', hotspotsEdits);
-      if (error) showToast('error', error.message);
-      else {
-        setGlobalSettings((g) => ({ ...g, hotspots: { ...g.hotspots, ...hotspotsEdits } }));
-        showToast('success', '3D bilgi noktaları kaydedildi.');
-      }
-      setHotspotsEdits({});
-    }
-    setPanel(null);
-  }
-
-  async function closeAnnouncementsModal() {
-    if (Object.keys(announcementsEdits).length > 0) {
-      const error = await saveGlobalBucket('announcements', announcementsEdits);
-      if (error) showToast('error', error.message);
-      else {
-        setGlobalSettings((g) => ({ ...g, announcements: { ...g.announcements, ...announcementsEdits } }));
-        showToast('success', 'Duyurular kaydedildi.');
-      }
-      setAnnouncementsEdits({});
-    }
-    setPanel(null);
-  }
-
   const textEditCount = Object.values(edits).reduce((sum, bucket) => sum + Object.keys(bucket).length, 0);
   const editCount =
-    textEditCount + Object.keys(imageEdits).length + Object.keys(seoEdits).length + Object.keys(sectionEdits).length;
+    textEditCount +
+    Object.keys(imageEdits).length +
+    Object.keys(seoEdits).length +
+    Object.keys(sectionEdits).length +
+    Object.keys(themeEdits).length +
+    Object.keys(hotspotsEdits).length +
+    Object.keys(announcementsEdits).length;
   const activeImageOriginal = activeImageKey ? imageOriginalsRef.current[activeImageKey] : null;
   const activeImageInitial = activeImageOriginal
     ? { ...activeImageOriginal, ...(imageEdits[activeImageKey] || {}) }
@@ -718,7 +711,8 @@ export default function LiveEditor({ onLogout }) {
           initial={{ ...globalSettings.theme, ...themeEdits }}
           doc={iframeRef.current?.contentDocument}
           onChange={(patch) => setThemeEdits((current) => ({ ...current, ...patch }))}
-          onClose={closeThemeModal}
+          onClose={() => setPanel(null)}
+          onToast={showToast}
         />
       )}
 
@@ -742,7 +736,8 @@ export default function LiveEditor({ onLogout }) {
         <HotspotsModal
           initial={{ ...globalSettings.hotspots, ...hotspotsEdits }}
           onChange={(patch) => setHotspotsEdits((current) => ({ ...current, ...patch }))}
-          onClose={closeHotspotsModal}
+          onClose={() => setPanel(null)}
+          onToast={showToast}
         />
       )}
 
@@ -750,7 +745,7 @@ export default function LiveEditor({ onLogout }) {
         <AnnouncementsModal
           initial={{ ...globalSettings.announcements, ...announcementsEdits }}
           onChange={(patch) => setAnnouncementsEdits((current) => ({ ...current, ...patch }))}
-          onClose={closeAnnouncementsModal}
+          onClose={() => setPanel(null)}
           onToast={showToast}
         />
       )}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
+import ModalFooter from './ModalFooter.jsx';
 
 function upsertMeta(doc, attr, key, content) {
   let el = doc.head.querySelector(`meta[${attr}="${key}"]`);
@@ -17,8 +18,10 @@ export default function SeoModal({ pageId, pageLabel, initial, doc, onChange, on
   const [ogImage, setOgImage] = useState(initial.ogImage || '');
   const [uploading, setUploading] = useState(false);
 
-  function commit(patch) {
-    onChange(patch);
+  /* Live-previews into the iframe's own head as the admin types — pure
+     visual feedback, not a commit. The draft only reaches the parent's
+     editCount / "Değişiklikleri Kaydet" pipeline when Uygula is pressed. */
+  function preview(patch) {
     if (!doc) return;
     if (patch.title !== undefined) doc.title = patch.title;
     if (patch.description !== undefined) upsertMeta(doc, 'name', 'description', patch.description);
@@ -40,17 +43,28 @@ export default function SeoModal({ pageId, pageLabel, initial, doc, onChange, on
       return;
     }
     setOgImage(result.url);
-    commit({ ogImage: result.url });
+    preview({ ogImage: result.url });
     onToast('success', 'OG görseli yüklendi.');
   }
 
+  function handleApply() {
+    onChange({ title, description, ogImage });
+    onToast('success', 'SEO Ayarları Uygulandı ✓', 1500);
+    onClose();
+  }
+
+  function handleCancel() {
+    preview({ title: initial.title || '', description: initial.description || '', ogImage: initial.ogImage || '' });
+    onClose();
+  }
+
   return (
-    <div className="fixed inset-0 z-[55] flex items-center justify-center" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[55] flex items-center justify-center" onMouseDown={(e) => e.target === e.currentTarget && handleCancel()}>
       <div className="absolute inset-0 bg-black/50" />
       <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#171b18] p-5">
         <div className="flex items-center justify-between mb-4">
           <span className="font-label-caps text-[13px] font-bold tracking-[0.06em] text-white">SEO — {pageLabel}</span>
-          <button type="button" onClick={onClose} className="text-white/40 hover:text-white text-[18px] leading-none">×</button>
+          <button type="button" onClick={handleCancel} className="text-white/40 hover:text-white text-[18px] leading-none">×</button>
         </div>
 
         <label className="block mb-4">
@@ -58,7 +72,7 @@ export default function SeoModal({ pageId, pageLabel, initial, doc, onChange, on
           <input
             type="text"
             value={title}
-            onChange={(e) => { setTitle(e.target.value); commit({ title: e.target.value }); }}
+            onChange={(e) => { setTitle(e.target.value); preview({ title: e.target.value }); }}
             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white focus:outline-none focus:border-sky-400"
           />
         </label>
@@ -68,7 +82,7 @@ export default function SeoModal({ pageId, pageLabel, initial, doc, onChange, on
           <textarea
             rows={3}
             value={description}
-            onChange={(e) => { setDescription(e.target.value); commit({ description: e.target.value }); }}
+            onChange={(e) => { setDescription(e.target.value); preview({ description: e.target.value }); }}
             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white focus:outline-none focus:border-sky-400 resize-none"
           />
         </label>
@@ -86,6 +100,8 @@ export default function SeoModal({ pageId, pageLabel, initial, doc, onChange, on
             className="block w-full text-[11px] text-white/70 file:mr-2 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:text-white hover:file:bg-white/20"
           />
         </label>
+
+        <ModalFooter onApply={handleApply} onCancel={handleCancel} applyLabel="Kaydet ve Uygula" />
       </div>
     </div>
   );
