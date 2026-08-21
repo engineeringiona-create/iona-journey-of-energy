@@ -60,7 +60,7 @@
 <button class="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
 <span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
 </button>
-<a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" data-quote-cta href="/iletisim.html">
+<a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" href="/iletisim.html#contact-form">
 <span data-i18n="nav.cta">Teklif Alın</span> <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
 </a>
 </div>
@@ -90,7 +90,7 @@
 <span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
 </button>
 </div>
-<a class="mobile-nav-cta" data-quote-cta href="/iletisim.html" data-i18n="nav.cta">Teklif Alın</a>
+<a class="mobile-nav-cta" href="/iletisim.html#contact-form" data-i18n="nav.cta">Teklif Alın</a>
 </div>
 
 <!-- 3D Expo: split-screen scroll experience. Left = scrollable machine
@@ -149,6 +149,10 @@
 </div>
 </section>
 
+<!-- Phase 41: solutions -> faq live inside their own contained "one
+     screen per section" scroll stack — see the .snap-stack comment in
+     base.css for why the expo hero above is deliberately excluded. -->
+<div class="snap-stack">
 <!-- Solutions catalog: real product/technology list from ionaengineering.com/solutions -->
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="solutions">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
@@ -387,6 +391,7 @@
 </div>
 </div>
 </section>
+</div>
 
 <!-- Footer -->
 <footer class="bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">

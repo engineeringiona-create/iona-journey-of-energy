@@ -237,7 +237,7 @@
 
   "contact.form.eyebrow": "Solicitar Presupuesto",
   "contact.form.title": "Cuéntenos Sobre Su Proyecto",
-  "contact.form.body": "Complete el formulario y su aplicación de correo se abrirá automáticamente, enviando su mensaje directamente a nuestro equipo de ingeniería.",
+  "contact.form.body": "Complete el formulario y su mensaje se enviará directamente a nuestro equipo de ingeniería.",
   "contact.form.name_placeholder": "Nombre y Apellidos",
   "contact.form.email_placeholder": "Su Correo Electrónico",
   "contact.form.subject_placeholder": "Asunto",
