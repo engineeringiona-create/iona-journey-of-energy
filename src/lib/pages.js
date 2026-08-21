@@ -7,7 +7,8 @@ export const PAGES = [
   { id: 'teknoloji', label: 'Teknoloji', path: '/teknoloji.html' },
   { id: 'hakkimizda', label: 'Hakkımızda', path: '/hakkimizda.html' },
   { id: 'etki', label: 'Etki', path: '/etki.html' },
-  { id: 'iletisim', label: 'İletişim', path: '/iletisim.html' }
+  { id: 'iletisim', label: 'İletişim', path: '/iletisim.html' },
+  { id: 'duyurular', label: 'Duyurular', path: '/duyurular.html' }
 ];
 
 export function pageIdForPath(pathname) {

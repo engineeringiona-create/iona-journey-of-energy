@@ -24,6 +24,7 @@ export default defineConfig({
         etki: resolve(__dirname, 'etki.html'),
         iletisim: resolve(__dirname, 'iletisim.html'),
         ionaflux: resolve(__dirname, 'ionaflux.html'),
+        duyurular: resolve(__dirname, 'duyurular.html'),
         admin: resolve(__dirname, 'admin.html')
       }
     }

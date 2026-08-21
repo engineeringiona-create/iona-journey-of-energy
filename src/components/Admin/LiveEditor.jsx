@@ -13,7 +13,7 @@ import SectionsPanel from './SectionsPanel.jsx';
 import AnnouncementModal from './AnnouncementModal.jsx';
 import HistoryDropdown from './HistoryDropdown.jsx';
 import HotspotsModal from './HotspotsModal.jsx';
-import EventPopupModal from './EventPopupModal.jsx';
+import AnnouncementsModal from './AnnouncementsModal.jsx';
 import StatsModal from './StatsModal.jsx';
 
 const STYLE_ID = 'iona-admin-editor-style';
@@ -29,7 +29,7 @@ const TOOLS = [
   { id: 'sections', label: 'Bölümler', icon: 'visibility' },
   { id: 'announcement', label: 'Duyuru Bandı', icon: 'campaign' },
   { id: 'hotspots', label: '3D Bilgi Noktaları', icon: 'view_in_ar' },
-  { id: 'eventPopup', label: 'Etkinlik Duyurusu', icon: 'event' },
+  { id: 'announcements', label: 'Duyuru Yöneticisi', icon: 'newspaper' },
   { id: 'stats', label: 'İstatistikler', icon: 'bar_chart' },
   { id: 'history', label: 'Geçmiş', icon: 'history' }
 ];
@@ -102,8 +102,8 @@ export default function LiveEditor({ onLogout }) {
   const [themeEdits, setThemeEdits] = useState({});
   const [announcementEdits, setAnnouncementEdits] = useState({});
   const [hotspotsEdits, setHotspotsEdits] = useState({});
-  const [eventPopupEdits, setEventPopupEdits] = useState({});
-  const [globalSettings, setGlobalSettings] = useState({ theme: {}, announcement: {}, hotspots: {}, eventPopup: {} });
+  const [announcementsEdits, setAnnouncementsEdits] = useState({});
+  const [globalSettings, setGlobalSettings] = useState({ theme: {}, announcement: {}, hotspots: {}, announcements: {} });
   const [activeImageKey, setActiveImageKey] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [panel, setPanel] = useState(null);
@@ -130,19 +130,19 @@ export default function LiveEditor({ onLogout }) {
           theme: readLocalBucket('theme') || {},
           announcement: readLocalBucket('announcement') || {},
           hotspots: readLocalBucket('hotspots') || {},
-          eventPopup: readLocalBucket('eventPopup') || {}
+          announcements: readLocalBucket('announcements') || {}
         });
         return;
       }
       const { data } = await supabase
         .from('site_content')
         .select('id,content')
-        .in('id', ['theme', 'announcement', 'hotspots', 'eventPopup']);
+        .in('id', ['theme', 'announcement', 'hotspots', 'announcements']);
       setGlobalSettings({
         theme: data?.find((r) => r.id === 'theme')?.content || {},
         announcement: data?.find((r) => r.id === 'announcement')?.content || {},
         hotspots: data?.find((r) => r.id === 'hotspots')?.content || {},
-        eventPopup: data?.find((r) => r.id === 'eventPopup')?.content || {}
+        announcements: data?.find((r) => r.id === 'announcements')?.content || {}
       });
     })();
   }, []);
@@ -544,15 +544,15 @@ export default function LiveEditor({ onLogout }) {
     setPanel(null);
   }
 
-  async function closeEventPopupModal() {
-    if (Object.keys(eventPopupEdits).length > 0) {
-      const error = await saveGlobalBucket('eventPopup', eventPopupEdits);
+  async function closeAnnouncementsModal() {
+    if (Object.keys(announcementsEdits).length > 0) {
+      const error = await saveGlobalBucket('announcements', announcementsEdits);
       if (error) showToast('error', error.message);
       else {
-        setGlobalSettings((g) => ({ ...g, eventPopup: { ...g.eventPopup, ...eventPopupEdits } }));
-        showToast('success', 'Etkinlik duyurusu kaydedildi.');
+        setGlobalSettings((g) => ({ ...g, announcements: { ...g.announcements, ...announcementsEdits } }));
+        showToast('success', 'Duyurular kaydedildi.');
       }
-      setEventPopupEdits({});
+      setAnnouncementsEdits({});
     }
     setPanel(null);
   }
@@ -746,11 +746,11 @@ export default function LiveEditor({ onLogout }) {
         />
       )}
 
-      {panel === 'eventPopup' && (
-        <EventPopupModal
-          initial={{ ...globalSettings.eventPopup, ...eventPopupEdits }}
-          onChange={(patch) => setEventPopupEdits((current) => ({ ...current, ...patch }))}
-          onClose={closeEventPopupModal}
+      {panel === 'announcements' && (
+        <AnnouncementsModal
+          initial={{ ...globalSettings.announcements, ...announcementsEdits }}
+          onChange={(patch) => setAnnouncementsEdits((current) => ({ ...current, ...patch }))}
+          onClose={closeAnnouncementsModal}
           onToast={showToast}
         />
       )}

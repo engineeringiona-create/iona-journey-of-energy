@@ -10,7 +10,7 @@ import { readLocalImages } from './lib/imageContent.js';
 import { readLocalBucket } from './lib/adminStore.js';
 import { applyAnnouncementBar } from './lib/announcementBar.js';
 import { applyHotspots } from './lib/hotspots.js';
-import { applyEventPopup } from './lib/eventPopup.js';
+import { applyAnnouncementPopup } from './lib/announcements.js';
 import { pageIdForPath } from './lib/pages.js';
 
 export const LANGS = [
@@ -151,14 +151,14 @@ async function fetchContentOverrides(lang) {
   }
 }
 
-/* Global (non-page-scoped) admin buckets: theme accent, announcement
-   bar, 3D hotspots, and the event popup all live in their own
-   site_content rows (id "theme" / "announcement" / "hotspots" /
-   "eventPopup") since they apply site-wide (or are only ever relevant
-   on one specific page, but still not part of that page's own
-   text/image/seo content), not per the currently-open page's row.
-   Fire-and-forget from initI18n() — a slow/failed fetch just means no
-   override shows up, never blocks the rest of the page. */
+/* Global (non-page-scoped) admin buckets: theme accent, top announcement
+   bar, 3D hotspots, and the announcements popup carousel all live in
+   their own site_content rows (id "theme" / "announcement" /
+   "hotspots" / "announcements") since they apply site-wide (or are only
+   ever relevant on one specific page, but still not part of that
+   page's own text/image/seo content), not per the currently-open
+   page's row. Fire-and-forget from initI18n() — a slow/failed fetch
+   just means no override shows up, never blocks the rest of the page. */
 async function applyGlobalOverrides() {
   const pageId = pageIdForPath(window.location.pathname);
   const supabase = getSupabase();
@@ -166,19 +166,19 @@ async function applyGlobalOverrides() {
     applyThemeOverrides(readLocalBucket('theme'));
     applyAnnouncementBar(readLocalBucket('announcement'));
     if (pageId === 'teknoloji') applyHotspots(readLocalBucket('hotspots')?.list);
-    applyEventPopup(readLocalBucket('eventPopup'), pageId);
+    applyAnnouncementPopup(readLocalBucket('announcements')?.list, pageId);
     return;
   }
   try {
     const { data, error } = await supabase
       .from('site_content')
       .select('id,content')
-      .in('id', ['theme', 'announcement', 'hotspots', 'eventPopup']);
+      .in('id', ['theme', 'announcement', 'hotspots', 'announcements']);
     if (error || !data) return;
     applyThemeOverrides(data.find((r) => r.id === 'theme')?.content);
     applyAnnouncementBar(data.find((r) => r.id === 'announcement')?.content);
     if (pageId === 'teknoloji') applyHotspots(data.find((r) => r.id === 'hotspots')?.content?.list);
-    applyEventPopup(data.find((r) => r.id === 'eventPopup')?.content, pageId);
+    applyAnnouncementPopup(data.find((r) => r.id === 'announcements')?.content?.list, pageId);
   } catch (e) {
     /* no theme/banner/hotspot/popup override, page still works fine */
   }

@@ -7,6 +7,7 @@
     { "source": "/etki", "destination": "/etki.html" },
     { "source": "/iletisim", "destination": "/iletisim.html" },
     { "source": "/ionaflux", "destination": "/ionaflux.html" },
+    { "source": "/duyurular", "destination": "/duyurular.html" },
     { "source": "/admin", "destination": "/admin.html" }
   ]
 }
