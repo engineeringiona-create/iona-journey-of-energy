@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSupabase } from '../../lib/supabaseClient.js';
 import { writeLocalContent } from '../../lib/localContent.js';
 import { writeLocalImages, clearLocalImages } from '../../lib/imageContent.js';
-import { readLocalBucket, writeLocalBucket } from '../../lib/adminStore.js';
+import { readLocalBucket, writeLocalBucket, clearLocalBucket } from '../../lib/adminStore.js';
 import { PAGES, pageIdForPath } from '../../lib/pages.js';
 import ImageSettingsModal from './ImageSettingsModal.jsx';
 import Toast from './Toast.jsx';
@@ -306,6 +306,14 @@ export default function LiveEditor({ onLogout }) {
       if (hasImageEdits) writeLocalImages(currentPage.id, imageEdits);
       if (hasSeoEdits) writeLocalBucket(`seo:${currentPage.id}`, seoEdits);
       if (hasSectionEdits) writeLocalBucket(`sections:${currentPage.id}`, sectionEdits);
+      /* Merge saved edits into the "originals" baselines so reopening a
+         modal right after a save shows what was just saved, not stale
+         pre-edit values — nothing reloads the iframe after a save, so
+         these refs would otherwise never pick up the change. */
+      seoOriginalsRef.current = { ...seoOriginalsRef.current, ...seoEdits };
+      Object.entries(imageEdits).forEach(([key, patch]) => {
+        imageOriginalsRef.current[key] = { ...(imageOriginalsRef.current[key] || {}), ...patch };
+      });
       setSaveError('Supabase bağlı değil — .env dosyasına VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY ekleyin.');
       setEdits({});
       setImageEdits({});
@@ -361,6 +369,13 @@ export default function LiveEditor({ onLogout }) {
       if (revError) console.warn('[IONA Admin] Geçmiş kaydı oluşturulamadı:', revError.message);
     });
 
+    /* Same stale-baseline fix as the local-fallback branch above — no
+       iframe reload happens after a Supabase save either. */
+    seoOriginalsRef.current = { ...seoOriginalsRef.current, ...seoEdits };
+    Object.entries(imageEdits).forEach(([key, patch]) => {
+      imageOriginalsRef.current[key] = { ...(imageOriginalsRef.current[key] || {}), ...patch };
+    });
+
     setEdits({});
     setImageEdits({});
     setSeoEdits({});
@@ -371,28 +386,30 @@ export default function LiveEditor({ onLogout }) {
 
   async function handleReset() {
     const ok = window.confirm(
-      `${currentPage.label} sayfasındaki TÜM metin, görsel, SEO ve bölüm değişiklikleri varsayılana sıfırlansın mı? Bu işlem geri alınamaz.`
+      `${currentPage.label} sayfasındaki TÜM metin, görsel, SEO ve bölüm değişiklikleri VE genel tema renkleri varsayılana sıfırlansın mı? Bu işlem geri alınamaz.`
     );
     if (!ok) return;
 
     setResetting(true);
     const supabase = getSupabase();
     if (supabase) {
-      const { error } = await supabase
-        .from('site_content')
-        .upsert({ id: currentPage.id, content: {}, updated_at: new Date().toISOString() });
+      const [{ error }, { error: themeError }] = await Promise.all([
+        supabase.from('site_content').upsert({ id: currentPage.id, content: {}, updated_at: new Date().toISOString() }),
+        supabase.from('site_content').upsert({ id: 'theme', content: {}, updated_at: new Date().toISOString() })
+      ]);
       setResetting(false);
-      if (error) {
-        showToast('error', error.message);
+      if (error || themeError) {
+        showToast('error', (error || themeError).message);
         return;
       }
-      showToast('success', `${currentPage.label} varsayılana sıfırlandı.`);
+      showToast('success', `${currentPage.label} ve tema renkleri varsayılana sıfırlandı.`);
     } else {
       clearLocalImages(currentPage.id);
+      clearLocalBucket('theme');
       setResetting(false);
       showToast(
         'success',
-        'Bu tarayıcıdaki görsel değişiklikleri temizlendi. (Not: Supabase bağlı olmadığından diğer değişiklikler bu tarayıcıda sıfırlanamıyor.)'
+        'Bu tarayıcıdaki görsel ve tema değişiklikleri temizlendi. (Not: Supabase bağlı olmadığından diğer değişiklikler bu tarayıcıda sıfırlanamıyor.)'
       );
     }
 
@@ -400,6 +417,8 @@ export default function LiveEditor({ onLogout }) {
     setImageEdits({});
     setSeoEdits({});
     setSectionEdits({});
+    setThemeEdits({});
+    setGlobalSettings((g) => ({ ...g, theme: {} }));
     setSaved(false);
     setActiveImageKey(null);
     setPanel(null);
@@ -588,6 +607,7 @@ export default function LiveEditor({ onLogout }) {
           pageId={currentPage.id}
           pageLabel={currentPage.label}
           initial={{ ...seoOriginalsRef.current, ...seoEdits }}
+          doc={iframeRef.current?.contentDocument}
           onChange={recordSeoEdit}
           onClose={() => setPanel(null)}
           onToast={showToast}

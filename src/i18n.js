@@ -96,21 +96,30 @@ function upsertMeta(attr, key, content) {
   el.setAttribute('content', content);
 }
 
-/* Live theme accent (Phase 33): a single injected <style> overriding
-   --color-accent plus the two CSS vars that actually drive buttons/CTAs/
-   glows across the site (--brand, --brand-orange — see DESIGN.md), in
-   both the light and dark root blocks, so the picked color shows up
-   regardless of the visitor's theme mode. */
+/* Live theme palette (Phase 34): three independent knobs — brand (green,
+   drives logo/icons/badges/borders), cta (orange, drives buttons/CTA/
+   glows), and surface (drives the --border-green section/card tint) — in
+   both the light and dark root blocks so the picked colors show up
+   regardless of the visitor's theme mode. Only theme.brand/cta/surface
+   are honored; a leftover legacy theme.accent (the old single-color
+   picker this replaced, which collapsed brand+CTA into one flat color)
+   is intentionally ignored so any previously-saved single-color override
+   stops applying immediately, reverting to base.css's real dual-tone
+   brand colors until a new granular value is picked. */
 const THEME_STYLE_ID = 'iona-theme-vars';
 function applyThemeOverrides(theme) {
-  if (!theme || !theme.accent) return;
+  if (!theme || (!theme.brand && !theme.cta && !theme.surface)) return;
   let style = document.getElementById(THEME_STYLE_ID);
   if (!style) {
     style = document.createElement('style');
     style.id = THEME_STYLE_ID;
     document.head.appendChild(style);
   }
-  style.textContent = `:root, :root.dark { --color-accent: ${theme.accent}; --brand: ${theme.accent}; --brand-orange: ${theme.accent}; }`;
+  const rules = [];
+  if (theme.cta) rules.push(`--color-accent: ${theme.cta};`, `--brand-orange: ${theme.cta};`);
+  if (theme.brand) rules.push(`--brand: ${theme.brand};`);
+  if (theme.surface) rules.push(`--border-green: color-mix(in srgb, ${theme.surface} 24%, transparent);`);
+  style.textContent = `:root, :root.dark { ${rules.join(' ')} }`;
 }
 
 async function fetchContentOverrides(lang) {

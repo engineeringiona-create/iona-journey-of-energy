@@ -1,7 +1,17 @@
 import { useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
 
-export default function SeoModal({ pageId, pageLabel, initial, onChange, onClose, onToast }) {
+function upsertMeta(doc, attr, key, content) {
+  let el = doc.head.querySelector(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = doc.createElement('meta');
+    el.setAttribute(attr, key);
+    doc.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+
+export default function SeoModal({ pageId, pageLabel, initial, doc, onChange, onClose, onToast }) {
   const [title, setTitle] = useState(initial.title || '');
   const [description, setDescription] = useState(initial.description || '');
   const [ogImage, setOgImage] = useState(initial.ogImage || '');
@@ -9,6 +19,13 @@ export default function SeoModal({ pageId, pageLabel, initial, onChange, onClose
 
   function commit(patch) {
     onChange(patch);
+    if (!doc) return;
+    if (patch.title !== undefined) doc.title = patch.title;
+    if (patch.description !== undefined) upsertMeta(doc, 'name', 'description', patch.description);
+    if (patch.ogImage !== undefined) {
+      upsertMeta(doc, 'property', 'og:image', patch.ogImage);
+      upsertMeta(doc, 'property', 'og:title', title);
+    }
   }
 
   async function handleFile(e) {
