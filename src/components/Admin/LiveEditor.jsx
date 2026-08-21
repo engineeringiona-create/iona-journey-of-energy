@@ -12,6 +12,9 @@ import ThemeModal from './ThemeModal.jsx';
 import SectionsPanel from './SectionsPanel.jsx';
 import AnnouncementModal from './AnnouncementModal.jsx';
 import HistoryDropdown from './HistoryDropdown.jsx';
+import HotspotsModal from './HotspotsModal.jsx';
+import EventPopupModal from './EventPopupModal.jsx';
+import StatsModal from './StatsModal.jsx';
 
 const STYLE_ID = 'iona-admin-editor-style';
 const VIEWPORTS = [
@@ -25,6 +28,9 @@ const TOOLS = [
   { id: 'theme', label: 'Tema', icon: 'palette' },
   { id: 'sections', label: 'Bölümler', icon: 'visibility' },
   { id: 'announcement', label: 'Duyuru Bandı', icon: 'campaign' },
+  { id: 'hotspots', label: '3D Bilgi Noktaları', icon: 'view_in_ar' },
+  { id: 'eventPopup', label: 'Etkinlik Duyurusu', icon: 'event' },
+  { id: 'stats', label: 'İstatistikler', icon: 'bar_chart' },
   { id: 'history', label: 'Geçmiş', icon: 'history' }
 ];
 
@@ -84,6 +90,7 @@ export default function LiveEditor({ onLogout }) {
   const iframeRef = useRef(null);
   const cleanupRef = useRef(null);
   const modeRef = useRef('edit');
+  const langRef = useRef('tr');
   const imageElRef = useRef(null);
   const imageOriginalsRef = useRef({});
   const seoOriginalsRef = useRef({});
@@ -94,7 +101,9 @@ export default function LiveEditor({ onLogout }) {
   const [sectionEdits, setSectionEdits] = useState({});
   const [themeEdits, setThemeEdits] = useState({});
   const [announcementEdits, setAnnouncementEdits] = useState({});
-  const [globalSettings, setGlobalSettings] = useState({ theme: {}, announcement: {} });
+  const [hotspotsEdits, setHotspotsEdits] = useState({});
+  const [eventPopupEdits, setEventPopupEdits] = useState({});
+  const [globalSettings, setGlobalSettings] = useState({ theme: {}, announcement: {}, hotspots: {}, eventPopup: {} });
   const [activeImageKey, setActiveImageKey] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
   const [panel, setPanel] = useState(null);
@@ -117,19 +126,40 @@ export default function LiveEditor({ onLogout }) {
     (async () => {
       const supabase = getSupabase();
       if (!supabase) {
-        setGlobalSettings({ theme: readLocalBucket('theme') || {}, announcement: readLocalBucket('announcement') || {} });
+        setGlobalSettings({
+          theme: readLocalBucket('theme') || {},
+          announcement: readLocalBucket('announcement') || {},
+          hotspots: readLocalBucket('hotspots') || {},
+          eventPopup: readLocalBucket('eventPopup') || {}
+        });
         return;
       }
-      const { data } = await supabase.from('site_content').select('id,content').in('id', ['theme', 'announcement']);
+      const { data } = await supabase
+        .from('site_content')
+        .select('id,content')
+        .in('id', ['theme', 'announcement', 'hotspots', 'eventPopup']);
       setGlobalSettings({
         theme: data?.find((r) => r.id === 'theme')?.content || {},
-        announcement: data?.find((r) => r.id === 'announcement')?.content || {}
+        announcement: data?.find((r) => r.id === 'announcement')?.content || {},
+        hotspots: data?.find((r) => r.id === 'hotspots')?.content || {},
+        eventPopup: data?.find((r) => r.id === 'eventPopup')?.content || {}
       });
     })();
   }, []);
 
+  /* edits is keyed by language first ({ tr: {key: value}, en: {...} })
+     so that switching the admin's TR/EN target mid-session — without a
+     save in between — can't misattribute pending text edits to the
+     wrong language bucket. Reads langRef (not the `lang` state) so this
+     stays correct even though recordEdit's own closure is created once
+     and never rebuilt (same stale-closure hazard modeRef already guards
+     against for edit/navigate mode). */
   const recordEdit = useCallback((key, value) => {
-    setEdits((current) => ({ ...current, [key]: value }));
+    const activeLang = langRef.current;
+    setEdits((current) => ({
+      ...current,
+      [activeLang]: { ...(current[activeLang] || {}), [key]: value }
+    }));
     setSaved(false);
   }, []);
 
@@ -270,14 +300,20 @@ export default function LiveEditor({ onLogout }) {
       }
     }
 
+    function onI18nChange(e) {
+      if (e.detail?.lang) setLangState(e.detail.lang);
+    }
+
     doc.addEventListener('click', onClick, true);
     doc.addEventListener('focusout', onFocusOut, true);
     doc.addEventListener('keydown', onKeyDown, true);
+    doc.addEventListener('i18nchange', onI18nChange);
 
     cleanupRef.current = () => {
       doc.removeEventListener('click', onClick, true);
       doc.removeEventListener('focusout', onFocusOut, true);
       doc.removeEventListener('keydown', onKeyDown, true);
+      doc.removeEventListener('i18nchange', onI18nChange);
     };
 
     setReady(true);
@@ -292,6 +328,21 @@ export default function LiveEditor({ onLogout }) {
     doc.documentElement.classList.toggle('iona-edit-mode', mode === 'edit');
     if (mode === 'navigate' && doc.activeElement?.isContentEditable) doc.activeElement.blur();
   }, [mode]);
+
+  useEffect(() => {
+    langRef.current = lang;
+  }, [lang]);
+
+  /* Reuses the live site's own language switcher (src/i18n.js's
+     initLangSwitcher()) instead of reimplementing lang-switching here —
+     clicking the nav's hidden data-lang button re-renders the page's
+     text in place, same page/scroll position, no iframe reload. The
+     resulting "i18nchange" event (also dispatched by that same code)
+     is what actually updates the `lang` state below. */
+  function switchLang(code) {
+    const doc = iframeRef.current?.contentDocument;
+    doc?.querySelector(`[data-lang="${code}"]`)?.click();
+  }
 
   function handlePageChange(nextPageId) {
     if (nextPageId === selectedPage) return;
@@ -317,7 +368,7 @@ export default function LiveEditor({ onLogout }) {
     const supabase = getSupabase();
     if (!supabase) {
       console.warn('[IONA Admin] Supabase yapılandırılmamış (.env eksik) — değişiklik veritabanına yazılmadı.');
-      if (hasTextEdits) writeLocalContent(lang, edits);
+      if (hasTextEdits) Object.entries(edits).forEach(([langCode, patch]) => writeLocalContent(langCode, patch));
       if (hasImageEdits) writeLocalImages(currentPage.id, imageEdits);
       if (hasSeoEdits) writeLocalBucket(`seo:${currentPage.id}`, seoEdits);
       if (hasSectionEdits) writeLocalBucket(`sections:${currentPage.id}`, sectionEdits);
@@ -347,7 +398,11 @@ export default function LiveEditor({ onLogout }) {
     }
 
     const payload = { ...(existing?.content || {}) };
-    if (hasTextEdits) payload[lang] = { ...(payload[lang] || {}), ...edits };
+    if (hasTextEdits) {
+      Object.entries(edits).forEach(([langCode, patch]) => {
+        payload[langCode] = { ...(payload[langCode] || {}), ...patch };
+      });
+    }
     if (hasImageEdits) {
       const mergedImages = { ...(payload.images || {}) };
       Object.entries(imageEdits).forEach(([key, patch]) => {
@@ -476,8 +531,35 @@ export default function LiveEditor({ onLogout }) {
     setPanel(null);
   }
 
+  async function closeHotspotsModal() {
+    if (Object.keys(hotspotsEdits).length > 0) {
+      const error = await saveGlobalBucket('hotspots', hotspotsEdits);
+      if (error) showToast('error', error.message);
+      else {
+        setGlobalSettings((g) => ({ ...g, hotspots: { ...g.hotspots, ...hotspotsEdits } }));
+        showToast('success', '3D bilgi noktaları kaydedildi.');
+      }
+      setHotspotsEdits({});
+    }
+    setPanel(null);
+  }
+
+  async function closeEventPopupModal() {
+    if (Object.keys(eventPopupEdits).length > 0) {
+      const error = await saveGlobalBucket('eventPopup', eventPopupEdits);
+      if (error) showToast('error', error.message);
+      else {
+        setGlobalSettings((g) => ({ ...g, eventPopup: { ...g.eventPopup, ...eventPopupEdits } }));
+        showToast('success', 'Etkinlik duyurusu kaydedildi.');
+      }
+      setEventPopupEdits({});
+    }
+    setPanel(null);
+  }
+
+  const textEditCount = Object.values(edits).reduce((sum, bucket) => sum + Object.keys(bucket).length, 0);
   const editCount =
-    Object.keys(edits).length + Object.keys(imageEdits).length + Object.keys(seoEdits).length + Object.keys(sectionEdits).length;
+    textEditCount + Object.keys(imageEdits).length + Object.keys(seoEdits).length + Object.keys(sectionEdits).length;
   const activeImageOriginal = activeImageKey ? imageOriginalsRef.current[activeImageKey] : null;
   const activeImageInitial = activeImageOriginal
     ? { ...activeImageOriginal, ...(imageEdits[activeImageKey] || {}) }
@@ -512,6 +594,19 @@ export default function LiveEditor({ onLogout }) {
               Gezin
             </span>
           </button>
+          <div className="flex items-center gap-1 rounded-full bg-white/5 border border-white/10 p-1 shrink-0">
+            {['tr', 'en'].map((code) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => switchLang(code)}
+                title={code === 'tr' ? 'Türkçe metinleri düzenle' : 'İngilizce metinleri düzenle'}
+                className={`px-3 py-1 rounded-full font-label-caps text-[11px] font-bold tracking-[0.06em] transition-colors duration-200 ${lang === code ? 'bg-emerald-500 text-black' : 'text-white/50'}`}
+              >
+                {code.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <div className="flex items-center gap-1 rounded-full bg-white/5 border border-white/10 p-1 shrink-0">
             {VIEWPORTS.map((v) => (
               <button
@@ -642,6 +737,25 @@ export default function LiveEditor({ onLogout }) {
           onClose={closeAnnouncementModal}
         />
       )}
+
+      {panel === 'hotspots' && (
+        <HotspotsModal
+          initial={{ ...globalSettings.hotspots, ...hotspotsEdits }}
+          onChange={(patch) => setHotspotsEdits((current) => ({ ...current, ...patch }))}
+          onClose={closeHotspotsModal}
+        />
+      )}
+
+      {panel === 'eventPopup' && (
+        <EventPopupModal
+          initial={{ ...globalSettings.eventPopup, ...eventPopupEdits }}
+          onChange={(patch) => setEventPopupEdits((current) => ({ ...current, ...patch }))}
+          onClose={closeEventPopupModal}
+          onToast={showToast}
+        />
+      )}
+
+      {panel === 'stats' && <StatsModal onClose={() => setPanel(null)} onToast={showToast} />}
 
       {panel === 'history' && (
         <HistoryDropdown

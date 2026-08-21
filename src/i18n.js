@@ -9,6 +9,8 @@ import { readLocalContent } from './lib/localContent.js';
 import { readLocalImages } from './lib/imageContent.js';
 import { readLocalBucket } from './lib/adminStore.js';
 import { applyAnnouncementBar } from './lib/announcementBar.js';
+import { applyHotspots } from './lib/hotspots.js';
+import { applyEventPopup } from './lib/eventPopup.js';
 import { pageIdForPath } from './lib/pages.js';
 
 export const LANGS = [
@@ -149,25 +151,51 @@ async function fetchContentOverrides(lang) {
   }
 }
 
-/* Global (non-page-scoped) admin buckets: theme accent + announcement
-   bar live in their own site_content rows (id "theme" / "announcement")
-   since they apply site-wide, not per page. Fire-and-forget from
-   initI18n() — a slow/failed fetch just means no theme/banner override
-   shows up, never blocks the rest of the page. */
+/* Global (non-page-scoped) admin buckets: theme accent, announcement
+   bar, 3D hotspots, and the event popup all live in their own
+   site_content rows (id "theme" / "announcement" / "hotspots" /
+   "eventPopup") since they apply site-wide (or are only ever relevant
+   on one specific page, but still not part of that page's own
+   text/image/seo content), not per the currently-open page's row.
+   Fire-and-forget from initI18n() — a slow/failed fetch just means no
+   override shows up, never blocks the rest of the page. */
 async function applyGlobalOverrides() {
+  const pageId = pageIdForPath(window.location.pathname);
   const supabase = getSupabase();
   if (!supabase) {
     applyThemeOverrides(readLocalBucket('theme'));
     applyAnnouncementBar(readLocalBucket('announcement'));
+    if (pageId === 'teknoloji') applyHotspots(readLocalBucket('hotspots')?.list);
+    applyEventPopup(readLocalBucket('eventPopup'), pageId);
     return;
   }
   try {
-    const { data, error } = await supabase.from('site_content').select('id,content').in('id', ['theme', 'announcement']);
+    const { data, error } = await supabase
+      .from('site_content')
+      .select('id,content')
+      .in('id', ['theme', 'announcement', 'hotspots', 'eventPopup']);
     if (error || !data) return;
     applyThemeOverrides(data.find((r) => r.id === 'theme')?.content);
     applyAnnouncementBar(data.find((r) => r.id === 'announcement')?.content);
+    if (pageId === 'teknoloji') applyHotspots(data.find((r) => r.id === 'hotspots')?.content?.list);
+    applyEventPopup(data.find((r) => r.id === 'eventPopup')?.content, pageId);
   } catch (e) {
-    /* no theme/banner override, page still works fine */
+    /* no theme/banner/hotspot/popup override, page still works fine */
+  }
+}
+
+/* Lightweight analytics (Phase 34): one best-effort row per page load.
+   No visitor identity, just path + timestamp. Never awaited by its
+   caller and always caught, so a network failure here can never delay
+   or break the page it's trying to measure. */
+async function trackPageView() {
+  try {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    const { error } = await supabase.from('page_views').insert({ page_path: window.location.pathname });
+    if (error) console.warn('[IONA] page_views kaydı başarısız:', error.message);
+  } catch (e) {
+    /* analytics is best-effort only */
   }
 }
 
@@ -227,6 +255,7 @@ export async function initI18n() {
   window.__ionaDict = dict;
   applyDict(dict);
   applyGlobalOverrides();
+  trackPageView();
   document.dispatchEvent(new CustomEvent('i18nready', { detail: { lang, dict } }));
   return dict;
 }

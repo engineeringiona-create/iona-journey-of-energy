@@ -96,3 +96,21 @@ create policy "public insert site_content_revisions" on site_content_revisions
 
 create policy "public read site_content_revisions" on site_content_revisions
   for select using (true);
+
+-- Phase 34: lightweight page-view analytics. One row per page load,
+-- fired best-effort from src/i18n.js's initI18n() (every page). No
+-- visitor identity captured, just path + timestamp — good enough for
+-- the admin "İstatistikler" summary, not a real analytics pipeline.
+create table if not exists page_views (
+  id uuid primary key default gen_random_uuid(),
+  page_path text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table page_views enable row level security;
+
+create policy "public insert page_views" on page_views
+  for insert with check (true);
+
+create policy "public read page_views" on page_views
+  for select using (true);
