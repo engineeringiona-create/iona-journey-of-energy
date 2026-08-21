@@ -1,29 +1,66 @@
 const OVERLAY_ID = 'iona-announcements-popup';
 const STYLE_ID = 'iona-announcements-popup-style';
 
-/* "Liquid glass" wide-format popup (Phase 39): translucent frosted card
-   over a dark backdrop, wide two-column layout on desktop (visual left,
-   content right), stacked on mobile. All the glass/blur values live in
-   one injected stylesheet so media queries (impossible via inline
-   style) can drive the column switch. */
+/* "Liquid glass" wide-format popup (Phase 39): translucent frosted card,
+   wide two-column layout on desktop (visual left, content right),
+   stacked on mobile. All the glass/blur values live in one injected
+   stylesheet so media queries (impossible via inline style) can drive
+   the column switch.
+
+   Phase 41: the glass itself now follows the site's light/dark theme
+   (same :root / :root.dark switch base.css uses for --bg/--surface/
+   --text) instead of always being the dark-emerald tint — a light frost
+   with dark text in light mode, the original dark frost with white text
+   in dark mode. Every color below reads one of these --ap-* variables
+   instead of a literal white/black rgba so the two themes never drift. */
 function injectStyles() {
   if (document.getElementById(STYLE_ID)) return;
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    #${OVERLAY_ID} { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; background: rgba(5,7,6,0.72); padding: 24px; }
+    :root {
+      --ap-overlay-bg: rgba(230,229,222,0.7);
+      --ap-card-bg: rgba(255,255,255,0.68);
+      --ap-border: rgba(20,24,26,0.14);
+      --ap-border-strong: rgba(20,24,26,0.22);
+      --ap-shadow: 0 25px 50px -12px rgba(20,24,26,0.28), inset 0 1px 1px 0 rgba(255,255,255,0.6);
+      --ap-text: #14181a;
+      --ap-text-muted: rgba(20,24,26,0.68);
+      --ap-title-shadow: none;
+      --ap-glass-btn-bg: rgba(20,24,26,0.06);
+      --ap-glass-btn-bg-hover: rgba(20,24,26,0.12);
+      --ap-glass-btn-border: rgba(20,24,26,0.16);
+      --ap-dot-bg: rgba(20,24,26,0.2);
+      --ap-counter: rgba(20,24,26,0.45);
+    }
+    :root.dark {
+      --ap-overlay-bg: rgba(5,7,6,0.72);
+      --ap-card-bg: rgba(6,28,20,0.6);
+      --ap-border: rgba(255,255,255,0.16);
+      --ap-border-strong: rgba(255,255,255,0.22);
+      --ap-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 1px 1px 0 rgba(255,255,255,0.2);
+      --ap-text: #fff;
+      --ap-text-muted: rgba(255,255,255,0.72);
+      --ap-title-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      --ap-glass-btn-bg: rgba(255,255,255,0.1);
+      --ap-glass-btn-bg-hover: rgba(255,255,255,0.18);
+      --ap-glass-btn-border: rgba(255,255,255,0.22);
+      --ap-dot-bg: rgba(255,255,255,0.28);
+      --ap-counter: rgba(255,255,255,0.4);
+    }
+    #${OVERLAY_ID} { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; background: var(--ap-overlay-bg); padding: 24px; }
     .iona-ap-glow { position: absolute; width: 640px; height: 640px; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
     .iona-ap-glow-a { background: radial-gradient(circle, rgba(63,174,102,0.35), transparent 70%); top: -220px; left: -160px; }
     .iona-ap-glow-b { background: radial-gradient(circle, rgba(255,138,61,0.28), transparent 70%); bottom: -220px; right: -160px; }
     .iona-ap-card {
       position: relative; z-index: 1; width: 90vw; max-width: 860px; max-height: 85vh;
       display: flex; flex-direction: column; overflow: hidden;
-      background: rgba(6,28,20,0.6);
+      background: var(--ap-card-bg);
       backdrop-filter: blur(20px) saturate(190%);
       -webkit-backdrop-filter: blur(20px) saturate(190%);
-      border: 1px solid rgba(255,255,255,0.16);
+      border: 1px solid var(--ap-border);
       border-radius: 20px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 1px 1px 0 rgba(255,255,255,0.2);
+      box-shadow: var(--ap-shadow);
       opacity: 1; transition: opacity 150ms ease;
     }
     @media (min-width: 820px) { .iona-ap-card { flex-direction: row; max-height: 560px; } }
@@ -34,26 +71,26 @@ function injectStyles() {
     .iona-ap-close {
       position: absolute; top: 14px; right: 14px; z-index: 3; width: 34px; height: 34px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.22); color: #fff; font-size: 16px; line-height: 1; cursor: pointer;
+      background: var(--ap-glass-btn-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--ap-border-strong); color: var(--ap-text); font-size: 16px; line-height: 1; cursor: pointer;
     }
-    .iona-ap-close:hover { background: rgba(255,255,255,0.18); }
-    .iona-ap-badge { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.85); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 5px 12px; border-radius: 999px; margin-bottom: 14px; }
-    .iona-ap-title { color: #fff; font-weight: 800; font-size: 24px; line-height: 1.2; margin: 0 0 12px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-    .iona-ap-desc { color: rgba(255,255,255,0.72); font-size: 14px; line-height: 1.65; max-height: 160px; overflow-y: auto; margin: 0 0 20px; padding-right: 4px; }
+    .iona-ap-close:hover { background: var(--ap-glass-btn-bg-hover); }
+    .iona-ap-badge { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; background: var(--ap-glass-btn-bg); border: 1px solid var(--ap-border); color: var(--ap-text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 5px 12px; border-radius: 999px; margin-bottom: 14px; }
+    .iona-ap-title { color: var(--ap-text); font-weight: 800; font-size: 24px; line-height: 1.2; margin: 0 0 12px; text-shadow: var(--ap-title-shadow); }
+    .iona-ap-desc { color: var(--ap-text-muted); font-size: 14px; line-height: 1.65; max-height: 160px; overflow-y: auto; margin: 0 0 20px; padding-right: 4px; }
     .iona-ap-actions { display: flex; gap: 10px; margin-top: auto; }
     .iona-ap-cta { flex: 1; text-align: center; background: var(--brand-orange, #ff751f); color: #fff; font-weight: 700; font-size: 13px; padding: 13px; border-radius: 999px; text-decoration: none; }
     .iona-ap-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
     .iona-ap-arrow {
       width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.08); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.18); color: #fff; cursor: pointer; font-size: 15px;
+      background: var(--ap-glass-btn-bg); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      border: 1px solid var(--ap-border); color: var(--ap-text); cursor: pointer; font-size: 15px;
     }
-    .iona-ap-arrow:hover { background: rgba(255,255,255,0.16); }
+    .iona-ap-arrow:hover { background: var(--ap-glass-btn-bg-hover); }
     .iona-ap-dots { display: flex; align-items: center; gap: 6px; }
-    .iona-ap-dot { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.28); display: inline-block; cursor: pointer; transition: width 150ms ease, background 150ms ease; }
+    .iona-ap-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--ap-dot-bg); display: inline-block; cursor: pointer; transition: width 150ms ease, background 150ms ease; }
     .iona-ap-dot.is-active { width: 18px; background: var(--brand-orange, #ff751f); }
-    .iona-ap-counter { color: rgba(255,255,255,0.4); font-size: 11px; }
+    .iona-ap-counter { color: var(--ap-counter); font-size: 11px; }
   `;
   document.head.appendChild(style);
 }
