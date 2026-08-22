@@ -10,7 +10,6 @@
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
-<canvas id="webgl-stage"></canvas>
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex justify-between items-center px-safe-margin-desktop py-5 transition-all duration-500 hidden md:flex" id="top-nav">
 <a class="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-300" href="/">
@@ -96,20 +95,25 @@
 <!-- 3D Services showcase: a self-contained, fixed-height slider (NOT
      scroll-driven — a scroll-hijacking pinned version of this shipped
      and got pulled after repeatedly landing broken/overlapping text).
-     Left column = the active machine's copy. Right column is left
-     empty on purpose: #webgl-stage (see base.css) is one fixed,
-     full-viewport, transparent canvas shared with etki.html, not an
-     element nested in here — its machines are positioned in 3D space
-     (see expo-scene.js's agBase/gsBase/pmBase) to sit visually in that
-     empty right column. Model/copy switching is entirely click-driven
-     (arrows + pills, see servicesShowcase.js) — the page around it
-     scrolls completely normally, nothing here touches scroll. -->
+     Left column = the active machine's copy. Right column is
+     #services-3d-canvas-box: a dedicated, position:relative +
+     overflow:hidden container that owns #webgl-stage outright — the
+     canvas is a real child of it now, absolutely filling this one box
+     (see #webgl-stage in base.css) instead of pinned to the viewport,
+     so it scrolls away with this section like everything else instead
+     of following the screen. See expo-scene.js's resize()/layout() for
+     the matching change on the Three.js side (sized off this box's own
+     rect, not window.innerWidth/innerHeight; machines centered in it
+     rather than offset to dodge a text column they no longer share a
+     frame with). Model/copy switching is entirely click-driven (arrows
+     + pills, see servicesShowcase.js) — the page around it scrolls
+     completely normally, nothing here touches scroll. -->
 <section class="relative bg-transparent pt-24 md:pt-28 pb-20 md:pb-28" id="expo">
 <div class="px-safe-margin-mobile md:px-safe-margin-desktop">
 
-<div class="relative w-full min-h-[85vh] md:h-[750px] flex items-center" id="services-3d-showcase">
+<div class="relative w-full flex flex-col md:flex-row md:items-center gap-8 md:gap-0 md:h-[750px]" id="services-3d-showcase">
 
-<div class="relative w-full md:w-[45%] h-full">
+<div class="relative w-full min-h-[420px] md:w-[45%] md:h-full">
 
 <div class="services-3d-slide" id="expo-agitator" data-machine="agitator">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.agitator_eyebrow">Teknoloji · Karıştırma Sistemi</span>
@@ -140,7 +144,9 @@
 
 </div>
 
-<div class="hidden md:block md:w-[55%] h-full" aria-hidden="true"></div>
+<div class="relative w-full h-[650px] md:h-full md:w-[55%] overflow-hidden rounded-3xl" id="services-3d-canvas-box">
+
+<canvas id="webgl-stage"></canvas>
 
 <button type="button" class="services-3d-arrow services-3d-arrow-prev" id="services-3d-prev" data-i18n-aria-label="services.expo.prev_aria" aria-label="Önceki">
 <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
@@ -156,14 +162,21 @@
 </div>
 
 </div>
+
+</div>
 </div>
 </section>
 
-<!-- Phase 41: solutions -> faq live inside their own contained "one
-     screen per section" scroll stack — see the .snap-stack comment in
-     base.css for why the expo hero above is deliberately excluded. -->
-<div class="snap-stack">
-<!-- Solutions catalog: real product/technology list from ionaengineering.com/solutions -->
+<!-- solutions -> faq used to live inside a .snap-stack (a mandatory
+     scroll-snap container capped at height:100vh/overflow-y:auto) so
+     each section rested full-screen as you scrolled through them. That
+     container's own internal scroll never reliably handed off back to
+     the page once you reached the last section (faq) — visitors got
+     stuck unable to reach the footer. Removed outright: every section
+     below is now a plain, normally-flowing block like every other page
+     on the site, so the document scrolls straight through to the
+     footer with nothing capturing the wheel/touch gesture along the
+     way. --><!-- Solutions catalog: real product/technology list from ionaengineering.com/solutions -->
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="solutions">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="services.solutions.eyebrow">Ürün &amp; Teknoloji Kataloğu</span>
@@ -401,7 +414,6 @@
 </div>
 </div>
 </section>
-</div>
 
 <!-- Footer -->
 <footer class="bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">

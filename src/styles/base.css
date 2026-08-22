@@ -344,14 +344,27 @@ body {
     }
 }
 
-/* Full-screen fixed WebGL backdrop. Only teknoloji.html and etki.html
-   instantiate a renderer against this canvas; other pages simply don't
-   include the <canvas id="webgl-stage"> element. */
+/* teknoloji.html's expo-scene.js canvas — the only page that currently
+   instantiates a <canvas id="webgl-stage">. (etki.html's genset-scene.js
+   renders to this same id too, but nothing currently mounts it — no
+   <canvas> in etki.html to select, predating this fix, not something
+   this change touches. If that page ever comes back, it'll want its own
+   scoped rule rather than reusing the one below.)
+
+   Confined to #services-3d-canvas-box (a normal, position:relative +
+   overflow:hidden box inside the showcase section) instead of a fixed/
+   full-viewport backdrop — an earlier version had this canvas pinned to
+   the viewport, which meant it visually "followed the screen" past its
+   own section into Çözümlerimiz/the footer, reading as broken/stuck
+   scrolling even though the document itself was scrolling fine
+   underneath. expo-scene.js's resize()/layout() size the renderer and
+   camera off this box's own rect, not window.innerWidth/innerHeight —
+   see that file's own comments. */
 #webgl-stage {
-    position: fixed;
+    position: absolute;
     inset: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     z-index: 0;
     pointer-events: none;
     transform: translateZ(0);
@@ -1062,33 +1075,3 @@ body {
     }
 }
 
-/* teknoloji.html ("Hizmetler") only: below the scrollytelling expo hero
-   (which needs ordinary free-scrolling — it crossfades 3D machines over
-   ~700vh via position:sticky panels, see expo-scene.js — mandatory snap
-   applied to the whole document would fight that and yank the reader
-   past it mid-crossfade), the remaining sections (solutions, metrics,
-   field-photos, workflow, faq) live inside this wrapper as their own
-   contained snap viewport: one wheel tick or swipe advances a full
-   section, which rests centered in view before the next one comes in.
-   Sections with more content than one screen (faq) still scroll freely
-   inside themselves first — mandatory snap only forces the *rest*
-   position once a scroll gesture ends, it never traps mid-section. */
-.snap-stack {
-    height: 100vh;
-    height: 100dvh;
-    overflow-y: auto;
-    scroll-snap-type: y mandatory;
-}
-.snap-stack > section[id] {
-    scroll-snap-align: start;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-@media (prefers-reduced-motion: reduce) {
-    .snap-stack {
-        scroll-snap-type: y proximity;
-    }
-}

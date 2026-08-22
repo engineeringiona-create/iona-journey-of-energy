@@ -27,24 +27,26 @@ const SHAKE_ROT_AMP = 0.006;
 
 /* Largest of the three buildRig() targetRadius values below (agitator
    5.6, genset 6.8, pump 6.2) — genset is the biggest. The camera is one
-   shared object for all three machines, so its mobile distance has to
+   shared object for all three machines, so the fit distance has to
    clear whichever one is currently on screen; sizing off the largest
    keeps all three safely inside frame instead of tuning per-machine. */
-const MOBILE_FIT_RADIUS = 6.8;
-const MOBILE_FIT_MARGIN = 1.15;
+const FIT_RADIUS = 6.8;
+const FIT_MARGIN = 1.15;
 
-/* The old mobile camera (fixed z=22, fov=40) never accounted for the
-   phone's actual aspect ratio — on a typical portrait screen (aspect
-   ~0.46) that distance only leaves enough half-frustum width to fit
-   about half of MOBILE_FIT_RADIUS, so the genset's sides were cropped
-   off-screen on real phones. This fits distance to whichever of
-   height/width is the tighter constraint at the live aspect, same
-   approach as GltfTwinScene.jsx's frameBox for the homepage hero. */
-function mobileCameraDistance(fovDeg, aspect) {
+/* The canvas now lives confined inside its own box in the showcase
+   section (not a full-viewport backdrop — see teknoloji.html/base.css's
+   webgl-stage-confined), so its aspect ratio is whatever that box's own
+   width/height come out to at the live layout, never assumable as "the
+   window's aspect". This fits distance to whichever of height/width is
+   the tighter constraint at that live aspect, same approach as
+   GltfTwinScene.jsx's frameBox for the homepage hero — used for every
+   breakpoint now, not just mobile, since neither is a fixed 16:9 frame
+   anymore. */
+function fitCameraDistance(fovDeg, aspect) {
   const fov = fovDeg * (Math.PI / 180);
-  const distanceForHeight = MOBILE_FIT_RADIUS / Math.tan(fov / 2);
-  const distanceForWidth = MOBILE_FIT_RADIUS / (Math.tan(fov / 2) * aspect);
-  return Math.max(distanceForHeight, distanceForWidth) * MOBILE_FIT_MARGIN;
+  const distanceForHeight = FIT_RADIUS / Math.tan(fov / 2);
+  const distanceForWidth = FIT_RADIUS / (Math.tan(fov / 2) * aspect);
+  return Math.max(distanceForHeight, distanceForWidth) * FIT_MARGIN;
 }
 
 function armMachine(mode) {
@@ -175,7 +177,10 @@ export function initExpoScene(canvas) {
     scene.environment = currentEnv;
   });
 
-  const camera = new THREE.PerspectiveCamera(32, window.innerWidth / window.innerHeight, 0.1, 400);
+  /* Aspect is a placeholder — resize() (called immediately below, once
+     the machines/canvas box exist) sets it for real from the confined
+     canvas box's own live size before first paint. */
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 400);
   camera.position.set(0, 0.6, 16);
   camera.lookAt(0, 0, 0);
 
@@ -261,24 +266,34 @@ export function initExpoScene(canvas) {
     });
   }
 
+  /* Machines used to sit off-center (base.x ~4.6-5.1) to dodge a text
+     column that shared the same full-viewport canvas frame. The canvas
+     is confined to its own dedicated box now (see webgl-stage-confined)
+     with nothing else drawn into that frame, so there's nothing left to
+     dodge — every machine is simply centered in its own box. */
   function layout() {
     const mobile = window.innerWidth < MOBILE_BREAKPOINT;
-    agBase.set(mobile ? 0 : 4.6, mobile ? 0.5 : 0.2);
-    gsBase.set(mobile ? 0 : 5.1, mobile ? -0.5 : -0.3);
-    pmBase.set(mobile ? 0 : 4.8, mobile ? 0.5 : 0.1);
+    agBase.set(0, mobile ? 0.5 : 0.2);
+    gsBase.set(0, mobile ? -0.5 : -0.3);
+    pmBase.set(0, mobile ? 0.5 : 0.1);
     agMode.homeX = agBase.x; agMode.homeY = agBase.y;
     gsMode.homeX = gsBase.x; gsMode.homeY = gsBase.y;
     pmMode.homeX = pmBase.x; pmMode.homeY = pmBase.y;
     camera.fov = mobile ? 40 : 32;
-    camera.position.z = mobile ? mobileCameraDistance(camera.fov, window.innerWidth / window.innerHeight) : 16;
+    camera.position.z = fitCameraDistance(camera.fov, camera.aspect);
     camera.updateProjectionMatrix();
     if (!agMode.assembled && !agMode.playing) armMachine(agMode);
     if (!gsMode.assembled && !gsMode.playing) armMachine(gsMode);
     if (pmMode.ready && !pmMode.assembled && !pmMode.playing) armMachine(pmMode);
   }
 
+  /* Sized off the canvas's own confined box (its parent element), not
+     window.innerWidth/innerHeight — see webgl-stage-confined in
+     base.css, this canvas no longer spans the full viewport. */
   function resize() {
-    const w = window.innerWidth, h = window.innerHeight;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
+    if (w === 0 || h === 0) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     layout();
