@@ -618,6 +618,18 @@ const DIGESTER_PIPE_MESH_NAMES = new Set([
    a real plant). Named *_GRATING_* still for the material's own
    history, even though the material itself is concrete now. */
 const DIGESTER_GRATING_MESH_NAMES = new Set(['dome_walkway', 'walkway_inner_kerb', 'top_platform', 'stair_tread']);
+/* The 4 new side-entry wall mixers (plantStructureOverrides.js) —
+   deliberately distinct names from the GLB's own pre-existing
+   mixer_shaft/mixer_motor/mixer_hub/mixer_blade (the dome-mounted top
+   mixers under the `mixers`/`top_mixers` groups, a separate feature
+   this doesn't touch). Routed around the whole per-structure material
+   system entirely (see the scene.traverse() skip-check below) so they
+   stay 100% opaque with their own fixed materials while the rest of
+   the digester X-rays to 0.25 opacity on select. */
+const DIGESTER_MIXER_MESH_NAMES = new Set([
+  'side_mixer_collar', 'side_mixer_housing', 'side_mixer_shaft',
+  'side_mixer_hub', 'side_mixer_blade', 'side_mixer_beacon'
+]);
 /* Roof-mounted mechanical/electrical equipment + exposed exterior
    piping across the three prefab buildings — client asked for these to
    read as genuinely different things instead of one flat dark blob,
@@ -901,6 +913,11 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
      too, so every override still goes transparent in step with the
      rest of its structure when selected. */
   const namedMeshMaterialsRef = useRef(new Map());
+  /* The 4 side-entry digester mixers' propeller hub groups + beacon-ring
+     meshes (plantStructureOverrides.js) — ticked every frame below
+     (propeller spin, beacon emissive pulse) alongside the hover-worm
+     shader's own uTime update, not a separate effect/rAF loop. */
+  const digesterMixersRef = useRef({ propellerHubs: [], beacons: [] });
 
   useEffect(() => {
     return () => {
@@ -919,12 +936,15 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     /* Motor Odasi -> containerized CHP unit (adds ribs/louvers/hazard
        stripe to engine_room), Pompa Odasi -> open-air covered pump
        station (swaps pump_room's enclosed shell for posts + a tilted
-       canopy) — see plantStructureOverrides.js's own header comment.
-       Runs before the material-building pass and scene.traverse()
-       below so every mesh it adds gets picked up by the exact same
+       canopy), digester -> 4 new side-entry mixers — see
+       plantStructureOverrides.js's own header comment. Runs before the
+       material-building pass and scene.traverse() below so every mesh
+       it adds (except the mixers, deliberately — see
+       DIGESTER_MIXER_MESH_NAMES) gets picked up by the exact same
        per-structure material/hover/click system as everything the GLB
        shipped with. */
-    applyStructureOverrides(plantRoot);
+    const { propellerHubs, beacons } = applyStructureOverrides(plantRoot);
+    digesterMixersRef.current = { propellerHubs, beacons };
 
     const materials = new Map();
     const baseYs = new Map();
@@ -1299,6 +1319,19 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         child.visible = false;
         return;
       }
+      /* The 4 side-entry mixers (plantStructureOverrides.js) skip this
+         whole per-structure material system on purpose: they already
+         got their own fixed material set directly at creation time, and
+         the X-ray effect below (materialsRef/namedMeshMaterialsRef) only
+         ever dims materials it finds in those two maps — since these
+         mixer meshes were never registered into either one, they simply
+         never get touched by that dimming pass, which is exactly what
+         "mixers stay 100% opaque while the tank goes see-through" needs.
+         Skipped here too so this generic pass doesn't stomp their
+         materials back to the digester's shared clay/tank_wall look. */
+      if (structure.name === 'digester' && DIGESTER_MIXER_MESH_NAMES.has(baseName)) {
+        return;
+      }
       /* A handful of specific, real mesh names (tank_wall, and each
          structure's own foundation/plinth) get a dedicated material
          instead of the structure's shared flat-ceramic one — see
@@ -1430,13 +1463,27 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
 
   /* Drives the flowing-worm shader's motion — cheap (5 float writes/
      frame) even though it runs regardless of hover state, since the
-     shader itself gates all visible cost behind `uHoverActive > 0.0`. */
-  useFrame((state) => {
+     shader itself gates all visible cost behind `uHoverActive > 0.0`.
+     Also spins the 4 side-entry mixer propellers and pulses their
+     beacon rings — reduceMotion (imported at module scope, see
+     scene-utils.js's own export) skips both: a still propeller instead
+     of a slowly rotating one for a "prefers-reduced-motion" visitor,
+     same rule the digester's rotSpeed/rotSpeed-style flags follow
+     elsewhere on the site. */
+  useFrame((state, delta) => {
     const elapsed = state.clock.elapsedTime;
     hoverUniformsRef.current.forEach((uniformsList) => {
       uniformsList.forEach((uniforms) => {
         uniforms.uTime.value = elapsed;
       });
+    });
+    if (!reduceMotion) {
+      digesterMixersRef.current.propellerHubs.forEach((hub) => {
+        hub.rotation.z += delta * 1.4;
+      });
+    }
+    digesterMixersRef.current.beacons.forEach((beacon, i) => {
+      beacon.material.emissiveIntensity = 0.6 + Math.sin(elapsed * 1.8 + i * 0.7) * 0.35;
     });
   });
 

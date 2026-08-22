@@ -35,11 +35,13 @@ function box(w, h, d) {
   return new THREE.BoxGeometry(w, h, d);
 }
 
-function makeMesh(geometry, name, position, rotation) {
-  const mesh = new THREE.Mesh(geometry);
+function makeMesh(geometry, name, position, rotation, material) {
+  const mesh = new THREE.Mesh(geometry, material);
   mesh.name = name;
   mesh.position.set(...position);
   if (rotation) mesh.rotation.set(...rotation);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
   return mesh;
 }
 
@@ -154,10 +156,158 @@ function replacePumpRoomShell(pumpRoom) {
   canopy.add(makeMesh(box(9.6, 0.22, 6.6), 'roof', [0, 4.21, 0], [0.07, 0, 0]));
 }
 
+/* ---------------- Digester -> 4 side-entry wall mixers ----------------
+   Real dims from the GLB: tank_wall is a cylinder of radius 12 centered
+   at world y=3.45, wall face spanning world y:[0.9,6.0] — mid-wall
+   height (3.45) is what MID_Y below matches. The GLB already has 2
+   *different* wall-mounted mixers (nodes mixer_1/mixer_2 under the
+   `mixers` group, at the diagonal/corner azimuths ~45 deg and ~225 deg)
+   — a separate, pre-existing feature this doesn't touch, remove, or
+   reuse; these 4 are new, at true 0/90/180/270 deg, and use entirely
+   distinct mesh names (DIGESTER_MIXER_MESH_NAMES in GltfTwinScene.jsx)
+   so there's no chance of colliding with that existing pair.
+
+   Each assembly is built along local -Z = "toward tank center" via
+   group.lookAt(center) rather than hand-derived rotation.y trig — the
+   safe way to get 4 different azimuths pointed correctly without ever
+   being able to render and check one visually. Blade/hub geometry lives
+   in its own child group (not the outer per-mixer group) so
+   `rotation.z` on just that child spins the propeller around the
+   shaft's own axis without having to fight the parent's lookAt/downward-
+   tilt rotations already baked into it. */
+const DIGESTER_RADIUS = 12;
+const DIGESTER_MID_Y = 3.45;
+const MIXER_AZIMUTHS = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
+/* Small negative rotateX on the interior (shaft+propeller) sub-group
+   tilts local -Z ("inward") toward -Y ("downward") — derived from the
+   standard rotate-around-X matrix (Y' = Y*cos(t) - Z*sin(t)) applied to
+   a pure (0,0,-1) inward vector: Y' = sin(t), which only goes negative
+   (downward) for negative t. 0.09 rad ~= 5 deg, "slight" per spec. */
+const MIXER_DOWNWARD_TILT = -0.09;
+
+/* These meshes are routed around GltfTwinScene.jsx's whole per-structure
+   material system on purpose (see DIGESTER_MIXER_MESH_NAMES's own
+   comment there, and the scene.traverse() skip-check next to it) — the
+   X-ray effect only ever dims materials it finds registered in that
+   system, so the cleanest way to guarantee these 4 assemblies stay
+   100% opaque through every state is to never hand their materials to
+   it at all. Built here instead, directly, once, and shared across all
+   4 mixers (same reasoning as this file's other shared textures/
+   materials — one steel look, one red look, doesn't need 4 separate
+   instances since none of these ever change per-mixer). */
+const mixerSteelMaterial = new THREE.MeshStandardMaterial({ color: '#c7c9cc', metalness: 0.85, roughness: 0.25 });
+/* Emissive baked in at creation (not toggled) — "pop through the
+   frosted tank" per spec needs the glow present at rest, not only while
+   selected; GltfTwinScene.jsx's useFrame pulses emissiveIntensity on
+   top of this base value for the "subtle" animated part of that ask. */
+const mixerPropellerMaterial = new THREE.MeshStandardMaterial({
+  color: '#DC2626', metalness: 0.3, roughness: 0.35, emissive: '#ff3b3b', emissiveIntensity: 0.5
+});
+const mixerBeaconMaterial = new THREE.MeshStandardMaterial({
+  color: '#eafcff', metalness: 0.1, roughness: 0.4, emissive: '#66d9ff', emissiveIntensity: 0.6
+});
+
+function buildSideMixer(azimuth) {
+  const group = new THREE.Group();
+  group.name = 'side_entry_mixer';
+  group.position.set(
+    DIGESTER_RADIUS * Math.cos(azimuth),
+    DIGESTER_MID_Y,
+    DIGESTER_RADIUS * Math.sin(azimuth)
+  );
+  group.lookAt(0, DIGESTER_MID_Y, 0);
+
+  /* Exterior: flanged mounting collar flush with the wall (z=0, right
+     where lookAt's local -Z crosses the tank surface) + a compact
+     drive-motor housing just outside it (+Z = away from center). */
+  const collarGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.18, 16);
+  collarGeo.rotateX(Math.PI / 2);
+  group.add(makeMesh(collarGeo, 'side_mixer_collar', [0, 0, 0.05], null, mixerSteelMaterial));
+
+  group.add(makeMesh(box(0.7, 0.7, 0.9), 'side_mixer_housing', [0, 0, 0.55], null, mixerSteelMaterial));
+
+  /* Interior: shaft + propeller, tilted down slightly as a group so the
+     propeller spin animation (rotation.z on the hub group alone, see
+     GltfTwinScene.jsx's useFrame) isn't fighting this tilt every frame. */
+  const interior = new THREE.Group();
+  interior.name = 'side_entry_mixer_interior';
+  interior.rotateX(MIXER_DOWNWARD_TILT);
+  group.add(interior);
+
+  const SHAFT_LENGTH = 3.2;
+  const shaftGeo = new THREE.CylinderGeometry(0.09, 0.09, SHAFT_LENGTH, 10);
+  shaftGeo.rotateX(Math.PI / 2);
+  interior.add(makeMesh(shaftGeo, 'side_mixer_shaft', [0, 0, -SHAFT_LENGTH / 2], null, mixerSteelMaterial));
+
+  const hub = new THREE.Group();
+  hub.name = 'side_mixer_prop_hub';
+  hub.position.set(0, 0, -SHAFT_LENGTH);
+  interior.add(hub);
+
+  const hubCoreGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.3, 10);
+  hubCoreGeo.rotateX(Math.PI / 2);
+  hub.add(makeMesh(hubCoreGeo, 'side_mixer_hub', [0, 0, 0], null, mixerSteelMaterial));
+
+  /* 3-blade propeller, 120 deg apart, each blade a thin pitched
+     rectangle radiating from the hub — signal red, per spec. */
+  const BLADE_COUNT = 3;
+  for (let i = 0; i < BLADE_COUNT; i++) {
+    const blade = makeMesh(box(0.16, 0.85, 0.05), 'side_mixer_blade', [0, 0.5, 0], null, mixerPropellerMaterial);
+    blade.rotation.z = (i / BLADE_COUNT) * Math.PI * 2;
+    blade.rotateY(0.45); // blade pitch, so it reads as a real propeller, not a flat fan
+    hub.add(blade);
+  }
+
+  /* Pulse-ring beacon at the wall insertion point, just proud of the
+     collar — a bright, distinctly-not-red accent (cyan-white) so it
+     reads as "sensor/indicator" rather than blending with the
+     propeller. Pulsed via emissiveIntensity in GltfTwinScene.jsx's
+     useFrame, alongside the propeller spin. */
+  const beaconGeo = new THREE.TorusGeometry(0.68, 0.035, 8, 24);
+  const beacon = makeMesh(beaconGeo, 'side_mixer_beacon', [0, 0, 0.08], null, mixerBeaconMaterial);
+  group.add(beacon);
+
+  return { group, hub, beacon };
+}
+
+/* Re-discovers the hub/beacon refs of already-built mixers instead of
+   just bailing empty-handed — React.StrictMode double-invokes this
+   component's useLayoutEffect once in dev (see this file's own header
+   comment), and the caller stores whatever this function returns
+   directly into a ref every time it runs. Returning {propellerHubs:[],
+   beacons:[]} on that second, "nothing to build" call would silently
+   overwrite the real refs the first call already produced, permanently
+   killing the propeller-spin/beacon-pulse animation with no error to
+   show for it — this is what actually keeps that from happening. */
+function addDigesterMixers(digester) {
+  const existing = digester.children.filter((child) => child.name === 'side_entry_mixer');
+  if (existing.length) {
+    return {
+      propellerHubs: existing.map((group) => group.getObjectByName('side_mixer_prop_hub')).filter(Boolean),
+      beacons: existing.map((group) => group.getObjectByName('side_mixer_beacon')).filter(Boolean)
+    };
+  }
+
+  const propellerHubs = [];
+  const beacons = [];
+  MIXER_AZIMUTHS.forEach((azimuth) => {
+    const { group, hub, beacon } = buildSideMixer(azimuth);
+    digester.add(group);
+    propellerHubs.push(hub);
+    beacons.push(beacon);
+  });
+  return { propellerHubs, beacons };
+}
+
 export function applyStructureOverrides(plantRoot) {
   const engineRoom = plantRoot.getObjectByName('engine_room');
   if (engineRoom) addEngineRoomDetails(engineRoom);
 
   const pumpRoom = plantRoot.getObjectByName('pump_room');
   if (pumpRoom) replacePumpRoomShell(pumpRoom);
+
+  const digester = plantRoot.getObjectByName('digester');
+  const mixers = digester ? addDigesterMixers(digester) : { propellerHubs: [], beacons: [] };
+
+  return mixers;
 }
