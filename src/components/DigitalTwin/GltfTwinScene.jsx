@@ -761,30 +761,40 @@ function createGratingTexture() {
    that shell's roof/roof_fascia/door/door_handle/window/vents — those
    stay on the structure's normal ceramic material, only the 4 wall
    names get this treatment. feed_pool is a separate case (below); the
-   digester has none of these names, so it's untouched by this set.
-   'wall_rib' added for engine_room's corrugation strips (see
-   plantStructureOverrides.js) — same steel/slate panel material as the
-   flat walls they sit on. */
-const BUILDING_WALL_MESH_NAMES = new Set(['wall_front', 'wall_back', 'wall_right', 'wall_left', 'wall_rib']);
-
-/* Engine room's safety-yellow hazard stripe (plantStructureOverrides.js)
-   — only that one structure has this name, harmless to register it for
-   every structure the same way FOUNDATION_MESH_NAMES/BUILDING_PIPE_MESH_NAMES
-   above already do for names that don't exist on every building. */
-const BUILDING_HAZARD_MESH_NAMES = new Set(['hazard_stripe']);
+   digester has none of these names, so it's untouched by this set. Only
+   scada_room still has these 4 real mesh names now — engine_room_shell
+   and pump_room_shell were both fully replaced by
+   plantStructureOverrides.js (containerized CHP unit / open-air pump
+   canopy respectively), neither keeps its original wall_* meshes. */
+const BUILDING_WALL_MESH_NAMES = new Set(['wall_front', 'wall_back', 'wall_right', 'wall_left']);
 
 /* Pump station's open-air canopy support posts (plantStructureOverrides.js)
    — bare structural steel, distinct from BUILDING_PIPE_MESH_NAMES'
    fluid-carrying pipework even though the finish is similar. */
 const BUILDING_STRUCTURAL_STEEL_MESH_NAMES = new Set(['canopy_post']);
 
-/* One shared texture/repeat across all 3 buildings rather than tuning
-   per-building height (their real wall heights actually differ —
-   engine_room 4.6m, pump_room 3.8m, scada_room 3.4m, per their GLB
-   bounding boxes) — a real industrial site commonly standardizes on one
-   panel module across every building for cost/procurement reasons, so
-   one shared spacing is a legitimate simplification here, not just a
-   shortcut. Thick dark seam band (bottom 15% of the tile) against a
+/* Engine room's rebuilt ISO shipping container (plantStructureOverrides.js)
+   — dark charcoal/steel, entirely its own material scoped to engine_room
+   only (see the dedicated `if (structure.name === 'engine_room')` block
+   below) so it never bleeds into scada_room's own prefab-office walls,
+   which still use BUILDING_WALL_MESH_NAMES/sandwichPanelMaterial above
+   unchanged. One shared name for every wall/rib/corner/roof/fan/stack/
+   louver/door part — they're all the same material, no reason to
+   register 8 different names for one look. */
+const ENGINE_ROOM_CONTAINER_MESH_NAMES = new Set(['container_panel']);
+/* Engine room's safety-yellow hazard stripe — the container's one
+   non-charcoal part. */
+const ENGINE_ROOM_HAZARD_MESH_NAMES = new Set(['container_hazard_stripe']);
+
+/* Originally one shared texture/repeat across all 3 prefab buildings;
+   now only scada_room actually uses BUILDING_WALL_MESH_NAMES/this
+   texture at all — engine_room_shell and pump_room_shell were both
+   deleted and rebuilt from scratch by plantStructureOverrides.js (see
+   ENGINE_ROOM_CONTAINER_MESH_NAMES / BUILDING_STRUCTURAL_STEEL_MESH_NAMES
+   above), neither keeps its original wall_* meshes. Left as-is rather
+   than re-tuned for scada_room alone, since the module size still
+   reads fine at that one building's own real wall height (~3.4m per
+   its GLB bounding box). Thick dark seam band (bottom 15% of the tile) against a
    light panel face, repeated 4x up the wall (repeat.y=4) — "thick,
    spaced-out" per spec, not the dense corrugation pattern used on the
    digester. repeat.x stays 1: the seam line already runs the tile's
@@ -1205,19 +1215,6 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         uniformsList.push(attachHoverWormShader(buildingPipeMaterial));
         BUILDING_PIPE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, buildingPipeMaterial));
 
-        /* Safety-yellow hazard stripe — engine_room's containerized CHP
-           unit only (see plantStructureOverrides.js), harmlessly
-           registered for every building the same way every other
-           per-structure material set here is. */
-        const hazardMaterial = new THREE.MeshStandardMaterial({
-          color: '#f4c430',
-          metalness: 0.1,
-          roughness: 0.6,
-        });
-        hazardMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(hazardMaterial));
-        BUILDING_HAZARD_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, hazardMaterial));
-
         /* Bare structural steel — the pump station's open-air canopy
            posts (plantStructureOverrides.js). Same finish as
            buildingPipeMaterial above but its own instance/name, since
@@ -1230,6 +1227,35 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         structuralSteelMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(structuralSteelMaterial));
         BUILDING_STRUCTURAL_STEEL_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, structuralSteelMaterial));
+      }
+
+      if (structure.name === 'engine_room') {
+        /* Dark charcoal/steel, engine_room's rebuilt ISO container only
+           (see ENGINE_ROOM_CONTAINER_MESH_NAMES's own comment) — a
+           dedicated block, not folded into the shared building-materials
+           section above, specifically so this dark finish never bleeds
+           into scada_room's own lighter prefab-office walls (both used
+           to share BUILDING_WALL_MESH_NAMES/sandwichPanelMaterial before
+           engine_room_shell was deleted and rebuilt from scratch). */
+        const containerMaterial = new THREE.MeshStandardMaterial({
+          color: '#2b2e30',
+          metalness: 0.45,
+          roughness: 0.5,
+        });
+        containerMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(containerMaterial));
+        ENGINE_ROOM_CONTAINER_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, containerMaterial));
+
+        /* Safety-yellow hazard stripe — the container's one non-charcoal
+           part. */
+        const hazardMaterial = new THREE.MeshStandardMaterial({
+          color: '#f4c430',
+          metalness: 0.1,
+          roughness: 0.6,
+        });
+        hazardMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(hazardMaterial));
+        ENGINE_ROOM_HAZARD_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, hazardMaterial));
       }
 
       if (structure.name === 'feed_pool') {
