@@ -197,6 +197,48 @@ body {
 .delay-300 { transition-delay: 300ms; }
 .delay-400 { transition-delay: 400ms; }
 
+/* Phase 44: teknoloji.html's services-3d-wrapper (the Mixer/Genset/Pump
+   trio) in its pinned/snapped state. The .is-pinned modifier is added by
+   servicesShowcase.js only on desktop with motion allowed — mobile and
+   prefers-reduced-motion visitors never get this class, so they keep the
+   original Phase 42 continuous-scroll layout (.expo-block's own
+   min-h-[220vh]/md:sticky rules, untouched) with zero CSS here applying
+   to them. Scoped to md: to match servicesShowcase.js's own
+   MOBILE_BREAKPOINT gate, as a second line of defense. */
+@media (min-width: 768px) {
+    .services-3d-wrapper.is-pinned {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .services-3d-wrapper.is-pinned .services-3d-slide {
+        position: absolute;
+        inset: 0;
+        min-height: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Undoes md:sticky md:top-28 on the text column — pinned mode has no
+       scroll happening inside the wrapper for sticky to react to, so it
+       would otherwise just sit at an odd static offset. GSAP (not CSS
+       transitions) drives the actual opacity/transform crossfade here,
+       see servicesShowcase.js — this rule only owns layout, not motion. */
+    .services-3d-wrapper.is-pinned .services-3d-slide > div {
+        position: static;
+    }
+
+    .services-3d-wrapper.is-pinned .services-3d-slide.is-active-slide {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .services-3d-wrapper.is-pinned .services-3d-gap {
+        display: none;
+    }
+}
+
 /* Full-screen fixed WebGL backdrop. Only teknoloji.html and etki.html
    instantiate a renderer against this canvas; other pages simply don't
    include the <canvas id="webgl-stage"> element. */

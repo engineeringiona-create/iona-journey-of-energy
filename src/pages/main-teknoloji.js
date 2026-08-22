@@ -4,6 +4,8 @@ import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpot
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { initExpoScene } from '../three/expo-scene.js';
+import { MOBILE_BREAKPOINT, reduceMotion } from '../three/scene-utils.js';
+import { initServicesShowcase } from '../lib/servicesShowcase.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
@@ -18,7 +20,7 @@ initParallax();
 initCardSpotlight();
 
 const canvas = document.getElementById('webgl-stage');
-const { agitator, genset, pump } = initExpoScene(canvas);
+const { agitator, genset, pump, camera } = initExpoScene(canvas);
 
 /* Each machine's block owns one ScrollTrigger spanning its own
    viewport entry/exit. The first time it's entered, the machine
@@ -38,14 +40,29 @@ function wireMachine(blockSelector, machine) {
   });
 }
 
-wireMachine('#expo-agitator', agitator);
-wireMachine('#expo-genset', genset);
-wireMachine('#expo-pump', pump);
+/* Phase 44: pinned discrete snap between the 3 machines, desktop +
+   motion-OK only — see servicesShowcase.js's own header comment for
+   why. Everyone else (mobile, prefers-reduced-motion) keeps the
+   original Phase 42 continuous scroll-crossfade wireMachine() path
+   completely unchanged, including its own immediate-entry kick for
+   the Agitator. */
+if (window.innerWidth >= MOBILE_BREAKPOINT && !reduceMotion) {
+  initServicesShowcase({
+    wrapper: document.getElementById('services-3d-wrapper'),
+    slides: Array.from(document.querySelectorAll('.services-3d-slide')),
+    machines: [agitator, genset, pump],
+    camera
+  });
+} else {
+  wireMachine('#expo-agitator', agitator);
+  wireMachine('#expo-genset', genset);
+  wireMachine('#expo-pump', pump);
 
-/* The Agitator's section now sits above the fold with no scroll
-   required to see it, so its cinematic must not wait for a scroll
-   event. ScrollTrigger's onEnter already fires immediately if the
-   trigger region is satisfied at creation time, but we also kick it
-   directly here so the assembly always starts the instant the page
-   (and its fonts/layout) settle, with zero dependency on scroll math. */
-agitator.enterSection();
+  /* The Agitator's section now sits above the fold with no scroll
+     required to see it, so its cinematic must not wait for a scroll
+     event. ScrollTrigger's onEnter already fires immediately if the
+     trigger region is satisfied at creation time, but we also kick it
+     directly here so the assembly always starts the instant the page
+     (and its fonts/layout) settle, with zero dependency on scroll math. */
+  agitator.enterSection();
+}
