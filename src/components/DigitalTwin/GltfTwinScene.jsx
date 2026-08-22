@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ContactShadows, Grid, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
@@ -839,7 +839,15 @@ function FeedPipeGapFill() {
   );
 }
 
-function Model({ plantRootRef, onReady, onSelect, onReset, selected }) {
+/* memo'd: every prop the parent passes below (plantRootRef, onReady,
+   onSelect, onReset) is a stable ref/useCallback identity except
+   `selected`, so without this, Model re-runs its whole ~350-mesh JSX
+   reconciliation on every unrelated parent state change too (groundY,
+   ringPositions, hasInteracted, selectedSubIndex...) — none of which
+   this component even reads. Plain shallow-prop memo, no custom
+   comparator needed, since nothing here is passed as a fresh
+   object/array literal each render. */
+const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected }) {
   const { scene } = useGLTF(MODEL_SRC);
   /* One clay material PER top-level structure (not one shared for the
      whole plant) — that's what makes the X-ray effect possible below:
@@ -1389,13 +1397,16 @@ function Model({ plantRootRef, onReady, onSelect, onReset, selected }) {
       onPointerOut={handlePointerOut}
     />
   );
-}
+});
 
 /* Owns the camera/controls tweening + shadow-frustum fitting once the
    model's real bounding box is known, and the click -> focus / miss ->
    reset transitions. Kept inside <Canvas> since it needs useThree/
-   useFrame. */
-function Rig({ plantRootRef, selected, groundY, groundScale, shadowFar, keyLightRef }) {
+   useFrame. memo'd for the same reason as Model above — every prop
+   here is a ref/state value it genuinely reacts to, but the parent
+   also re-renders for state this component doesn't touch at all
+   (ringPositions, hasInteracted, selectedSubIndex). */
+const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, shadowFar, keyLightRef }) {
   const { camera, gl } = useThree();
   const controlsRef = useRef(null);
   const overviewRef = useRef(null);
@@ -1638,7 +1649,7 @@ function Rig({ plantRootRef, selected, groundY, groundScale, shadowFar, keyLight
       />
     </>
   );
-}
+});
 
 /* Placeholder for the real equipment photography the client wants to
    drop in per sub-component (e.g. the actual Mixer) — no photo assets
@@ -1877,7 +1888,15 @@ export default function GltfTwinScene() {
         className="relative z-10"
         shadows
         camera={{ fov: CAMERA_FOV, near: 0.1, far: 500 }}
-        dpr={[1, 1.75]}
+        /* Hard-locked to 1, not a [min,max] range (was [1, 1.75]) — no
+           variable pixel ratio on this canvas at all now, retina/high-DPI
+           screens render at native CSS resolution instead of scaling up
+           for sharpness. This scene already carries real-time shadow
+           mapping (see keyLightRef's shadow-mapSize) on top of the
+           ~350-mesh facility, the single heaviest per-fragment cost on
+           the site — dropping this is worth more than the 1.75 clamp
+           bought. */
+        dpr={1}
         gl={{ antialias: true, powerPreference: 'high-performance', alpha: true }}
         onPointerMissed={handleReset}
       >

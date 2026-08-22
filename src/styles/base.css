@@ -64,10 +64,29 @@ body {
 }
 
 .glass-blur {
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     background: var(--nav-bg);
     transition: background-color 400ms ease;
+}
+
+/* The nav bar sits fixed on top of every page and is on screen for the
+   entire visit — its blur has to re-sample whatever scrolls behind it
+   every frame that happens, the steadiest backdrop-filter cost on the
+   site. Dropped below desktop; --nav-bg's opacity bumped up to
+   compensate (0.62 -> 0.9 light, 0.68 -> 0.88 dark) so the bar still
+   reads solid enough over scrolling content without the blur itself. */
+@media (max-width: 1023px) {
+    :root {
+        --nav-bg: rgba(255, 255, 255, 0.9);
+    }
+    :root.dark {
+        --nav-bg: rgba(14, 18, 16, 0.88);
+    }
+    .glass-blur {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
 }
 
 /* ---------------- Mobile nav (hamburger + dropdown panel) ----------------
@@ -215,15 +234,22 @@ body {
    same element, out of sync with each other) — not repeating that here. */
 #services-3d-showcase {
     isolation: isolate;
+    /* No `size` (that's what `strict`/`content` add over this) — the
+       showcase has no single explicit height of its own on mobile
+       (its two children stack and size themselves; only md:h-[750px]
+       fixes it), so size containment would collapse it to 0 height
+       there. layout+paint+style containment is still real, safe
+       perf isolation: a re-render inside here can't trigger layout/
+       paint work outside it, or vice versa. */
+    contain: layout paint style;
 }
 
 /* Left column: the active service's typography, ~45% wide on desktop
-   (md:w-[45%] in teknoloji.html) — the remaining ~55% ("right column")
-   is deliberately left empty: #webgl-stage below is one fixed,
-   full-viewport, transparent canvas shared with etki.html, not an
-   element nested in here, and its machines are positioned in 3D space
-   (see expo-scene.js's agBase/gsBase/pmBase) to sit visually in that
-   empty space rather than in a literal nested canvas container. */
+   (md:w-[45%] in teknoloji.html). Right column is
+   #services-3d-canvas-box, a dedicated position:relative +
+   overflow:hidden box that #webgl-stage fills — see that id's own
+   comment in this file for why it's confined there instead of a
+   fixed/full-viewport backdrop. */
 #services-3d-showcase .services-3d-slide {
     position: absolute;
     inset: 0;
@@ -233,6 +259,10 @@ body {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    /* Every step crossfades this via GSAP opacity tweens (see
+       servicesShowcase.js) — promoting it ahead of time means that
+       tween never has to wait on a first-frame layer-promotion cost. */
+    will-change: opacity;
 }
 
 #services-3d-showcase .services-3d-slide.is-active-slide {
@@ -259,8 +289,8 @@ body {
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
     border: 1px solid rgba(20, 24, 20, 0.14);
     color: var(--text);
     cursor: pointer;
@@ -300,8 +330,8 @@ body {
     max-width: calc(100% - 32px);
     overflow-x: auto;
     background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
     border: 1px solid rgba(20, 24, 20, 0.14);
 }
 
@@ -342,6 +372,34 @@ body {
         padding: 7px 12px;
         font-size: 11px;
     }
+}
+
+/* Backdrop-blur forces the compositor to re-sample everything behind
+   the blurred element every frame it's on screen — real cost on
+   weaker mobile/tablet GPUs, for buttons this small. Dropped
+   entirely below desktop; background opacity bumped up in its place
+   (0.55 -> 0.82, dark 0.08 -> 0.5) so the glass still reads as opaque
+   enough to stay legible over the 3D model without the blur itself. */
+@media (max-width: 1023px) {
+    .services-3d-arrow,
+    .services-3d-tabs {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(255, 255, 255, 0.82);
+    }
+    :root.dark .services-3d-arrow,
+    :root.dark .services-3d-tabs {
+        background: rgba(20, 24, 20, 0.72);
+    }
+}
+
+/* Çözümlerimiz's 8-card grid: no `size` here either (natural content
+   height, not a fixed box), same reasoning as #services-3d-showcase
+   above — layout+paint+style containment only, so a card's own hover
+   transform/spotlight repaint can't force the browser to re-check
+   layout/paint outside this section. */
+#solutions {
+    contain: layout paint style;
 }
 
 /* teknoloji.html's expo-scene.js canvas — the only page that currently

@@ -56,8 +56,8 @@ function injectStyles() {
       position: relative; z-index: 1; width: 90vw; max-width: 860px; max-height: 85vh;
       display: flex; flex-direction: column; overflow: hidden;
       background: var(--ap-card-bg);
-      backdrop-filter: blur(20px) saturate(190%);
-      -webkit-backdrop-filter: blur(20px) saturate(190%);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
       border: 1px solid var(--ap-border);
       border-radius: 20px;
       box-shadow: var(--ap-shadow);

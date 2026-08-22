@@ -190,16 +190,47 @@ export function createRenderer(canvas) {
   const renderer = new THREE.WebGLRenderer({
     canvas, antialias: true, alpha: true, powerPreference: 'high-performance'
   });
-  /* Clamped to 1.75, not the full devicePixelRatio (up to 3+ on some
-     Android/retina phones) — past that point the extra fragment-shading
-     cost of the studio env map + ACES tonemapping buys imperceptible
-     sharpness but reliably tips mobile/retina below 60fps. */
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  /* Hard-locked to 1.0, not scaled by devicePixelRatio at all (was
+     clamped to 1.75) — retina/high-DPI screens render visibly softer
+     this way, a deliberate trade against the studio env map + ACES
+     tonemapping's per-fragment cost, which was still tipping weaker
+     GPUs below 60fps even at the 1.75 clamp. No variable pixel ratio:
+     always exactly 1, on every device. */
+  renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
   renderer.setClearColor(0x000000, 0);
   return renderer;
+}
+
+/* Antialias is a WebGLRenderer constructor-only option — there's no way
+   to flip it off mid-session without destroying and rebuilding the
+   whole renderer/context, too disruptive to do automatically on a
+   struggling machine. Pixel ratio, unlike antialias, *can* be dropped
+   live (setPixelRatio triggers its own internal resize), so that's the
+   actual lever here: sample a rolling average frame time, and if it's
+   held under targetFps for a full sampleWindow of frames, drop the
+   pixel ratio once (down to `floor`, still <= createRenderer's own 1.0
+   ceiling) and stop sampling — a one-way downgrade, never upgraded back
+   mid-session, since flip-flopping on noisy frame timing would itself
+   be a visible stutter. Call sample(dt) once per rendered frame. */
+export function createFpsGovernor(renderer, { targetFps = 45, sampleWindow = 90, floor = 0.75 } = {}) {
+  let frames = 0;
+  let accum = 0;
+  let downgraded = false;
+  return function sample(dt) {
+    if (downgraded || dt <= 0) return;
+    frames += 1;
+    accum += dt;
+    if (frames < sampleWindow) return;
+    if (frames / accum < targetFps) {
+      downgraded = true;
+      renderer.setPixelRatio(floor);
+    }
+    frames = 0;
+    accum = 0;
+  };
 }
 
 /* Product-photography five-point rig: a strong key, a tight specular

@@ -24,10 +24,22 @@ let lenis = null;
 export function initSmoothScroll() {
   if (reduceMotion || lenis) return lenis;
 
+  /* lerp-driven (not duration/easing) on purpose: Lenis checks
+     `if (duration && easing) ... else if (lerp)` internally, so setting
+     both would silently make duration win and lerp do nothing — the
+     opposite of "max momentum, minimal drag" a fixed-duration tween
+     doesn't give you (every scroll takes exactly `duration` regardless
+     of how fast/slow the input was). lerp is frame-rate-independent
+     exponential smoothing instead: 0.08 closes ~8% of the remaining
+     distance per frame, snappy and responsive rather than syrupy.
+     duration/easing are still exactly right for the one-off scrollTo()
+     anchor jumps below, just not for continuous wheel/touch scrolling. */
   lenis = new Lenis({
-    duration: 1.1,
-    easing: (t) => 1 - Math.pow(1 - t, 3),
-    smoothWheel: true
+    lerp: 0.08,
+    smoothWheel: true,
+    syncTouch: true,
+    touchMultiplier: 1.8,
+    infinite: false
   });
 
   lenis.on('scroll', ScrollTrigger.update);

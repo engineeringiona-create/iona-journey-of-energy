@@ -61,7 +61,7 @@ function tex(canvas, repeat, linear = true) {
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.repeat.set(repeat, repeat);
   t.colorSpace = linear ? THREE.NoColorSpace : THREE.SRGBColorSpace;
-  t.anisotropy = 8;
+  t.anisotropy = 4; // was 8 — halved, still visibly sharp at oblique angles, cheaper per-fragment
   return t;
 }
 
@@ -148,7 +148,7 @@ export function decal(lines, opt = {}) {
   subArr.forEach(t => { x.fillText(t, cx, y); y += step; });
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
+  t.anisotropy = 4; // was 8 — halved, still visibly sharp at oblique angles, cheaper per-fragment
   return t;
 }
 

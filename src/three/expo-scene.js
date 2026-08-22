@@ -5,7 +5,7 @@ import { buildGenset } from './models/cg170b-model.js';
 import { buildPump } from './models/pump-model.js';
 import {
   MOBILE_BREAKPOINT, buildRig, collectMaterials, buildEnvironment, createRenderer, addStudioLights,
-  isDarkMode, relightScene
+  isDarkMode, relightScene, createFpsGovernor
 } from './scene-utils.js';
 
 /* ---------------------------------------------------------------
@@ -298,9 +298,21 @@ export function initExpoScene(canvas) {
     camera.aspect = w / h;
     layout();
   }
-  window.addEventListener('resize', resize);
+  /* A live window drag fires 'resize' dozens of times a second — each
+     one walks layout()'s machine-base math, so coalescing every tick
+     inside a burst down to one call per animation frame (rather than
+     running it as many times as the event fires) keeps that off the
+     main thread during the drag itself, not just at the end of it. */
+  let resizeQueued = false;
+  function onWindowResize() {
+    if (resizeQueued) return;
+    resizeQueued = true;
+    requestAnimationFrame(() => { resizeQueued = false; resize(); });
+  }
+  window.addEventListener('resize', onWindowResize);
   resize();
 
+  const fpsGovernor = createFpsGovernor(renderer);
   let lastTime = performance.now();
   function applyShake(mode, t) {
     if (!mode.assembled) return;
@@ -339,6 +351,7 @@ export function initExpoScene(canvas) {
     }
 
     renderer.render(scene, camera);
+    fpsGovernor(dt);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
