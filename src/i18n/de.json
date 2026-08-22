@@ -130,6 +130,11 @@
   "services.expo.pump_subtitle": "Exzenterschneckenpumpen-Technologie",
   "services.expo.pump_body1": "Der exzentrische Rotor rotiert im Elastomerstator und erzeugt so einen pulsationsfreien Förderstrom mit konstanter Fördermenge. Dies verlängert die Lebensdauer der Pumpe und reduziert den Wartungsaufwand selbst bei abrasiven und hochviskosen Substraten.",
   "services.expo.pump_body2": "Dank der modularen Gehäusekonstruktion lässt sich der Stator – das einzige Verschleißteil – innerhalb weniger Minuten austauschen, ohne die gesamte Leitung zu demontieren. Konzipiert für null Stillstandszeit außerhalb geplanter Wartungsarbeiten.",
+  "services.expo.tab1": "1. Rührsystem",
+  "services.expo.tab2": "2. Energieerzeugung",
+  "services.expo.tab3": "3. Pumpstation",
+  "services.expo.prev_aria": "Zurück",
+  "services.expo.next_aria": "Weiter",
 
   "services.solutions.eyebrow": "Produkt- & Technologiekatalog",
   "services.solutions.title": "Unsere Lösungen",

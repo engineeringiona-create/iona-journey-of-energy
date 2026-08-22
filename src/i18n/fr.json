@@ -130,6 +130,11 @@
   "services.expo.pump_subtitle": "Technologie de pompe à cavité progressive hélicoïdale",
   "services.expo.pump_body1": "Le rotor excentrique tourne à l'intérieur d'un stator en élastomère, produisant un débit constant et sans pulsation. Cela prolonge la durée de vie de la pompe et réduit la fréquence des interventions de maintenance, même avec des substrats abrasifs et à haute viscosité.",
   "services.expo.pump_body2": "Grâce à une conception de carter modulaire, le stator — seule pièce d'usure — peut être remplacé en quelques minutes, sans démonter l'ensemble de la ligne, pour un objectif de zéro temps d'arrêt en dehors des opérations de maintenance planifiée.",
+  "services.expo.tab1": "1. Système de brassage",
+  "services.expo.tab2": "2. Production d'énergie",
+  "services.expo.tab3": "3. Station de pompage",
+  "services.expo.prev_aria": "Précédent",
+  "services.expo.next_aria": "Suivant",
 
   "services.solutions.eyebrow": "Catalogue de produits et technologies",
   "services.solutions.title": "Nos solutions",

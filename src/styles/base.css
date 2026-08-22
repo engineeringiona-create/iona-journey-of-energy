@@ -197,69 +197,150 @@ body {
 .delay-300 { transition-delay: 300ms; }
 .delay-400 { transition-delay: 400ms; }
 
-/* teknoloji.html's #services-3d-showcase (the Mixer/Genset/Pump trio) in
-   its pinned/snapped state. The .is-pinned modifier is added by
-   servicesShowcase.js only on desktop with motion allowed — mobile and
-   prefers-reduced-motion visitors never get this class, so they keep the
-   original continuous-scroll layout (.expo-block's own
-   min-h-[220vh]/md:sticky rules, untouched) with zero CSS here applying
-   to them. Scoped to md: to match servicesShowcase.js's own
-   MOBILE_BREAKPOINT gate, as a second line of defense.
+/* teknoloji.html's #services-3d-showcase: a fixed-height, click-driven
+   slider between the 3 machines (arrows + pills, see
+   servicesShowcase.js) — NOT scroll-driven. An earlier version pinned
+   this section with ScrollTrigger and stepped it via wheel/touch
+   hijacking; that shipped broken (overlapping text) twice in a row and
+   was pulled entirely in favor of this plain, always-normal-scrolling
+   version. Applies at every viewport width now, not just md: — there's
+   no scroll-position logic left for a breakpoint to gate.
 
    Every animated property below (opacity, visibility, pointer-events) is
    set here ONLY as a resting/initial state — no `transition` on any of
    it. servicesShowcase.js's GSAP tweens own the actual crossfade
    in-between; a CSS transition running alongside a GSAP tween on the
-   same property is exactly what produced the earlier "text bleeds into
-   other text" bug (two animation systems both writing inline opacity
-   on the same element, out of sync with each other). */
-@media (min-width: 768px) {
-    #services-3d-showcase.is-pinned {
-        position: relative;
-        width: 100%;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-    }
+   same property is what produced the earlier "text bleeds into other
+   text" bug (two animation systems both writing inline opacity on the
+   same element, out of sync with each other) — not repeating that here. */
+#services-3d-showcase {
+    isolation: isolate;
+}
 
-    /* Left column: the active service's typography, ~46% wide via the
-       existing .w-full.md:max-w-[46%] ancestor already wrapping this
-       whole showcase (see teknoloji.html) — left as-is rather than
-       re-declared here, so this rule only owns the slide-stacking, not
-       column width. The remaining ~54% of the viewport is the "right
-       column": no element lives there, it's the empty space the
-       always-on-top, full-viewport #webgl-stage canvas renders each
-       machine into (see expo-scene.js's agBase/gsBase/pmBase) — kept
-       that way rather than nesting a real canvas element in here, since
-       #webgl-stage is shared with etki.html's single-model page too. */
-    #services-3d-showcase.is-pinned .services-3d-slide {
-        position: absolute;
-        inset: 0;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-    }
+/* Left column: the active service's typography, ~45% wide on desktop
+   (md:w-[45%] in teknoloji.html) — the remaining ~55% ("right column")
+   is deliberately left empty: #webgl-stage below is one fixed,
+   full-viewport, transparent canvas shared with etki.html, not an
+   element nested in here, and its machines are positioned in 3D space
+   (see expo-scene.js's agBase/gsBase/pmBase) to sit visually in that
+   empty space rather than in a literal nested canvas container. */
+#services-3d-showcase .services-3d-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
 
-    /* Undoes md:sticky md:top-28 on the text column — pinned mode has no
-       scroll happening inside the wrapper for sticky to react to, so it
-       would otherwise just sit at an odd static offset. */
-    #services-3d-showcase.is-pinned .services-3d-slide > div {
-        position: static;
-    }
+#services-3d-showcase .services-3d-slide.is-active-slide {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
 
-    #services-3d-showcase.is-pinned .services-3d-slide.is-active-slide {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
+/* Liquid-glass prev/next arrows, floating at the showcase's own
+   vertical center — same blur/saturate recipe as the announcement
+   popup's glass buttons (see lib/announcements.js's --ap-glass-btn-*)
+   for a consistent "glass" look across the site, values inlined here
+   rather than sharing those page-scoped custom properties since this
+   is a different page. */
+.services-3d-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(20, 24, 20, 0.14);
+    color: var(--text);
+    cursor: pointer;
+    transition: background-color 300ms ease, border-color 300ms ease, transform 300ms ease;
+}
 
-    #services-3d-showcase.is-pinned .services-3d-gap {
-        display: none;
+.services-3d-arrow:hover {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(20, 24, 20, 0.22);
+}
+
+.services-3d-arrow-prev { left: 0; }
+.services-3d-arrow-next { right: 0; }
+
+:root.dark .services-3d-arrow {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}
+
+:root.dark .services-3d-arrow:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.26);
+}
+
+/* Pill tab switcher, centered along the showcase's own bottom edge. */
+.services-3d-tabs {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 999px;
+    max-width: calc(100% - 32px);
+    overflow-x: auto;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(20, 24, 20, 0.14);
+}
+
+:root.dark .services-3d-tabs {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+.services-3d-tab {
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 300ms ease, color 300ms ease;
+}
+
+.services-3d-tab.is-active {
+    background: var(--brand-orange);
+    color: #fff;
+}
+
+@media (max-width: 767px) {
+    .services-3d-arrow {
+        width: 40px;
+        height: 40px;
+    }
+    .services-3d-tabs {
+        bottom: 8px;
+    }
+    .services-3d-tab {
+        padding: 7px 12px;
+        font-size: 11px;
     }
 }
 

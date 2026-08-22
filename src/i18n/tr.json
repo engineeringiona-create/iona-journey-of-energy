@@ -132,6 +132,11 @@
   "services.expo.pump_subtitle": "Helisel Rotor-Stator Teknolojisi",
   "services.expo.pump_body1": "Eksantrik rotor, elastomer stator içinde dönerek nabızsız ve sabit debili bir akış üretir. Bu, aşındırıcı ve yüksek viskoziteli substratlarda bile pompa ömrünü uzatır ve bakım sıklığını azaltır.",
   "services.expo.pump_body2": "Modüler gövde tasarımı sayesinde aşınan tek parça olan stator, tüm hattı sökmeden dakikalar içinde değiştirilebilir — planlı bakımlar dışında sıfır kesinti hedefiyle tasarlandı.",
+  "services.expo.tab1": "1. Karıştırma Sistemi",
+  "services.expo.tab2": "2. Güç Üretimi",
+  "services.expo.tab3": "3. Pompa İstasyonu",
+  "services.expo.prev_aria": "Önceki",
+  "services.expo.next_aria": "Sonraki",
 
   "services.solutions.eyebrow": "Ürün & Teknoloji Kataloğu",
   "services.solutions.title": "Çözümlerimiz",

@@ -141,6 +141,11 @@
   "services.expo.pump_subtitle": "Helical Rotor-Stator Technology",
   "services.expo.pump_body1": "The eccentric rotor turns within an elastomer stator to produce a pulsation-free, constant flow rate. This extends pump service life and reduces maintenance frequency, even with abrasive, high-viscosity substrates.",
   "services.expo.pump_body2": "Thanks to the modular housing design, the stator — the only wearing component — can be replaced in minutes without dismantling the entire line, engineered for zero downtime outside of scheduled maintenance.",
+  "services.expo.tab1": "1. Mixing System",
+  "services.expo.tab2": "2. Power Generation",
+  "services.expo.tab3": "3. Pump Station",
+  "services.expo.prev_aria": "Previous",
+  "services.expo.next_aria": "Next",
 
   "services.solutions.eyebrow": "Product & Technology Catalog",
   "services.solutions.title": "Our Solutions",

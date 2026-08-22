@@ -93,28 +93,25 @@
 <a class="mobile-nav-cta" href="/iletisim.html#contact-form" data-i18n="nav.cta">Teklif Alın</a>
 </div>
 
-<!-- 3D Expo: split-screen scroll experience. Left = scrollable machine
-     text blocks. Right = open space where the fixed, transparent canvas
-     (behind everything at rest, lifted above the text mid-flight — see
-     expo-scene.js) shows each machine flying in, assembling, operating,
-     then shrinking away below frame as the next one arrives. -->
-<section class="relative bg-transparent pt-24 md:pt-28" id="expo">
+<!-- 3D Services showcase: a self-contained, fixed-height slider (NOT
+     scroll-driven — a scroll-hijacking pinned version of this shipped
+     and got pulled after repeatedly landing broken/overlapping text).
+     Left column = the active machine's copy. Right column is left
+     empty on purpose: #webgl-stage (see base.css) is one fixed,
+     full-viewport, transparent canvas shared with etki.html, not an
+     element nested in here — its machines are positioned in 3D space
+     (see expo-scene.js's agBase/gsBase/pmBase) to sit visually in that
+     empty right column. Model/copy switching is entirely click-driven
+     (arrows + pills, see servicesShowcase.js) — the page around it
+     scrolls completely normally, nothing here touches scroll. -->
+<section class="relative bg-transparent pt-24 md:pt-28 pb-20 md:pb-28" id="expo">
 <div class="px-safe-margin-mobile md:px-safe-margin-desktop">
-<div class="w-full md:max-w-[46%]">
 
-<!-- services-3d-showcase is the pin/snap cage. On desktop (JS gate:
-     MOBILE_BREAKPOINT + !reduceMotion, see servicesShowcase.js) this
-     whole block gets pinned by ScrollTrigger and the 3 slides step
-     discretely on wheel/touch, one section per gesture. On mobile (or
-     reduced motion) none of that JS runs and this degrades back to the
-     original continuous-scroll layout untouched — every class below is
-     exactly what shipped originally, only the marker classes
-     (services-3d-slide/-gap) are new, for the pinned-mode JS/CSS to
-     hook into. -->
-<div id="services-3d-showcase">
+<div class="relative w-full min-h-[85vh] md:h-[750px] flex items-center" id="services-3d-showcase">
 
-<div class="expo-block services-3d-slide flex flex-col justify-start min-h-0 md:min-h-[220vh] py-4 md:py-16" id="expo-agitator" data-machine="agitator">
-<div class="md:sticky md:top-28">
+<div class="relative w-full md:w-[45%] h-full">
+
+<div class="services-3d-slide" id="expo-agitator" data-machine="agitator">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.agitator_eyebrow">Teknoloji · Karıştırma Sistemi</span>
 <h1 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.agitator_title">İleri Mühendislik, Sürdürülebilir Tesisler İçin</h1>
 <p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.agitator_intro">Sıkı fizibilite analizinden anahtar teslim inşaata kadar, sıfır operasyonel kesinti süresiyle özelleştirilmiş biyoenerji sistemleri sunuyoruz.</p>
@@ -122,19 +119,8 @@
 <p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.agitator_body1">Gelişmiş dikey ve yatay ajitasyon teknolojilerimiz ölü bölgeleri ortadan kaldırır ve köpük oluşumunu önler. Bu, mükemmel substrat homojenliği sağlayarak maksimum metan dönüşümü ve daha yüksek enerji verimliliği sunar.</p>
 <p class="text-body-md text-[var(--text-muted)]" data-i18n="services.expo.agitator_body2">Iona'nın özel karıştırma teknolojisi ve sağlam doğrudan katı besleme sistemleriyle tesislerimiz, anaerobik çürütücü içinde %14'e varan kuru madde içeriğinde bile son derece kararlı operasyonlar sağlar.</p>
 </div>
-</div>
 
-<!-- Short handoff gap: machines are never disassembled, only crossfaded
-     (see expo-scene.js), so genset's onEnter is free to fire while the
-     agitator is still fading out — that overlap is the crossfade. Kept
-     just tall enough for one scroll gesture to carry the reader from the
-     end of the Agitator copy into the Genset block. Hidden in pinned
-     mode (services-3d-gap, see base.css) — the pin/snap stepper does the
-     handoff itself, no scroll spacer needed there. -->
-<div aria-hidden="true" class="services-3d-gap min-h-0 md:min-h-[20vh]"></div>
-
-<div class="expo-block services-3d-slide flex flex-col justify-start min-h-0 md:min-h-[220vh] py-4 md:py-16" id="expo-genset" data-machine="genset">
-<div class="md:sticky md:top-28">
+<div class="services-3d-slide" id="expo-genset" data-machine="genset">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.genset_eyebrow">Teknoloji · Güç Üretimi</span>
 <h2 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.genset_title">Yüksek Verimli Güç Üretimi</h2>
 <p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.genset_intro">Verimli, sürdürülebilir enerji çözümleri sunan anahtar teslim biyogaz tesisleri inşa ediyoruz.</p>
@@ -142,13 +128,8 @@
 <p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.genset_body1">Yenilikçi Taşma Sistemimiz (OFT), tamamen "Birleşik Kap" prensibiyle çalışır. Çürüyen madde transferinde yerçekiminden akıllıca yararlanarak mekanik stresi büyük ölçüde azaltır ve pompalama enerji tüketimini %66'ya kadar keser.</p>
 <p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.genset_body2">Akıllı ısı dağıtım üniteleri termal enerji kullanımını optimize eder. Tüm Iona tesisleri, akıllı sensörlerle entegre otomatik termal donma önleme koruması içerir.</p>
 </div>
-</div>
 
-<!-- Same short handoff gap as above, between genset and the pump station. -->
-<div aria-hidden="true" class="services-3d-gap min-h-0 md:min-h-[20vh]"></div>
-
-<div class="expo-block services-3d-slide flex flex-col justify-start min-h-0 md:min-h-[220vh] py-4 md:py-16" id="expo-pump" data-machine="pump">
-<div class="md:sticky md:top-28">
+<div class="services-3d-slide" id="expo-pump" data-machine="pump">
 <span class="font-label-caps text-label-caps text-[#ff751f] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.pump_eyebrow">Teknoloji · Pompa İstasyonu</span>
 <h2 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.pump_title">Kesintisiz Malzeme Transferi</h2>
 <p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.pump_intro">Merkezi Pompa İstasyonumuz (CPS), tesisin her noktasına yüksek katı madde oranında bile darbesiz, kararlı akış sağlar.</p>
@@ -156,9 +137,24 @@
 <p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.pump_body1">Eksantrik rotor, elastomer stator içinde dönerek nabızsız ve sabit debili bir akış üretir. Bu, aşındırıcı ve yüksek viskoziteli substratlarda bile pompa ömrünü uzatır ve bakım sıklığını azaltır.</p>
 <p class="text-body-md text-[var(--text-muted)]" data-i18n="services.expo.pump_body2">Modüler gövde tasarımı sayesinde aşınan tek parça olan stator, tüm hattı sökmeden dakikalar içinde değiştirilebilir — planlı bakımlar dışında sıfır kesinti hedefiyle tasarlandı.</p>
 </div>
-</div>
 
 </div>
+
+<div class="hidden md:block md:w-[55%] h-full" aria-hidden="true"></div>
+
+<button type="button" class="services-3d-arrow services-3d-arrow-prev" id="services-3d-prev" data-i18n-aria-label="services.expo.prev_aria" aria-label="Önceki">
+<span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+</button>
+<button type="button" class="services-3d-arrow services-3d-arrow-next" id="services-3d-next" data-i18n-aria-label="services.expo.next_aria" aria-label="Sonraki">
+<span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+</button>
+
+<div class="services-3d-tabs" role="tablist" aria-label="3B Teknoloji Vitrini">
+<button type="button" class="services-3d-tab is-active" data-slide-index="0" role="tab" aria-selected="true" data-i18n="services.expo.tab1">1. Karıştırma Sistemi</button>
+<button type="button" class="services-3d-tab" data-slide-index="1" role="tab" aria-selected="false" data-i18n="services.expo.tab2">2. Güç Üretimi</button>
+<button type="button" class="services-3d-tab" data-slide-index="2" role="tab" aria-selected="false" data-i18n="services.expo.tab3">3. Pompa İstasyonu</button>
+</div>
+
 </div>
 </div>
 </section>

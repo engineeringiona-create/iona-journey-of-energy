@@ -130,6 +130,11 @@
   "services.expo.pump_subtitle": "Tecnología de Rotor-Estator Helicoidal",
   "services.expo.pump_body1": "El rotor excéntrico gira dentro de un estator elastomérico, generando un caudal constante y sin pulsaciones. Esto prolonga la vida útil de la bomba y reduce la frecuencia de mantenimiento, incluso con sustratos abrasivos y de alta viscosidad.",
   "services.expo.pump_body2": "Gracias al diseño modular de la carcasa, el estator —la única pieza de desgaste— puede sustituirse en minutos sin desmontar toda la línea, diseñado para lograr cero tiempo de inactividad fuera de los mantenimientos programados.",
+  "services.expo.tab1": "1. Sistema de Agitación",
+  "services.expo.tab2": "2. Generación de Energía",
+  "services.expo.tab3": "3. Estación de Bombeo",
+  "services.expo.prev_aria": "Anterior",
+  "services.expo.next_aria": "Siguiente",
 
   "services.solutions.eyebrow": "Catálogo de Productos y Tecnología",
   "services.solutions.title": "Nuestras Soluciones",
