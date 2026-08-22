@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { reduceMotion } from '../../three/scene-utils.js';
 import StaticDotGridBackground from './StaticDotGridBackground.jsx';
 import SonarRings from './SonarRings.jsx';
+import { applyStructureOverrides } from './plantStructureOverrides.js';
 
 /* Real facility scan, dropped in by the user (biyogaz-tesisi.glb ->
    public/models/iona-tesis-3d.glb), revised 2026-08-09 to a simplified
@@ -748,8 +749,22 @@ function createGratingTexture() {
    that shell's roof/roof_fascia/door/door_handle/window/vents — those
    stay on the structure's normal ceramic material, only the 4 wall
    names get this treatment. feed_pool is a separate case (below); the
-   digester has none of these names, so it's untouched by this set. */
-const BUILDING_WALL_MESH_NAMES = new Set(['wall_front', 'wall_back', 'wall_right', 'wall_left']);
+   digester has none of these names, so it's untouched by this set.
+   'wall_rib' added for engine_room's corrugation strips (see
+   plantStructureOverrides.js) — same steel/slate panel material as the
+   flat walls they sit on. */
+const BUILDING_WALL_MESH_NAMES = new Set(['wall_front', 'wall_back', 'wall_right', 'wall_left', 'wall_rib']);
+
+/* Engine room's safety-yellow hazard stripe (plantStructureOverrides.js)
+   — only that one structure has this name, harmless to register it for
+   every structure the same way FOUNDATION_MESH_NAMES/BUILDING_PIPE_MESH_NAMES
+   above already do for names that don't exist on every building. */
+const BUILDING_HAZARD_MESH_NAMES = new Set(['hazard_stripe']);
+
+/* Pump station's open-air canopy support posts (plantStructureOverrides.js)
+   — bare structural steel, distinct from BUILDING_PIPE_MESH_NAMES'
+   fluid-carrying pipework even though the finish is similar. */
+const BUILDING_STRUCTURAL_STEEL_MESH_NAMES = new Set(['canopy_post']);
 
 /* One shared texture/repeat across all 3 buildings rather than tuning
    per-building height (their real wall heights actually differ —
@@ -900,6 +915,16 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
   useLayoutEffect(() => {
     const plantRoot = scene.getObjectByName('biogas_plant') ?? scene;
     plantRootRef.current = plantRoot;
+
+    /* Motor Odasi -> containerized CHP unit (adds ribs/louvers/hazard
+       stripe to engine_room), Pompa Odasi -> open-air covered pump
+       station (swaps pump_room's enclosed shell for posts + a tilted
+       canopy) — see plantStructureOverrides.js's own header comment.
+       Runs before the material-building pass and scene.traverse()
+       below so every mesh it adds gets picked up by the exact same
+       per-structure material/hover/click system as everything the GLB
+       shipped with. */
+    applyStructureOverrides(plantRoot);
 
     const materials = new Map();
     const baseYs = new Map();
@@ -1159,6 +1184,32 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         buildingPipeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(buildingPipeMaterial));
         BUILDING_PIPE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, buildingPipeMaterial));
+
+        /* Safety-yellow hazard stripe — engine_room's containerized CHP
+           unit only (see plantStructureOverrides.js), harmlessly
+           registered for every building the same way every other
+           per-structure material set here is. */
+        const hazardMaterial = new THREE.MeshStandardMaterial({
+          color: '#f4c430',
+          metalness: 0.1,
+          roughness: 0.6,
+        });
+        hazardMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(hazardMaterial));
+        BUILDING_HAZARD_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, hazardMaterial));
+
+        /* Bare structural steel — the pump station's open-air canopy
+           posts (plantStructureOverrides.js). Same finish as
+           buildingPipeMaterial above but its own instance/name, since
+           these are load-bearing structure, not fluid-carrying pipe. */
+        const structuralSteelMaterial = new THREE.MeshStandardMaterial({
+          color: '#7e8184',
+          metalness: 0.8,
+          roughness: 0.3,
+        });
+        structuralSteelMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(structuralSteelMaterial));
+        BUILDING_STRUCTURAL_STEEL_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, structuralSteelMaterial));
       }
 
       if (structure.name === 'feed_pool') {
