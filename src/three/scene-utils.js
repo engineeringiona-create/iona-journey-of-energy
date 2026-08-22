@@ -190,7 +190,11 @@ export function createRenderer(canvas) {
   const renderer = new THREE.WebGLRenderer({
     canvas, antialias: true, alpha: true, powerPreference: 'high-performance'
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  /* Clamped to 1.75, not the full devicePixelRatio (up to 3+ on some
+     Android/retina phones) — past that point the extra fragment-shading
+     cost of the studio env map + ACES tonemapping buys imperceptible
+     sharpness but reliably tips mobile/retina below 60fps. */
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;

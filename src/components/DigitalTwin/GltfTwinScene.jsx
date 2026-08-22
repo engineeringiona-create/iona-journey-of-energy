@@ -18,7 +18,7 @@ import SonarRings from './SonarRings.jsx';
 const MODEL_SRC = '/models/iona-tesis-3d.glb';
 useGLTF.preload(MODEL_SRC);
 
-const CAMERA_DURATION = reduceMotion ? 0.01 : 1.1;
+const CAMERA_DURATION = reduceMotion ? 0.01 : 0.8;
 const CAMERA_EASE = 'power2.inOut';
 /* Narrowed from 48 to 42 for a more "premium product shot" compression
    (less wide-angle bulge/distortion, edges read more parallel/imposing)
@@ -1396,7 +1396,7 @@ function Model({ plantRootRef, onReady, onSelect, onReset, selected }) {
    reset transitions. Kept inside <Canvas> since it needs useThree/
    useFrame. */
 function Rig({ plantRootRef, selected, groundY, groundScale, shadowFar, keyLightRef }) {
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
   const controlsRef = useRef(null);
   const overviewRef = useRef(null);
   const timelineRef = useRef(null);
@@ -1558,13 +1558,30 @@ function Rig({ plantRootRef, selected, groundY, groundScale, shadowFar, keyLight
     }
 
     const target = controlsRef.current.target;
-    const tl = gsap.timeline();
+    /* The ~350-mesh shadow map is the single most expensive pass in this
+       scene, and it depends only on light/geometry, never on the camera
+       — so it's dead work to keep re-baking it every one of these frames
+       while only the camera is moving. Freezing autoUpdate for the tween's
+       duration (and forcing one last bake on arrival, in case anything
+       else queued a shadow-affecting change mid-flight) is a free ~1s
+       window of guaranteed 60fps for exactly the moment a stutter would
+       be most visible. */
+    gl.shadowMap.autoUpdate = false;
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gl.shadowMap.autoUpdate = true;
+        gl.shadowMap.needsUpdate = true;
+      }
+    });
     tl.to(camera.position, { x: position.x, y: position.y, z: position.z, duration: CAMERA_DURATION, ease: CAMERA_EASE }, 0);
     tl.to(target, { x: center.x, y: center.y, z: center.z, duration: CAMERA_DURATION, ease: CAMERA_EASE }, 0);
     timelineRef.current = tl;
 
-    return () => tl.kill();
-  }, [selected, camera]);
+    return () => {
+      tl.kill();
+      gl.shadowMap.autoUpdate = true;
+    };
+  }, [selected, camera, gl]);
 
   useFrame(() => controlsRef.current?.update());
 
@@ -1860,7 +1877,7 @@ export default function GltfTwinScene() {
         className="relative z-10"
         shadows
         camera={{ fov: CAMERA_FOV, near: 0.1, far: 500 }}
-        dpr={[1, 2]}
+        dpr={[1, 1.75]}
         gl={{ antialias: true, powerPreference: 'high-performance', alpha: true }}
         onPointerMissed={handleReset}
       >

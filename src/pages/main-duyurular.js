@@ -1,4 +1,4 @@
-import { initFadeIn, initThemeToggle, initSiteSearch, initMobileNav } from '../common.js';
+import { initFadeIn, initThemeToggle, initSiteSearch, initMobileNav, initSmoothScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { getSupabase } from '../lib/supabaseClient.js';
@@ -6,6 +6,7 @@ import { readLocalBucket } from '../lib/adminStore.js';
 import { openAnnouncementModal } from '../lib/announcements.js';
 
 await initI18n();
+initSmoothScroll();
 initLangSwitcher();
 initQuoteModal();
 initFadeIn();

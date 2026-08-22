@@ -9,7 +9,7 @@ import { DEFAULT_CAMERA_POSITION, DEFAULT_CAMERA_TARGET, TWIN_COMPONENTS } from 
    code path either way (camera.lookAt still gets driven every step,
    just over ~1 frame instead of ~1s) rather than a separate branch
    that sets final values directly and has to be kept in sync by hand. */
-const CAMERA_DURATION = reduceMotion ? 0.01 : 1;
+const CAMERA_DURATION = reduceMotion ? 0.01 : 0.8;
 const CAMERA_EASE = 'power2.inOut';
 
 /* The cutaway reveal and the other-stations dim are a second, shorter

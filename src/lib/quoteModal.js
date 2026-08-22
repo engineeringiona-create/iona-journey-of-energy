@@ -38,6 +38,8 @@ function openModal() {
   card.style.background = '#171b18';
   card.style.borderRadius = '16px';
   card.style.boxShadow = '0 40px 80px -20px rgba(0,0,0,0.5)';
+  card.style.transform = 'translateZ(0)';
+  card.style.backfaceVisibility = 'hidden';
 
   overlay.appendChild(card);
   document.body.appendChild(overlay);

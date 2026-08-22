@@ -1,7 +1,67 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const reduceMotion = typeof matchMedia === 'function'
+  && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let lenis = null;
+
+/* Buttery momentum scrolling for the whole document (Phase 43). Lenis
+   smooths the real window scroll (no wrapper/virtual-scroll div), so
+   every existing ScrollTrigger keeps reading document.scrollingElement
+   as before — it just needs telling to re-check on each Lenis tick
+   rather than only on native 'scroll' events. Driven off gsap.ticker
+   (not Lenis's own internal rAF) so it shares one single rAF loop with
+   every GSAP tween/ScrollTrigger already running on the page instead
+   of racing a second one; lagSmoothing(0) stops GSAP from trying to
+   "catch up" after a dropped/backgrounded tab, which would otherwise
+   fight Lenis's own smoothing with a sudden jump.
+   Skipped entirely under prefers-reduced-motion, same as every other
+   motion helper here — native instant scroll stays native. */
+export function initSmoothScroll() {
+  if (reduceMotion || lenis) return lenis;
+
+  lenis = new Lenis({
+    duration: 1.1,
+    easing: (t) => 1 - Math.pow(1 - t, 3),
+    smoothWheel: true
+  });
+
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => lenis.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  /* Same-page hash links (nav anchors, "#contact-form" etc.) jump via
+     the native browser hash-scroll otherwise, which bypasses Lenis
+     entirely and reads as a jarring snap against the smooth scroll
+     everywhere else. href values here come from hand-authored markup,
+     not user input, but "#" alone (used all over as a plain button
+     href) and stray non-CSS-safe fragments still need guarding. */
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const hash = link.getAttribute('href');
+      if (!hash || hash === '#') return;
+      let target;
+      try {
+        target = document.querySelector(hash);
+      } catch (err) {
+        return;
+      }
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(target, { duration: 1.2, easing: (t) => 1 - Math.pow(1 - t, 3) });
+    });
+  });
+
+  return lenis;
+}
+
+export function getLenis() {
+  return lenis;
+}
 
 /* Shared across every page: reveals .fade-in-element children as their
    containing .fade-in-section scrolls into view. */

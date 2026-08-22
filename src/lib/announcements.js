@@ -62,6 +62,8 @@ function injectStyles() {
       border-radius: 20px;
       box-shadow: var(--ap-shadow);
       opacity: 1; transition: opacity 150ms ease;
+      transform: translateZ(0);
+      backface-visibility: hidden;
     }
     @media (min-width: 820px) { .iona-ap-card { flex-direction: row; max-height: 560px; } }
     .iona-ap-visual { position: relative; flex-shrink: 0; width: 100%; height: 220px; overflow: hidden; }

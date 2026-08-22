@@ -1,9 +1,10 @@
-import { initFadeIn, initThemeToggle, initSiteSearch, initCardSpotlight, initMobileNav } from '../common.js';
+import { initFadeIn, initThemeToggle, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { getSupabase } from '../lib/supabaseClient.js';
 
 await initI18n();
+initSmoothScroll();
 initLangSwitcher();
 initQuoteModal();
 initFadeIn();
