@@ -1024,6 +1024,14 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
           map: createDigesterWallAlbedoTexture(),
           bumpMap: createDigesterWallCorrugationTexture(),
           bumpScale: DIGESTER_WALL_BUMP_SCALE,
+          /* Explicit, not just relying on THREE's own defaults (which
+             already match this at rest) — the X-ray effect below only
+             ever toggles .transparent/.opacity on select, never these,
+             so depth writing/testing stay correctly "on" the rest of
+             the time regardless: solid opaque wall fully occludes the
+             mixers inside it from every angle. */
+          depthWrite: true,
+          depthTest: true,
         });
         wallMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(wallMaterial));
@@ -1040,6 +1048,8 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
           roughness: 0.22,
           clearcoat: 1.0,
           clearcoatRoughness: 0.08,
+          depthWrite: true,
+          depthTest: true,
         });
         domeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(domeMaterial));

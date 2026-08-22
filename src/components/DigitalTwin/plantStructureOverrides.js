@@ -232,6 +232,57 @@ function replacePumpRoomShell(pumpRoom) {
   canopy.add(makeMesh(box(9.6, 0.22, 6.6), 'roof', [0, 4.21, 0], [0.07, 0, 0]));
 }
 
+/* ---------------- Digester -> seal the wall/tabliye seam ----------------
+   Real dims from the GLB: tank_wall (radius 12) tops out at world
+   y=6.0; top_ring (the tabliye) is centered at y=5.85, its own bounds
+   spanning y:[5.625,6.075] and x/z:[-12.3,12.3]. Those two bounding
+   boxes DO already overlap vertically (the wall's own top, y=6.0, sits
+   inside the ring's y-span) — so the reported gap isn't a simple
+   vertical shortfall between two boxes that don't touch, it's almost
+   certainly a thin RADIAL slit: whatever the ring's actual solid
+   geometry looks like inside that outer x/z:±12.3 bounding box (an
+   annulus/rim shape, not a solid disk — its inner edge isn't captured
+   by a bounding box at all), it apparently doesn't sit flush against
+   the wall's own outer surface at radius 12 everywhere around the
+   circumference, leaving a hairline gap the internal mixers show
+   through from outside.
+
+   Can't resolve that precisely without decoding the mesh's actual
+   vertex/triangle data (its true inner radius isn't visible from the
+   GLB's JSON alone the way outer bounding boxes are) — no 3D editor
+   available in this environment either way. Sealed pragmatically
+   instead: an extra opaque lateral cylinder surface, radius 12 (exactly
+   matching the wall), spanning generously past both the wall's own top
+   (6.0) and the ring's full bounds (5.625-6.075) with real margin each
+   way, rather than trying to hit a precise 0.05m overlap I can't
+   verify. Named 'tank_wall' on purpose — DIGESTER_WALL_MESH_NAME in
+   GltfTwinScene.jsx already routes that exact name to the tank wall's
+   own material (with its corrugation bump map), so this patch reads as
+   a seamless continuation of the real wall, not a visibly different
+   band, with zero new material wiring needed. openEnded (no top/bottom
+   caps) since only the lateral surface is needed to plug a radial slit
+   — caps would just be flat opaque discs sitting uselessly inside the
+   ring/dome geometry that's already there. */
+function sealDigesterWallSeam(digester) {
+  /* Can't rename this mesh to anything other than 'tank_wall' (that's
+     what routes it to the wall's own material, see this function's own
+     comment above) or use getObjectByName for the idempotency check the
+     way every other override in this file does — a userData marker
+     instead, checked across digester's direct children (tank_wall,
+     like every other real mesh here, is one). */
+  if (digester.children.some((child) => child.userData.isWallSeamSeal)) return;
+
+  const SEAL_RADIUS = 12;
+  const SEAL_BOTTOM_Y = 5.55;
+  const SEAL_TOP_Y = 6.15;
+  const sealGeo = new THREE.CylinderGeometry(
+    SEAL_RADIUS, SEAL_RADIUS, SEAL_TOP_Y - SEAL_BOTTOM_Y, 64, 1, true
+  );
+  const seal = makeMesh(sealGeo, 'tank_wall', [0, (SEAL_BOTTOM_Y + SEAL_TOP_Y) / 2, 0], null, null);
+  seal.userData.isWallSeamSeal = true;
+  digester.add(seal);
+}
+
 /* ---------------- Digester -> 4 side-entry wall mixers ----------------
    Real dims from the GLB: tank_wall is a cylinder of radius 12 centered
    at world y=3.45, wall face spanning world y:[0.9,6.0] — mid-wall
@@ -599,6 +650,7 @@ export function applyStructureOverrides(plantRoot) {
   if (pumpRoom) replacePumpRoomShell(pumpRoom);
 
   const digester = plantRoot.getObjectByName('digester');
+  if (digester) sealDigesterWallSeam(digester);
   const mixers = digester ? addDigesterMixers(digester) : { propellerHubs: [], beacons: [] };
 
   return mixers;
