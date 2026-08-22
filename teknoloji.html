@@ -102,16 +102,16 @@
 <div class="px-safe-margin-mobile md:px-safe-margin-desktop">
 <div class="w-full md:max-w-[46%]">
 
-<!-- Phase 44: services-3d-wrapper is the pin/snap cage. On desktop (JS
-     gate: MOBILE_BREAKPOINT + !reduceMotion, see servicesShowcase.js)
-     this whole block gets pinned by ScrollTrigger and the 3 slides
-     step discretely on wheel/touch, one section per gesture. On mobile
-     (or reduced motion) none of that JS runs and this degrades back to
-     the original Phase 42 continuous-scroll layout untouched — every
-     class below is exactly what shipped before Phase 44, nothing
-     removed, only new marker classes (services-3d-slide/-gap) added
-     for the pinned-mode JS/CSS to hook into. -->
-<div class="services-3d-wrapper" id="services-3d-wrapper">
+<!-- services-3d-showcase is the pin/snap cage. On desktop (JS gate:
+     MOBILE_BREAKPOINT + !reduceMotion, see servicesShowcase.js) this
+     whole block gets pinned by ScrollTrigger and the 3 slides step
+     discretely on wheel/touch, one section per gesture. On mobile (or
+     reduced motion) none of that JS runs and this degrades back to the
+     original continuous-scroll layout untouched — every class below is
+     exactly what shipped originally, only the marker classes
+     (services-3d-slide/-gap) are new, for the pinned-mode JS/CSS to
+     hook into. -->
+<div id="services-3d-showcase">
 
 <div class="expo-block services-3d-slide flex flex-col justify-start min-h-0 md:min-h-[220vh] py-4 md:py-16" id="expo-agitator" data-machine="agitator">
 <div class="md:sticky md:top-28">

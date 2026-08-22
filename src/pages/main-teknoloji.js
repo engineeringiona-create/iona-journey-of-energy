@@ -48,7 +48,7 @@ function wireMachine(blockSelector, machine) {
    the Agitator. */
 if (window.innerWidth >= MOBILE_BREAKPOINT && !reduceMotion) {
   initServicesShowcase({
-    wrapper: document.getElementById('services-3d-wrapper'),
+    wrapper: document.getElementById('services-3d-showcase'),
     slides: Array.from(document.querySelectorAll('.services-3d-slide')),
     machines: [agitator, genset, pump],
     camera
