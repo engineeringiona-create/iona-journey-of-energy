@@ -336,31 +336,72 @@ const mixerBeaconMaterial = new THREE.MeshStandardMaterial({
   color: '#eafcff', metalness: 0.1, roughness: 0.4, emissive: '#66d9ff', emissiveIntensity: 0.6,
   transparent: false, opacity: 1, depthWrite: true
 });
+/* Propeller hub cone — dark metallic, distinct from both the shaft's
+   light polished steel and the blades' bright red, so the hub still
+   reads as its own part instead of blending into either. */
+const mixerHubMaterial = new THREE.MeshStandardMaterial({
+  color: '#3a3d40', metalness: 0.8, roughness: 0.35, transparent: false, opacity: 1, depthWrite: true
+});
 
-/* 4-blade propeller, `count` set by the caller — the wall mixers below
+/* CONFIRMED BUG, now fixed: every blade used to be built as a plain
+   centered box (BoxGeometry defaults to centered on its own origin)
+   given a fixed position offset like [0, 0.5, 0], with rotation.z
+   varying per blade to "fan them out". That doesn't work — an
+   Object3D's transform rotates its geometry around its OWN local
+   origin *first*, then translates by `position`; rotating a shape
+   that's centered on that same origin leaves its centroid sitting
+   exactly at the origin no matter the rotation, so `position` then
+   moves that already-centered shape by the same fixed offset every
+   time regardless of rotation.z. Net effect: all `count` blades ended
+   up stacked on top of each other at the same single point (0, 0.5, 0)
+   relative to the hub, each just individually spun in place there —
+   not fanned out around the hub center at all. Then, since that whole
+   overlapping clump sits 0.5 units away from the hub's true rotation
+   center, spinning the hub via hub.rotation.z every frame swept that
+   off-center clump around in a circle — the reported "orbiting/
+   revolving in a wide circle instead of spinning in place" bug.
+
+   Fixed by moving the offset into the GEOMETRY itself instead of the
+   mesh's position: bladeGeo.translate() shifts the box's own vertices
+   so its root edge sits at object-space (0,0,0) and its tip extends
+   outward to (0, BLADE_LENGTH, 0) — the blade's rotation origin is now
+   the hub center, zero lever arm, by construction. Each blade's mesh
+   position stays [0,0,0] (same origin as the hub core); only its
+   rotation.z (baked in once, at build time, not touched by the spin
+   animation) differs per blade, correctly fanning them out around the
+   shared center this time. `count` set by the caller — the wall mixers
    ask for 4 (spec: "Mid & Lower Wall Mixers: Single 4-blade propeller
-   assembly"), the twin top-slab mixers ask for 2 clusters of these
-   spaced along one shaft, each cluster still built by this same
-   function since nothing about blade count/shape differs between the
-   two mixer types, only how many clusters and where they sit. */
-function buildPropeller(count) {
-  const hub = new THREE.Group();
-  hub.name = 'side_mixer_prop_hub';
+   assembly"), the twin top-slab mixers ask for 2 clusters of 3, each
+   cluster still built by this same function since nothing about
+   blade count/shape differs between the two mixer types, only how many
+   clusters and where they sit. */
+const BLADE_LENGTH = 0.85;
 
-  const hubCoreGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.3, 10);
+function buildPropeller(count) {
+  const propellerGroup = new THREE.Group();
+  propellerGroup.name = 'side_mixer_prop_hub';
+
+  /* Tapered (0.16 -> 0.06), not a straight cylinder — reads as a
+     bullet-nosed hub cone per spec, still built from CylinderGeometry
+     (just with different top/bottom radii) rather than swapping
+     primitive types for a detail this small. Dark, not the shaft's
+     light polished steel — mixerHubMaterial, defined alongside the
+     other mixer materials above. */
+  const hubCoreGeo = new THREE.CylinderGeometry(0.16, 0.06, 0.32, 12);
   hubCoreGeo.rotateX(Math.PI / 2);
-  const hubCore = makeMesh(hubCoreGeo, 'side_mixer_hub', [0, 0, 0], null, mixerSteelMaterial);
+  const hubCore = makeMesh(hubCoreGeo, 'side_mixer_hub', [0, 0, 0], null, mixerHubMaterial);
   hubCore.renderOrder = MIXER_RENDER_ORDER;
-  hub.add(hubCore);
+  propellerGroup.add(hubCore);
 
   for (let i = 0; i < count; i++) {
-    const blade = makeMesh(box(0.16, 0.85, 0.05), 'side_mixer_blade', [0, 0.5, 0], null, mixerPropellerMaterial);
-    blade.rotation.z = (i / count) * Math.PI * 2;
-    blade.rotateY(0.45); // blade pitch, so it reads as a real propeller, not a flat fan
+    const bladeGeo = box(0.16, BLADE_LENGTH, 0.05);
+    bladeGeo.translate(0, BLADE_LENGTH / 2, 0); // root at origin, tip extends outward
+    bladeGeo.rotateY(0.45); // blade pitch, baked into the geometry so it doesn't fight the per-blade fan-out rotation below
+    const blade = makeMesh(bladeGeo, 'side_mixer_blade', [0, 0, 0], [0, 0, (i / count) * Math.PI * 2], mixerPropellerMaterial);
     blade.renderOrder = MIXER_RENDER_ORDER;
-    hub.add(blade);
+    propellerGroup.add(blade);
   }
-  return hub;
+  return propellerGroup;
 }
 
 function buildSideMixer(azimuth) {
