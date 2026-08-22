@@ -243,30 +243,59 @@ function replacePumpRoomShell(pumpRoom) {
    distinct mesh names (DIGESTER_MIXER_MESH_NAMES in GltfTwinScene.jsx)
    so there's no chance of colliding with that existing pair.
 
-   Each assembly is built along local -Z = "toward tank center" via
-   group.lookAt(center) rather than hand-derived rotation.y trig — the
-   safe way to get 4 different azimuths pointed correctly without ever
-   being able to render and check one visually. Blade/hub geometry lives
-   in its own child group (not the outer per-mixer group) so
-   `rotation.z` on just that child spins the propeller around the
-   shaft's own axis without having to fight the parent's lookAt/downward-
-   tilt rotations already baked into it. */
+   CONFIRMED BUG, now fixed: the previous version oriented each mixer
+   with `group.lookAt(tankCenter)` and built the shaft along local -Z,
+   assuming -Z would point at the target the way it does for a camera.
+   It doesn't. Checked directly against this project's installed
+   three@0.185.1 source (node_modules/three/src/core/Object3D.js,
+   Object3D.prototype.lookAt): for a Camera or Light it calls
+   `_m1.lookAt(_position, _target, up)`, but for every other Object3D
+   (a plain Group, like these) it calls `_m1.lookAt(_target, _position,
+   up)` — eye and target swapped — which makes local +Z point at the
+   target, not -Z. So the old code's "interior" shaft (built at -Z) was
+   actually pointing AWAY from the tank center, into open air — exactly
+   the "shafts extending outwards" bug report. Rebuilt below using
+   explicit Vector3 math instead of lookAt at all: computeMixerDirection
+   returns a real world-space unit vector, and
+   quaternion.setFromUnitVectors(+Z, thatVector) maps local +Z onto it
+   directly — no eye/target convention to get backwards a second time. */
 const DIGESTER_RADIUS = 12;
 const DIGESTER_MID_Y = 3.45;
 const MIXER_AZIMUTHS = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
-/* Negative rotateX on the interior (shaft+propeller) sub-group tilts
-   local -Z ("inward") toward -Y ("downward") — derived from the
-   standard rotate-around-X matrix (Y' = Y*cos(t) - Z*sin(t)) applied to
-   a pure (0,0,-1) inward vector: Y' = sin(t), which only goes negative
-   (downward) for negative t. -0.26 rad ~= 15 deg, per spec. Positive
-   rotateY afterward cants the same sub-group tangentially ("to the
-   right", i.e. off the pure-radial line, so the flow reads as a swirl
-   around the tank rather than 4 mixers all pushing straight at the
-   center) — same sign for every mixer regardless of its own azimuth,
-   since "canted right" is relative to each mixer's own outward-facing
-   view, which lookAt() already normalized per-mixer. */
-const MIXER_DOWNWARD_TILT = -0.26;
-const MIXER_TANGENTIAL_CANT = 0.16;
+
+/* Computes a real inward-pointing unit vector for a mixer mounted at
+   `mountPos`: base direction is straight from mountPos to a point
+   directly below it on the tank's own vertical axis
+   (0, mountPos.y - 0.4, 0) — for a wall mount (mountPos.x/z far from 0)
+   this points strongly inward with a mild built-in downward bias; for
+   the top mixers (mountPos.x/z close to the axis already) it's mostly
+   just "down", which combined with their own larger extraDownwardTilt
+   below is what gives them their steep, near-vertical incline.
+   `tangentAngle` rotates that base direction around the world Y axis
+   (an unambiguous, always-correct way to add "swirl" — real Y-axis
+   rotation, no sign trap possible). `extraDownwardTilt` then pushes the
+   vector's own Y component down further by sin(angle) and renormalizes
+   — deliberately NOT another axis-angle rotation: decreasing Y directly
+   is downward regardless of the vector's current azimuth/tilt, so
+   there's no second sign to get wrong on top of the lookAt one above. */
+function computeMixerDirection(mountPos, tangentAngle, extraDownwardTilt) {
+  const dir = new THREE.Vector3(0, mountPos.y - 0.4, 0).sub(mountPos).normalize();
+  dir.applyAxisAngle(new THREE.Vector3(0, 1, 0), tangentAngle);
+  dir.y -= Math.sin(extraDownwardTilt);
+  return dir.normalize();
+}
+
+/* ~17 deg tangential swirl on every side mixer, same sign each time so
+   the 4 of them swirl the same rotational way around the tank rather
+   than fighting each other — matches "canted slightly to the right"
+   well enough without a defined viewer position to make "right"
+   itself unambiguous. ~10 deg *additional* downward pitch, on top of
+   the mild downward bias computeMixerDirection's base formula already
+   has built in. */
+const SIDE_MIXER_TANGENT_ANGLE = 0.30;
+const SIDE_MIXER_EXTRA_TILT = 0.17;
+const SIDE_MIXER_SHAFT_LENGTH = 2.5;
+
 /* Guarantees these render after (on top of) the tank wall's alpha-
    blended material regardless of draw-order/depth-sort edge cases in
    X-ray mode — belt-and-suspenders alongside these meshes never being
@@ -276,7 +305,7 @@ const MIXER_TANGENTIAL_CANT = 0.16;
    normally don't need this, but the tank wall going transparent right
    in front of them while they're deep inside a bounding box that
    overlaps it is exactly the case this exists for. */
-const MIXER_RENDER_ORDER = 999;
+const MIXER_RENDER_ORDER = 10;
 
 /* These meshes are routed around GltfTwinScene.jsx's whole per-structure
    material system on purpose (see DIGESTER_MIXER_MESH_NAMES's own
@@ -284,12 +313,13 @@ const MIXER_RENDER_ORDER = 999;
    X-ray effect only ever dims materials it finds registered in that
    system, so the cleanest way to guarantee these assemblies stay 100%
    opaque through every state is to never hand their materials to it at
-   all. transparent:false / opacity:1 set explicitly (not just left at
-   the THREE default, which happens to already be this) so that's true
-   by inspection here, not by coincidence. Built once, shared across
-   every mixer instance — none of these ever differ per-mixer. */
+   all. transparent:false / opacity:1 / depthWrite:true set explicitly
+   (not just left at the THREE defaults, which happen to already be
+   this) so that's true by inspection here, not by coincidence. Built
+   once, shared across every mixer instance — none of these ever differ
+   per-mixer. */
 const mixerSteelMaterial = new THREE.MeshStandardMaterial({
-  color: '#c7c9cc', metalness: 0.85, roughness: 0.25, transparent: false, opacity: 1
+  color: '#c7c9cc', metalness: 0.85, roughness: 0.25, transparent: false, opacity: 1, depthWrite: true
 });
 /* Emissive baked in at creation (not toggled) — "pop through the
    frosted tank" per spec needs the glow present at rest, not only while
@@ -299,12 +329,12 @@ const mixerSteelMaterial = new THREE.MeshStandardMaterial({
    "high roughness/contrast" on the propellers specifically, a matte
    painted-metal read rather than the shaft/housing's polished one. */
 const mixerPropellerMaterial = new THREE.MeshStandardMaterial({
-  color: '#DC2626', metalness: 0.25, roughness: 0.75, emissive: '#ff3b3b', emissiveIntensity: 0.5,
-  transparent: false, opacity: 1
+  color: '#EF4444', metalness: 0.25, roughness: 0.75, emissive: '#ff3b3b', emissiveIntensity: 0.5,
+  transparent: false, opacity: 1, depthWrite: true
 });
 const mixerBeaconMaterial = new THREE.MeshStandardMaterial({
   color: '#eafcff', metalness: 0.1, roughness: 0.4, emissive: '#66d9ff', emissiveIntensity: 0.6,
-  transparent: false, opacity: 1
+  transparent: false, opacity: 1, depthWrite: true
 });
 
 /* 4-blade propeller, `count` set by the caller — the wall mixers below
@@ -334,60 +364,57 @@ function buildPropeller(count) {
 }
 
 function buildSideMixer(azimuth) {
-  const group = new THREE.Group();
-  group.name = 'side_entry_mixer';
-  group.position.set(
+  const mountPos = new THREE.Vector3(
     DIGESTER_RADIUS * Math.cos(azimuth),
     DIGESTER_MID_Y,
     DIGESTER_RADIUS * Math.sin(azimuth)
   );
-  group.lookAt(0, DIGESTER_MID_Y, 0);
+  const inwardDir = computeMixerDirection(mountPos, SIDE_MIXER_TANGENT_ANGLE, SIDE_MIXER_EXTRA_TILT);
 
-  /* Exterior: flanged mounting collar flush with the wall (z=0, right
-     where lookAt's local -Z crosses the tank surface) + a compact
-     drive-motor housing just outside it (+Z = away from center). Both
-     stay on the pure-radial line (no tangential cant) — only the
-     interior shaft/propeller cants, matching a real side-entry mixer
-     where the motor mounts square to the wall and only the submerged
-     impeller end angles off for flow. */
+  const group = new THREE.Group();
+  group.name = 'side_entry_mixer';
+  group.position.copy(mountPos);
+  /* Maps local +Z onto inwardDir directly — by definition, local +Z is
+     "into the tank" for this group from here on, local -Z is "out into
+     the exterior air". No lookAt, no eye/target convention to invert. */
+  group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), inwardDir);
+
+  /* Exterior: flanged mounting collar flush with the wall (z~0, right
+     at the wall surface) + a compact drive-motor housing just outside
+     it — both at NEGATIVE local Z now (outward), the corrected side of
+     the bug fixed above. */
   const collarGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.18, 16);
   collarGeo.rotateX(Math.PI / 2);
-  const collar = makeMesh(collarGeo, 'side_mixer_collar', [0, 0, 0.05], null, mixerSteelMaterial);
+  const collar = makeMesh(collarGeo, 'side_mixer_collar', [0, 0, -0.05], null, mixerSteelMaterial);
   collar.renderOrder = MIXER_RENDER_ORDER;
   group.add(collar);
 
-  const housing = makeMesh(box(0.7, 0.7, 0.9), 'side_mixer_housing', [0, 0, 0.55], null, mixerSteelMaterial);
+  const housing = makeMesh(box(0.7, 0.7, 0.9), 'side_mixer_housing', [0, 0, -0.55], null, mixerSteelMaterial);
   housing.renderOrder = MIXER_RENDER_ORDER;
   group.add(housing);
 
-  /* Interior: shaft + propeller, tilted down and canted tangentially as
-     one sub-group so the propeller spin animation (rotation.z on the
-     hub alone, see GltfTwinScene.jsx's useFrame) isn't fighting either
-     rotation every frame. */
-  const interior = new THREE.Group();
-  interior.name = 'side_entry_mixer_interior';
-  interior.rotateX(MIXER_DOWNWARD_TILT);
-  interior.rotateY(MIXER_TANGENTIAL_CANT);
-  group.add(interior);
-
-  const SHAFT_LENGTH = 3.2;
-  const shaftGeo = new THREE.CylinderGeometry(0.09, 0.09, SHAFT_LENGTH, 10);
+  /* Interior: shaft + propeller, at POSITIVE local Z (inward — the
+     other corrected side). SIDE_MIXER_SHAFT_LENGTH (2.5) plus the
+     collar's own small standoff keeps the propeller tip well short of
+     the tank's own radius (12), so it's strictly inside the volume
+     regardless of the tangential/downward bias baked into inwardDir. */
+  const shaftGeo = new THREE.CylinderGeometry(0.09, 0.09, SIDE_MIXER_SHAFT_LENGTH, 10);
   shaftGeo.rotateX(Math.PI / 2);
-  const shaft = makeMesh(shaftGeo, 'side_mixer_shaft', [0, 0, -SHAFT_LENGTH / 2], null, mixerSteelMaterial);
+  const shaft = makeMesh(shaftGeo, 'side_mixer_shaft', [0, 0, SIDE_MIXER_SHAFT_LENGTH / 2], null, mixerSteelMaterial);
   shaft.renderOrder = MIXER_RENDER_ORDER;
-  interior.add(shaft);
+  group.add(shaft);
 
   const hub = buildPropeller(4);
-  hub.position.set(0, 0, -SHAFT_LENGTH);
-  interior.add(hub);
+  hub.position.set(0, 0, SIDE_MIXER_SHAFT_LENGTH);
+  group.add(hub);
 
   /* Pulse-ring beacon at the wall insertion point, just proud of the
-     collar — a bright, distinctly-not-red accent (cyan-white) so it
-     reads as "sensor/indicator" rather than blending with the
-     propeller. Pulsed via emissiveIntensity in GltfTwinScene.jsx's
-     useFrame, alongside the propeller spin. */
+     collar (exterior side) — a bright, distinctly-not-red accent
+     (cyan-white) so it reads as "sensor/indicator" rather than blending
+     with the propeller. Pulsed via emissiveIntensity in
+     GltfTwinScene.jsx's useFrame, alongside the propeller spin. */
   const beaconGeo = new THREE.TorusGeometry(0.68, 0.035, 8, 24);
-  const beacon = makeMesh(beaconGeo, 'side_mixer_beacon', [0, 0, 0.08], null, mixerBeaconMaterial);
+  const beacon = makeMesh(beaconGeo, 'side_mixer_beacon', [0, 0, -0.08], null, mixerBeaconMaterial);
   beacon.renderOrder = MIXER_RENDER_ORDER;
   group.add(beacon);
 
@@ -413,48 +440,53 @@ function removeGhostMixers(digester) {
 }
 
 /* ---------------- Digester -> 2 twin-propeller top-slab mixers ----------------
-   "Tabliyeden girenler" (top-slab inclined mixers) — mounted near the
-   tank's own rim (top_ring sits at world y=5.85, tank_wall's own top
-   edge at y=6.0), descending inclined into the liquid with 2 propeller
-   clusters spaced along one shaft ("twin" per spec), as opposed to the
-   4 side mixers' single 4-blade cluster each. Oriented the same
-   lookAt() way as buildSideMixer, but the target here is below AND
-   partway toward center (not level with the mount point), so the
-   resulting tilt is a real incline, not a pure horizontal yaw — see
-   this function's own placement math for exactly how much of each. */
-const TOP_MIXER_MOUNT_RADIUS = 4.5;
-const TOP_MIXER_MOUNT_Y = 5.6;
+   "Tabliyeden eğimli girenler" (top-slab inclined mixers) — mounted at
+   the perimeter slab ring near the tank's own rim (top_ring sits at
+   world y=5.85, tank_wall's own top edge at y=6.0; radius 10.5 below
+   sits just inside the tank's own r=12, matching the ring rather than
+   the tank's vertical centerline), penetrating steeply downward into
+   the liquid with 2 propeller clusters spaced along one shaft ("twin"
+   per spec), as opposed to the 4 side mixers' single 4-blade cluster
+   each. Same computeMixerDirection()/quaternion approach as
+   buildSideMixer, with a much larger extraDownwardTilt (these
+   penetrate steeply, close to vertical, not the side mixers' mostly-
+   horizontal entry) and no tangential cant (spec describes these as
+   "angled downwards", not swirled — cant is a side-mixer-only detail). */
+const TOP_MIXER_MOUNT_RADIUS = 10.5;
+const TOP_MIXER_MOUNT_Y = 5.7;
 const TOP_MIXER_SHAFT_LENGTH = 4.2;
+const TOP_MIXER_EXTRA_TILT = 0.9;
 const TOP_MIXER_AZIMUTHS = [Math.PI / 4, (5 * Math.PI) / 4];
 
 function buildTwinTopMixer(azimuth) {
-  const mountX = TOP_MIXER_MOUNT_RADIUS * Math.cos(azimuth);
-  const mountZ = TOP_MIXER_MOUNT_RADIUS * Math.sin(azimuth);
+  const mountPos = new THREE.Vector3(
+    TOP_MIXER_MOUNT_RADIUS * Math.cos(azimuth),
+    TOP_MIXER_MOUNT_Y,
+    TOP_MIXER_MOUNT_RADIUS * Math.sin(azimuth)
+  );
+  const inwardDir = computeMixerDirection(mountPos, 0, TOP_MIXER_EXTRA_TILT);
 
   const group = new THREE.Group();
   group.name = 'top_slab_mixer';
-  group.position.set(mountX, TOP_MIXER_MOUNT_Y, mountZ);
-  /* Target: straight down TOP_MIXER_SHAFT_LENGTH, biased 40% of the way
-     toward the tank's vertical centerline — dominant downward
-     component with a real but modest inward lean, "inclined" rather
-     than either purely vertical or purely radial. */
-  group.lookAt(mountX * 0.6, TOP_MIXER_MOUNT_Y - TOP_MIXER_SHAFT_LENGTH, mountZ * 0.6);
+  group.position.copy(mountPos);
+  group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), inwardDir);
 
-  /* Mount flange at deck level + compact motor housing above it — local
-     +Z here means "away from the descend target", i.e. up/outward,
-     same convention buildSideMixer uses for its exterior parts. */
+  /* Mount flange at deck level + compact motor housing above it —
+     NEGATIVE local Z (outward/up, above the slab), corrected side. */
   const flangeGeo = new THREE.CylinderGeometry(0.48, 0.48, 0.16, 16);
-  const flange = makeMesh(flangeGeo, 'side_mixer_collar', [0, 0, 0.04], null, mixerSteelMaterial);
+  const flange = makeMesh(flangeGeo, 'side_mixer_collar', [0, 0, -0.04], null, mixerSteelMaterial);
   flange.renderOrder = MIXER_RENDER_ORDER;
   group.add(flange);
 
-  const housing = makeMesh(box(0.6, 0.85, 0.6), 'side_mixer_housing', [0, 0, 0.5], null, mixerSteelMaterial);
+  const housing = makeMesh(box(0.6, 0.85, 0.6), 'side_mixer_housing', [0, 0, -0.5], null, mixerSteelMaterial);
   housing.renderOrder = MIXER_RENDER_ORDER;
   group.add(housing);
 
+  /* Shaft + twin propellers at POSITIVE local Z (downward/inward into
+     the tank, submerged) — the corrected side. */
   const shaftGeo = new THREE.CylinderGeometry(0.08, 0.08, TOP_MIXER_SHAFT_LENGTH, 10);
   shaftGeo.rotateX(Math.PI / 2);
-  const shaft = makeMesh(shaftGeo, 'side_mixer_shaft', [0, 0, -TOP_MIXER_SHAFT_LENGTH / 2], null, mixerSteelMaterial);
+  const shaft = makeMesh(shaftGeo, 'side_mixer_shaft', [0, 0, TOP_MIXER_SHAFT_LENGTH / 2], null, mixerSteelMaterial);
   shaft.renderOrder = MIXER_RENDER_ORDER;
   group.add(shaft);
 
@@ -464,13 +496,13 @@ function buildTwinTopMixer(azimuth) {
      3-blade shape buildPropeller was originally written for. */
   const hubs = [0.55, 0.95].map((t) => {
     const hub = buildPropeller(3);
-    hub.position.set(0, 0, -TOP_MIXER_SHAFT_LENGTH * t);
+    hub.position.set(0, 0, TOP_MIXER_SHAFT_LENGTH * t);
     group.add(hub);
     return hub;
   });
 
   const beaconGeo = new THREE.TorusGeometry(0.58, 0.035, 8, 24);
-  const beacon = makeMesh(beaconGeo, 'side_mixer_beacon', [0, 0, 0.06], null, mixerBeaconMaterial);
+  const beacon = makeMesh(beaconGeo, 'side_mixer_beacon', [0, 0, -0.06], null, mixerBeaconMaterial);
   beacon.renderOrder = MIXER_RENDER_ORDER;
   group.add(beacon);
 
