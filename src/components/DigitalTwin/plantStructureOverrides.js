@@ -63,11 +63,19 @@ function makeMesh(geometry, name, position, rotation, material) {
    below) so the new corrugated panels sit just inside where the old
    flush walls were, not floating past them.
 
-   Every part here shares one name ('container_panel') and one dark
-   charcoal/steel material (see ENGINE_ROOM_CONTAINER_MESH_NAMES in
+   Originally every part here shared one name/material — a dark
+   charcoal (#2b2e30) at metalness 0.45, which under this scene's
+   lighting rendered as a near-featureless black block ("pitch-black
+   void", reported back). Metallic PBR surfaces only read as lit where
+   the environment/lights actually catch a specular highlight; a dark
+   base color combined with real metalness has very little diffuse
+   fallback to fill in everywhere else, so large flat dark-metal panels
+   are especially prone to this. Split into 5 distinct named zones now
+   (container_wall/container_frame/container_stack/container_fan/
+   container_hazard_stripe, each with its own material in
    GltfTwinScene.jsx, scoped to engine_room only so pump_room's canopy
-   and scada_room's own prefab walls are untouched) except the hazard
-   stripe, which needs its own yellow. */
+   and scada_room's own prefab walls are untouched) — lighter base
+   colors and lower metalness throughout, per this phase's spec. */
 const CONTAINER_HALF_W = 6.9;
 const CONTAINER_HALF_D = 3.35;
 const CONTAINER_WALL_HALF_H = 2.25;
@@ -94,13 +102,13 @@ function rebuildEngineRoomContainer(engineRoom) {
   [CONTAINER_HALF_D, -CONTAINER_HALF_D].forEach((z) => {
     container.add(makeMesh(
       box(CONTAINER_HALF_W * 2, CONTAINER_WALL_HALF_H * 2, CONTAINER_WALL_THK),
-      'container_panel', [0, CONTAINER_WALL_MID_Y, z]
+      'container_wall', [0, CONTAINER_WALL_MID_Y, z]
     ));
   });
   [CONTAINER_HALF_W, -CONTAINER_HALF_W].forEach((x) => {
     container.add(makeMesh(
       box(CONTAINER_WALL_THK, CONTAINER_WALL_HALF_H * 2, CONTAINER_HALF_D * 2),
-      'container_panel', [x, CONTAINER_WALL_MID_Y, 0]
+      'container_wall', [x, CONTAINER_WALL_MID_Y, 0]
     ));
   });
 
@@ -109,7 +117,7 @@ function rebuildEngineRoomContainer(engineRoom) {
   for (let i = 0; i < LONG_RIB_COUNT; i++) {
     const x = -CONTAINER_HALF_W + 0.2 + (i / (LONG_RIB_COUNT - 1)) * (CONTAINER_HALF_W * 2 - 0.4);
     [CONTAINER_HALF_D + 0.03, -CONTAINER_HALF_D - 0.03].forEach((z) => {
-      container.add(makeMesh(box(...RIB_SIZE), 'container_panel', [x, CONTAINER_WALL_MID_Y, z]));
+      container.add(makeMesh(box(...RIB_SIZE), 'container_wall', [x, CONTAINER_WALL_MID_Y, z]));
     });
   }
   const SHORT_RIB_COUNT = 11;
@@ -117,61 +125,67 @@ function rebuildEngineRoomContainer(engineRoom) {
   for (let i = 0; i < SHORT_RIB_COUNT; i++) {
     const z = -CONTAINER_HALF_D + 0.2 + (i / (SHORT_RIB_COUNT - 1)) * (CONTAINER_HALF_D * 2 - 0.4);
     [CONTAINER_HALF_W + 0.03, -CONTAINER_HALF_W - 0.03].forEach((x) => {
-      container.add(makeMesh(box(...SHORT_RIB_SIZE), 'container_panel', [x, CONTAINER_WALL_MID_Y, z]));
+      container.add(makeMesh(box(...SHORT_RIB_SIZE), 'container_wall', [x, CONTAINER_WALL_MID_Y, z]));
     });
   }
 
   /* Reinforced corner castings — a real ISO container's 8 corner
-     fittings, small solid blocks at every top/bottom corner. */
+     fittings, small solid blocks at every top/bottom corner. Own name/
+     material (container_frame, medium/dark slate) so they read as
+     distinct geometric definition against the lighter wall panels,
+     per spec, instead of blending into them. */
   const CASTING = [0.28, 0.28, 0.28];
   [CONTAINER_HALF_W - 0.14, -CONTAINER_HALF_W + 0.14].forEach((x) => {
     [CONTAINER_HALF_D - 0.14, -CONTAINER_HALF_D + 0.14].forEach((z) => {
       [CONTAINER_WALL_MID_Y + CONTAINER_WALL_HALF_H - 0.14, CONTAINER_WALL_MID_Y - CONTAINER_WALL_HALF_H + 0.14].forEach((y) => {
-        container.add(makeMesh(box(...CASTING), 'container_panel', [x, y, z]));
+        container.add(makeMesh(box(...CASTING), 'container_frame', [x, y, z]));
       });
     });
   });
 
   /* Blank steel door panel (no window, no glass) on the front wall. */
-  container.add(makeMesh(box(1.1, 2.05, 0.05), 'container_panel', [-4.6, 1.35, CONTAINER_HALF_D + 0.03]));
+  container.add(makeMesh(box(1.1, 2.05, 0.05), 'container_wall', [-4.6, 1.35, CONTAINER_HALF_D + 0.03]));
 
   /* Roof deck. */
   container.add(makeMesh(
     box(CONTAINER_HALF_W * 2 + 0.25, 0.15, CONTAINER_HALF_D * 2 + 0.25),
-    'container_panel', [0, CONTAINER_ROOF_Y, 0]
+    'container_wall', [0, CONTAINER_ROOF_Y, 0]
   ));
 
   /* Dual rooftop cooling fans/radiators — two identical housing+blade
      assemblies, symmetric across the roof's centerline (spec: "dual
      industrial cooling fans/radiators", not the single unit Phase 47
      left in place — that whole original roof_radiator/radiator_fan
-     fixture went with the deleted shell). */
+     fixture went with the deleted shell). Own name/material
+     (container_fan, dark metallic mesh-grille look). */
   [-3.2, 3.2].forEach((x) => {
     const fanY = CONTAINER_ROOF_Y + 0.35;
     const housingGeo = new THREE.CylinderGeometry(0.78, 0.78, 0.5, 16);
-    container.add(makeMesh(housingGeo, 'container_panel', [x, fanY, 0]));
+    container.add(makeMesh(housingGeo, 'container_fan', [x, fanY, 0]));
     for (let b = 0; b < 3; b++) {
-      const blade = makeMesh(box(0.09, 0.05, 1.35), 'container_panel', [x, fanY + 0.28, 0]);
+      const blade = makeMesh(box(0.09, 0.05, 1.35), 'container_fan', [x, fanY + 0.28, 0]);
       blade.rotation.y = (b / 3) * Math.PI * 2;
       container.add(blade);
     }
   });
 
   /* Vertical exhaust silencer chimney stack + cap, off to one corner —
-     roughly where the deleted shell's own exhaust_stack sat. */
+     roughly where the deleted shell's own exhaust_stack sat. Own name/
+     material (container_stack, clean galvanized/stainless steel). */
   const stackGeo = new THREE.CylinderGeometry(0.36, 0.36, 3.2, 12);
-  container.add(makeMesh(stackGeo, 'container_panel', [5.6, CONTAINER_ROOF_Y + 1.75, -2.1]));
+  container.add(makeMesh(stackGeo, 'container_stack', [5.6, CONTAINER_ROOF_Y + 1.75, -2.1]));
   container.add(makeMesh(
     new THREE.CylinderGeometry(0.44, 0.44, 0.12, 12),
-    'container_panel', [5.6, CONTAINER_ROOF_Y + 3.42, -2.1]
+    'container_stack', [5.6, CONTAINER_ROOF_Y + 3.42, -2.1]
   ));
 
-  /* Air intake louvers: a bank of angled slats on the right wall. */
+  /* Air intake louvers: a bank of angled slats on the right wall —
+     same dark metallic mesh-grille material as the roof fans. */
   const LOUVER_COUNT = 6;
   for (let i = 0; i < LOUVER_COUNT; i++) {
     const y = CONTAINER_WALL_MID_Y - 0.75 + i * 0.3;
     container.add(makeMesh(
-      box(0.05, 0.24, 1.2), 'container_panel', [CONTAINER_HALF_W + 0.07, y, 1.1], [0, 0, Math.PI / 7]
+      box(0.05, 0.24, 1.2), 'container_fan', [CONTAINER_HALF_W + 0.07, y, 1.1], [0, 0, Math.PI / 7]
     ));
   }
 
