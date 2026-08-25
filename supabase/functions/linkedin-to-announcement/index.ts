@@ -23,10 +23,12 @@ const CORS_HEADERS = {
 
 const CATEGORIES = ["Proje Geliştirme", "Etkinlik", "Teknoloji", "Saha"];
 const MAX_INPUT_CHARS = 8000;
-/* gemini-2.5-flash is the current free-tier-eligible flash model as of
-   this writing. If Google retires it, gemini-1.5-flash is the older
-   fallback the user named — swap this one constant, nothing else. */
-const GEMINI_MODEL = "gemini-2.5-flash";
+/* gemini-2.5-flash (originally used here) was retired by Google — a
+   live probe against this project's own key returned 404 with
+   "no longer available to new users... use models/gemini-3.6-flash".
+   That's Google's own migration message, not a guess. If this breaks
+   again, swap this one constant. */
+const GEMINI_MODEL = "gemini-3.6-flash";
 
 function jsonResponse(data: unknown, status: number) {
   return new Response(JSON.stringify(data), {
