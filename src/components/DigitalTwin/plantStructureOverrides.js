@@ -35,12 +35,20 @@ function box(w, h, d) {
   return new THREE.BoxGeometry(w, h, d);
 }
 
-function makeMesh(geometry, name, position, rotation, material) {
+function makeMesh(geometry, name, position, rotation, material, castsShadow = true) {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = name;
   mesh.position.set(...position);
   if (rotation) mesh.rotation.set(...rotation);
-  mesh.castShadow = true;
+  /* Every one of these meshes used to cast a shadow, trim included —
+     harmless back when the shadow map only rebaked on camera moves,
+     but now that it rebakes on its own throttle (GltfTwinScene.jsx's
+     SHADOW_BAKE_INTERVAL) every mesh in the depth pass has a real,
+     recurring cost. Sub-centimeter trim (ribs, corner castings,
+     louvers) has no visible shadow payoff at this facility's scale, so
+     it still receives shadows (stays grounded/shaded) but no longer
+     casts them. */
+  mesh.castShadow = castsShadow;
   mesh.receiveShadow = true;
   return mesh;
 }
@@ -117,7 +125,7 @@ function rebuildEngineRoomContainer(engineRoom) {
   for (let i = 0; i < LONG_RIB_COUNT; i++) {
     const x = -CONTAINER_HALF_W + 0.2 + (i / (LONG_RIB_COUNT - 1)) * (CONTAINER_HALF_W * 2 - 0.4);
     [CONTAINER_HALF_D + 0.03, -CONTAINER_HALF_D - 0.03].forEach((z) => {
-      container.add(makeMesh(box(...RIB_SIZE), 'container_wall', [x, CONTAINER_WALL_MID_Y, z]));
+      container.add(makeMesh(box(...RIB_SIZE), 'container_wall', [x, CONTAINER_WALL_MID_Y, z], null, undefined, false));
     });
   }
   const SHORT_RIB_COUNT = 11;
@@ -125,7 +133,7 @@ function rebuildEngineRoomContainer(engineRoom) {
   for (let i = 0; i < SHORT_RIB_COUNT; i++) {
     const z = -CONTAINER_HALF_D + 0.2 + (i / (SHORT_RIB_COUNT - 1)) * (CONTAINER_HALF_D * 2 - 0.4);
     [CONTAINER_HALF_W + 0.03, -CONTAINER_HALF_W - 0.03].forEach((x) => {
-      container.add(makeMesh(box(...SHORT_RIB_SIZE), 'container_wall', [x, CONTAINER_WALL_MID_Y, z]));
+      container.add(makeMesh(box(...SHORT_RIB_SIZE), 'container_wall', [x, CONTAINER_WALL_MID_Y, z], null, undefined, false));
     });
   }
 
@@ -138,7 +146,7 @@ function rebuildEngineRoomContainer(engineRoom) {
   [CONTAINER_HALF_W - 0.14, -CONTAINER_HALF_W + 0.14].forEach((x) => {
     [CONTAINER_HALF_D - 0.14, -CONTAINER_HALF_D + 0.14].forEach((z) => {
       [CONTAINER_WALL_MID_Y + CONTAINER_WALL_HALF_H - 0.14, CONTAINER_WALL_MID_Y - CONTAINER_WALL_HALF_H + 0.14].forEach((y) => {
-        container.add(makeMesh(box(...CASTING), 'container_frame', [x, y, z]));
+        container.add(makeMesh(box(...CASTING), 'container_frame', [x, y, z], null, undefined, false));
       });
     });
   });
@@ -185,7 +193,7 @@ function rebuildEngineRoomContainer(engineRoom) {
   for (let i = 0; i < LOUVER_COUNT; i++) {
     const y = CONTAINER_WALL_MID_Y - 0.75 + i * 0.3;
     container.add(makeMesh(
-      box(0.05, 0.24, 1.2), 'container_fan', [CONTAINER_HALF_W + 0.07, y, 1.1], [0, 0, Math.PI / 7]
+      box(0.05, 0.24, 1.2), 'container_fan', [CONTAINER_HALF_W + 0.07, y, 1.1], [0, 0, Math.PI / 7], undefined, false
     ));
   }
 

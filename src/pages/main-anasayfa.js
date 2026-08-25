@@ -3,12 +3,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
+import { initBiogasCalculator } from '../lib/biogasCalculator.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
 initSmoothScroll();
 initLangSwitcher();
 initQuoteModal();
+initBiogasCalculator();
 initFadeIn();
 initThemeToggle();
 initSiteSearch();

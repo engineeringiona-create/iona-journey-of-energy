@@ -21,6 +21,10 @@ useGLTF.preload(MODEL_SRC);
 
 const CAMERA_DURATION = reduceMotion ? 0.01 : 0.8;
 const CAMERA_EASE = 'power2.inOut';
+/* ~12Hz shadow-map rebake instead of every frame — see Rig's shadow
+   bake effect for why. Soft/low-frequency shadows (slow propeller
+   spin, slow beacon pulse) show no visible stepping at this rate. */
+const SHADOW_BAKE_INTERVAL = 1 / 12;
 /* Narrowed from 48 to 42 for a more "premium product shot" compression
    (less wide-angle bulge/distortion, edges read more parallel/imposing)
    — frameBox always fits the whole box to the frame regardless of FOV,
@@ -438,6 +442,56 @@ function attachHoverWormShader(material) {
   return uniforms;
 }
 
+/* Phase 54 "Proses Akışı" toggle: a GPU-only dashed/pulsing emissive
+   band traveling along a pipe run, independent of hover. Same
+   onBeforeCompile mechanism and shader chunks as attachHoverWormShader
+   above (kept as a separate function, not merged into it, since flow
+   state (uFlowActive) is driven by a page-level toggle while hover
+   state is driven by pointer events — two independent triggers on two
+   independent uniform sets is simpler than one function juggling both).
+   No CPU particles: the entire animation is `fract()`/`smoothstep()` on
+   the fragment's own local position plus a single uTime uniform, so the
+   per-frame CPU cost is one float write per material regardless of how
+   much pipe geometry is on screen. */
+function attachFlowPulseShader(material, color) {
+  const uniforms = {
+    uFlowTime: { value: 0 },
+    uFlowActive: { value: 0 },
+    uFlowColor: { value: new THREE.Color(color) },
+  };
+
+  material.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms);
+
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vFlowPos;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFlowPos = transformed;');
+
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vFlowPos;
+        uniform float uFlowTime;
+        uniform float uFlowActive;
+        uniform vec3 uFlowColor;`
+      )
+      .replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        if ( uFlowActive > 0.0 ) {
+          float flowAxis = ( vFlowPos.x + vFlowPos.y + vFlowPos.z ) * 0.85;
+          float flowDash = fract( flowAxis - uFlowTime * 1.6 );
+          float flowBand = smoothstep( 0.0, 0.06, flowDash ) * ( 1.0 - smoothstep( 0.3, 0.4, flowDash ) );
+          float flowPulse = 0.7 + sin( uFlowTime * 2.4 ) * 0.3;
+          totalEmissiveRadiance += uFlowColor * flowBand * flowPulse * uFlowActive * 2.4;
+        }`
+      );
+  };
+
+  return uniforms;
+}
+
 /* The digester's own cylindrical shell — the mesh itself is real and
    verified out of the GLB (not guessed, and NOT named "Digester_Shell"
    — that name doesn't exist anywhere in this model; the other room
@@ -781,10 +835,44 @@ const BUILDING_STRUCTURAL_STEEL_MESH_NAMES = new Set(['canopy_post']);
    unchanged. One shared name for every wall/rib/corner/roof/fan/stack/
    louver/door part — they're all the same material, no reason to
    register 8 different names for one look. */
-const ENGINE_ROOM_CONTAINER_MESH_NAMES = new Set(['container_panel']);
+/* Phase 53 (plantStructureOverrides.js) split the container's single
+   'container_panel' name into 5 named zones so each could carry its
+   own lighter/less-metallic material instead of the one dark charcoal
+   finish that read as a pitch-black void — see rebuildEngineRoomContainer's
+   own comment. Each name below gets its own dedicated material in the
+   engine_room block below. */
+const ENGINE_ROOM_WALL_MESH_NAMES = new Set(['container_wall']);
+const ENGINE_ROOM_FRAME_MESH_NAMES = new Set(['container_frame']);
+const ENGINE_ROOM_STACK_MESH_NAMES = new Set(['container_stack']);
+const ENGINE_ROOM_FAN_MESH_NAMES = new Set(['container_fan']);
 /* Engine room's safety-yellow hazard stripe — the container's one
    non-charcoal part. */
 const ENGINE_ROOM_HAZARD_MESH_NAMES = new Set(['container_hazard_stripe']);
+
+/* Phase 54 "Proses Akışı" flow lines — real named segments read directly
+   out of the GLB's own site_piping node hierarchy (not guessed), split
+   into the 3 process lines the toggle animates. Support brackets
+   (gas_pipe_support, heat_pipe_sleeper) and the separate heat loop
+   (heat_main/heat_inlet/heat_return/...) are left off the flow effect
+   on purpose — the toggle's job is to read as "raw feed -> digester",
+   "biogas -> CHP", "power -> grid", not light up every pipe in the
+   trench. */
+const SITE_PIPING_FEED_MESH_NAMES = new Set([
+  'feed_from_pool', 'pool_flange', 'feed_to_digester', 'digester_feed_flange',
+]);
+const SITE_PIPING_GAS_MESH_NAMES = new Set([
+  'gas_main', 'gas_wall_flange', 'gas_elbow', 'gas_header', 'gas_train',
+  'gas_into_chp', 'gas_wall_flange_chp',
+]);
+const SITE_PIPING_POWER_MESH_NAMES = new Set([
+  'cable_tray_main', 'cable_tray_post', 'cable_drop_chp', 'cable_to_pumps', 'scada_junction_box',
+]);
+/* Same green/amber/cyan the spec calls for. Feed reuses this file's own
+   documented hover-glow green (HOVER_WORM_COLOR_A) instead of a 4th
+   invented hex. */
+const FLOW_FEED_COLOR = HOVER_WORM_COLOR_A;
+const FLOW_GAS_COLOR = '#ffb020';
+const FLOW_POWER_COLOR = '#4dd9e8';
 
 /* Originally one shared texture/repeat across all 3 prefab buildings;
    now only scada_room actually uses BUILDING_WALL_MESH_NAMES/this
@@ -884,7 +972,7 @@ function FeedPipeGapFill() {
    this component even reads. Plain shallow-prop memo, no custom
    comparator needed, since nothing here is passed as a fresh
    object/array literal each render. */
-const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected }) {
+const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected, flowActive }) {
   const { scene } = useGLTF(MODEL_SRC);
   /* One clay material PER top-level structure (not one shared for the
      whole plant) — that's what makes the X-ray effect possible below:
@@ -928,6 +1016,11 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
      (propeller spin, beacon emissive pulse) alongside the hover-worm
      shader's own uTime update, not a separate effect/rAF loop. */
   const digesterMixersRef = useRef({ propellerHubs: [], beacons: [] });
+  /* The 3 site_piping flow-pulse uniform sets (feed/gas/power) — ticked
+     every frame (uFlowTime) alongside the mixer/hover uTime updates, and
+     GSAP-tweened (uFlowActive, 0<->1) by the effect below whenever the
+     `flowActive` toggle prop changes. */
+  const flowUniformsRef = useRef([]);
 
   useEffect(() => {
     return () => {
@@ -960,6 +1053,10 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     const baseYs = new Map();
     const hoverUniforms = new Map();
     const namedMeshMaterials = new Map();
+    /* The 3 flow-pulse uniform sets (feed/gas/power), ticked every frame
+       and tweened on toggle by the outer component — see flowUniformsRef
+       below and its own comment. */
+    const flowUniforms = [];
     /* One concrete-noise texture, shared by every structure's own
        concrete material instance below — sharing a *texture* across
        materials is fine (it's a stateless GPU resource); it's sharing a
@@ -1240,23 +1337,61 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       }
 
       if (structure.name === 'engine_room') {
-        /* Dark charcoal/steel, engine_room's rebuilt ISO container only
-           (see ENGINE_ROOM_CONTAINER_MESH_NAMES's own comment) — a
-           dedicated block, not folded into the shared building-materials
-           section above, specifically so this dark finish never bleeds
-           into scada_room's own lighter prefab-office walls (both used
-           to share BUILDING_WALL_MESH_NAMES/sandwichPanelMaterial before
-           engine_room_shell was deleted and rebuilt from scratch). */
-        const containerMaterial = new THREE.MeshStandardMaterial({
-          color: '#2b2e30',
-          metalness: 0.45,
-          roughness: 0.5,
+        /* engine_room's rebuilt ISO container (plantStructureOverrides.js)
+           — a dedicated block, not folded into the shared
+           building-materials section above, specifically so these
+           finishes never bleed into scada_room's own lighter prefab-office
+           walls (both used to share BUILDING_WALL_MESH_NAMES/
+           sandwichPanelMaterial before engine_room_shell was deleted and
+           rebuilt from scratch). 4 distinct zones now (was a single dark
+           charcoal 'container_panel' at metalness 0.45, which read as a
+           near-featureless black block under this scene's lighting —
+           lighter base colors / lower metalness throughout fixes that). */
+        const wallMaterial = new THREE.MeshStandardMaterial({
+          color: '#8a8f94',
+          metalness: 0.25,
+          roughness: 0.55,
         });
-        containerMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(containerMaterial));
-        ENGINE_ROOM_CONTAINER_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, containerMaterial));
+        wallMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(wallMaterial));
+        ENGINE_ROOM_WALL_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, wallMaterial));
 
-        /* Safety-yellow hazard stripe — the container's one non-charcoal
+        /* Corner castings — medium/dark slate, deliberately a step
+           darker than the wall so they read as distinct geometric
+           definition instead of blending into the panels. */
+        const frameMaterial = new THREE.MeshStandardMaterial({
+          color: '#54585c',
+          metalness: 0.35,
+          roughness: 0.45,
+        });
+        frameMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(frameMaterial));
+        ENGINE_ROOM_FRAME_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, frameMaterial));
+
+        /* Exhaust stack — clean galvanized/stainless steel, brighter and
+           more reflective than the wall panels. */
+        const stackMaterial = new THREE.MeshStandardMaterial({
+          color: '#c7cbce',
+          metalness: 0.6,
+          roughness: 0.3,
+        });
+        stackMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(stackMaterial));
+        ENGINE_ROOM_STACK_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, stackMaterial));
+
+        /* Roof fans + intake louvers — dark metallic mesh-grille look,
+           the one zone that keeps a darker/more metallic finish since
+           grilles read as recessed/shadowed on a real container. */
+        const fanMaterial = new THREE.MeshStandardMaterial({
+          color: '#3a3d40',
+          metalness: 0.5,
+          roughness: 0.4,
+        });
+        fanMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(fanMaterial));
+        ENGINE_ROOM_FAN_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, fanMaterial));
+
+        /* Safety-yellow hazard stripe — the container's one accent-color
            part. */
         const hazardMaterial = new THREE.MeshStandardMaterial({
           color: '#f4c430',
@@ -1300,6 +1435,37 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         FEED_POOL_HARDWARE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, poolHardwareMaterial));
       }
 
+      if (structure.name === 'site_piping') {
+        /* Phase 54: each of the 3 flow-pulse materials still needs a
+           normal bare-steel/cable-tray look at rest (uFlowActive starts
+           at 0) — the flow shader only adds emissive on top, so getting
+           the base PBR look right here matters independent of the
+           toggle. No hover-worm shader on these (attachHoverWormShader):
+           site_piping has no plantData entry, so it never receives
+           pointer-over events in the first place — see handlePointerOver's
+           own guard — attaching that shader here would be dead code. */
+        const feedMaterial = new THREE.MeshStandardMaterial({
+          color: '#8a8d90', metalness: 0.7, roughness: 0.4,
+        });
+        feedMaterial.needsUpdate = true;
+        flowUniforms.push(attachFlowPulseShader(feedMaterial, FLOW_FEED_COLOR));
+        SITE_PIPING_FEED_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, feedMaterial));
+
+        const gasMaterial = new THREE.MeshStandardMaterial({
+          color: '#8a8d90', metalness: 0.7, roughness: 0.4,
+        });
+        gasMaterial.needsUpdate = true;
+        flowUniforms.push(attachFlowPulseShader(gasMaterial, FLOW_GAS_COLOR));
+        SITE_PIPING_GAS_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, gasMaterial));
+
+        const powerMaterial = new THREE.MeshStandardMaterial({
+          color: '#4a4d50', metalness: 0.55, roughness: 0.5,
+        });
+        powerMaterial.needsUpdate = true;
+        flowUniforms.push(attachFlowPulseShader(powerMaterial, FLOW_POWER_COLOR));
+        SITE_PIPING_POWER_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, powerMaterial));
+      }
+
       /* Every structure gets its own concrete-base material instance
          (texture shared, material not — see concreteNoiseTexture's own
          comment) registered under every real foundation mesh name; the
@@ -1327,6 +1493,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     baseYRef.current = baseYs;
     hoverUniformsRef.current = hoverUniforms;
     namedMeshMaterialsRef.current = namedMeshMaterials;
+    flowUniformsRef.current = flowUniforms;
 
     scene.traverse((child) => {
       if (!child.isMesh) return;
@@ -1521,7 +1688,27 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     digesterMixersRef.current.beacons.forEach((beacon, i) => {
       beacon.material.emissiveIntensity = 0.6 + Math.sin(elapsed * 1.8 + i * 0.7) * 0.35;
     });
+    if (!reduceMotion) {
+      flowUniformsRef.current.forEach((uniforms) => {
+        uniforms.uFlowTime.value = elapsed;
+      });
+    }
   });
+
+  /* Toggle-driven, not tied to `selected` — the flow effect and the
+     structure X-ray/focus system are two independent things a visitor
+     can combine (e.g. focus the digester while flow is running). Snaps
+     instantly under reduceMotion instead of tweening, same rule
+     CAMERA_DURATION/HOVER_DURATION already follow. */
+  useEffect(() => {
+    flowUniformsRef.current.forEach((uniforms) => {
+      gsap.to(uniforms.uFlowActive, {
+        value: flowActive ? 1 : 0,
+        duration: reduceMotion ? 0.01 : 0.6,
+        ease: 'power2.out',
+      });
+    });
+  }, [flowActive]);
 
   return (
     <primitive
@@ -1703,18 +1890,13 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
     }
 
     const target = controlsRef.current.target;
-    /* The ~350-mesh shadow map is the single most expensive pass in this
-       scene, and it depends only on light/geometry, never on the camera
-       — so it's dead work to keep re-baking it every one of these frames
-       while only the camera is moving. Freezing autoUpdate for the tween's
-       duration (and forcing one last bake on arrival, in case anything
-       else queued a shadow-affecting change mid-flight) is a free ~1s
-       window of guaranteed 60fps for exactly the moment a stutter would
-       be most visible. */
-    gl.shadowMap.autoUpdate = false;
+    /* shadowMap.autoUpdate is permanently off (see the mount effect
+       below) and rebaked on our own throttle instead, so there's
+       nothing left to freeze/restore around this tween — just force
+       one fresh bake on arrival in case anything shadow-affecting
+       queued up mid-flight. */
     const tl = gsap.timeline({
       onComplete: () => {
-        gl.shadowMap.autoUpdate = true;
         gl.shadowMap.needsUpdate = true;
       }
     });
@@ -1724,11 +1906,31 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
 
     return () => {
       tl.kill();
-      gl.shadowMap.autoUpdate = true;
     };
   }, [selected, camera, gl]);
 
   useFrame(() => controlsRef.current?.update());
+
+  /* The ~350-mesh shadow map is the single most expensive pass in this
+     scene. Phases 48-51 added continuously-spinning mixer propellers
+     and pulsing beacons, so with three.js's default autoUpdate=true
+     that full-scene depth pass was silently re-running every single
+     frame, all the time — not just during the camera tween this file
+     already special-cased. Baking it on its own ~12Hz clock instead of
+     60Hz is imperceptible for shadows this soft/low-frequency but cuts
+     the dominant per-frame cost by ~5x. */
+  const shadowBakeAccumRef = useRef(0);
+  useEffect(() => {
+    gl.shadowMap.autoUpdate = false;
+    gl.shadowMap.needsUpdate = true;
+  }, [gl]);
+  useFrame((state, delta) => {
+    shadowBakeAccumRef.current += delta;
+    if (shadowBakeAccumRef.current >= SHADOW_BAKE_INTERVAL) {
+      shadowBakeAccumRef.current = 0;
+      gl.shadowMap.needsUpdate = true;
+    }
+  });
 
   return (
     <>
@@ -1959,6 +2161,26 @@ export default function GltfTwinScene() {
      — then gone for the rest of the session. Deliberately not persisted
      (no localStorage) since a full reload is a fresh visit. */
   const [hasInteracted, setHasInteracted] = useState(false);
+  /* "Proses Akışı (Canlı)" toggle — off by default (spec), and forced
+     off + hidden below the 768px breakpoint (mobile GPUs/thermal budget
+     don't need a second always-on shader effect layered on top of the
+     ~350-mesh scene). Tracks viewport width live, not just at mount, so
+     rotating a tablet or resizing a window mid-session can't leave the
+     toggle active on a now-narrow viewport with no way to see/reach it. */
+  const [flowActive, setFlowActive] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 768
+  );
+  useEffect(() => {
+    function handleResize() {
+      setIsMobileViewport(window.innerWidth < 768);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  useEffect(() => {
+    if (isMobileViewport) setFlowActive(false);
+  }, [isMobileViewport]);
 
   const handleReady = useCallback((plantRoot) => {
     const box = new THREE.Box3().setFromObject(plantRoot);
@@ -2054,6 +2276,7 @@ export default function GltfTwinScene() {
           onSelect={handleSelect}
           onReset={handleReset}
           selected={selected}
+          flowActive={flowActive && !isMobileViewport}
         />
         <FeedPipeGapFill />
         <Rig
@@ -2076,6 +2299,27 @@ export default function GltfTwinScene() {
           onClose={handleReset}
         />
       )}
+
+      {/* Flow toggle pill — top-right corner, out of the way of the
+         bottom-center discoverability hint and the offset-zoomed
+         DetailPanel (which docks right on desktop, see FOCUS_OFFSET_FRACTION's
+         own comment, but only once a structure is actually selected).
+         `hidden md:inline-flex`: Tailwind's `md` is exactly the 768px
+         spec breakpoint, so this reuses the same threshold as the
+         `isMobileViewport` state instead of a second hardcoded number. */}
+      <button
+        type="button"
+        onClick={() => setFlowActive((v) => !v)}
+        aria-pressed={flowActive}
+        className={`hidden md:inline-flex absolute top-4 right-4 sm:top-6 sm:right-6 z-20 items-center gap-2 rounded-full border px-5 py-2.5 shadow-lg backdrop-blur-md transition-colors ${
+          flowActive
+            ? 'border-[var(--brand)] bg-[var(--brand)]/20 text-[var(--brand)]'
+            : 'border-[var(--border-strong)] bg-[var(--surface)]/70 text-[var(--text)]'
+        }`}
+      >
+        <span aria-hidden="true">⚡</span>
+        <span className="font-label-caps text-label-caps">Proses Akışı (Canlı)</span>
+      </button>
 
       {/* First-click discoverability hint — bottom-center so it never
          competes with the hero title (now pinned near the top, see

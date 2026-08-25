@@ -1133,3 +1133,40 @@ body {
     }
 }
 
+/* Biogaz getiri hesaplayıcı waste-type pills — same shape/interaction
+   as .services-3d-tab, brand green instead of brand-orange since this
+   is a data-entry control, not a CTA (the CTA below it keeps the
+   orange). */
+.biogaz-atik-pill {
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+}
+
+.biogaz-atik-pill[aria-pressed="true"] {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+/* Contact section's Google Maps embed — a subtle desaturation in light
+   theme, and the standard invert-based dark-map trick in dark theme
+   (Google's iframe embed has no style-JSON hook without the paid JS
+   API, so a CSS filter is the only lever available here). */
+.iona-map-frame {
+    filter: grayscale(0.5) contrast(1.05);
+}
+
+.dark .iona-map-frame {
+    filter: grayscale(1) invert(0.92) contrast(0.9) brightness(0.95) hue-rotate(180deg);
+}
+

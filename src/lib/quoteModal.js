@@ -16,7 +16,16 @@ export function initQuoteModal() {
   });
 }
 
-function openModal() {
+/* Lets a caller outside this module (the ROI calculator's CTA) open the
+   same modal pre-filled with its own computed values, instead of
+   duplicating the whole overlay/form/submit machinery for one extra
+   entry point. `project`/`notes` map onto renderForm's existing fields
+   — nothing else needed pre-filling. */
+export function openQuoteModal(prefill = {}) {
+  openModal(prefill);
+}
+
+function openModal(prefill = {}) {
   if (document.getElementById(MODAL_ID)) return;
 
   const overlay = document.createElement('div');
@@ -54,10 +63,10 @@ function openModal() {
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', onKeyDown);
 
-  renderForm(card, overlay, close);
+  renderForm(card, overlay, close, prefill);
 }
 
-function renderForm(card, overlay, close) {
+function renderForm(card, overlay, close, prefill = {}) {
   card.innerHTML = `
     <div style="padding:28px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -69,8 +78,8 @@ function renderForm(card, overlay, close) {
         ${field('name', 'Ad Soyad', 'text', true)}
         ${field('email', 'E-posta', 'email', true)}
         ${field('phone', 'Telefon', 'tel', false)}
-        ${field('project', 'Proje / Atık Türü veya Tesis Kapasitesi', 'text', false)}
-        ${textarea('notes', 'Ek Açıklama')}
+        ${field('project', 'Proje / Atık Türü veya Tesis Kapasitesi', 'text', false, prefill.project)}
+        ${textarea('notes', 'Ek Açıklama', prefill.notes)}
         <p id="iona-qm-error" style="color:#f87171;font-size:12px;margin:0;display:none;"></p>
         <button type="submit" id="iona-qm-submit" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--brand-orange,#ff751f);color:#fff;font-weight:700;font-size:13px;padding:13px;border-radius:999px;border:0;cursor:pointer;">
           <span id="iona-qm-spinner" style="display:none;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.35);border-top-color:#fff;animation:iona-qm-spin 700ms linear infinite;"></span>
@@ -87,22 +96,30 @@ function renderForm(card, overlay, close) {
   form.addEventListener('submit', (e) => handleSubmit(e, card, overlay, close));
 }
 
-function field(name, label, type, required) {
+function field(name, label, type, required, value) {
+  const escapedValue = value ? escapeHtml(value) : '';
   return `
     <label style="display:flex;flex-direction:column;gap:5px;">
       <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:rgba(255,255,255,0.5);text-transform:uppercase;">${label}${required ? ' *' : ''}</span>
-      <input name="${name}" type="${type}" ${required ? 'required' : ''} style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:13px;">
+      <input name="${name}" type="${type}" ${required ? 'required' : ''} value="${escapedValue}" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:13px;">
     </label>
   `;
 }
 
-function textarea(name, label) {
+function textarea(name, label, value) {
+  const escapedValue = value ? escapeHtml(value) : '';
   return `
     <label style="display:flex;flex-direction:column;gap:5px;">
       <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:rgba(255,255,255,0.5);text-transform:uppercase;">${label}</span>
-      <textarea name="${name}" rows="3" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:13px;resize:none;"></textarea>
+      <textarea name="${name}" rows="3" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:13px;resize:none;">${escapedValue}</textarea>
     </label>
   `;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 async function handleSubmit(e, card, overlay, close) {
