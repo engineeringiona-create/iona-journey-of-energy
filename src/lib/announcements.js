@@ -53,7 +53,7 @@ function injectStyles() {
     .iona-ap-glow-a { background: radial-gradient(circle, rgba(63,174,102,0.35), transparent 70%); top: -220px; left: -160px; }
     .iona-ap-glow-b { background: radial-gradient(circle, rgba(255,138,61,0.28), transparent 70%); bottom: -220px; right: -160px; }
     .iona-ap-card {
-      position: relative; z-index: 1; width: 90vw; max-width: 860px; max-height: 85vh;
+      position: relative; z-index: 1; width: 92vw; max-width: 1080px; max-height: 90vh;
       display: flex; flex-direction: column; overflow: hidden;
       background: var(--ap-card-bg);
       backdrop-filter: blur(16px) saturate(150%);
@@ -65,11 +65,15 @@ function injectStyles() {
       transform: translateZ(0);
       backface-visibility: hidden;
     }
-    @media (min-width: 820px) { .iona-ap-card { flex-direction: row; max-height: 560px; } }
-    .iona-ap-visual { position: relative; flex-shrink: 0; width: 100%; height: 220px; overflow: hidden; }
-    @media (min-width: 820px) { .iona-ap-visual { width: 42%; height: auto; } }
-    .iona-ap-visual img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .iona-ap-body { position: relative; flex: 1; min-width: 0; padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
+    @media (min-width: 820px) { .iona-ap-card { flex-direction: row; max-height: 82vh; } }
+    /* object-fit: contain (not cover) + a neutral fill behind it — banner
+       images come in whatever aspect ratio the admin uploaded, and
+       cropping to fill a fixed box was cutting parts of it off. The fill
+       color keeps contain's letterboxing from reading as blank space. */
+    .iona-ap-visual { position: relative; flex-shrink: 0; width: 100%; height: 260px; overflow: hidden; background: var(--ap-glass-btn-bg); }
+    @media (min-width: 820px) { .iona-ap-visual { width: 44%; height: auto; } }
+    .iona-ap-visual img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .iona-ap-body { position: relative; flex: 1; min-width: 0; padding: 32px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; }
     .iona-ap-close {
       position: absolute; top: 14px; right: 14px; z-index: 3; width: 34px; height: 34px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -79,7 +83,14 @@ function injectStyles() {
     .iona-ap-close:hover { background: var(--ap-glass-btn-bg-hover); }
     .iona-ap-badge { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; background: var(--ap-glass-btn-bg); border: 1px solid var(--ap-border); color: var(--ap-text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 5px 12px; border-radius: 999px; margin-bottom: 14px; }
     .iona-ap-title { color: var(--ap-text); font-weight: 800; font-size: 24px; line-height: 1.2; margin: 0 0 12px; text-shadow: var(--ap-title-shadow); }
-    .iona-ap-desc { color: var(--ap-text-muted); font-size: 14px; line-height: 1.65; max-height: 160px; overflow-y: auto; margin: 0 0 20px; padding-right: 4px; }
+    /* No own max-height/scroll here on purpose — a second nested scroll
+       container inside .iona-ap-body was the "scrolling the text scrolls
+       the page behind it" bug: at the inner box's scroll boundary the
+       wheel event has nowhere further to go inside it and bubbles up to
+       the page. One scroll container (.iona-ap-body) for the whole card
+       body fixes that; overscroll-behavion: contain on it plus the body
+       scroll lock below stop that bubbling reaching the page either way. */
+    .iona-ap-desc { color: var(--ap-text-muted); font-size: 14px; line-height: 1.65; white-space: pre-wrap; margin: 0 0 20px; padding-right: 4px; }
     .iona-ap-actions { display: flex; gap: 10px; margin-top: auto; }
     .iona-ap-cta { flex: 1; text-align: center; background: var(--brand-orange, #ff751f); color: #fff; font-weight: 700; font-size: 13px; padding: 13px; border-radius: 999px; text-decoration: none; }
     .iona-ap-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
@@ -134,8 +145,15 @@ export function openAnnouncementModal(cards, startIndex = 0) {
   overlay.append(glowA, glowB, card);
   document.body.appendChild(overlay);
 
+  /* Locks the page itself while the popup is open — without this, once
+     .iona-ap-body's own scroll hits its top/bottom the wheel event
+     bubbles past it and scrolls the page underneath the overlay instead. */
+  const previousBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
   function close() {
     overlay.remove();
+    document.body.style.overflow = previousBodyOverflow;
     document.removeEventListener('keydown', onKeydown);
   }
 
