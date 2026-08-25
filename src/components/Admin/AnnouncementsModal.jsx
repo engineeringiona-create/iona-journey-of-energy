@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
 import ModalFooter from './ModalFooter.jsx';
+import LinkedInImportModal from './LinkedInImportModal.jsx';
 
 function makeId() {
   return `ann_${Date.now()}_${Math.round(Math.random() * 1000)}`;
@@ -25,6 +26,12 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
   const [list, setList] = useState(initial.list || []);
   const [activeId, setActiveId] = useState((initial.list || [])[0]?.id || null);
   const [uploading, setUploading] = useState(false);
+  const [showLinkedInImport, setShowLinkedInImport] = useState(false);
+
+  function handleLinkedInImport(item) {
+    commit([...list, item]);
+    setActiveId(item.id);
+  }
 
   /* Local draft only — reaches the parent's editCount / "Değişiklikleri
      Kaydet" pipeline once, when Uygula is pressed. */
@@ -110,6 +117,13 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
               className="mt-3 shrink-0 font-label-caps text-[11px] font-bold tracking-[0.06em] bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 py-2 rounded-full transition-colors duration-200"
             >
               + Yeni Duyuru
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowLinkedInImport(true)}
+              className="mt-2 shrink-0 font-label-caps text-[11px] font-bold tracking-[0.06em] bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 py-2 rounded-full transition-colors duration-200"
+            >
+              ✨ LinkedIn'den AI ile Duyuru Oluştur
             </button>
           </div>
 
@@ -230,6 +244,14 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
 
         <ModalFooter onApply={handleApply} onCancel={onClose} />
       </div>
+
+      {showLinkedInImport && (
+        <LinkedInImportModal
+          onImport={handleLinkedInImport}
+          onClose={() => setShowLinkedInImport(false)}
+          onToast={onToast}
+        />
+      )}
     </div>
   );
 }

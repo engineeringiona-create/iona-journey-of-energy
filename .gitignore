@@ -6,3 +6,4 @@ dist/
 _font-backup-arial-test/
 .env
 .env.local
+supabase/.temp/
