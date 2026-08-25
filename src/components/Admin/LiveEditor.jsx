@@ -15,6 +15,7 @@ import HistoryDropdown from './HistoryDropdown.jsx';
 import HotspotsModal from './HotspotsModal.jsx';
 import AnnouncementsModal from './AnnouncementsModal.jsx';
 import StatsModal from './StatsModal.jsx';
+import CopilotChat from './CopilotChat.jsx';
 
 const STYLE_ID = 'iona-admin-editor-style';
 const VIEWPORTS = [
@@ -767,6 +768,17 @@ export default function LiveEditor({ onLogout }) {
       )}
 
       <Toast toast={toast} onDismiss={() => setToast(null)} />
+
+      <CopilotChat
+        onProposeAnnouncement={(item) => {
+          setAnnouncementsEdits((current) => {
+            const baseList = current.list ?? globalSettings.announcements?.list ?? [];
+            const newItem = { ...item, id: `ann_${Date.now()}_${Math.round(Math.random() * 1000)}` };
+            return { ...current, list: [...baseList, newItem] };
+          });
+        }}
+        onToast={showToast}
+      />
     </div>
   );
 }
