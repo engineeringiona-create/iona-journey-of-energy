@@ -1,14 +1,20 @@
 // Deno edge function — deploy with:
 //   supabase functions deploy linkedin-to-announcement
-//   supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
+//   supabase secrets set GEMINI_API_KEY=AIza...
 //
-// The API key lives only in Supabase's secret store and Anthropic's
-// servers; it is never sent to or readable from the browser bundle. The
-// admin client calls this function via supabase.functions.invoke(...),
+// Uses Google Gemini instead of Claude (switched to stay on Gemini's free
+// tier for this low-volume admin-only task). Calls the Gemini REST API
+// directly via fetch rather than the @google/generative-ai npm package —
+// that package was being superseded by @google/genai around this model's
+// training cutoff, so the plain REST endpoint (stable for a long time
+// regardless of which SDK wraps it) is the safer bet in a Deno edge
+// function where a wrong import would fail loudly at request time.
+//
+// The API key lives only in Supabase's secret store and Google's servers;
+// it is never sent to or readable from the browser bundle. The admin
+// client calls this function via supabase.functions.invoke(...),
 // authenticated with the project's anon key (same as every other
 // supabase-js call already used across the admin panel).
-import Anthropic from "npm:@anthropic-ai/sdk";
-
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -17,6 +23,10 @@ const CORS_HEADERS = {
 
 const CATEGORIES = ["Proje Geliştirme", "Etkinlik", "Teknoloji", "Saha"];
 const MAX_INPUT_CHARS = 8000;
+/* gemini-2.5-flash is the current free-tier-eligible flash model as of
+   this writing. If Google retires it, gemini-1.5-flash is the older
+   fallback the user named — swap this one constant, nothing else. */
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 function jsonResponse(data: unknown, status: number) {
   return new Response(JSON.stringify(data), {
@@ -49,55 +59,64 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: `Metin çok uzun (maks. ${MAX_INPUT_CHARS} karakter).` }, 400);
   }
 
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+  const apiKey = Deno.env.get("GEMINI_API_KEY");
   if (!apiKey) {
-    return jsonResponse({ error: "Sunucu yapılandırması eksik (ANTHROPIC_API_KEY secret'ı ayarlanmamış)." }, 500);
+    return jsonResponse({ error: "Sunucu yapılandırması eksik (GEMINI_API_KEY secret'ı ayarlanmamış)." }, 500);
   }
 
-  const client = new Anthropic({ apiKey });
   const languageName = targetLanguage === "en" ? "English" : "Turkish";
+  const systemInstruction =
+    "You are an editor for IONA Engineering, a biogas/renewable-energy engineering company. " +
+    `Given a raw LinkedIn post, produce a clean website announcement in ${languageName}. ` +
+    "Write a catchy, professional title fitting the biogas/energy industry. " +
+    "Polish the body into clean prose with Markdown **bolding** on key terms and numbers, " +
+    "removing LinkedIn-specific artifacts (hashtag spam, 'follow me' CTAs, excess emoji, engagement-bait phrasing). " +
+    `Pick exactly one category from this fixed list: ${CATEGORIES.join(", ")}. ` +
+    "Extract 3 to 6 short, lowercase keyword tags capturing the key takeaways.";
+
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
   try {
-    const response = await client.messages.create({
-      model: "claude-opus-5",
-      max_tokens: 2048,
-      system:
-        "You are an editor for IONA Engineering, a biogas/renewable-energy engineering company. " +
-        `Given a raw LinkedIn post, produce a clean website announcement in ${languageName}. ` +
-        "Write a catchy, professional title fitting the biogas/energy industry. " +
-        "Polish the body into clean prose with Markdown **bolding** on key terms and numbers, " +
-        "removing LinkedIn-specific artifacts (hashtag spam, 'follow me' CTAs, excess emoji, engagement-bait phrasing). " +
-        `Pick exactly one category from this fixed list: ${CATEGORIES.join(", ")}. ` +
-        "Extract 3 to 6 short, lowercase keyword tags capturing the key takeaways.",
-      messages: [{ role: "user", content: rawText }],
-      output_config: {
-        format: {
-          type: "json_schema",
-          schema: {
-            type: "object",
+    const geminiResponse = await fetch(geminiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        contents: [{ role: "user", parts: [{ text: rawText }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
             properties: {
-              title: { type: "string" },
-              body_markdown: { type: "string" },
-              category: { type: "string", enum: CATEGORIES },
-              tags: { type: "array", items: { type: "string" } },
+              title: { type: "STRING" },
+              body_markdown: { type: "STRING" },
+              category: { type: "STRING", enum: CATEGORIES },
+              tags: { type: "ARRAY", items: { type: "STRING" } },
             },
             required: ["title", "body_markdown", "category", "tags"],
-            additionalProperties: false,
           },
         },
-      },
+      }),
     });
 
-    if (response.stop_reason === "refusal") {
+    if (!geminiResponse.ok) {
+      const errText = await geminiResponse.text();
+      console.error("Gemini API error:", geminiResponse.status, errText);
+      return jsonResponse({ error: "AI dönüştürme başarısız oldu, lütfen tekrar deneyin." }, 502);
+    }
+
+    const data = await geminiResponse.json();
+    const candidate = data.candidates?.[0];
+    if (!candidate || candidate.finishReason === "SAFETY" || candidate.finishReason === "PROHIBITED_CONTENT") {
       return jsonResponse({ error: "İçerik AI tarafından reddedildi, lütfen metni gözden geçirin." }, 422);
     }
 
-    const textBlock = response.content.find((block) => block.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
+    const text = candidate.content?.parts?.[0]?.text;
+    if (!text) {
       return jsonResponse({ error: "AI yanıtı boş döndü." }, 502);
     }
 
-    const parsed = JSON.parse(textBlock.text);
+    const parsed = JSON.parse(text);
     return jsonResponse({ result: parsed }, 200);
   } catch (err) {
     console.error("linkedin-to-announcement error:", err);

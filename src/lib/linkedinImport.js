@@ -1,9 +1,9 @@
 import { getSupabase } from './supabaseClient.js';
 
 /* Calls the linkedin-to-announcement Supabase Edge Function — the only
-   place the Anthropic API key is used, kept server-side as a Supabase
+   place the Gemini API key is used, kept server-side as a Supabase
    secret (see supabase/functions/linkedin-to-announcement/index.ts).
-   Never call the Anthropic API directly from this file: doing so would
+   Never call the Gemini API directly from this file: doing so would
    require the key in client-side JS, which ships in the public bundle. */
 export async function transformLinkedInPost(rawText, targetLanguage) {
   const supabase = getSupabase();
