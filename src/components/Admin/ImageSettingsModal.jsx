@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
 import ModalFooter from './ModalFooter.jsx';
+import MediaPickerModal from './MediaPickerModal.jsx';
 
 const GRID_POINTS = [
   [0, 0], [50, 0], [100, 0],
@@ -14,6 +15,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
   const [scale, setScale] = useState(initial.scale ?? 1);
   const [previewSrc, setPreviewSrc] = useState(initial.src || '');
   const [uploading, setUploading] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
   const panelRef = useRef(null);
   const draftRef = useRef({});
 
@@ -58,6 +60,15 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
     if (targetEl) targetEl.style.transform = next !== 1 ? `scale(${next})` : '';
   }
 
+  function applyImageUrl(url) {
+    draftRef.current = { ...draftRef.current, src: url };
+    if (targetEl) {
+      if (isBackground) targetEl.style.backgroundImage = `url(${JSON.stringify(url).slice(1, -1)})`;
+      else targetEl.src = url;
+    }
+    setPreviewSrc(url);
+  }
+
   async function handleFile(e) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -73,12 +84,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
       onToast('error', result.error);
       return;
     }
-    draftRef.current = { ...draftRef.current, src: result.url };
-    if (targetEl) {
-      if (isBackground) targetEl.style.backgroundImage = `url(${JSON.stringify(result.url).slice(1, -1)})`;
-      else targetEl.src = result.url;
-    }
-    setPreviewSrc(result.url);
+    applyImageUrl(result.url);
     onToast('success', 'Görsel yüklendi.');
   }
 
@@ -137,6 +143,14 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
           className="block w-full text-[11px] text-white/70 file:mr-2 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:text-white hover:file:bg-white/20"
         />
       </label>
+
+      <button
+        type="button"
+        onClick={() => setShowMediaPicker(true)}
+        className="w-full mb-4 -mt-2.5 font-label-caps text-[11px] font-bold tracking-[0.06em] bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 py-1.5 rounded-full transition-colors duration-200"
+      >
+        📁 Kütüphaneden Seç
+      </button>
 
       {isUploadOnly ? (
         <p className="text-[11px] text-white/40 leading-snug">
@@ -197,6 +211,16 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
       )}
 
       <ModalFooter onApply={handleApply} onCancel={handleCancel} />
+
+      <MediaPickerModal
+        isOpen={showMediaPicker}
+        onClose={() => setShowMediaPicker(false)}
+        onSelect={(url) => {
+          applyImageUrl(url);
+          onToast('success', 'Görsel seçildi.', 1200);
+        }}
+        onToast={onToast}
+      />
     </div>
   );
 }

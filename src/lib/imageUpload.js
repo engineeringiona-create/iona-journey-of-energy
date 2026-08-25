@@ -1,6 +1,10 @@
 import { getSupabase } from './supabaseClient.js';
 
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+/* Matches the site_assets bucket's own file_size_limit/allowed_mime_types
+   (supabase/schema.sql) — checking client-side too just gives a faster,
+   friendlier error instead of waiting on a rejected upload request. */
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+export const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
 const MAX_BASE64_FALLBACK_BYTES = 1.5 * 1024 * 1024;
 
 /* Tries Supabase Storage bucket "site_assets" first (see supabase/schema.sql
@@ -9,7 +13,10 @@ const MAX_BASE64_FALLBACK_BYTES = 1.5 * 1024 * 1024;
    row rather than object storage. */
 export async function uploadImage(file, { pageId, key }) {
   if (file.size > MAX_UPLOAD_BYTES) {
-    return { ok: false, error: 'Dosya çok büyük (maks. 5MB).' };
+    return { ok: false, error: 'Dosya çok büyük (maks. 10MB).' };
+  }
+  if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    return { ok: false, error: 'Desteklenmeyen dosya türü (PNG, JPG, WEBP veya SVG kullanın).' };
   }
 
   const supabase = getSupabase();

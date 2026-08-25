@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { transformLinkedInPost } from '../../lib/linkedinImport.js';
 import { uploadImage } from '../../lib/imageUpload.js';
+import MediaPickerModal from './MediaPickerModal.jsx';
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -19,6 +20,7 @@ export default function LinkedInImportModal({ onImport, onClose, onToast }) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
   const [aiResult, setAiResult] = useState(null);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
@@ -111,6 +113,13 @@ export default function LinkedInImportModal({ onImport, onClose, onToast }) {
                   disabled={uploading}
                   className="w-full text-[12px] text-white/70 file:mr-2 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-white file:text-[12px]"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowMediaPicker(true)}
+                  className="mt-1.5 w-full font-label-caps text-[11px] font-bold tracking-[0.06em] bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 py-1.5 rounded-lg transition-colors duration-200"
+                >
+                  📁 Kütüphaneden Seç
+                </button>
               </label>
             </div>
 
@@ -174,6 +183,13 @@ export default function LinkedInImportModal({ onImport, onClose, onToast }) {
           </>
         )}
       </div>
+
+      <MediaPickerModal
+        isOpen={showMediaPicker}
+        onClose={() => setShowMediaPicker(false)}
+        onSelect={(url) => setImageUrl(url)}
+        onToast={onToast}
+      />
     </div>
   );
 }

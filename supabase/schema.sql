@@ -37,15 +37,29 @@ create policy "public update" on site_content
 -- Anyone with the anon key can upload arbitrary files to this bucket;
 -- fine for this prototype phase, revisit alongside the site_content
 -- RLS note above before this becomes a real production site.
-insert into storage.buckets (id, name, public)
-values ('site_assets', 'site_assets', true)
-on conflict (id) do nothing;
+-- Phase 58: this bucket + its policies were declared here but had never
+-- actually been applied to the live project (confirmed via
+-- `select * from storage.buckets` returning zero rows) — every upload
+-- since this file was first written had been silently falling back to
+-- imageUpload.js's base64 path. Applied for real this time, with a size/
+-- mime-type cap added (10MB, matching the Medya Kütüphanesi uploader's
+-- own client-side check) and a delete policy (needed for the media
+-- library's "Sil" button — schema.sql never had one before).
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('site_assets', 'site_assets', true, 10485760, array['image/png','image/jpeg','image/webp','image/svg+xml'])
+on conflict (id) do update set
+  public = true,
+  file_size_limit = 10485760,
+  allowed_mime_types = array['image/png','image/jpeg','image/webp','image/svg+xml'];
 
 create policy "public read site_assets" on storage.objects
   for select using (bucket_id = 'site_assets');
 
 create policy "public upload site_assets" on storage.objects
   for insert with check (bucket_id = 'site_assets');
+
+create policy "public delete site_assets" on storage.objects
+  for delete using (bucket_id = 'site_assets');
 
 -- Phase 33: contact form submissions (iletisim.html "Teklif Al" form).
 -- The form still opens a mailto: as its primary path (no backend to

@@ -16,6 +16,7 @@ import HotspotsModal from './HotspotsModal.jsx';
 import AnnouncementsModal from './AnnouncementsModal.jsx';
 import StatsModal from './StatsModal.jsx';
 import CopilotChat from './CopilotChat.jsx';
+import MediaPickerModal from './MediaPickerModal.jsx';
 
 const STYLE_ID = 'iona-admin-editor-style';
 const VIEWPORTS = [
@@ -31,6 +32,7 @@ const TOOLS = [
   { id: 'announcement', label: 'Duyuru Bandı', icon: 'campaign' },
   { id: 'hotspots', label: '3D Bilgi Noktaları', icon: 'view_in_ar' },
   { id: 'announcements', label: 'Duyuru Yöneticisi', icon: 'newspaper' },
+  { id: 'media', label: 'Medya Kütüphanesi', icon: 'perm_media' },
   { id: 'stats', label: 'İstatistikler', icon: 'bar_chart' },
   { id: 'history', label: 'Geçmiş', icon: 'history' }
 ];
@@ -749,6 +751,10 @@ export default function LiveEditor({ onLogout }) {
           onClose={() => setPanel(null)}
           onToast={showToast}
         />
+      )}
+
+      {panel === 'media' && (
+        <MediaPickerModal isOpen onClose={() => setPanel(null)} onToast={showToast} />
       )}
 
       {panel === 'stats' && <StatsModal onClose={() => setPanel(null)} onToast={showToast} />}

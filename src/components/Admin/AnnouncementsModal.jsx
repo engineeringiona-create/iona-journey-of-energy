@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
 import ModalFooter from './ModalFooter.jsx';
 import LinkedInImportModal from './LinkedInImportModal.jsx';
+import MediaPickerModal from './MediaPickerModal.jsx';
 
 function makeId() {
   return `ann_${Date.now()}_${Math.round(Math.random() * 1000)}`;
@@ -27,6 +28,7 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
   const [activeId, setActiveId] = useState((initial.list || [])[0]?.id || null);
   const [uploading, setUploading] = useState(false);
   const [showLinkedInImport, setShowLinkedInImport] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
   function handleLinkedInImport(item) {
     commit([...list, item]);
@@ -192,13 +194,22 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
                   {uploading ? 'Yükleniyor...' : 'Banner Görseli'}
                 </span>
                 {active.bannerImage && <img src={active.bannerImage} alt="" className="w-full h-24 object-cover rounded-lg mb-2" />}
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={uploading}
-                  onChange={handleFile}
-                  className="block w-full text-[11px] text-white/70 file:mr-2 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:text-white hover:file:bg-white/20"
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={uploading}
+                    onChange={handleFile}
+                    className="flex-1 text-[11px] text-white/70 file:mr-2 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-[11px] file:font-bold file:text-white hover:file:bg-white/20"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowMediaPicker(true)}
+                    className="shrink-0 font-label-caps text-[11px] font-bold tracking-[0.06em] bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 px-3 py-1.5 rounded-full transition-colors duration-200"
+                  >
+                    📁 Kütüphaneden Seç
+                  </button>
+                </div>
               </div>
 
               <label className="flex items-center gap-2 cursor-pointer">
@@ -252,6 +263,13 @@ export default function AnnouncementsModal({ initial, onChange, onClose, onToast
           onToast={onToast}
         />
       )}
+
+      <MediaPickerModal
+        isOpen={showMediaPicker}
+        onClose={() => setShowMediaPicker(false)}
+        onSelect={(url) => updateActive({ bannerImage: url })}
+        onToast={onToast}
+      />
     </div>
   );
 }
