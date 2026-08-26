@@ -1476,7 +1476,11 @@ html {
 .ionaflux-phone {
     display: flex;
     justify-content: center;
-    filter: drop-shadow(0 40px 70px rgba(0, 0, 0, 0.55));
+    /* Phase 70: two stacked drop-shadows instead of one — a big soft
+       ambient throw plus a tighter, closer one standing in for a
+       realistic diffused contact shadow where the phone "sits" on the
+       titanium canvas. */
+    filter: drop-shadow(0 40px 70px rgba(0, 0, 0, 0.55)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
 }
 
 .ionaflux-phone-frame {
@@ -1543,7 +1547,7 @@ html {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    color: #f8fafa;
+    color: #f8fafc;
 }
 
 .ionaflux-status-bar {
@@ -1572,7 +1576,7 @@ html {
 .ionaflux-app-title {
     font-weight: 800;
     font-size: 13px;
-    color: #f8fafa;
+    color: #f8fafc;
 }
 
 .ionaflux-live-badge {
@@ -1614,14 +1618,24 @@ html {
     margin-bottom: 10px;
 }
 
+/* Phase 70: "SCADA glass" — frosted dark glass instead of the flat
+   4%-white tint these had before, matching the same Apple-Pro-style
+   treatment as the titanium canvas the phone sits on. backdrop-blur
+   only does anything meaningful with content actually moving behind it
+   (scroll, the ambient glow orb drifting) — kept anyway since it's
+   cheap here (small, low card count, not the page-wide nav blur that
+   base.css already special-cases off mobile for cost reasons). */
 .ionaflux-metric-card,
 .ionaflux-sparkline-card,
 .ionaflux-alert-item,
 .ionaflux-report-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
     padding: 10px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .ionaflux-metric-card {
