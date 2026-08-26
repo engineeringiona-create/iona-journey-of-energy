@@ -145,3 +145,23 @@ alter table site_content_revisions add column if not exists note text;
 
 create policy "public update site_content_revisions" on site_content_revisions
   for update using (true) with check (true);
+
+-- Phase 61: full modular page builder (section reorder/visibility/title,
+-- typography & theme customizer, per-image framing). No new table or
+-- column — both features fit inside the existing jsonb columns this file
+-- already declared:
+--   * site_content.content.sections (page-scoped, e.g. the "home" row)
+--     gains an optional `_order: [sectionId, ...]` key alongside its
+--     existing per-id `{ [sectionId]: hidden }` booleans (Phase 33).
+--     Applied on the real page by applySectionLayout() in src/i18n.js,
+--     shared reorder logic in src/lib/sectionLayout.js. Section titles
+--     reuse the SAME page row's per-lang text buckets — no new key —
+--     since a section's eyebrow/title is just another data-i18n value.
+--   * site_content id='theme' row (Phase 34, global bucket) gains
+--     fontFamily / fontScale / borderOpacity / surfaceTint alongside its
+--     existing brand/cta/surface color keys. Applied via
+--     src/lib/themeVars.js, shared by the real site and the admin Tema
+--     modal's live iframe preview.
+-- Per-image framing (objectFit/aspectRatio/borderRadius/maxWidthPercent/
+-- placement) is just more keys in the existing per-image patch object
+-- already stored at site_content.content.images[imgKey] (Phase 32).

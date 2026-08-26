@@ -59,6 +59,30 @@ body {
     transition: background-color 400ms ease, color 400ms ease;
 }
 
+/* Phase 61: "Tipografi & Tema" panel knobs (src/lib/themeVars.js).
+   Scaling html's root font-size scales every rem-based size sitewide in
+   one shot rather than needing a --font-scale multiply baked into each
+   of the eight font-name and text-size Tailwind tokens individually. The family
+   override only applies once [data-font-override] is set (an admin
+   actually picked a non-default font) — !important is required to beat
+   the compiled Tailwind utility classes below, which set font-family at
+   the same specificity. */
+html {
+    font-size: calc(100% * var(--font-scale, 1));
+}
+
+:root[data-font-override] body,
+:root[data-font-override] .font-label-caps,
+:root[data-font-override] .font-headline-md,
+:root[data-font-override] .font-headline-lg-mobile,
+:root[data-font-override] .font-headline-lg,
+:root[data-font-override] .font-body-md,
+:root[data-font-override] .font-display-hero,
+:root[data-font-override] .font-body-lg,
+:root[data-font-override] .font-display-hero-mobile {
+    font-family: var(--font-family-override), Arial, sans-serif !important;
+}
+
 ::-webkit-scrollbar {
     display: none;
 }

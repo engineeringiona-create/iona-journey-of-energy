@@ -9,7 +9,8 @@ import Toast from './Toast.jsx';
 import InboxDrawer from './InboxDrawer.jsx';
 import SeoModal from './SeoModal.jsx';
 import ThemeModal from './ThemeModal.jsx';
-import SectionsPanel from './SectionsPanel.jsx';
+import SectionsPanel, { SECTION_LABELS } from './SectionsPanel.jsx';
+import { reorderSections } from '../../lib/sectionLayout.js';
 import AnnouncementModal from './AnnouncementModal.jsx';
 import HistoryDropdown from './HistoryDropdown.jsx';
 import HotspotsModal from './HotspotsModal.jsx';
@@ -28,7 +29,7 @@ const TOOLS = [
   { id: 'inbox', label: 'Gelen Kutusu', icon: 'mail' },
   { id: 'seo', label: 'SEO', icon: 'travel_explore' },
   { id: 'theme', label: 'Tema', icon: 'palette' },
-  { id: 'sections', label: 'Bölümler', icon: 'visibility' },
+  { id: 'sections', label: 'Sayfa Düzeni & Bölümler', icon: 'dashboard_customize' },
   { id: 'announcement', label: 'Duyuru Bandı', icon: 'campaign' },
   { id: 'hotspots', label: '3D Bilgi Noktaları', icon: 'view_in_ar' },
   { id: 'announcements', label: 'Duyuru Yöneticisi', icon: 'newspaper' },
@@ -184,6 +185,52 @@ export default function LiveEditor({ onLogout }) {
     setSaved(false);
   }, []);
 
+  /* Reorder ("Sayfa Düzeni & Bölümler" ⬆️/⬇️): sectionEdits._order sits
+     alongside the per-id hidden booleans in the very same bucket, since
+     that's exactly the shape content.sections is saved/applied as (see
+     applySectionLayout in src/i18n.js) — no separate storage needed.
+     Falls back to the DOM's own current order (sectionsListRef, captured
+     at iframe load) until the first move. */
+  const recordSectionMove = useCallback((index, direction) => {
+    setSectionEdits((current) => {
+      const order = current._order || sectionsListRef.current.map((s) => s.id);
+      const target = index + direction;
+      if (target < 0 || target >= order.length) return current;
+      const next = [...order];
+      [next[index], next[target]] = [next[target], next[index]];
+      const doc = iframeRef.current?.contentDocument;
+      if (doc) reorderSections(doc, next);
+      return { ...current, _order: next };
+    });
+    setSaved(false);
+  }, []);
+
+  /* Section title/subtitle fields in the layout panel are just a
+     convenience surface over the SAME per-key text edits the inline
+     contenteditable flow already produces (see SECTION_LABELS in
+     SectionsPanel.jsx) — reuses recordEdit's exact save path instead of
+     inventing a parallel one. */
+  const recordSectionTextEdit = useCallback(
+    (key, value) => {
+      recordEdit(key, value);
+      const doc = iframeRef.current?.contentDocument;
+      const el = doc?.querySelector(`[data-i18n="${key}"]`);
+      if (el) el.textContent = value;
+    },
+    [recordEdit]
+  );
+
+  function sectionTextsSnapshot() {
+    const doc = iframeRef.current?.contentDocument;
+    const activeLang = langRef.current;
+    const keys = Object.values(SECTION_LABELS).flatMap((m) => [m.eyebrowKey, m.titleKey]).filter(Boolean);
+    const out = {};
+    keys.forEach((key) => {
+      out[key] = edits[activeLang]?.[key] ?? doc?.querySelector(`[data-i18n="${key}"]`)?.textContent ?? '';
+    });
+    return out;
+  }
+
   const handleLoad = useCallback(() => {
     const doc = iframeRef.current?.contentDocument;
     if (!doc) return;
@@ -208,13 +255,32 @@ export default function LiveEditor({ onLogout }) {
         const match = /url\((['"]?)(.*?)\1\)/.exec(cs.backgroundImage || '');
         bgSrc = match ? match[2] : '';
       }
+      /* Framing fields (Phase 61) always land as inline styles via
+         applyImageFraming (i18n.js) / applyFraming (ImageSettingsModal),
+         same as scale's transform above — read straight from el.style
+         rather than computed style, since a not-yet-set property should
+         read back as the real "no override" default, not the browser's
+         resolved value. */
+      const placementFromMargins = () => {
+        const ml = el.style.marginLeft;
+        const mr = el.style.marginRight;
+        if (ml === '0' && mr === 'auto') return 'left';
+        if (ml === 'auto' && mr === '0') return 'right';
+        if (ml === 'auto' && mr === 'auto') return 'center';
+        return 'full';
+      };
       imageOriginalsRef.current[key] = {
         src: isImg ? (el.currentSrc || el.src) : bgSrc,
         isBackground: !isImg,
         posX,
         posY,
         scale: scaleMatch ? parseFloat(scaleMatch[1]) : 1,
-        isParallax: el.classList.contains('parallax-media')
+        isParallax: el.classList.contains('parallax-media'),
+        objectFit: el.style.objectFit || 'cover',
+        aspectRatio: el.style.aspectRatio || 'auto',
+        borderRadius: el.style.borderRadius ? parseFloat(el.style.borderRadius) : 0,
+        maxWidthPercent: el.style.maxWidth ? parseFloat(el.style.maxWidth) : 100,
+        placement: placementFromMargins()
       };
     });
 
@@ -721,8 +787,14 @@ export default function LiveEditor({ onLogout }) {
 
       {panel === 'sections' && (
         <SectionsPanel
-          sections={sectionsListRef.current.map((s) => ({ id: s.id, hidden: sectionEdits[s.id] ?? s.hidden }))}
+          sections={(sectionEdits._order || sectionsListRef.current.map((s) => s.id))
+            .map((id) => sectionsListRef.current.find((s) => s.id === id))
+            .filter(Boolean)
+            .map((s) => ({ id: s.id, hidden: sectionEdits[s.id] ?? s.hidden }))}
+          texts={sectionTextsSnapshot()}
           onToggle={recordSectionEdit}
+          onMove={recordSectionMove}
+          onEditText={recordSectionTextEdit}
           onClose={() => setPanel(null)}
         />
       )}

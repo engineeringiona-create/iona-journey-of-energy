@@ -12,6 +12,8 @@ import { applyAnnouncementBar } from './lib/announcementBar.js';
 import { applyHotspots } from './lib/hotspots.js';
 import { applyAnnouncementPopup } from './lib/announcements.js';
 import { pageIdForPath } from './lib/pages.js';
+import { applyThemeVars } from './lib/themeVars.js';
+import { reorderSections } from './lib/sectionLayout.js';
 
 export const LANGS = [
   { code: 'tr', label: 'Türkçe' },
@@ -61,19 +63,50 @@ function applyImageOverrides(images) {
     if (patch.scale !== undefined && !el.classList.contains('parallax-media')) {
       el.style.transform = patch.scale !== 1 ? `scale(${patch.scale})` : '';
     }
+    applyImageFraming(el, patch, isImg);
   });
 }
 
-/* Section visibility (Phase 33): content.sections is { [sectionId]: true }
-   where the key is the section element's own existing DOM id — every
-   <section> on this site already carries one, so no new markup/attribute
-   is needed. true means "hidden". */
-function applySectionVisibility(sections) {
+/* Phase 61 framing controls (ImageSettingsModal "Çerçeveleme" tab): fit,
+   aspect ratio, corner radius, and width-scale/placement apply directly as
+   inline styles on the element (works the same for <img> and background-
+   div slots). Placement only has a visible effect once maxWidthPercent is
+   below 100 — at full width there's no free space left to align within,
+   which is expected, not a bug. */
+function applyImageFraming(el, patch, isImg) {
+  if (patch.objectFit && isImg) el.style.objectFit = patch.objectFit;
+  if (patch.aspectRatio) el.style.aspectRatio = patch.aspectRatio === 'auto' ? '' : patch.aspectRatio;
+  if (patch.borderRadius !== undefined) el.style.borderRadius = `${patch.borderRadius}px`;
+  if (patch.maxWidthPercent !== undefined) {
+    const full = patch.maxWidthPercent >= 100;
+    el.style.maxWidth = full ? '' : `${patch.maxWidthPercent}%`;
+    el.style.width = full ? '' : '100%';
+  }
+  if (patch.placement) {
+    const margins = { left: ['0', 'auto'], right: ['auto', '0'], center: ['auto', 'auto'], full: ['', ''] };
+    const [ml, mr] = margins[patch.placement] || margins.center;
+    el.style.marginLeft = ml;
+    el.style.marginRight = mr;
+    el.style.display = patch.placement === 'full' ? '' : 'block';
+  }
+}
+
+/* Section visibility + order (Phase 33, extended Phase 61): content.sections
+   is { [sectionId]: true, _order: [id, id, ...] } where each id is a
+   section element's own existing DOM id — every <section> on this site
+   already carries one, so no new markup/attribute is needed. true means
+   "hidden"; _order (optional, admin "Sayfa Düzeni & Bölümler" reorder)
+   re-threads the listed sections into that sequence in-place — see
+   src/lib/sectionLayout.js, shared with the admin reorder panel's live
+   iframe preview. */
+function applySectionLayout(sections) {
   if (!sections) return;
-  Object.entries(sections).forEach(([id, hidden]) => {
+  const { _order, ...hiddenMap } = sections;
+  Object.entries(hiddenMap).forEach(([id, hidden]) => {
     const el = document.getElementById(id);
     if (el) el.style.display = hidden ? 'none' : '';
   });
+  reorderSections(document, _order);
 }
 
 /* SEO overrides (Phase 33): content.seo = { title, description, ogImage }.
@@ -98,30 +131,18 @@ function upsertMeta(attr, key, content) {
   el.setAttribute('content', content);
 }
 
-/* Live theme palette (Phase 34): three independent knobs — brand (green,
+/* Live theme + typography palette (Phase 34, extended Phase 61: font
+   family, base font-size scale, border/surface-tint alpha). Brand (green,
    drives logo/icons/badges/borders), cta (orange, drives buttons/CTA/
-   glows), and surface (drives the --border-green section/card tint) — in
-   both the light and dark root blocks so the picked colors show up
-   regardless of the visitor's theme mode. Only theme.brand/cta/surface
-   are honored; a leftover legacy theme.accent (the old single-color
-   picker this replaced, which collapsed brand+CTA into one flat color)
-   is intentionally ignored so any previously-saved single-color override
-   stops applying immediately, reverting to base.css's real dual-tone
-   brand colors until a new granular value is picked. */
-const THEME_STYLE_ID = 'iona-theme-vars';
+   glows), and surface (drives the --border-green section/card tint) apply
+   identically in both light and dark root blocks; border/surface-tint
+   need different base colors per mode, handled inside applyThemeVars
+   itself. See src/lib/themeVars.js — shared with the admin Tema modal's
+   iframe preview so the two can never drift. A leftover legacy
+   theme.accent (the old single-color picker this replaced) is
+   intentionally ignored. */
 function applyThemeOverrides(theme) {
-  if (!theme || (!theme.brand && !theme.cta && !theme.surface)) return;
-  let style = document.getElementById(THEME_STYLE_ID);
-  if (!style) {
-    style = document.createElement('style');
-    style.id = THEME_STYLE_ID;
-    document.head.appendChild(style);
-  }
-  const rules = [];
-  if (theme.cta) rules.push(`--color-accent: ${theme.cta};`, `--brand-orange: ${theme.cta};`);
-  if (theme.brand) rules.push(`--brand: ${theme.brand};`);
-  if (theme.surface) rules.push(`--border-green: color-mix(in srgb, ${theme.surface} 24%, transparent);`);
-  style.textContent = `:root, :root.dark { ${rules.join(' ')} }`;
+  applyThemeVars(document, theme);
 }
 
 async function fetchContentOverrides(lang) {
@@ -129,7 +150,7 @@ async function fetchContentOverrides(lang) {
   const supabase = getSupabase();
   if (!supabase) {
     applyImageOverrides(readLocalImages(pageId));
-    applySectionVisibility(readLocalBucket(`sections:${pageId}`));
+    applySectionLayout(readLocalBucket(`sections:${pageId}`));
     applySeoOverrides(readLocalBucket(`seo:${pageId}`));
     const local = readLocalContent(lang);
     if (!local) return null;
@@ -140,7 +161,7 @@ async function fetchContentOverrides(lang) {
     const { data, error } = await supabase.from('site_content').select('*').eq('id', pageId).maybeSingle();
     if (error || !data || !data.content) return null;
     applyImageOverrides(data.content.images);
-    applySectionVisibility(data.content.sections);
+    applySectionLayout(data.content.sections);
     applySeoOverrides(data.content.seo);
     if (!data.content[lang]) return null;
     return Object.fromEntries(
