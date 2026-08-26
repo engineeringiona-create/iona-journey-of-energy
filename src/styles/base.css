@@ -723,12 +723,9 @@ html {
 
 /* ---------------- Industrial Elegance ----------------
    Replaces an earlier blurred-glow/grid experiment that read as
-   muddy and too subtle to register. Three sharp, literal devices
-   instead:
-   - .bg-alt: legacy alternating section tone (var(--surface-2)).
-     Superseded sitewide by the --section-alt token + .blueprint-watermark
-     /.bg-ghost-text pair below, kept only so nothing that already
-     references it breaks.
+   muddy and too subtle to register. Two sharp, literal devices
+   instead (a third, .bg-alt, had zero remaining references anywhere in
+   the site and was removed in the Phase 66 dead-code pass):
    - the fixed left-edge rule (plain markup, not a class — see any
      page's <body>) — one hairline down the whole layout.
    - .watermark-edge / .bg-ghost-text: two flavors of the same idea, a
@@ -736,10 +733,6 @@ html {
      a section edge, or centered full-bleed respectively). Both run
      through isolation + a negative z-index layer. Used only on About/
      Services-style sections, never on dense grids. */
-.bg-alt {
-    background-color: var(--surface-2) !important;
-}
-
 .bg-decorated {
     position: relative;
     isolation: isolate;
