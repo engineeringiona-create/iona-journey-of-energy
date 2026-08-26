@@ -1358,44 +1358,41 @@ html {
     }
 }
 
-/* ---------------- Phase 64: "Neden Iona" premium dark tech section ------
-   Permanently dark regardless of the site's light/dark toggle — same idea
-   as the #ionaflux-teaser section right above it on index.html, which
-   already hardcodes its own dark bg/text rather than using the
-   theme-variable classes every other section uses. Targeted by #id
-   (specific enough to beat the shared .accordion-item rules elsewhere in
-   this file without touching their light-theme behavior on every other
-   page that reuses the same accordion markup, e.g. teknoloji.html's expo
-   tabs). .accordion-item already had a hardcoded-dark hover/active state
-   (background #14181a, .accordion-desc #b7c2bb) — this only needed to
-   extend that same treatment to the RESTING state too, since now the
-   whole section sits on a dark canvas instead of a light one, not just
-   on hover. */
-#why-choose-us {
-    background: #0b0f19;
-    border-top-color: rgba(255, 255, 255, 0.08);
-}
-
-#why-choose-us h2 {
-    color: #f8fafa;
-}
-
+/* ---------------- Phase 67: "Neden Bizi Seçmelisiniz" reverted to light --
+   Phase 64 made this section permanently dark to match the IonaFlux
+   teaser right above it — that put two dark sections back to back, which
+   read wrong, so this reverts it to a normal light section while
+   IonaFlux stays dark. Deleting the Phase 64 rules that forced #0b0f19/
+   white text already restores the light look for the section bg and h2
+   (both fall back to the original bg-[var(--section-alt)] Tailwind class
+   and inherited var(--text), untouched in the HTML this whole time) —
+   only the accordion card treatment actually needs new rules here, since
+   .accordion-item's shared base styling (elsewhere in this file) still
+   assumes a dark hover/active state (#14181a bg, white text) that would
+   be invisible on a white card. ID-scoped so this doesn't touch that
+   shared accordion styling anywhere else it's reused (e.g. teknoloji.html
+   expo tabs). */
 #why-choose-us .accordion-item {
-    background-color: rgba(15, 23, 42, 0.8);
-    border: 1px solid #1e293b;
+    background-color: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
     border-radius: 0.75rem;
     margin-bottom: 0.75rem;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-#why-choose-us .accordion-item:hover,
+#why-choose-us .accordion-item:hover {
+    border-color: color-mix(in srgb, #10b981 40%, transparent);
+}
+
 #why-choose-us .accordion-item.is-active {
-    border-color: color-mix(in srgb, #78dc77 50%, transparent);
+    border: 2px solid #78dc77;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
 }
 
 #why-choose-us .accordion-title {
-    color: #f8fafa;
+    color: #0f172a;
 }
 
 #why-choose-us .accordion-number {
@@ -1403,7 +1400,11 @@ html {
 }
 
 #why-choose-us .accordion-icon {
-    color: #94a3b8;
+    color: #64748b;
+}
+
+#why-choose-us .accordion-desc {
+    color: #475569;
 }
 
 /* ---------------- Phase 64: CAD blueprint perimeter accent ---------------
