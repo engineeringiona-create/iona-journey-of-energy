@@ -278,9 +278,24 @@ export default function PhoneMockup() {
                         </div>
                       </div>
                       <div className="ionaflux-metric-card ionaflux-balloon-widget">
-                        <span className="ionaflux-balloon-icon" aria-hidden="true">🎈</span>
+                        {/* Phase 76: double-membrane digester dome instead of
+                           the party-balloon emoji — a cylindrical tank body
+                           with a curved gas-dome roof (the actual membrane
+                           that inflates with stored biogas on a real
+                           digester), a faint inner curve suggesting the
+                           second membrane layer, and dashed level lines.
+                           Dome fill is the "ambient green = active gas
+                           volume" cue from the spec. */}
+                        <svg viewBox="0 0 24 24" className="ionaflux-balloon-icon" aria-hidden="true">
+                          <path d="M5 11 C5 5.5 9 3 12 3 C15 3 19 5.5 19 11 Z" fill="rgba(46, 174, 115, 0.28)" stroke="#2eae73" strokeWidth="1.3" strokeLinejoin="round" />
+                          <path d="M6.5 10.2 C6.5 6.2 9.4 4.4 12 4.4 C14.6 4.4 17.5 6.2 17.5 10.2" fill="none" stroke="#2eae73" strokeWidth="0.8" opacity="0.55" />
+                          <rect x="5" y="11" width="14" height="9" rx="1" fill="none" stroke="#2eae73" strokeWidth="1.3" />
+                          <line x1="6.5" y1="14.5" x2="17.5" y2="14.5" stroke="#2eae73" strokeWidth="0.7" strokeDasharray="1.5 1.5" opacity="0.7" />
+                          <line x1="6.5" y1="17" x2="17.5" y2="17" stroke="#2eae73" strokeWidth="0.7" strokeDasharray="1.5 1.5" opacity="0.7" />
+                          <line x1="4" y1="20" x2="20" y2="20" stroke="#2eae73" strokeWidth="1.3" strokeLinecap="round" />
+                        </svg>
                         <div>
-                          <span className="ionaflux-metric-label">Gaz Depolama / Balon</span>
+                          <span className="ionaflux-metric-label">Biyogaz Depolama (Digester Kubbe)</span>
                           <span key={`storage-${tick}`} className="ionaflux-metric-value ionaflux-flash ionaflux-metric-value-sm">
                             %{metrics.gasStorage.toFixed(0)} Doluluk
                           </span>
