@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { uploadImage } from '../../lib/imageUpload.js';
+import { pickFrameTarget } from '../../lib/imageFrameTarget.js';
 import ModalFooter from './ModalFooter.jsx';
 import MediaPickerModal from './MediaPickerModal.jsx';
 
@@ -42,15 +43,14 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
   const isParallax = !!initial.isParallax;
   const isBackground = !!initial.isBackground;
   const isUploadOnly = imgKey === 'ionaflux_panel';
-  /* Phase 63 fix: "h-full object-cover" images on this site sit inside a
-     dedicated aspect-ratio wrapper div (overflow-hidden, its own
-     aspect-[...]/rounded-xl) that the img is stretched to fill — writing
-     aspect-ratio/border-radius/width onto the img itself was a no-op
-     there since h-full already pins its height to that wrapper. Frame
-     controls (everything but object-fit, which only makes sense on the
-     img) target the wrapper for those; unwrapped images and background-
-     div slots target themselves, same as before. */
-  const frameTarget = !isBackground && targetEl?.classList.contains('h-full') ? targetEl.parentElement : targetEl;
+  /* Phase 65 fix (see src/lib/imageFrameTarget.js): an image stretched to
+     exactly fill an overflow-hidden parent — whatever markup made that
+     true, not just a literal `h-full` class (Phase 63's check, which
+     missed Phase 64's .bento-card-media img { width/height:100% } since
+     that's a plain CSS rule, not a class) — gets frame controls (crop-
+     agnostic ones; object-fit stays on the img itself) written onto that
+     parent instead, since writing them onto the img was a no-op there. */
+  const frameTarget = pickFrameTarget(targetEl, !isBackground);
 
   useEffect(() => {
     function onKeyDown(e) {

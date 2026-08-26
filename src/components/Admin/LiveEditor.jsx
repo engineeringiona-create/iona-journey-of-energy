@@ -12,6 +12,7 @@ import SeoModal from './SeoModal.jsx';
 import ThemeModal from './ThemeModal.jsx';
 import SectionsPanel, { SECTION_LABELS } from './SectionsPanel.jsx';
 import { reorderSections } from '../../lib/sectionLayout.js';
+import { pickFrameTarget } from '../../lib/imageFrameTarget.js';
 import AnnouncementModal from './AnnouncementModal.jsx';
 import HistoryDropdown from './HistoryDropdown.jsx';
 import HotspotsModal from './HotspotsModal.jsx';
@@ -297,21 +298,18 @@ export default function LiveEditor({ onLogout }) {
         const match = /url\((['"]?)(.*?)\1\)/.exec(cs.backgroundImage || '');
         bgSrc = match ? match[2] : '';
       }
-      /* Framing fields (Phase 61, fixed Phase 63) always land as inline
-         styles via applyImageFraming (i18n.js) / applyFraming
-         (ImageSettingsModal) — read straight from inline style rather
-         than computed style, since a not-yet-set property should read
-         back as the real "no override" default, not the browser's
-         resolved value.
-         Every "h-full object-cover" image on this site sits inside a
-         dedicated aspect-ratio wrapper div (overflow-hidden, its own
-         aspect-[...]/rounded-xl classes) that the img is stretched to
-         fill — setting aspect-ratio/border-radius/width on the img
-         itself would be inert there since h-full already pins its
-         height to that wrapper. Frame styles target the wrapper for
-         those; unwrapped images (.parallax-media, plain w-full h-auto
-         content shots) and background-div slots target themselves. */
-      const frameTarget = isImg && el.classList.contains('h-full') ? el.parentElement : el;
+      /* Framing fields (Phase 61, fixed Phase 63, fixed again Phase 65)
+         always land as inline styles via applyImageFraming (i18n.js) /
+         applyFraming (ImageSettingsModal) — read straight from inline
+         style rather than computed style, since a not-yet-set property
+         should read back as the real "no override" default, not the
+         browser's resolved value.
+         frameTarget picks the wrapper over the img itself whenever the
+         img is geometrically stretched to fill an overflow-hidden parent
+         (see src/lib/imageFrameTarget.js) — Phase 63's `h-full` class
+         check missed Phase 64's .bento-card-media, which fills its
+         parent via a plain CSS rule instead of that class. */
+      const frameTarget = pickFrameTarget(el, isImg);
       const placementFromMargins = () => {
         const ml = frameTarget.style.marginLeft;
         const mr = frameTarget.style.marginRight;

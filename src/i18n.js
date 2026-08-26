@@ -14,6 +14,7 @@ import { applyAnnouncementPopup } from './lib/announcements.js';
 import { pageIdForPath } from './lib/pages.js';
 import { applyThemeVars } from './lib/themeVars.js';
 import { reorderSections } from './lib/sectionLayout.js';
+import { pickFrameTarget } from './lib/imageFrameTarget.js';
 
 export const LANGS = [
   { code: 'tr', label: 'Türkçe' },
@@ -70,21 +71,19 @@ function applyImageOverrides(images) {
 /* Phase 61 framing controls (ImageSettingsModal "Çerçeveleme" tab): fit,
    aspect ratio, corner radius, and width-scale/placement apply as inline
    styles. object-fit always targets the element itself (meaningless on a
-   wrapper div). The rest (Phase 63 fix): every "h-full object-cover" image
-   on this site sits inside a dedicated aspect-ratio wrapper div
-   (overflow-hidden, its own aspect-[...]/rounded-xl) that the img is
-   stretched to fill — writing aspect-ratio/border-radius/width onto the
-   img itself is inert there since h-full already pins its height to that
-   wrapper, so those target el.parentElement instead for that shape.
-   Unwrapped images and background-div slots (isImg but no h-full, or a
-   background div, which IS its own frame) target themselves, same as
-   before. Placement only has a visible effect once maxWidthPercent is
-   below 100 — at full width there's no free space left to align within,
-   which is expected, not a bug. */
+   wrapper div). The rest (Phase 65 fix, see src/lib/imageFrameTarget.js):
+   an image stretched to exactly fill an overflow-hidden parent (whatever
+   markup made that true — a `h-full` class, a scoped CSS rule, anything)
+   gets its frame styles written onto that parent instead, since writing
+   them onto the img itself would be inert there. Unwrapped images and
+   background-div slots (which are their own frame) target themselves,
+   same as before. Placement only has a visible effect once
+   maxWidthPercent is below 100 — at full width there's no free space
+   left to align within, which is expected, not a bug. */
 function applyImageFraming(el, patch, isImg) {
   if (patch.objectFit && isImg) el.style.objectFit = patch.objectFit;
 
-  const frameTarget = isImg && el.classList.contains('h-full') ? el.parentElement : el;
+  const frameTarget = pickFrameTarget(el, isImg);
   if (!frameTarget) return;
   if (patch.aspectRatio) frameTarget.style.aspectRatio = patch.aspectRatio === 'auto' ? '' : patch.aspectRatio;
   if (patch.borderRadius !== undefined) frameTarget.style.borderRadius = `${patch.borderRadius}px`;
