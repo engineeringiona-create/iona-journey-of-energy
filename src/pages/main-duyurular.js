@@ -32,7 +32,7 @@ function escapeHtml(str) {
 
 function cardHtml(a) {
   const bannerHtml = a.bannerImage
-    ? `<img src="${a.bannerImage}" alt="" class="w-full h-44 object-cover">`
+    ? `<img src="${a.bannerImage}" alt="" class="w-full h-44 object-cover" loading="lazy" decoding="async">`
     : `<div class="w-full h-44 bg-[var(--surface-2)]"></div>`;
   return `
     <button type="button" class="text-left rounded-2xl overflow-hidden bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors duration-300 flex flex-col" data-announcement-card>

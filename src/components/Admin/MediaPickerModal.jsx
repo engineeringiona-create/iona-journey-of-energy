@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import LazyThumb from './LazyThumb.jsx';
 import { listMedia, uploadToLibrary, deleteFromLibrary } from '../../lib/mediaLibrary.js';
 import { MAX_UPLOAD_BYTES, ALLOWED_MIME_TYPES } from '../../lib/imageUpload.js';
 
@@ -188,7 +189,7 @@ export default function MediaPickerModal({ isOpen, onClose, onSelect, onToast })
                   onClick={() => (onSelect ? (onSelect(item.url), onClose()) : setPreviewItem(item))}
                   className="block w-full aspect-square"
                 >
-                  <img src={item.url} alt={item.name} loading="lazy" className="w-full h-full object-cover" />
+                  <LazyThumb src={item.thumbUrl || item.url} alt={item.name} className="w-full h-full object-cover" />
                 </button>
 
                 <div className="absolute inset-x-0 top-0 flex justify-end gap-1 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-gradient-to-b from-black/60 to-transparent">

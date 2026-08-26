@@ -175,7 +175,7 @@ export function openAnnouncementModal(cards, startIndex = 0) {
   function render() {
     const a = cards[index];
     const visualHtml = a.bannerImage
-      ? `<div class="iona-ap-visual"><img src="${a.bannerImage}" alt=""></div>`
+      ? `<div class="iona-ap-visual"><img src="${a.bannerImage}" alt="" loading="lazy" decoding="async"></div>`
       : '';
     const badgeHtml = a.category || a.date
       ? `<span class="iona-ap-badge">${[a.category, a.date].filter(Boolean).map(escapeHtml).join(' · ')}</span>`

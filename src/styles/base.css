@@ -1133,6 +1133,25 @@ body {
     }
 }
 
+/* Shimmer skeleton for media library thumbnails (MediaPickerModal / LazyThumb)
+   while _thumb.webp files load. */
+.thumb-shimmer {
+    background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+    background-size: 200% 100%;
+    animation: thumb-shimmer-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes thumb-shimmer-sweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .thumb-shimmer {
+        animation: none;
+    }
+}
+
 /* Biogaz getiri hesaplayıcı waste-type pills — same shape/interaction
    as .services-3d-tab, brand green instead of brand-orange since this
    is a data-entry control, not a CTA (the CTA below it keeps the
