@@ -26,7 +26,11 @@
        own variable (distinct from --surface-2) because its light value
        is a specific #f9fafb, not the warmer #f2f0ea --surface-2 already
        used for cards/inputs. */
-    --section-alt: #f9fafb;
+    /* Phase 64: bumped from #f9fafb to a slightly cooler, more clinical
+       slate-50 per the "crisp, clinical slate-50 (#F8FAFC)" ask — pairs
+       with .statement-card and .bento-card's now-flat white/slate-200
+       treatment below (no more glow/blur layer competing with it). */
+    --section-alt: #f8fafc;
     /* Green stays out of large section fills entirely now (that read as
        a big washed-out block, not a brand accent) — --border-green is
        the only surviving brand-tinted token, kept for thin top-border
@@ -1176,55 +1180,17 @@ html {
     }
 }
 
-/* ---------------- Phase 60/60.1: clean-tech ambient background ----------
-   Light-theme-only dressing for stark white informational sections: a
-   dot-matrix micro-grid (vignetted so it fades at the section edges) plus
-   two brand-color glow orbs pinned to opposite corners. Self-contained
-   (own position/isolation/overflow) so it can be dropped on a section with
-   or without .bg-decorated. Disabled in dark mode — the surface is already
-   dark there and a literal glow/grid layer would just add noise on top of
-   the existing .bg-ghost-text/.watermark-edge treatment.
-   Phase 60 shipped this at opacity 0.04–0.09, deliberately faint to avoid
-   repeating the "blurred-glow/grid experiment" the Industrial Elegance
-   comment above says read as muddy — but that landed unreadable instead,
-   not just subtle. Phase 60.1 turns it up to a level that actually
-   registers (0.12–0.18) and swaps the placeholder Tailwind emerald-500
-   (#10b981) for #78dc77, this project's actual documented primary green
-   (DESIGN.md `primary`), not a substitute. */
-.clean-tech-bg {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-}
-
-.clean-tech-bg::before,
-.clean-tech-bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.clean-tech-bg::before {
-    background-image: radial-gradient(circle, color-mix(in srgb, #64748b 65%, #78dc77 35%) 1.5px, transparent 1.5px);
-    background-size: 26px 26px;
-    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 85%);
-    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 85%);
-    opacity: 0.16;
-}
-
-.clean-tech-bg::after {
-    background-image:
-        radial-gradient(circle at 88% 8%, rgba(120, 220, 119, 0.18) 0%, transparent 48%),
-        radial-gradient(circle at 6% 94%, rgba(245, 158, 11, 0.12) 0%, transparent 48%);
-    filter: blur(64px);
-}
-
-:root.dark .clean-tech-bg::before,
-:root.dark .clean-tech-bg::after {
-    display: none;
-}
+/* ---------------- Phase 64: clean-tech-bg REMOVED ----------------
+   Phase 60 shipped a dot-matrix + amber/green glow-orb ambient layer at
+   0.04-0.09 opacity ("too subtle to register"); Phase 60.1 turned it up
+   to 0.12-0.18 to compensate. Phase 64 calls the result "muddy" and asks
+   for it gone outright in favor of a flatter, clinical slate-50 surface
+   — so rather than a third opacity value, the whole .clean-tech-bg layer
+   (dot-grid + both orbs) is deleted. The class is also stripped from
+   every section that had it (hakkimizda.html #smart-tech/#statements,
+   etki.html #industries, teknoloji.html #solutions) so nothing references
+   a removed rule. See --section-alt in :root above for the new flat
+   slate-50 tone those sections use instead. */
 
 /* Refines .watermark-edge/.bg-ghost-text to a hollow outline stroke in light
    mode so the giant background word reads as a quiet outline instead of a
@@ -1245,84 +1211,225 @@ html {
     opacity: 0.03;
 }
 
-/* ---------------- Phase 60/60.1: statement glass cards ----------------
-   Wraps isolated text blocks (Mission/Vision/Values/Sustainability on the
-   About page) in a cohesive glassmorphic card instead of floating text on
-   raw background. Dark mode swaps the literal white glass for a translucent
-   dark one (var(--surface)-based) rather than reusing bg-white/95, which
-   would read as a pale fogged rectangle on a dark section.
-   Phase 60.1: bumped from a 1px/70%-alpha border and a 2px two-tone
-   gradient top-line (both read as too faint against the also-faint
-   background layer) to a 2px solid border and a solid 3px #78dc77 accent
-   strip — and #78dc77 (this project's real DESIGN.md primary green)
-   replaces the placeholder emerald-500 throughout. */
-.statement-card {
+/* ---------------- Phase 64: About page Bento grid ----------------
+   Replaces Phase 60/60.1's four identical .statement-card text boxes
+   (deleted along with the glow-orb background they were designed to sit
+   on top of) with four purpose-built card types in an asymmetric bento
+   layout: a wide text card (Misyon & Vizyon), a stat card, a media card,
+   and a second wide text card (Değerler & Sürdürülebilirlik). Flat/crisp
+   per the "clinical slate-50 + pure white cards + razor-sharp borders"
+   direction — no blur, no glass, a single 1px border and a tight
+   shadow-sm instead of Phase 60.1's 2px border + floaty 30px shadow.
+   Dark mode still swaps white for a solid dark surface (not translucent
+   glass) so the same crispness holds regardless of theme. */
+.bento-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 2px solid rgba(226, 232, 240, 0.9);
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
     border-radius: 1rem;
     padding: 2rem;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
-    transition: border-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: border-color 0.25s ease;
 }
 
-.statement-card:hover {
+.bento-card:hover {
     border-color: #78dc77;
 }
 
-.statement-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 1.5rem;
-    right: 1.5rem;
-    height: 3px;
-    border-radius: 999px 999px 0 0;
-    background: #78dc77;
+.bento-pill {
+    display: inline-flex;
+    align-items: center;
+    background: #ecfdf3;
+    color: #15803d;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid #bbf0c4;
+    margin-bottom: 1rem;
 }
 
-.statement-card-icon {
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 0.75rem;
-    background: color-mix(in srgb, #78dc77 14%, transparent);
-    border: 1px solid color-mix(in srgb, #78dc77 30%, transparent);
+.bento-feature-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--section-alt);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.bento-feature-pill::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #78dc77;
+    flex-shrink: 0;
+}
+
+/* Stat card: dark slate surface (its own permanent dark, not theme-tied
+   — a "high-impact metric" reads better as a deliberate dark accent tile
+   than another white card) with a bright green number and a small
+   corner "spark" badge. */
+.bento-card-stat {
+    background: #0f172a;
+    border-color: #1e293b;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.bento-card-stat:hover {
+    border-color: #78dc77;
+}
+
+.bento-spark {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, #78dc77 18%, transparent);
     color: #78dc77;
+    font-size: 18px;
+    margin: 0 auto 1rem;
 }
 
-.statement-card-icon .material-symbols-outlined {
-    font-size: 22px;
+.bento-stat-number {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #78dc77;
+    margin-bottom: 0.5rem;
 }
 
-/* Category badge (Değer Beyanı / Sürdürülebilirlik / ...) — see the
-   Tailwind utility classes on the eyebrow <span> in hakkimizda.html for
-   the pill shape/color itself; this just removes the block-level eyebrow
-   spacing those spans use everywhere else on the site, since the pill is
-   inline content now, not a full-width label line. */
-.statement-card .statement-badge {
-    display: inline-flex;
+.bento-stat-label {
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.4;
 }
 
-:root.dark .statement-card {
-    background: rgba(23, 27, 24, 0.65);
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+/* Media card: photo fills the card, dark glass caption pinned to the
+   bottom edge (the one place a blur/glass treatment stays — over a
+   photo, not over the removed ambient background). */
+.bento-card-media {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    min-height: 220px;
 }
 
-:root.dark .statement-card:hover {
-    border-color: color-mix(in srgb, #78dc77 55%, transparent);
+.bento-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.bento-media-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.875rem 1.25rem;
+    background: rgba(11, 15, 25, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #f8fafa;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+:root.dark .bento-card {
+    background: var(--surface);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+:root.dark .bento-feature-pill {
+    color: var(--text);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .statement-card {
+    .bento-card {
         transition: none;
     }
+}
+
+/* ---------------- Phase 64: "Neden Iona" premium dark tech section ------
+   Permanently dark regardless of the site's light/dark toggle — same idea
+   as the #ionaflux-teaser section right above it on index.html, which
+   already hardcodes its own dark bg/text rather than using the
+   theme-variable classes every other section uses. Targeted by #id
+   (specific enough to beat the shared .accordion-item rules elsewhere in
+   this file without touching their light-theme behavior on every other
+   page that reuses the same accordion markup, e.g. teknoloji.html's expo
+   tabs). .accordion-item already had a hardcoded-dark hover/active state
+   (background #14181a, .accordion-desc #b7c2bb) — this only needed to
+   extend that same treatment to the RESTING state too, since now the
+   whole section sits on a dark canvas instead of a light one, not just
+   on hover. */
+#why-choose-us {
+    background: #0b0f19;
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+#why-choose-us h2 {
+    color: #f8fafa;
+}
+
+#why-choose-us .accordion-item {
+    background-color: rgba(15, 23, 42, 0.8);
+    border: 1px solid #1e293b;
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+#why-choose-us .accordion-item:hover,
+#why-choose-us .accordion-item.is-active {
+    border-color: color-mix(in srgb, #78dc77 50%, transparent);
+}
+
+#why-choose-us .accordion-title {
+    color: #f8fafa;
+}
+
+#why-choose-us .accordion-number {
+    color: #78dc77;
+}
+
+#why-choose-us .accordion-icon {
+    color: #94a3b8;
+}
+
+/* ---------------- Phase 64: CAD blueprint perimeter accent ---------------
+   Ultra-fine hairline schematic lines pinned to a section's bottom-right
+   corner (Sektörler / Biyogaz Hesaplayıcı) — distinct from the existing
+   .blueprint-watermark (a big centered illustration in --text at 3%
+   opacity): this is a small corner accent in a fixed light-slate tone
+   (works the same on light or dark section backgrounds) at 15% opacity,
+   built from straight hairlines + circles standing in for a reactor/
+   piping schematic. */
+.cad-blueprint-accent {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: clamp(220px, 24vw, 380px);
+    height: auto;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* Biogaz getiri hesaplayıcı waste-type pills — same shape/interaction

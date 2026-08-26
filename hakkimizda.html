@@ -110,7 +110,7 @@
 </section>
 
 <!-- Smart technologies -->
-<section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section bg-decorated clean-tech-bg" id="smart-tech">
+<section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section bg-decorated" id="smart-tech">
 <div class="bg-ghost-text" aria-hidden="true"><span>ENGINEERING</span></div>
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter">
 <div class="md:col-span-5">
@@ -128,35 +128,41 @@
 </section>
 
 <!-- Mission, Vision, Values, Sustainability -->
-<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section bg-decorated clean-tech-bg" id="statements">
+<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section bg-decorated" id="statements">
 <div class="bg-ghost-text" aria-hidden="true"><span>VISION</span></div>
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="about.statements.eyebrow">Değere ve Size Bağlılığımız</span>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="about.statements.title">Misyonumuz, Vizyonumuz ve Değerlerimiz</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 fade-in-element delay-200">
-<div class="statement-card">
-<div class="statement-card-icon"><span class="material-symbols-outlined" aria-hidden="true">flag</span></div>
-<span class="statement-badge items-center bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full border border-emerald-200 mb-4" data-i18n="about.statements.mission_eyebrow">Misyon Beyanı</span>
-<h3 class="font-headline-md text-headline-md mb-3" data-i18n="about.statements.mission_title">Yüksek Performanslı Yeşil Enerji Çözümleri Mühendisliği</h3>
-<p class="text-body-md text-[var(--text-muted)] max-w-md" data-i18n="about.statements.mission_body">Misyonumuz, atık zorluklarını dünya genelindeki topluluklar ve endüstriler için sürdürülebilir ekonomik ve çevresel değere dönüştüren gelişmiş ve güvenilir biyogaz tesisleri tasarlamaktır.</p>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-5 fade-in-element delay-200">
+<!-- Card A: Misyon & Vizyon -->
+<div class="bento-card md:col-span-2">
+<span class="bento-pill">Misyon &amp; Vizyon</span>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="about.statements.mission_title">Yüksek Performanslı Yeşil Enerji Çözümleri Mühendisliği</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-5" data-i18n="about.statements.mission_body">Misyonumuz, atık zorluklarını dünya genelindeki topluluklar ve endüstriler için sürdürülebilir ekonomik ve çevresel değere dönüştüren gelişmiş ve güvenilir biyogaz tesisleri tasarlamaktır.</p>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="about.statements.vision_title">Yenilenebilir Biyoenerjiye Küresel Geçişte Öncülük Etmek</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="about.statements.vision_body">Organik atığın tamamen geri dönüştürülerek kesintisiz temiz enerjiye dönüştüğü bir gelecek hayal ediyoruz. IONA, döngüsel ekonominin halkasını kapatmada dünyanın en güvenilir küresel ortağı olmayı hedefliyor.</p>
 </div>
-<div class="statement-card">
-<div class="statement-card-icon"><span class="material-symbols-outlined" aria-hidden="true">visibility</span></div>
-<span class="statement-badge items-center bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full border border-emerald-200 mb-4" data-i18n="about.statements.vision_eyebrow">Vizyon Beyanı</span>
-<h3 class="font-headline-md text-headline-md mb-3" data-i18n="about.statements.vision_title">Yenilenebilir Biyoenerjiye Küresel Geçişte Öncülük Etmek</h3>
-<p class="text-body-md text-[var(--text-muted)] max-w-md" data-i18n="about.statements.vision_body">Organik atığın tamamen geri dönüştürülerek kesintisiz temiz enerjiye dönüştüğü bir gelecek hayal ediyoruz. IONA, döngüsel ekonominin halkasını kapatmada dünyanın en güvenilir küresel ortağı olmayı hedefliyor.</p>
+<!-- Card B: Stat -->
+<div class="bento-card bento-card-stat">
+<span class="bento-spark" aria-hidden="true">⚡</span>
+<span class="bento-stat-number">99.4%</span>
+<p class="bento-stat-label">Yıllık Kesintisiz Tesis Çalışma Verimi</p>
 </div>
-<div class="statement-card">
-<div class="statement-card-icon"><span class="material-symbols-outlined" aria-hidden="true">workspace_premium</span></div>
-<span class="statement-badge items-center bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full border border-emerald-200 mb-4" data-i18n="about.statements.values_eyebrow">Değer Beyanı</span>
-<h3 class="font-headline-md text-headline-md mb-3" data-i18n="about.statements.values_title">Yenilik, Güvenilirlik ve Mühendislik Mükemmelliği Üzerine İnşa Edildi</h3>
-<p class="text-body-md text-[var(--text-muted)] max-w-md" data-i18n="about.statements.values_body">Patentli teknolojiler, sıkı proses kontrolleri ve eksiksiz operasyonel şeffaflık ile uzun vadeli güvenilirlik sunarak her projenin güvenliğini ve yüksek verimliliğini sağlıyoruz.</p>
+<!-- Card C: Media -->
+<div class="bento-card bento-card-media">
+<img data-img-key="about_bento_media" src="/images/digester-dome-facility.jpg" alt="Saha ve reaktör mühendisliği" loading="lazy" decoding="async">
+<div class="bento-media-caption">Saha &amp; Reaktör Mühendisliği</div>
 </div>
-<div class="statement-card">
-<div class="statement-card-icon"><span class="material-symbols-outlined" aria-hidden="true">eco</span></div>
-<span class="statement-badge items-center bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full border border-emerald-200 mb-4" data-i18n="about.statements.sustainability_eyebrow">Sürdürülebilirlik</span>
-<h3 class="font-headline-md text-headline-md mb-3" data-i18n="about.statements.sustainability_title">Gelecek Nesiller İçin Sıfır Atık ve Düşük Karbon</h3>
-<p class="text-body-md text-[var(--text-muted)] max-w-md" data-i18n="about.statements.sustainability_body">Sürdürülebilirlik, tasarımlarımızın özüdür. Metan geri kazanımını en üst düzeye çıkararak, birinci sınıf biyo-gübrelerle toprak sağlığını koruyarak ve küresel karbon ayak izlerini azaltarak yarını güvence altına alıyoruz.</p>
+<!-- Card D: Değerlerimiz & Sürdürülebilirlik -->
+<div class="bento-card md:col-span-2">
+<span class="bento-pill">Değerlerimiz &amp; Sürdürülebilirlik</span>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="about.statements.values_title">Yenilik, Güvenilirlik ve Mühendislik Mükemmelliği Üzerine İnşa Edildi</h3>
+<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="about.statements.sustainability_body">Sürdürülebilirlik, tasarımlarımızın özüdür. Metan geri kazanımını en üst düzeye çıkararak, birinci sınıf biyo-gübrelerle toprak sağlığını koruyarak ve küresel karbon ayak izlerini azaltarak yarını güvence altına alıyoruz.</p>
+<div class="flex flex-wrap gap-2">
+<span class="bento-feature-pill">Patentli Teknoloji</span>
+<span class="bento-feature-pill">Metan Geri Kazanımı</span>
+<span class="bento-feature-pill">Düşük Karbon Ayak İzi</span>
+</div>
 </div>
 </div>
 </div>
