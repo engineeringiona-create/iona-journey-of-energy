@@ -131,6 +131,7 @@ export default function PhoneMockup() {
           <div className="ionaflux-phone-btn ionaflux-phone-btn-action" aria-hidden="true" />
           <div className="ionaflux-phone-btn ionaflux-phone-btn-volume" aria-hidden="true" />
           <div className="ionaflux-phone-btn ionaflux-phone-btn-power" aria-hidden="true" />
+          <div className="ionaflux-phone-speaker" aria-hidden="true" />
 
           <button
             type="button"
@@ -142,6 +143,7 @@ export default function PhoneMockup() {
           >
             <span className="ionaflux-live-dot" />
             {islandExpanded && <span className="ionaflux-island-text">{metrics.methane.toFixed(1)}% CH4 Live</span>}
+            <span className="ionaflux-island-lens" aria-hidden="true" />
           </button>
 
           <div className="ionaflux-phone-screen" role="img" aria-label="IonaFlux mobil uygulama önizlemesi">

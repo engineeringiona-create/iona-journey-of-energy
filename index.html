@@ -226,9 +226,17 @@
 </span>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm text-white" data-i18n="home.ionaflux.title">Tesisinizin Dijital İkizi: IonaFlux.</h2>
 <p class="text-body-md mb-stack-md max-w-md" style="color:#c2cac3" data-i18n="home.ionaflux.body">IonaFlux, Iona mühendisliği tarafından geliştirilen ve müşterilerimize teslim edilen dijital işletme platformudur. Canlı SCADA verisi, arıza yönetimi ve saha raporlaması tek panelde birleşir.</p>
-<a class="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] transition-transform duration-150 ease-out active:scale-[0.97]" style="background:#3fae66;color:#04160a" href="/ionaflux.html" data-i18n="home.ionaflux.cta">IonaFlux'u Keşfedin</a>
+<a class="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] transition-transform duration-150 ease-out active:scale-[0.97]" style="background:#3fae66;color:#04160a" href="/ionaflux.html" data-i18n="home.ionaflux.cta">IonaFlux'u Keşfedin &amp; Canlı Demo</a>
 </div>
-<div class="fade-in-element delay-200" id="ionaflux-phone-mockup-root"></div>
+<div class="ionaflux-glass-panel p-6 fade-in-element delay-200">
+<img class="w-full h-auto rounded-2xl mb-5" src="/images/ionaflux/scada.jpg" alt="IonaFlux canlı SCADA görünümü: çürütücü sıcaklığı, debi ve jeneratör durumları" loading="lazy" decoding="async">
+<div class="grid grid-cols-2 gap-3">
+<span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">bolt</span>Canlı SCADA Verisi</span>
+<span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">build</span>Arıza Yönetimi</span>
+<span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">qr_code_scanner</span>QR Makine Tanısı</span>
+<span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">summarize</span>Saha Raporlama</span>
+</div>
+</div>
 </div>
 </section>
 
@@ -438,5 +446,4 @@
 
 <script type="module" src="/src/pages/main-anasayfa.js"></script>
 <script type="module" src="/src/components/DigitalTwin/mount.jsx"></script>
-<script type="module" src="/src/components/IonaFlux/mount.jsx"></script>
 </body></html>
