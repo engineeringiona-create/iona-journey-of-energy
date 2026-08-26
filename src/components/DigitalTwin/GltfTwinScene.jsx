@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { ContactShadows, Grid, OrbitControls, useGLTF } from '@react-three/drei';
+import { ContactShadows, Grid, Html, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { reduceMotion } from '../../three/scene-utils.js';
@@ -268,6 +268,34 @@ const plantData = {
         video: '/videos/digester-mixer.mp4'
       }
     ]
+  },
+  /* Phase 74: not one of the "5 real major structures" the comment above
+     this object describes — this is a nested sub-object of 'digester'
+     (see DIGESTER_MIXER_MESH_NAMES/plantStructureOverrides.js), made
+     independently selectable once the digester itself is already
+     selected (see Model's handleClick, which only resolves a raycast
+     hit to 'biogas_mixer' while `selected?.name === 'digester'`; outside
+     that, a click on it still just re-selects the whole digester like
+     any other digester surface). No subComponents (there's nothing to
+     drill into further) — `specs` renders as the same bullet list
+     DetailPanel's Level 2 already uses for a sub-component, just at
+     Level 1 here since there's only one "sub" this structure has.
+     `returnTo` drives DetailPanel's back-to-parent button instead of
+     the normal drill-down back button, since going "back" from a
+     structure with no sub-components means returning to the digester
+     that contains it, not to a Level 1 view of itself. */
+  biogas_mixer: {
+    title: 'Ağır Hizmet Dalgıç Karıştırıcı & Homojenizatör',
+    description: 'Yüksek Verimli Hidrodinamik Biyogaz Mikseri',
+    photo: '/images/equipment/digester-mixer.jpg',
+    specs: [
+      '⚙️ Motor Gücü: 15 - 22 kW (IE4 Süper Premium Verim)',
+      '🌪️ Pervane Tipi: Özel Açılı Çift/Üç Kanatlı Helisel Bıçak (Kırmızı Koruma Kaplamalı)',
+      '🛡️ Malzeme Dayanımı: AISI 304 / 316 Paslanmaz Çelik, Agresif pH ve H2S Koruması',
+      '🎯 Fonksiyon: Yüzey kabuklaşmasını önleme, taban çökeltisi giderme ve homojen sıcaklık dağılımı.'
+    ],
+    subComponents: [],
+    returnTo: 'digester'
   }
 };
 
@@ -359,6 +387,21 @@ function applyLateralOffset(position, center, camera, rightFraction, upFraction 
 function findStructureNode(node, plantRoot) {
   while (node && node.parent !== plantRoot) node = node.parent;
   return node;
+}
+
+/* Phase 74: same idea as findStructureNode above, but walks up looking
+   for a 'biogas_mixer' group specifically, stopping as soon as it
+   reaches a direct child of plantRoot (a top-level structure) without
+   finding one — a click on, say, engine_room correctly returns null
+   here rather than walking past it. Used instead of findStructureNode
+   when resolving a click/hover that should be able to hit a mixer
+   nested one level inside the digester, not just the digester itself. */
+function findMixerNode(node, plantRoot) {
+  while (node && node.parent !== plantRoot) {
+    if (node.name === 'biogas_mixer') return node;
+    node = node.parent;
+  }
+  return null;
 }
 
 /* The GLB authors dozens of repeated fixtures under one shared name —
@@ -1016,6 +1059,15 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
      (propeller spin, beacon emissive pulse) alongside the hover-worm
      shader's own uTime update, not a separate effect/rAF loop. */
   const digesterMixersRef = useRef({ propellerHubs: [], beacons: [] });
+  /* Phase 74: the digester's own tank_wall mesh instance(s) — needed so
+     the X-ray effect below can also disable raycasting on them while
+     the digester is selected/transparent. Geometrically, tank_wall is a
+     closed shell that sits between the camera and the biogas_mixer
+     groups mounted through it from every outside angle; three.js
+     raycasting only cares about geometry, never material opacity, so
+     without this a click meant for the now-visible mixer inside would
+     still hit the (visually see-through) wall first and never reach it. */
+  const tankWallMeshesRef = useRef([]);
   /* The 3 site_piping flow-pulse uniform sets (feed/gas/power) — ticked
      every frame (uFlowTime) alongside the mixer/hover uTime updates, and
      GSAP-tweened (uFlowActive, 0<->1) by the effect below whenever the
@@ -1053,6 +1105,12 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     const baseYs = new Map();
     const hoverUniforms = new Map();
     const namedMeshMaterials = new Map();
+    /* Phase 74 — see tankWallMeshesRef's own comment. Local array +
+       one wholesale assignment to the ref once traverse finishes,
+       same pattern as materials/baseYs/etc. above (not pushed directly
+       into the ref), so a re-run of this effect can't silently
+       accumulate duplicate mesh references across runs. */
+    const tankWallMeshes = [];
     /* The 3 flow-pulse uniform sets (feed/gas/power), ticked every frame
        and tweened on toggle by the outer component — see flowUniformsRef
        below and its own comment. */
@@ -1545,7 +1603,12 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       child.material.needsUpdate = true;
       child.castShadow = true;
       child.receiveShadow = true;
+      /* Phase 74: see tankWallMeshesRef's own comment. */
+      if (structure.name === 'digester' && baseName === DIGESTER_WALL_MESH_NAME) {
+        tankWallMeshes.push(child);
+      }
     });
+    tankWallMeshesRef.current = tankWallMeshes;
 
     onReady(plantRoot);
   }, [scene, plantRootRef, onReady]);
@@ -1564,9 +1627,21 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
      camera's offset-zoom effect (in Rig) already reacts to, so the two
      are two independent effects on one shared piece of state, not
      coupled to each other. */
+  /* Phase 74: biogas_mixer is a NESTED selection one level inside
+     digester (see findMixerNode), not a sibling structure of it — while
+     a mixer is the active `selected`, the digester's own shell must
+     stay X-rayed too, or tank_wall would snap back solid the instant a
+     visitor clicks the mixer, right as the camera zooms in close on it
+     (the view would then be looking out from inside now-opaque
+     geometry). Every isActive comparison below runs against this
+     effective name instead of selected.name directly for exactly that
+     reason — everywhere else (any of the other 4 structures) it's a
+     no-op, unchanged from before. */
+  const effectiveSelectedName = selected?.name === 'biogas_mixer' ? 'digester' : selected?.name;
+
   useEffect(() => {
     materialsRef.current.forEach((material, name) => {
-      const isActive = Boolean(selected) && name === selected.name;
+      const isActive = Boolean(selected) && name === effectiveSelectedName;
       material.transparent = isActive;
       material.opacity = isActive ? 0.25 : 1;
       material.needsUpdate = true;
@@ -1577,12 +1652,23 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
        or e.g. a structure's foundation would stay solid while the rest
        of it goes see-through on select. */
     namedMeshMaterialsRef.current.forEach((structureNamedMaterials, structureName) => {
-      const isActive = Boolean(selected) && structureName === selected.name;
+      const isActive = Boolean(selected) && structureName === effectiveSelectedName;
       structureNamedMaterials.forEach((material) => {
         material.transparent = isActive;
         material.opacity = isActive ? 0.25 : 1;
         material.needsUpdate = true;
       });
+    });
+    /* Phase 74: tank_wall stops absorbing raycasts while the digester is
+       X-rayed, so a click meant for the now-visible biogas_mixer
+       (mounted through the wall) actually reaches it instead of hitting
+       the wall's own geometry first — see tankWallMeshesRef's comment.
+       Restoring THREE.Mesh.prototype.raycast (not just deleting the
+       override) is what makes the wall clickable/selectable again the
+       instant the digester is deselected. */
+    const digesterActive = effectiveSelectedName === 'digester';
+    tankWallMeshesRef.current.forEach((mesh) => {
+      mesh.raycast = digesterActive ? () => {} : THREE.Mesh.prototype.raycast;
     });
   }, [selected]);
 
@@ -1591,11 +1677,44 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
      site_piping (the pipe network connecting them) has no plantData
      entry on purpose, so clicking a pipe resets the view instead of
      zooming into it, same as clicking empty background. */
+  /* Phase 74: on top of the shared blade-glow boost (animateMixerHover),
+     "slight glow" is what's actually feasible without a post-processing
+     outline pass (a real silhouette/rim-light outline needs its own
+     render pass this scene doesn't have and adding one is a much bigger
+     change than this feature warrants) — the emissive boost alone reads
+     as a clear hover cue on an already-glowing red part. */
+  const animateMixerHover = useCallback((isHovering) => {
+    const hub = digesterMixersRef.current.propellerHubs[0];
+    const blade = hub?.children.find((c) => c.name === 'side_mixer_blade');
+    const material = blade?.material;
+    if (!material) return;
+    /* 0.5 is the material's own resting emissiveIntensity (baked in at
+       creation, see plantStructureOverrides.js) — reverting to 0 here
+       instead would dim the blades below their normal at-rest glow. */
+    gsap.to(material, {
+      emissiveIntensity: isHovering ? 0.95 : 0.5,
+      duration: HOVER_DURATION,
+      ease: HOVER_EASE,
+    });
+  }, []);
+
   const handleClick = useCallback(
     (event) => {
       event.stopPropagation();
       const plantRoot = plantRootRef.current;
       if (!plantRoot) return;
+      /* Mixers are only independently clickable once the digester
+         they're mounted through is already selected/transparent —
+         findMixerNode walks up from the raycast hit looking for a
+         'biogas_mixer' ancestor, stopping before it ever reaches a
+         top-level structure (see the function's own comment). */
+      if (selected?.name === 'digester') {
+        const mixer = findMixerNode(event.object, plantRoot);
+        if (mixer) {
+          onSelect(mixer);
+          return;
+        }
+      }
       const node = findStructureNode(event.object, plantRoot);
       if (node && Object.prototype.hasOwnProperty.call(plantData, node.name)) {
         onSelect(node);
@@ -1603,7 +1722,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         onReset();
       }
     },
-    [plantRootRef, onSelect, onReset]
+    [plantRootRef, onSelect, onReset, selected]
   );
 
   /* Shared by pointer-over and pointer-out: tweens the structure's own
@@ -1640,6 +1759,17 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       event.stopPropagation();
       const plantRoot = plantRootRef.current;
       if (!plantRoot) return;
+      if (selected?.name === 'digester') {
+        const mixer = findMixerNode(event.object, plantRoot);
+        if (mixer) {
+          if (hoveredNameRef.current !== 'biogas_mixer') {
+            hoveredNameRef.current = 'biogas_mixer';
+            document.body.style.cursor = 'pointer';
+            animateMixerHover(true);
+          }
+          return;
+        }
+      }
       const node = findStructureNode(event.object, plantRoot);
       if (!node || !Object.prototype.hasOwnProperty.call(plantData, node.name)) return;
       if (hoveredNameRef.current === node.name) return;
@@ -1647,7 +1777,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       document.body.style.cursor = 'pointer';
       animateHover(node, true);
     },
-    [plantRootRef, animateHover]
+    [plantRootRef, animateHover, animateMixerHover, selected]
   );
 
   const handlePointerOut = useCallback(
@@ -1655,13 +1785,21 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       event.stopPropagation();
       const plantRoot = plantRootRef.current;
       if (!plantRoot) return;
+      if (hoveredNameRef.current === 'biogas_mixer') {
+        const stillOnMixer = selected?.name === 'digester' && findMixerNode(event.object, plantRoot);
+        if (stillOnMixer) return;
+        hoveredNameRef.current = null;
+        document.body.style.cursor = 'auto';
+        animateMixerHover(false);
+        return;
+      }
       const node = findStructureNode(event.object, plantRoot);
       if (!node || !Object.prototype.hasOwnProperty.call(plantData, node.name)) return;
       hoveredNameRef.current = null;
       document.body.style.cursor = 'auto';
       animateHover(node, false);
     },
-    [plantRootRef, animateHover]
+    [plantRootRef, animateHover, animateMixerHover, selected]
   );
 
   /* Drives the flowing-worm shader's motion — cheap (5 float writes/
@@ -1710,13 +1848,44 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     });
   }, [flowActive]);
 
+  /* Phase 74: floating "⚡ Dalgıç Karıştırıcı" hint, world-anchored to
+     the first mixer's beacon — only while the digester is selected and
+     nothing more specific is (i.e. before the visitor has actually
+     clicked a mixer; once they do, `selected` becomes the mixer itself,
+     this condition goes false, and the hint disappears on its own,
+     which is exactly the "you found it" signal it's for). Position is
+     computed once per selection change, not every frame — the mixers
+     don't translate, only their propellers spin in place. */
+  const [mixerHintPos, setMixerHintPos] = useState(null);
+  useEffect(() => {
+    if (selected?.name !== 'digester') {
+      setMixerHintPos(null);
+      return;
+    }
+    const beacon = digesterMixersRef.current.beacons[0];
+    if (!beacon) {
+      setMixerHintPos(null);
+      return;
+    }
+    setMixerHintPos(beacon.getWorldPosition(new THREE.Vector3()));
+  }, [selected]);
+
   return (
-    <primitive
-      object={scene}
-      onClick={handleClick}
-      onPointerOver={handlePointerOver}
-      onPointerOut={handlePointerOut}
-    />
+    <>
+      <primitive
+        object={scene}
+        onClick={handleClick}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      />
+      {mixerHintPos && (
+        <Html position={mixerHintPos} center distanceFactor={8}>
+          <div className="pointer-events-none select-none whitespace-nowrap rounded-full border border-[#78dc77]/50 bg-black/70 backdrop-blur-md px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_0_16px_rgba(120,220,119,0.5)] animate-pulse">
+            ⚡ Dalgıç Karıştırıcı
+          </div>
+        </Html>
+      )}
+    </>
   );
 });
 
@@ -2064,7 +2233,7 @@ function EquipmentMedia({ photo, video }) {
    model — see FOCUS_OFFSET_FRACTION above, bumped to keep the model
    clear of this wider card. On mobile it falls back to a compact
    top banner (same as before) since there's no spare side space there. */
-function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose }) {
+function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onReturnToParent }) {
   const structure = plantData[structureKey];
   if (!structure) return null;
   const sub = subIndex != null ? structure.subComponents[subIndex] : null;
@@ -2123,6 +2292,21 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose }) {
           )}
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{structure.title}</h2>
           <p className="text-base leading-relaxed text-gray-600">{structure.description}</p>
+          {/* Phase 74: structures with no drill-down (currently just
+             biogas_mixer — see plantData's own comment) show their specs
+             directly at this level instead of via a sub-component button,
+             reusing the exact same bullet-list treatment Level 2 already
+             renders for sub.specs. */}
+          {structure.specs && structure.specs.length > 0 && (
+            <ul className="flex flex-col gap-2.5 rounded-2xl border border-black/10 bg-black/[0.02] p-5">
+              {structure.specs.map((item) => (
+                <li key={item} className="flex items-start gap-2.5 text-sm leading-snug text-gray-700">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="flex flex-col gap-3">
             {structure.subComponents.map((component, index) => (
               <button
@@ -2136,6 +2320,15 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose }) {
               </button>
             ))}
           </div>
+          {structure.returnTo && onReturnToParent && (
+            <button
+              type="button"
+              onClick={() => onReturnToParent(structure.returnTo)}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-emerald-600/30 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-700 font-label-caps text-label-caps py-3 transition-colors duration-200"
+            >
+              <span aria-hidden="true">↩️</span> Reaktör Görünümüne Dön
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -2224,6 +2417,18 @@ export default function GltfTwinScene() {
     setSelectedSubIndex(index);
     setCurrentLevel(2);
   }, []);
+  /* Phase 74: DetailPanel's "↩️ Reaktör Görünümüne Dön" button (only
+     rendered for structures with a `returnTo`, currently just
+     biogas_mixer) — looks the parent structure back up by name and
+     re-selects it exactly like clicking it in the scene would, rather
+     than a bespoke "go back to digester" path. */
+  const handleReturnToParent = useCallback(
+    (parentName) => {
+      const parent = plantRootRef.current?.getObjectByName(parentName);
+      if (parent) handleSelect(parent);
+    },
+    [handleSelect]
+  );
   const handleBackToStructure = useCallback(() => {
     setSelectedSubIndex(null);
     setCurrentLevel(1);
@@ -2297,6 +2502,7 @@ export default function GltfTwinScene() {
           onSelectSub={handleSelectSub}
           onBack={handleBackToStructure}
           onClose={handleReset}
+          onReturnToParent={handleReturnToParent}
         />
       )}
 

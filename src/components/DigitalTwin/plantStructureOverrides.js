@@ -486,7 +486,15 @@ function buildSideMixer(azimuth) {
   const inwardDir = computeMixerDirection(mountPos, SIDE_MIXER_TANGENT_ANGLE, SIDE_MIXER_EXTRA_TILT);
 
   const group = new THREE.Group();
-  group.name = 'side_entry_mixer';
+  /* Phase 74: renamed from 'side_entry_mixer' — this name now doubles as
+     the plantData selection key (GltfTwinScene.jsx's handleClick walks
+     up from a raycast hit looking for a node named 'biogas_mixer'
+     specifically, distinct from the normal findStructureNode walk that
+     always resolves to a top-level structure like 'digester'), so the 4
+     side-entry mixers are independently clickable as their own thing
+     once the digester is already selected/transparent, instead of every
+     click on them just re-selecting the whole digester. */
+  group.name = 'biogas_mixer';
   group.position.copy(mountPos);
   /* Maps local +Z onto inwardDir directly — by definition, local +Z is
      "into the tank" for this group from here on, local -Z is "out into
@@ -633,7 +641,7 @@ function buildTwinTopMixer(azimuth) {
    propeller-spin/beacon-pulse animation with no error to show for it —
    this is what actually keeps that from happening. */
 function addDigesterMixers(digester) {
-  const existingSide = digester.children.filter((child) => child.name === 'side_entry_mixer');
+  const existingSide = digester.children.filter((child) => child.name === 'biogas_mixer');
   const existingTop = digester.children.filter((child) => child.name === 'top_slab_mixer');
   if (existingSide.length || existingTop.length) {
     return {
