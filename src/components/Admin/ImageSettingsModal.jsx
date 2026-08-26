@@ -42,6 +42,15 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
   const isParallax = !!initial.isParallax;
   const isBackground = !!initial.isBackground;
   const isUploadOnly = imgKey === 'ionaflux_panel';
+  /* Phase 63 fix: "h-full object-cover" images on this site sit inside a
+     dedicated aspect-ratio wrapper div (overflow-hidden, its own
+     aspect-[...]/rounded-xl) that the img is stretched to fill — writing
+     aspect-ratio/border-radius/width onto the img itself was a no-op
+     there since h-full already pins its height to that wrapper. Frame
+     controls (everything but object-fit, which only makes sense on the
+     img) target the wrapper for those; unwrapped images and background-
+     div slots target themselves, same as before. */
+  const frameTarget = !isBackground && targetEl?.classList.contains('h-full') ? targetEl.parentElement : targetEl;
 
   useEffect(() => {
     function onKeyDown(e) {
@@ -92,22 +101,22 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
     if ('borderRadius' in patch) setBorderRadius(patch.borderRadius);
     if ('maxWidthPercent' in patch) setMaxWidthPercent(patch.maxWidthPercent);
     draftRef.current = { ...draftRef.current, ...patch };
-    if (!targetEl) return;
+    if ('objectFit' in patch && targetEl && !isBackground) targetEl.style.objectFit = patch.objectFit;
+    if (!frameTarget) return;
 
-    if ('objectFit' in patch && !isBackground) targetEl.style.objectFit = patch.objectFit;
-    if ('aspectRatio' in patch) targetEl.style.aspectRatio = patch.aspectRatio === 'auto' ? '' : patch.aspectRatio;
-    if ('borderRadius' in patch) targetEl.style.borderRadius = `${patch.borderRadius}px`;
+    if ('aspectRatio' in patch) frameTarget.style.aspectRatio = patch.aspectRatio === 'auto' ? '' : patch.aspectRatio;
+    if ('borderRadius' in patch) frameTarget.style.borderRadius = `${patch.borderRadius}px`;
     if ('maxWidthPercent' in patch) {
       const full = patch.maxWidthPercent >= 100;
-      targetEl.style.maxWidth = full ? '' : `${patch.maxWidthPercent}%`;
-      targetEl.style.width = full ? '' : '100%';
+      frameTarget.style.maxWidth = full ? '' : `${patch.maxWidthPercent}%`;
+      frameTarget.style.width = full ? '' : '100%';
     }
     if ('placement' in patch) {
       const margins = { left: ['0', 'auto'], right: ['auto', '0'], center: ['auto', 'auto'], full: ['', ''] };
       const [ml, mr] = margins[patch.placement] || margins.full;
-      targetEl.style.marginLeft = ml;
-      targetEl.style.marginRight = mr;
-      targetEl.style.display = patch.placement === 'full' ? '' : 'block';
+      frameTarget.style.marginLeft = ml;
+      frameTarget.style.marginRight = mr;
+      frameTarget.style.display = patch.placement === 'full' ? '' : 'block';
     }
   }
 
@@ -157,16 +166,18 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
       }
       targetEl.style.transform = initial.scale && initial.scale !== 1 ? `scale(${initial.scale})` : '';
       if (!isBackground) targetEl.style.objectFit = initial.objectFit || '';
-      targetEl.style.aspectRatio = initial.aspectRatio && initial.aspectRatio !== 'auto' ? initial.aspectRatio : '';
-      targetEl.style.borderRadius = initial.borderRadius ? `${initial.borderRadius}px` : '';
+    }
+    if (frameTarget) {
+      frameTarget.style.aspectRatio = initial.aspectRatio && initial.aspectRatio !== 'auto' ? initial.aspectRatio : '';
+      frameTarget.style.borderRadius = initial.borderRadius ? `${initial.borderRadius}px` : '';
       const fullWidth = (initial.maxWidthPercent ?? 100) >= 100;
-      targetEl.style.maxWidth = fullWidth ? '' : `${initial.maxWidthPercent}%`;
-      targetEl.style.width = fullWidth ? '' : '100%';
+      frameTarget.style.maxWidth = fullWidth ? '' : `${initial.maxWidthPercent}%`;
+      frameTarget.style.width = fullWidth ? '' : '100%';
       const margins = { left: ['0', 'auto'], right: ['auto', '0'], center: ['auto', 'auto'], full: ['', ''] };
       const [ml, mr] = margins[initial.placement] || margins.full;
-      targetEl.style.marginLeft = ml;
-      targetEl.style.marginRight = mr;
-      targetEl.style.display = !initial.placement || initial.placement === 'full' ? '' : 'block';
+      frameTarget.style.marginLeft = ml;
+      frameTarget.style.marginRight = mr;
+      frameTarget.style.display = !initial.placement || initial.placement === 'full' ? '' : 'block';
     }
     onClose();
   }
@@ -174,15 +185,17 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
   return (
     <div
       ref={panelRef}
-      style={{ position: 'fixed', top: position.top, left: position.left }}
-      className="z-50 w-[300px] max-h-[85vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#171b18] p-4 shadow-2xl"
+      style={{ position: 'fixed', top: position.top, left: position.left, maxHeight: position.maxHeight ?? '85vh' }}
+      className="z-50 w-[300px] flex flex-col rounded-2xl border border-white/10 bg-[#171b18] shadow-2xl overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-3">
+      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-white/10">
         <span className="font-label-caps text-[11px] font-bold tracking-[0.06em] text-sky-400">Görsel Ayarları</span>
         <button type="button" onClick={handleCancel} className="text-white/40 hover:text-white text-[16px] leading-none">×</button>
       </div>
 
-      <div className="rounded-lg overflow-hidden aspect-[16/10] bg-black/40 mb-3">
+      <div className="flex-1 overflow-y-auto p-4">
+
+      <div className="rounded-lg overflow-hidden aspect-[16/10] bg-black/40 mb-2.5">
         {previewSrc && (
           <img
             src={previewSrc}
@@ -193,7 +206,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
         )}
       </div>
 
-      <label className="block mb-4">
+      <label className="block mb-2.5">
         <span className="block font-label-caps text-[10px] font-bold tracking-[0.06em] text-white/50 mb-1.5">
           {uploading ? 'Yükleniyor...' : 'Yeni Görsel Yükle'}
         </span>
@@ -209,12 +222,12 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
       <button
         type="button"
         onClick={() => setShowMediaPicker(true)}
-        className="w-full mb-4 -mt-2.5 font-label-caps text-[11px] font-bold tracking-[0.06em] bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 py-1.5 rounded-full transition-colors duration-200"
+        className="w-full mb-2.5 -mt-2.5 font-label-caps text-[11px] font-bold tracking-[0.06em] bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 py-1.5 rounded-full transition-colors duration-200"
       >
         📁 Kütüphaneden Seç
       </button>
 
-      <div className="flex items-center gap-1 rounded-full bg-white/5 border border-white/10 p-1 mb-4">
+      <div className="flex items-center gap-1 rounded-full bg-white/5 border border-white/10 p-1 mb-2.5">
         <button
           type="button"
           onClick={() => setTab('crop')}
@@ -238,7 +251,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
           </p>
         ) : (
           <>
-            <div className="mb-4">
+            <div className="mb-2.5">
               <span className="block font-label-caps text-[10px] font-bold tracking-[0.06em] text-white/50 mb-1.5">Kırpma / Konum</span>
               <div className="grid grid-cols-3 gap-1 w-fit">
                 {GRID_POINTS.map(([gx, gy]) => {
@@ -264,7 +277,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
               </label>
               <input type="range" min="0" max="100" value={posX} onChange={(e) => applyPosition(Number(e.target.value), posY)} className="w-full accent-sky-400" />
             </div>
-            <div className="mb-4">
+            <div className="mb-2.5">
               <label className="flex items-center justify-between text-[11px] text-white/50 mb-1">
                 <span>Dikey (Y)</span><span>{posY}%</span>
               </label>
@@ -293,7 +306,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
 
       {tab === 'frame' && (
         <>
-          <div className="mb-4">
+          <div className="mb-2.5">
             <span className="block font-label-caps text-[10px] font-bold tracking-[0.06em] text-white/50 mb-1.5">Yerleşim</span>
             <div className="grid grid-cols-4 gap-1">
               {PLACEMENTS.map((p) => (
@@ -310,7 +323,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
             </div>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-2.5">
             <span className="block font-label-caps text-[10px] font-bold tracking-[0.06em] text-white/50 mb-1.5">En-Boy Oranı</span>
             <div className="grid grid-cols-2 gap-1">
               {ASPECT_RATIOS.map((a) => (
@@ -327,7 +340,7 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
           </div>
 
           {!isBackground && (
-            <div className="mb-4">
+            <div className="mb-2.5">
               <span className="block font-label-caps text-[10px] font-bold tracking-[0.06em] text-white/50 mb-1.5">Sığdırma</span>
               <div className="grid grid-cols-2 gap-1">
                 {[{ id: 'cover', label: 'Doldur (Cover)' }, { id: 'contain', label: 'Sığdır (Contain)' }].map((o) => (
@@ -360,7 +373,11 @@ export default function ImageSettingsModal({ imgKey, pageId, position, initial, 
         </>
       )}
 
-      <ModalFooter onApply={handleApply} onCancel={handleCancel} />
+      </div>
+
+      <div className="shrink-0 px-4 pb-4">
+        <ModalFooter onApply={handleApply} onCancel={handleCancel} applyLabel="Kaydet" cancelLabel="İptal" />
+      </div>
 
       <MediaPickerModal
         isOpen={showMediaPicker}

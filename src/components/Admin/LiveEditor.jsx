@@ -255,15 +255,24 @@ export default function LiveEditor({ onLogout }) {
         const match = /url\((['"]?)(.*?)\1\)/.exec(cs.backgroundImage || '');
         bgSrc = match ? match[2] : '';
       }
-      /* Framing fields (Phase 61) always land as inline styles via
-         applyImageFraming (i18n.js) / applyFraming (ImageSettingsModal),
-         same as scale's transform above — read straight from el.style
-         rather than computed style, since a not-yet-set property should
-         read back as the real "no override" default, not the browser's
-         resolved value. */
+      /* Framing fields (Phase 61, fixed Phase 63) always land as inline
+         styles via applyImageFraming (i18n.js) / applyFraming
+         (ImageSettingsModal) — read straight from inline style rather
+         than computed style, since a not-yet-set property should read
+         back as the real "no override" default, not the browser's
+         resolved value.
+         Every "h-full object-cover" image on this site sits inside a
+         dedicated aspect-ratio wrapper div (overflow-hidden, its own
+         aspect-[...]/rounded-xl classes) that the img is stretched to
+         fill — setting aspect-ratio/border-radius/width on the img
+         itself would be inert there since h-full already pins its
+         height to that wrapper. Frame styles target the wrapper for
+         those; unwrapped images (.parallax-media, plain w-full h-auto
+         content shots) and background-div slots target themselves. */
+      const frameTarget = isImg && el.classList.contains('h-full') ? el.parentElement : el;
       const placementFromMargins = () => {
-        const ml = el.style.marginLeft;
-        const mr = el.style.marginRight;
+        const ml = frameTarget.style.marginLeft;
+        const mr = frameTarget.style.marginRight;
         if (ml === '0' && mr === 'auto') return 'left';
         if (ml === 'auto' && mr === '0') return 'right';
         if (ml === 'auto' && mr === 'auto') return 'center';
@@ -277,9 +286,9 @@ export default function LiveEditor({ onLogout }) {
         scale: scaleMatch ? parseFloat(scaleMatch[1]) : 1,
         isParallax: el.classList.contains('parallax-media'),
         objectFit: el.style.objectFit || 'cover',
-        aspectRatio: el.style.aspectRatio || 'auto',
-        borderRadius: el.style.borderRadius ? parseFloat(el.style.borderRadius) : 0,
-        maxWidthPercent: el.style.maxWidth ? parseFloat(el.style.maxWidth) : 100,
+        aspectRatio: frameTarget.style.aspectRatio || 'auto',
+        borderRadius: frameTarget.style.borderRadius ? parseFloat(frameTarget.style.borderRadius) : 0,
+        maxWidthPercent: frameTarget.style.maxWidth ? parseFloat(frameTarget.style.maxWidth) : 100,
         placement: placementFromMargins()
       };
     });
@@ -324,14 +333,22 @@ export default function LiveEditor({ onLogout }) {
       imageElRef.current = el;
       const iframeRect = iframeRef.current.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
-      const MODAL_W = 280;
-      const MODAL_H = 420;
+      const MODAL_W = 300;
+      const MARGIN = 8;
       let top = iframeRect.top + elRect.top;
       let left = iframeRect.left + elRect.right + 12;
       if (left + MODAL_W > window.innerWidth) left = iframeRect.left + elRect.left - MODAL_W - 12;
-      if (left < 8) left = 8;
-      top = Math.min(Math.max(top, 8), window.innerHeight - MODAL_H - 8);
-      setImagePosition({ top, left });
+      if (left < MARGIN) left = MARGIN;
+      top = Math.min(Math.max(top, MARGIN), window.innerHeight - MARGIN);
+      /* Phase 63 fix: the panel grew (crop + framing tabs) well past the
+         old hardcoded 420px height guess, so clamping `top` against a
+         fixed height let the panel's real content run off the bottom of
+         the screen. Compute the actual room available below `top` instead
+         and hand it to the panel as a real max-height cap — the panel's
+         own flex layout (sticky-ish header/footer, scrolling body) takes
+         it from there. */
+      const maxHeight = Math.min(window.innerHeight * 0.85, window.innerHeight - top - MARGIN);
+      setImagePosition({ top, left, maxHeight });
       doc.querySelectorAll('.iona-admin-image-active').forEach((n) => n.classList.remove('iona-admin-image-active'));
       el.classList.add('iona-admin-image-active');
       setActiveImageKey(key);

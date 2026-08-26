@@ -68,26 +68,37 @@ function applyImageOverrides(images) {
 }
 
 /* Phase 61 framing controls (ImageSettingsModal "Çerçeveleme" tab): fit,
-   aspect ratio, corner radius, and width-scale/placement apply directly as
-   inline styles on the element (works the same for <img> and background-
-   div slots). Placement only has a visible effect once maxWidthPercent is
+   aspect ratio, corner radius, and width-scale/placement apply as inline
+   styles. object-fit always targets the element itself (meaningless on a
+   wrapper div). The rest (Phase 63 fix): every "h-full object-cover" image
+   on this site sits inside a dedicated aspect-ratio wrapper div
+   (overflow-hidden, its own aspect-[...]/rounded-xl) that the img is
+   stretched to fill — writing aspect-ratio/border-radius/width onto the
+   img itself is inert there since h-full already pins its height to that
+   wrapper, so those target el.parentElement instead for that shape.
+   Unwrapped images and background-div slots (isImg but no h-full, or a
+   background div, which IS its own frame) target themselves, same as
+   before. Placement only has a visible effect once maxWidthPercent is
    below 100 — at full width there's no free space left to align within,
    which is expected, not a bug. */
 function applyImageFraming(el, patch, isImg) {
   if (patch.objectFit && isImg) el.style.objectFit = patch.objectFit;
-  if (patch.aspectRatio) el.style.aspectRatio = patch.aspectRatio === 'auto' ? '' : patch.aspectRatio;
-  if (patch.borderRadius !== undefined) el.style.borderRadius = `${patch.borderRadius}px`;
+
+  const frameTarget = isImg && el.classList.contains('h-full') ? el.parentElement : el;
+  if (!frameTarget) return;
+  if (patch.aspectRatio) frameTarget.style.aspectRatio = patch.aspectRatio === 'auto' ? '' : patch.aspectRatio;
+  if (patch.borderRadius !== undefined) frameTarget.style.borderRadius = `${patch.borderRadius}px`;
   if (patch.maxWidthPercent !== undefined) {
     const full = patch.maxWidthPercent >= 100;
-    el.style.maxWidth = full ? '' : `${patch.maxWidthPercent}%`;
-    el.style.width = full ? '' : '100%';
+    frameTarget.style.maxWidth = full ? '' : `${patch.maxWidthPercent}%`;
+    frameTarget.style.width = full ? '' : '100%';
   }
   if (patch.placement) {
     const margins = { left: ['0', 'auto'], right: ['auto', '0'], center: ['auto', 'auto'], full: ['', ''] };
     const [ml, mr] = margins[patch.placement] || margins.center;
-    el.style.marginLeft = ml;
-    el.style.marginRight = mr;
-    el.style.display = patch.placement === 'full' ? '' : 'block';
+    frameTarget.style.marginLeft = ml;
+    frameTarget.style.marginRight = mr;
+    frameTarget.style.display = patch.placement === 'full' ? '' : 'block';
   }
 }
 
