@@ -97,6 +97,112 @@ function initHeroTwin() {
 }
 initHeroTwin();
 
+/* ---------------- Phase 88: hero line-reveal on load ----------------
+   Masks each .js-reveal-line element behind its own overflow-hidden
+   parent (set in index.html) and slides it up from fully below that
+   mask into place. Reduced-motion visitors get the final state with no
+   animation at all, same accessibility contract GltfTwinScene's own
+   `reduceMotion` check already uses elsewhere on this page. */
+function initHeroReveal() {
+  const lines = gsap.utils.toArray('.js-reveal-line');
+  if (!lines.length) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) {
+    gsap.set(lines, { yPercent: 0, opacity: 1 });
+    return;
+  }
+  gsap.set(lines, { yPercent: 100 });
+  gsap.to(lines, {
+    yPercent: 0,
+    duration: 1.1,
+    ease: 'cubic-bezier(0.76, 0, 0.24, 1)',
+    stagger: 0.12,
+    delay: 0.2
+  });
+}
+initHeroReveal();
+
+/* ---------------- Phase 88: DNA-grid background parallax ----------------
+   #hero-dna-grid (the 15%-opacity helix pattern behind the 3D column,
+   see index.html) drifts up slower than the page scrolls — a shallow
+   0.15 factor so it reads as "deep background" without fighting the
+   sticky 3D column that shares the same viewport real estate. rAF-
+   throttled so the scroll handler itself never does the transform write
+   more than once per frame. */
+function initDnaParallax() {
+  const grid = document.getElementById('hero-dna-grid');
+  if (!grid) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let ticking = false;
+  function apply() {
+    ticking = false;
+    grid.style.transform = `translate3d(0, ${window.scrollY * -0.15}px, 0)`;
+  }
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(apply);
+    },
+    { passive: true }
+  );
+}
+initDnaParallax();
+
+/* ---------------- Phase 88: custom identity cursor ----------------
+   Tracks the pointer and toggles .is-active on #iona-cursor whenever
+   it's over a .iona-cursor-target (hero CTA, 3D canvas column — see
+   index.html). Targets also get .iona-cursor-target's own `cursor:none`
+   (base.css) so the OS pointer doesn't fight the custom one. Desktop/
+   fine-pointer only: base.css already hides #iona-cursor under
+   (hover:none)/(pointer:coarse), so this just skips wiring up the
+   listeners at all on touch devices rather than wiring dead code. */
+function initCustomCursor() {
+  const cursor = document.getElementById('iona-cursor');
+  if (!cursor) return;
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  window.addEventListener(
+    'pointermove',
+    (e) => {
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
+    },
+    { passive: true }
+  );
+
+  document.querySelectorAll('.iona-cursor-target').forEach((el) => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('is-active'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('is-active'));
+  });
+}
+initCustomCursor();
+
+/* ---------------- Phase 88: magnetic hero CTA ----------------
+   Subtle "follows the cursor" pull on .hero-editorial-cta while the
+   pointer is inside it, eased back to rest on leave — the classic
+   agency-site magnetic-button feel. Capped at MAGNETIC_STRENGTH of the
+   raw offset (not a 1:1 follow) so the button visibly reacts without
+   the label text feeling like it's chasing the mouse. */
+function initMagneticButtons() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const MAGNETIC_STRENGTH = 0.35;
+  document.querySelectorAll('.hero-editorial-cta').forEach((btn) => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = (e.clientX - (rect.left + rect.width / 2)) * MAGNETIC_STRENGTH;
+      const y = (e.clientY - (rect.top + rect.height / 2)) * MAGNETIC_STRENGTH;
+      gsap.to(btn, { x, y, duration: 0.3, ease: 'power2.out' });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
+    });
+  });
+}
+initMagneticButtons();
+
 /* ---------------- Services: stagger fade-in on scroll ---------------- */
 function initServiceCards() {
   const cards = gsap.utils.toArray('.service-card');

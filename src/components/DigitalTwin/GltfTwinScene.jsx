@@ -74,6 +74,12 @@ const OVERVIEW_VERTICAL_BIAS = 0.35;
    uses it for the per-structure zoom, unrelated to this. */
 const FOCUS_DIR = new THREE.Vector3(0.65, 0.42, 0.75).normalize();
 const FOCUS_MARGIN = 1.3;
+/* Phase 88: max extra Y rotation (radians) applied to the whole plant
+   group as a function of page scroll — see the scroll-tilt useFrame in
+   Rig. ~14deg total swing, "slightly" per spec: enough to read as a
+   living inspection-turntable effect, not enough to fight the fixed
+   OVERVIEW_DIR framing or make selected-structure hit-testing feel off. */
+const SCROLL_TILT_RANGE = 0.25;
 /* "Offset zoom": fraction of the half-frustum-width (at the focused
    object's distance) to push the camera+target sideways so the object
    lands in roughly the screen's left third instead of dead center,
@@ -2061,6 +2067,27 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
   }, [selected, camera, gl]);
 
   useFrame(() => controlsRef.current?.update());
+
+  /* Phase 88: "fluid inspection" scroll-tilt — reads window.scrollY
+     directly each frame rather than plumbing scroll state down through
+     props/context, since this is the only consumer. Purely additive to
+     plantRootRef's own rotation (nothing else in this file ever touches
+     it, confirmed — the camera is what's GSAP-scripted, the plant group
+     itself has always just sat at its default rotation), and it's a
+     read of native scroll position, never preventDefault/wheel-hijacked,
+     so this can't turn into scroll-jacking. Lerped (not set directly) so
+     fast scroll deltas don't pop the model instantly from one tilt to
+     another. */
+  const scrollTiltRef = useRef(0);
+  useFrame(() => {
+    const root = plantRootRef.current;
+    if (!root || reduceMotion) return;
+    const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+    const targetTilt = (progress - 0.5) * SCROLL_TILT_RANGE;
+    scrollTiltRef.current += (targetTilt - scrollTiltRef.current) * 0.06;
+    root.rotation.y = scrollTiltRef.current;
+  });
 
   /* The ~350-mesh shadow map is the single most expensive pass in this
      scene. Phases 48-51 added continuously-spinning mixer propellers

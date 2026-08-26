@@ -495,6 +495,13 @@ html {
     display: block;
     min-height: 0;
     padding-top: 120px;
+    /* Phase 87: MNBAQ-brutalist pivot — pure white, fixed regardless of
+       the site's light/dark toggle. Same "ignores the toggle on purpose"
+       pattern as the fixed-dark IonaFlux section elsewhere on this page;
+       this section just picks the opposite fixed pole (always light) for
+       the same reason: a deliberate editorial look, not the themed rest
+       of the site. */
+    background: #ffffff;
 }
 
 /* text-headline-md sitewide mobile scale-down. The token ships one fixed
@@ -546,88 +553,92 @@ html {
     touch-action: pan-y;
 }
 
-/* Phase 80 editorial hero furniture: literal slate/porcelain colors by
-   design (an architectural-print look, not the site's normal theme
-   palette), but each one gets a :root.dark override back to the site's
-   own tokens so dark-mode readers aren't left with near-black text on
-   a now-dark #iona-digital-twin-root backdrop. */
+/* Phase 87: MNBAQ brutalist pivot. #hero is now a fixed-appearance
+   section like IonaFlux's fixed-dark one — pure white/black regardless
+   of the site's light/dark toggle — so every :root.dark override that
+   used to swap these back to theme tokens is gone on purpose. Keeping
+   any of them would have left near-invisible light-on-white text (or a
+   stray dark hairline) the instant a visitor had dark mode on, since
+   #hero's own background no longer follows the toggle either. */
 .hero-meta-label {
-    color: #94a3b8;
-}
-
-:root.dark .hero-meta-label {
-    color: var(--text-muted);
+    color: #6b6b6b;
 }
 
 .hero-editorial-title {
-    color: #020617;
-}
-
-:root.dark .hero-editorial-title {
-    color: var(--text);
+    color: #000000;
 }
 
 .hero-editorial-sub {
-    color: #475569;
-}
-
-:root.dark .hero-editorial-sub {
-    color: var(--text-muted);
+    color: #000000;
 }
 
 .hero-editorial-cta {
-    background: #020617;
+    background: #000000;
     color: #ffffff;
 }
 
 .hero-editorial-cta:hover {
-    /* Phase 84 spec calls for hover:bg-[#2D9937] — that's just var(--brand)
-       itself (Phase 82's official primary green), not a one-off hex, so
-       route through the token instead of duplicating the literal value. */
-    background: var(--brand);
-}
-
-:root.dark .hero-editorial-cta {
-    background: var(--brand);
-}
-
-:root.dark .hero-editorial-cta:hover {
+    /* var(--brand) is Phase 82's official primary green, #2D9937 — the
+       one accent color this brutalist section still borrows from the
+       site's theme tokens rather than hardcoding, since it's already
+       the exact brand-manual value regardless of light/dark. */
     background: var(--brand);
 }
 
 .hero-hairline {
-    /* Phase 85: 0.7 -> 0.8 to land exactly on Tailwind's slate-200/80,
-       the one thing separating the strip from the hero now that its own
-       fill is gone (see .hero-metric-strip-bg below). */
+    /* slate-200/80 exactly — the one separator line on an otherwise
+       border-free white canvas, so it needs to read consistently
+       whether or not the visitor's OS/site theme is dark. */
     border-color: rgba(226, 232, 240, 0.8);
 }
 
-:root.dark .hero-hairline {
-    border-color: var(--border);
-}
-
-/* Phase 85: dropped the near-opaque rgba(251,251,253,0.95) fill — a
-   cool near-white that read as a harsh solid bar against the warmer
-   --bg the rest of the hero sits on now that the canvas backdrop itself
-   is transparent (Phase 84). Fully transparent in both themes so the
-   strip just inherits whatever surface it's sitting on; .hero-hairline's
-   border-t is what separates it from the hero above. */
 .hero-metric-strip-bg {
     background: transparent;
 }
 
-:root.dark .hero-metric-strip-bg {
-    background: transparent;
-}
-
 .hero-metric-value {
-    color: #020617;
+    color: #000000;
 }
 
-:root.dark .hero-metric-value {
-    color: var(--text);
+/* Phase 88: custom "identity cursor" — morphs into the brand's circle+
+   ring motif over the 3D canvas and the hero CTA (see initCustomCursor
+   in main-anasayfa.js). Hidden/scaled-to-0 by default, not display:none,
+   so the opacity/scale transition actually has something to animate
+   from when it turns on; translate(-50%,-50%) keeps it centered on the
+   tracked point instead of offset by its own size. Desktop-only (a
+   hover-quality cursor is meaningless without a mouse) and skipped
+   entirely for reduced-motion, same guard the 3D scene itself uses. */
+.iona-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    will-change: transform, opacity;
 }
 
+.iona-cursor.is-active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+@media (hover: none), (pointer: coarse) {
+    .iona-cursor {
+        display: none;
+    }
+}
+
+/* Swapped in on the same hover targets the cursor morphs over — the
+   whole point of a custom cursor is that the OS one gets out of its
+   way while it's active. */
+.iona-cursor-target {
+    cursor: none;
+}
 
 .parallax-media {
     position: absolute;
