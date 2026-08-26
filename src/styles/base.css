@@ -72,6 +72,64 @@ body {
     transition: background-color 400ms ease, color 400ms ease;
 }
 
+/* Phase 90: sitewide living DNA/helix watermark (.iona-dna-bg, markup
+   appended right after <body> on every page — same pattern element/
+   pattern the hero used to own alone in Phase 87/88, now global).
+   z-index:0, not the literal z-[-1] the brief describes: body above
+   sets its own opaque background-color, and a negative z-index on a
+   fixed *child* of body paints BELOW that background and is invisible
+   — the classic z-index-under-opaque-parent-bg trap. z-index:0 plus
+   being the first element in body achieves the same "behind every real
+   section" result without that trap, since every section after it is
+   normal-flow/z-index:auto and paints on top by DOM order alone. */
+.iona-dna-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.iona-dna-bg svg {
+    width: 100%;
+    height: 100%;
+    animation: iona-dna-sway 18s ease-in-out infinite alternate;
+}
+
+@keyframes iona-dna-sway {
+    0% { transform: translateX(-5%); }
+    100% { transform: translateX(5%); }
+}
+
+@keyframes iona-dna-breathe-stroke {
+    0%, 100% { stroke: #2d9937; }
+    50% { stroke: #ffc700; }
+}
+
+@keyframes iona-dna-breathe-fill {
+    0%, 100% { fill: #2d9937; }
+    50% { fill: #ffc700; }
+}
+
+.iona-dna-bg path,
+.iona-dna-bg line {
+    animation: iona-dna-breathe-stroke 10s ease-in-out infinite;
+}
+
+.iona-dna-bg circle {
+    animation: iona-dna-breathe-fill 10s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iona-dna-bg svg,
+    .iona-dna-bg path,
+    .iona-dna-bg line,
+    .iona-dna-bg circle {
+        animation: none;
+    }
+}
+
 /* Phase 61: "Tipografi & Tema" panel knobs (src/lib/themeVars.js).
    Scaling html's root font-size scales every rem-based size sitewide in
    one shot rather than needing a --font-scale multiply baked into each
@@ -1719,39 +1777,88 @@ body:has(#preloader) {
    be invisible on a white card. ID-scoped so this doesn't touch that
    shared accordion styling anywhere else it's reused (e.g. teknoloji.html
    expo tabs). */
+/* Phase 90: brutalist rewrite — the rounded/shadowed/green-bordered
+   "card" look read as a generic template. Now a raw full-width row per
+   item, separated ONLY by a 1px hairline; no background, no radius, no
+   shadow, no colored border even on hover/active. */
 #why-choose-us .accordion-item {
-    background-color: #ffffff;
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 0.75rem;
-    margin-bottom: 0.75rem;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 0;
+    margin-bottom: 0;
+    box-shadow: none;
 }
 
-#why-choose-us .accordion-item:hover {
-    border-color: color-mix(in srgb, #10b981 40%, transparent);
-}
-
+#why-choose-us .accordion-item:hover,
 #why-choose-us .accordion-item.is-active {
-    border: 2px solid #78dc77;
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+    /* Overrides the shared .accordion-item:hover/.is-active dark-fill
+       (#14181a) elsewhere in this file — that's the old card-hover
+       treatment; this section stays flat white/transparent always. */
+    background-color: transparent;
+    border-color: rgba(226, 232, 240, 0.8);
+    box-shadow: none;
 }
 
 #why-choose-us .accordion-title {
-    color: #0f172a;
+    color: #000000;
+    font-weight: 700;
 }
 
 #why-choose-us .accordion-number {
-    color: #78dc77;
-}
-
-#why-choose-us .accordion-icon {
-    color: #64748b;
+    color: #2d9937;
 }
 
 #why-choose-us .accordion-desc {
-    color: #475569;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* Oversized minimalist plus/minus, replacing the old material-symbols
+   "add" glyph (which never actually swapped to a minus on open — this
+   fixes that too). Two absolutely-centered bars: the vertical one
+   rotates onto the horizontal one on .is-active, so "+" becomes "−" via
+   a single transform instead of swapping icons/DOM content. */
+#why-choose-us .accordion-icon {
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+#why-choose-us .accordion-icon-bar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: #000000;
+    transition: transform 300ms ease;
+}
+
+#why-choose-us .accordion-icon-bar-h {
+    width: 32px;
+    height: 2px;
+    transform: translate(-50%, -50%);
+}
+
+#why-choose-us .accordion-icon-bar-v {
+    width: 2px;
+    height: 32px;
+    transform: translate(-50%, -50%);
+}
+
+#why-choose-us .accordion-item:hover .accordion-icon-bar,
+#why-choose-us .accordion-item.is-active .accordion-icon-bar {
+    background: #2d9937;
+}
+
+#why-choose-us .accordion-item.is-active .accordion-icon-bar-v {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #why-choose-us .accordion-icon-bar {
+        transition: none;
+    }
 }
 
 /* ---------------- Phase 64: CAD blueprint perimeter accent ---------------

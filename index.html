@@ -18,6 +18,28 @@
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- Phase 90: sitewide living DNA/helix watermark — fixed, z-index:0,
+     first in body (see .iona-dna-bg in base.css for why not z-[-1]).
+     Same pattern the hero used to own alone (Phase 87); now global. -->
+<div class="iona-dna-bg" aria-hidden="true">
+<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs>
+<pattern id="ionaHelixBg" width="140" height="200" patternUnits="userSpaceOnUse">
+<path d="M10 0 C 70 50, 70 150, 130 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
+<path d="M130 0 C 70 50, 70 150, 10 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
+<line x1="34" y1="42" x2="106" y2="42" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="34" cy="42" r="2.5" fill="#2d9937"></circle>
+<circle cx="106" cy="42" r="2.5" fill="#2d9937"></circle>
+<line x1="70" y1="100" x2="70" y2="100" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="70" cy="100" r="2.5" fill="#2d9937"></circle>
+<line x1="34" y1="158" x2="106" y2="158" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="34" cy="158" r="2.5" fill="#2d9937"></circle>
+<circle cx="106" cy="158" r="2.5" fill="#2d9937"></circle>
+</pattern>
+</defs>
+<rect width="400" height="800" fill="url(#ionaHelixBg)"></rect>
+</svg>
+</div>
 <!-- Intro Preloader: follows the site's light/dark theme via var(--bg)/
      var(--brand) (set on <html> before first paint by the inline script
      above), same as before Phase 77. Scroll is locked for as long as this
@@ -46,11 +68,11 @@
 </div>
 </div>
 <!-- TopNavBar -->
-<!-- Phase 89: MNBAQ minimalist nav -- one unified bar (logo + MENU
+<!-- Phase 89: MNBAQ minimalist nav — one unified bar (logo + MENU
      trigger) at every breakpoint, replacing the old two-nav setup (an
      always-desktop bar with inline search/lang/links, plus a separate
      mobile-only hamburger). Search, language switcher and theme toggle
-     aren't gone -- they're folded into the fullscreen overlay this
+     aren't gone — they're folded into the fullscreen overlay this
      trigger opens. IDs below (mobile-nav-toggle/panel/icon) are kept
      from the old mobile-only bar on purpose: initMobileNav in
      common.js already wires these up correctly and every page's entry
@@ -137,28 +159,11 @@
      way a full-bleed absolute layer could, so there's no separate
      activation state needed on small screens anymore. -->
 <section class="hero-zone px-safe-margin-mobile md:px-safe-margin-desktop overflow-hidden" id="hero">
-<!-- Phase 87 MNBAQ motifs: pure decoration, z-0, sit behind the real
-     grid content below (which gets relative z-10). Biogas-cell/DNA grid
-     only shows lg+ (behind the 3D column); the sweep curve runs the
-     full width at every size. #hero-dna-grid is also the Phase 88
-     parallax target (see initDnaParallax in main-anasayfa.js). -->
-<svg id="hero-dna-grid" class="hidden lg:block absolute inset-y-0 right-0 w-[60%] h-full opacity-15 z-0 pointer-events-none select-none" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-<defs>
-<pattern id="ionaHelix" width="140" height="200" patternUnits="userSpaceOnUse">
-<path d="M10 0 C 70 50, 70 150, 130 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
-<path d="M130 0 C 70 50, 70 150, 10 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
-<line x1="34" y1="42" x2="106" y2="42" stroke="#2d9937" stroke-width="1"></line>
-<circle cx="34" cy="42" r="2.5" fill="#2d9937"></circle>
-<circle cx="106" cy="42" r="2.5" fill="#2d9937"></circle>
-<line x1="70" y1="100" x2="70" y2="100" stroke="#2d9937" stroke-width="1"></line>
-<circle cx="70" cy="100" r="2.5" fill="#2d9937"></circle>
-<line x1="34" y1="158" x2="106" y2="158" stroke="#2d9937" stroke-width="1"></line>
-<circle cx="34" cy="158" r="2.5" fill="#2d9937"></circle>
-<circle cx="106" cy="158" r="2.5" fill="#2d9937"></circle>
-</pattern>
-</defs>
-<rect width="400" height="800" fill="url(#ionaHelix)"></rect>
-</svg>
+<!-- Phase 90: the hero's own DNA-grid patch is gone — superseded by the
+     global fixed .iona-dna-bg watermark (see just after <body>), which
+     now covers every page instead of just this section. The sweep
+     curve stays: it's a hero-specific directional accent, not part of
+     the sitewide watermark. -->
 <svg class="absolute inset-x-0 top-1/4 w-full h-[400px] z-0 pointer-events-none select-none opacity-70" viewBox="0 0 1400 400" preserveAspectRatio="none" aria-hidden="true">
 <defs>
 <linearGradient id="ionaSweepGrad" x1="0" y1="0" x2="1" y2="0">
@@ -176,7 +181,7 @@
 </div>
 
 <div class="relative z-10 max-w-[1400px] mx-auto px-8 lg:px-16 grid grid-cols-1 lg:grid-cols-12 items-center gap-12 min-h-[75vh]">
-<div class="lg:col-span-5 z-10 flex flex-col justify-center transition-opacity duration-500 ease-out" id="hero-copy">
+<div class="lg:col-span-5 z-10 flex flex-col justify-center transition-opacity duration-500 ease-out pr-4 lg:pr-8" id="hero-copy">
 <span class="block overflow-hidden mb-6">
 <span class="hero-meta-label js-reveal-line inline-block text-xs font-mono tracking-widest uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
 </span>
@@ -186,18 +191,23 @@
 <circle cx="38" cy="50" r="30" fill="#2d9937"></circle>
 <circle cx="62" cy="50" r="30" fill="none" stroke="#ffc700" stroke-width="5"></circle>
 </svg>
+<!-- Phase 90: text-9xl (Phase 87) was overflowing lg:col-span-5 and
+     visually colliding with the 3D column at in-between widths —
+     text-[5rem]/[5.5rem] plus whitespace-normal/break-words instead of
+     relying on inline-block's own wrap behavior, so a long word can
+     never push past the column's own right padding. -->
 <div class="overflow-hidden mb-6">
-<h1 class="js-reveal-line inline-block text-7xl lg:text-9xl font-bold tracking-tighter hero-editorial-title leading-[1.05]" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
+<h1 class="js-reveal-line inline-block text-5xl lg:text-[5rem] xl:text-[5.5rem] font-bold tracking-tighter hero-editorial-title leading-[0.9] whitespace-normal break-words" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
 </div>
 <p class="text-lg hero-editorial-sub font-light leading-relaxed mb-8 max-w-lg" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
 <a class="hero-editorial-cta iona-cursor-target inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
 </div>
 <!-- Phase 88: sticky on lg+ so the twin stays put while hero-copy's
      stacked type/data (and the metric bar below) scroll past it — the
-     "museum wall" effect. h-screen (not the old fixed 650px) so it has
-     real room to stick within before the section's own bottom edge
-     pushes it back into flow. -->
-<div class="lg:col-span-7 w-full h-[550px] lg:h-screen relative lg:sticky lg:top-0 lg:flex lg:items-center iona-cursor-target">
+     "museum wall" effect. Phase 90: strictly boxed to its own column
+     (w-full h-[600px] + overflow-hidden) so the canvas can never bleed
+     past this grid cell regardless of viewport. -->
+<div class="lg:col-span-7 w-full h-[600px] lg:h-screen relative lg:sticky lg:top-0 lg:flex lg:items-center overflow-hidden iona-cursor-target">
 <div class="absolute inset-0 w-full h-full" id="iona-digital-twin-root"></div>
 </div>
 </div>
@@ -278,7 +288,15 @@
      main-anasayfa.js. Reuses the site's own 4 real service anchors
      (teknoloji.html#expo-agitator/#expo-genset/#expo-pump/#workflow —
      same targets common.js's SEARCH_INDEX already points at) rather
-     than inventing new service names. -->
+     than inventing new service names.
+
+     Phase 90: the image was `absolute` inside this section, so at some
+     row-count/viewport combos its centered-on-the-section positioning
+     drifted over the text column instead of staying clear of it. Now
+     `fixed` to the viewport (right-10 top-1/4, independent of this
+     section's own layout/scroll position) — it just floats in the same
+     screen corner regardless of which row is hovered or how tall the
+     list gets. -->
 <section class="relative bg-white px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-28 border-t border-slate-200 fade-in-section" id="services-exhibit">
 <div class="max-w-[1400px] mx-auto">
 <div class="flex items-end justify-between mb-12 gap-6 fade-in-element">
@@ -286,7 +304,7 @@
 <span class="hidden md:block text-[10px] font-mono uppercase tracking-widest text-black/40">04 / KATALOG</span>
 </div>
 <div class="relative">
-<img class="hidden lg:block pointer-events-none absolute top-1/2 right-0 -translate-y-1/2 w-[380px] h-[280px] object-cover opacity-0 transition-opacity duration-300" id="services-exhibit-image" src="/images/equipment/digester-mixer.jpg" alt="" aria-hidden="true">
+<img class="hidden lg:block pointer-events-none fixed right-10 top-1/4 w-[400px] h-[500px] object-cover opacity-0 transition-opacity duration-500 z-50" id="services-exhibit-image" src="/images/equipment/digester-mixer.jpg" alt="" aria-hidden="true">
 <div id="services-exhibit-list">
 <a class="services-exhibit-row" href="/teknoloji.html#expo-agitator" data-image="/images/equipment/digester-mixer.jpg">
 <span class="services-exhibit-number">01</span>
@@ -384,49 +402,61 @@
 </a>
 </div>
 <div class="fade-in-element delay-100">
-<div class="accordion-item spotlight-card is-active px-6 md:px-8 py-6">
+<div class="accordion-item is-active px-0 py-6">
 <div class="flex items-center justify-between gap-6 cursor-pointer">
 <div class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">01</span>
 <h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion1_title">Akıllı Teknoloji</h3>
 </div>
-<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-icon-bar accordion-icon-bar-h"></span>
+<span class="accordion-icon-bar accordion-icon-bar-v"></span>
+</span>
 </div>
 <div class="accordion-row">
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion1_desc">Maksimum verimlilik için gelişmiş otomasyon sistemleri entegre ediyoruz.</p></div>
 </div>
 </div>
-<div class="accordion-item spotlight-card px-6 md:px-8 py-6">
+<div class="accordion-item px-0 py-6">
 <div class="flex items-center justify-between gap-6 cursor-pointer">
 <div class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">02</span>
 <h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion2_title">Operasyonel Maliyet Tasarrufu</h3>
 </div>
-<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-icon-bar accordion-icon-bar-h"></span>
+<span class="accordion-icon-bar accordion-icon-bar-v"></span>
+</span>
 </div>
 <div class="accordion-row">
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion2_desc">Optimize edilmiş tesislerle işletme maliyetlerini düşürüyoruz.</p></div>
 </div>
 </div>
-<div class="accordion-item spotlight-card px-6 md:px-8 py-6">
+<div class="accordion-item px-0 py-6">
 <div class="flex items-center justify-between gap-6 cursor-pointer">
 <div class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">03</span>
 <h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion3_title">Kesintisiz Üretim</h3>
 </div>
-<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-icon-bar accordion-icon-bar-h"></span>
+<span class="accordion-icon-bar accordion-icon-bar-v"></span>
+</span>
 </div>
 <div class="accordion-row">
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion3_desc">Gelişmiş tasarımlarımız sürekli ve kesintisiz getiriyi garanti eder.</p></div>
 </div>
 </div>
-<div class="accordion-item spotlight-card px-6 md:px-8 py-6">
+<div class="accordion-item px-0 py-6">
 <div class="flex items-center justify-between gap-6 cursor-pointer">
 <div class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">04</span>
 <h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion4_title">7/24 Destek</h3>
 </div>
-<span class="material-symbols-outlined accordion-icon text-[var(--text-muted)]">add</span>
+<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-icon-bar accordion-icon-bar-h"></span>
+<span class="accordion-icon-bar accordion-icon-bar-v"></span>
+</span>
 </div>
 <div class="accordion-row">
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion4_desc">Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.</p></div>

@@ -12,12 +12,34 @@
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- Phase 90: sitewide living DNA/helix watermark — fixed, z-index:0,
+     first in body (see .iona-dna-bg in base.css for why not z-[-1]).
+     Same pattern the hero used to own alone (Phase 87); now global. -->
+<div class="iona-dna-bg" aria-hidden="true">
+<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs>
+<pattern id="ionaHelixBg" width="140" height="200" patternUnits="userSpaceOnUse">
+<path d="M10 0 C 70 50, 70 150, 130 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
+<path d="M130 0 C 70 50, 70 150, 10 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
+<line x1="34" y1="42" x2="106" y2="42" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="34" cy="42" r="2.5" fill="#2d9937"></circle>
+<circle cx="106" cy="42" r="2.5" fill="#2d9937"></circle>
+<line x1="70" y1="100" x2="70" y2="100" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="70" cy="100" r="2.5" fill="#2d9937"></circle>
+<line x1="34" y1="158" x2="106" y2="158" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="34" cy="158" r="2.5" fill="#2d9937"></circle>
+<circle cx="106" cy="158" r="2.5" fill="#2d9937"></circle>
+</pattern>
+</defs>
+<rect width="400" height="800" fill="url(#ionaHelixBg)"></rect>
+</svg>
+</div>
 <!-- TopNavBar -->
-<!-- Phase 89: MNBAQ minimalist nav -- one unified bar (logo + MENU
+<!-- Phase 89: MNBAQ minimalist nav — one unified bar (logo + MENU
      trigger) at every breakpoint, replacing the old two-nav setup (an
      always-desktop bar with inline search/lang/links, plus a separate
      mobile-only hamburger). Search, language switcher and theme toggle
-     aren't gone -- they're folded into the fullscreen overlay this
+     aren't gone — they're folded into the fullscreen overlay this
      trigger opens. IDs below (mobile-nav-toggle/panel/icon) are kept
      from the old mobile-only bar on purpose: initMobileNav in
      common.js already wires these up correctly and every page's entry

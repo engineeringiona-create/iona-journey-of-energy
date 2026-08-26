@@ -122,33 +122,12 @@ function initHeroReveal() {
 }
 initHeroReveal();
 
-/* ---------------- Phase 88: DNA-grid background parallax ----------------
-   #hero-dna-grid (the 15%-opacity helix pattern behind the 3D column,
-   see index.html) drifts up slower than the page scrolls — a shallow
-   0.15 factor so it reads as "deep background" without fighting the
-   sticky 3D column that shares the same viewport real estate. rAF-
-   throttled so the scroll handler itself never does the transform write
-   more than once per frame. */
-function initDnaParallax() {
-  const grid = document.getElementById('hero-dna-grid');
-  if (!grid) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  let ticking = false;
-  function apply() {
-    ticking = false;
-    grid.style.transform = `translate3d(0, ${window.scrollY * -0.15}px, 0)`;
-  }
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(apply);
-    },
-    { passive: true }
-  );
-}
-initDnaParallax();
+/* Phase 90 note: the old scroll-linked DNA parallax (initDnaParallax,
+   targeting a hero-only #hero-dna-grid element) is gone. That element
+   no longer exists — Phase 90 replaced it with .iona-dna-bg, a single
+   fixed-position sitewide watermark driven purely by CSS keyframes
+   (sway + color-breathe, see base.css), not scroll position, so there
+   was no scroll listener left to port over. */
 
 /* ---------------- Phase 88: custom identity cursor ----------------
    Tracks the pointer and toggles .is-active on #iona-cursor whenever
