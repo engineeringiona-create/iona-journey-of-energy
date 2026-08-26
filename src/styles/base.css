@@ -1152,6 +1152,137 @@ body {
     }
 }
 
+/* ---------------- Phase 60: clean-tech ambient background ----------------
+   Light-theme-only dressing for stark white informational sections: a faint
+   dot-matrix micro-grid (vignetted so it fades at the section edges) plus two
+   soft brand-color glow orbs pinned to opposite corners. Self-contained
+   (own position/isolation/overflow) so it can be dropped on a section with
+   or without .bg-decorated. Disabled in dark mode — the surface is already
+   dark there and a literal glow/grid layer would just add noise on top of
+   the existing .bg-ghost-text/.watermark-edge treatment. This revisits the
+   "blurred-glow/grid experiment" the Industrial Elegance comment above says
+   was pulled for reading muddy — kept deliberately faint (0.04–0.06) and
+   corner-pinned this time to avoid the same fate. */
+.clean-tech-bg {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.clean-tech-bg::before,
+.clean-tech-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.clean-tech-bg::before {
+    background-image: radial-gradient(circle, rgba(20, 24, 20, 0.55) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 65% 65% at 50% 50%, #000 0%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 65% 65% at 50% 50%, #000 0%, transparent 78%);
+    opacity: 0.09;
+}
+
+.clean-tech-bg::after {
+    background-image:
+        radial-gradient(circle at 88% 8%, rgba(16, 185, 129, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 6% 94%, rgba(245, 158, 11, 0.04) 0%, transparent 45%);
+    filter: blur(64px);
+}
+
+:root.dark .clean-tech-bg::before,
+:root.dark .clean-tech-bg::after {
+    display: none;
+}
+
+/* Refines .watermark-edge/.bg-ghost-text to a hollow outline stroke in light
+   mode so the giant background word reads as a quiet outline instead of a
+   filled gray shape competing with real headings. Dark mode keeps the
+   original filled-at-opacity-0.03 treatment, which already reads correctly
+   there. */
+.watermark-edge span,
+.bg-ghost-text span {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(20, 24, 20, 0.05);
+    opacity: 1;
+}
+
+:root.dark .watermark-edge span,
+:root.dark .bg-ghost-text span {
+    color: var(--text);
+    -webkit-text-stroke: 0;
+    opacity: 0.03;
+}
+
+/* ---------------- Phase 60: statement glass cards ----------------
+   Wraps isolated text blocks (Mission/Vision/Values/Sustainability on the
+   About page) in a cohesive glassmorphic card instead of floating text on
+   raw background. Dark mode swaps the literal white glass for a translucent
+   dark one (var(--surface)-based) rather than reusing bg-white/70, which
+   would read as a pale fogged rectangle on a dark section. */
+.statement-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.statement-card:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.statement-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.55), rgba(245, 158, 11, 0.35));
+}
+
+.statement-card-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    color: #10b981;
+}
+
+.statement-card-icon .material-symbols-outlined {
+    font-size: 22px;
+}
+
+:root.dark .statement-card {
+    background: rgba(23, 27, 24, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.3);
+}
+
+:root.dark .statement-card:hover {
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .statement-card {
+        transition: none;
+    }
+}
+
 /* Biogaz getiri hesaplayıcı waste-type pills — same shape/interaction
    as .services-3d-tab, brand green instead of brand-orange since this
    is a data-entry control, not a CTA (the CTA below it keeps the
