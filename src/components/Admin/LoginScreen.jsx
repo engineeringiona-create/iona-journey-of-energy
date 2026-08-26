@@ -21,9 +21,9 @@ export default function LoginScreen({ onSuccess }) {
     <div className="min-h-screen w-full flex items-center justify-center bg-[var(--bg)] px-6">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <img src="/images/iona-star-mark.png" alt="" width="40" height="40" className="mb-4" />
+          <img src="/images/iona-wordmark.svg" alt="iona" width="140" height="45" className="h-10 w-auto mb-3" />
           <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--text)]">
-            IONA <span className="text-[var(--brand)]">Admin</span>
+            <span className="text-[var(--brand)]">Admin</span>
           </h1>
           <p className="text-[13px] text-[var(--text-muted)] mt-1">Site içeriğini yönetmek için giriş yapın</p>
         </div>

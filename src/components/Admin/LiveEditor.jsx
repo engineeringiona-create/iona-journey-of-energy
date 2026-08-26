@@ -754,8 +754,8 @@ export default function LiveEditor({ onLogout }) {
     <div className="fixed inset-0 flex flex-col bg-[#0e1210]">
       <header className="h-14 shrink-0 z-10 flex items-center justify-between px-6 bg-[#171b18] border-b border-white/10 gap-4">
         <div className="flex items-center gap-3 min-w-0 overflow-x-auto">
-          <img src="/images/iona-star-mark.png" alt="" width="22" height="22" className="shrink-0" />
-          <span className="text-[14px] font-extrabold tracking-tight text-white shrink-0">IONA Live Editor</span>
+          <img src="/images/iona-wordmark.svg" alt="iona" width="70" height="22" className="h-[18px] w-auto shrink-0" />
+          <span className="text-[14px] font-extrabold tracking-tight text-white shrink-0">Live Editor</span>
           <span className="h-4 w-px bg-white/15 shrink-0" />
           <select
             value={selectedPage}

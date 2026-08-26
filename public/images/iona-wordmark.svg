@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -6 219 100" fill="none" role="img" aria-label="iona">
+  <defs>
+    <linearGradient id="ionaWordmarkGrad" x1="0" y1="0" x2="211" y2="94" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3fae66"/>
+      <stop offset="1" stop-color="#1B833E"/>
+    </linearGradient>
+  </defs>
+  <!-- i -->
+  <circle cx="17" cy="13" r="8" fill="url(#ionaWordmarkGrad)"/>
+  <line x1="17" y1="30" x2="17" y2="78" stroke="url(#ionaWordmarkGrad)" stroke-width="14" stroke-linecap="round"/>
+  <!-- o -->
+  <circle cx="60" cy="54" r="22" fill="none" stroke="url(#ionaWordmarkGrad)" stroke-width="14"/>
+  <!-- n -->
+  <path d="M95,78 L95,40 Q95,28 110,28 Q125,28 125,40 L125,78" fill="none" stroke="url(#ionaWordmarkGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- fluid n-a join -->
+  <path d="M125,72 Q134,82 143,70" fill="none" stroke="url(#ionaWordmarkGrad)" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+  <!-- a -->
+  <circle cx="163" cy="54" r="20" fill="none" stroke="url(#ionaWordmarkGrad)" stroke-width="14"/>
+  <line x1="183" y1="38" x2="183" y2="78" stroke="url(#ionaWordmarkGrad)" stroke-width="14" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="iona">
+  <defs>
+    <linearGradient id="ionaIconGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3fae66"/>
+      <stop offset="1" stop-color="#1B833E"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="58" height="58" rx="15" fill="url(#ionaIconGrad)"/>
+  <circle cx="32" cy="20" r="7" fill="#ffffff"/>
+  <line x1="32" y1="34" x2="32" y2="50" stroke="#ffffff" stroke-width="11" stroke-linecap="round"/>
+</svg>

@@ -18,26 +18,75 @@ initMobileNav();
 initParallax();
 initCardSpotlight();
 
-/* ---------------- Intro preloader ---------------- */
+/* ---------------- Intro preloader (Phase 77: IonaPreloader) ----------------
+   Sequential i -> o -> n -> a stroke-draw (SVG pathLength=1 normalizes every
+   shape's dash math to 0..1 regardless of its real geometry, so one tween
+   shape covers a circle, a line, and a curved path alike), a quick
+   back.out "settle" scale standing in for an oil-paint fill pass, then the
+   slogan shimmers in. Exit waits for both a minimum read-time AND the
+   window 'load' event (this is a static multi-page site with no client
+   hydration step, so 'load' is the closest equivalent to "asset-hydration
+   ready"), capped by a safety timeout so a slow asset can never strand the
+   preloader on screen. The dissolve itself is a pure CSS class
+   (#preloader.is-leaving) so it never fights this timeline. */
 function runPreloader() {
   const preloader = document.getElementById('preloader');
   if (!preloader) return;
-  const star = document.getElementById('preloader-star');
   const glow = document.getElementById('preloader-glow');
+  const slogan = document.getElementById('preloader-slogan');
+  const letters = ['pl-letter-i', 'pl-letter-o', 'pl-letter-n', 'pl-letter-a']
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
 
-  const pulse = gsap.timeline({ repeat: -1, yoyo: true, defaults: { duration: 0.75, ease: 'sine.inOut' } });
-  pulse.to(star, { scale: 1.18, rotate: 8 }, 0);
-  pulse.to(glow, { opacity: 0.9, scale: 1.35 }, 0);
-
-  gsap.delayedCall(1.5, () => {
-    pulse.kill();
-    gsap.to(preloader, {
-      opacity: 0,
-      duration: 0.8,
-      ease: 'power2.inOut',
-      onComplete: () => preloader.remove()
-    });
+  const glowPulse = gsap.to(glow, {
+    opacity: 0.85,
+    scale: 1.15,
+    duration: 1.3,
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut',
+    transformOrigin: '50% 50%'
   });
+
+  const STEP = 0.36;
+  const tl = gsap.timeline();
+  letters.forEach((letter, i) => {
+    const strokes = letter.querySelectorAll('[pathLength]');
+    const t = i * STEP;
+    tl.call(() => letter.classList.add('is-drawing'), null, t);
+    tl.fromTo(
+      strokes,
+      { strokeDashoffset: 1, strokeDasharray: 1 },
+      { strokeDashoffset: 0, duration: 0.34, ease: 'power2.inOut', stagger: 0.03 },
+      t
+    );
+    tl.fromTo(
+      letter,
+      { scale: 0.92, transformOrigin: '50% 50%' },
+      { scale: 1, duration: 0.22, ease: 'back.out(2.4)' },
+      t + 0.26
+    );
+    tl.call(() => letter.classList.add('is-filled'), null, t + 0.32);
+  });
+  const sloganAt = letters.length * STEP + 0.1;
+  tl.call(() => slogan.classList.add('is-in'), null, sloganAt);
+
+  const minVisibleMs = (sloganAt + 0.55) * 1000;
+
+  const exit = () => {
+    glowPulse.kill();
+    preloader.classList.add('is-leaving');
+    preloader.addEventListener('transitionend', () => preloader.remove(), { once: true });
+  };
+
+  const pageReady = new Promise((resolve) => {
+    if (document.readyState === 'complete') resolve();
+    else window.addEventListener('load', () => resolve(), { once: true });
+  });
+  const minTimer = new Promise((resolve) => setTimeout(resolve, minVisibleMs));
+  const safetyCap = new Promise((resolve) => setTimeout(resolve, 4000));
+
+  Promise.race([Promise.all([pageReady, minTimer]), safetyCap]).then(exit);
 }
 runPreloader();
 
