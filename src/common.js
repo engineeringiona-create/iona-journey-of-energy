@@ -296,3 +296,104 @@ export function initParallax() {
     });
   });
 }
+
+/* Phase 91: MPA "curtain" page transition. This is a static multi-page
+   site (7 separate HTML documents, no client-side router), so there's
+   no shared JS state to animate a transition *through* — instead,
+   every page's #iona-curtain (markup: right after <body>, see any
+   page) starts in its base CSS state already covering the viewport
+   (no flash, no JS needed for that part), and this reveals it shortly
+   after load. On a qualifying internal link click, it re-covers the
+   viewport and *delays* the real navigation until that animation
+   finishes, so the same green cover reads as one continuous curtain
+   across the page boundary: it closes over the old page, the browser
+   does a normal full navigation while hidden behind it, and the new
+   page's own copy of this same function reveals it again on arrival. */
+export function initPageCurtain() {
+  const curtain = document.getElementById('iona-curtain');
+  if (!curtain) return;
+
+  requestAnimationFrame(() => curtain.classList.add('is-revealed'));
+
+  if (reduceMotion) return;
+
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0) return;
+    const link = e.target.closest('a[href]');
+    if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+    let url;
+    try {
+      url = new URL(link.href, window.location.href);
+    } catch {
+      return;
+    }
+    if (url.origin !== window.location.origin) return;
+    // Same-page anchors (in-page nav, e.g. #contact-form) skip the
+    // curtain entirely — it's not a real page change.
+    if (url.pathname === window.location.pathname && url.hash) return;
+
+    e.preventDefault();
+    curtain.classList.remove('is-revealed');
+    window.setTimeout(() => {
+      window.location.href = link.href;
+    }, 550);
+  });
+}
+
+/* Phase 91: footer "gradient curve" draw-on. One-shot: disconnects
+   itself the moment it fires, since the curve should only ever draw
+   once per page view, not re-draw every time the footer scrolls back
+   into view. */
+export function initFooterCurve() {
+  const path = document.querySelector('.footer-curve-path');
+  if (!path) return;
+  if (reduceMotion) {
+    path.classList.add('is-drawn');
+    return;
+  }
+  const target = path.closest('footer') || path;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        path.classList.add('is-drawn');
+        observer.disconnect();
+      });
+    },
+    { threshold: 0.15 }
+  );
+  observer.observe(target);
+}
+
+/* Phase 91: horizontal-scroll exhibition gallery. Desktop/lg+ and
+   motion-OK only — adds .is-horizontal (base.css) to switch the track
+   from a plain stacked column to a flex row, pins the wrapping section,
+   and scrubs the track's x transform to scroll position so panels pan
+   left as the visitor scrolls down. Below lg or under reduced-motion,
+   this never runs at all: the CSS default (stacked column, natural
+   height) stands on its own, so those visitors get an ordinary
+   scrolling section instead of a half-configured horizontal one. */
+export function initHorizontalGallery(trackId) {
+  const track = document.getElementById(trackId);
+  if (!track) return;
+  if (reduceMotion) return;
+  if (!window.matchMedia('(min-width: 1024px)').matches) return;
+
+  const wrap = track.parentElement;
+  track.classList.add('is-horizontal');
+
+  gsap.to(track, {
+    x: () => -(track.scrollWidth - window.innerWidth),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: wrap,
+      start: 'top top',
+      end: () => '+=' + (track.scrollWidth - window.innerWidth),
+      scrub: 1,
+      pin: true,
+      invalidateOnRefresh: true
+    }
+  });
+}

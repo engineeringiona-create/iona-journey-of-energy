@@ -1,12 +1,14 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initMobileNav, initSmoothScroll } from '../common.js';
+import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initHorizontalGallery } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
 initSmoothScroll();
+initPageCurtain();
+initFooterCurve();
 initLangSwitcher();
 initQuoteModal();
 initFadeIn();
@@ -14,6 +16,7 @@ initThemeToggle();
 initSiteSearch();
 initMobileNav();
 initParallax();
+initHorizontalGallery('why-us-track');
 
 /* Stat counters (20+ Yıllık Deneyim, etc.) */
 const counters = document.querySelectorAll('[data-count-target]');

@@ -12,6 +12,13 @@
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- Phase 91: MPA curtain page transition. Base CSS state already
+     covers the viewport with no flash (no JS needed for that part); JS
+     reveals it on load and re-covers before any internal link navigates.
+     See initPageCurtain in common.js and #iona-curtain in base.css. -->
+<div id="iona-curtain" aria-hidden="true">
+<span class="iona-wordmark-text" style="font-size:32px">iona</span>
+</div>
 <!-- Phase 90: sitewide living DNA/helix watermark — fixed, z-index:0,
      first in body (see .iona-dna-bg in base.css for why not z-[-1]).
      Same pattern the hero used to own alone (Phase 87); now global. -->
@@ -122,56 +129,55 @@
 </section>
 
 <!-- Industries served -->
-<section class="relative bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section bg-decorated" id="industries">
-<div class="watermark-edge watermark-left" aria-hidden="true"><span>SEKTÖRLER</span></div>
-<svg class="cad-blueprint-accent" viewBox="0 0 300 200" fill="none" aria-hidden="true">
-<rect x="180" y="40" width="90" height="120" rx="4" stroke="#E2E8F0" stroke-width="1"></rect>
-<circle cx="225" cy="70" r="10" stroke="#E2E8F0" stroke-width="1"></circle>
-<line x1="0" y1="150" x2="180" y2="150" stroke="#E2E8F0" stroke-width="1"></line>
-<line x1="60" y1="150" x2="60" y2="200" stroke="#E2E8F0" stroke-width="1"></line>
-<circle cx="60" cy="150" r="5" stroke="#E2E8F0" stroke-width="1"></circle>
-<line x1="120" y1="150" x2="120" y2="90" stroke="#E2E8F0" stroke-width="1"></line>
-<circle cx="120" cy="90" r="5" stroke="#E2E8F0" stroke-width="1"></circle>
-<line x1="120" y1="90" x2="180" y2="90" stroke="#E2E8F0" stroke-width="1"></line>
-<line x1="270" y1="40" x2="270" y2="0" stroke="#E2E8F0" stroke-width="1"></line>
-<line x1="270" y1="160" x2="270" y2="200" stroke="#E2E8F0" stroke-width="1"></line>
-<circle cx="0" cy="150" r="3" fill="#E2E8F0"></circle>
-</svg>
-<div class="max-w-[theme(spacing.container-max)] mx-auto">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="industries.list.eyebrow">Sektörel Etki</span>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="industries.list.title">Hizmet Verdiğimiz Sektörler</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 fade-in-element delay-200">
-<div class="transition-all duration-300 hover:-translate-y-0.5">
-<div class="rounded-xl overflow-hidden mb-5 aspect-[16/10]">
-<img class="w-full h-full object-cover" data-img-key="industry_digester_dome" src="/images/digester-dome-facility.jpg" alt="Biyogaz çürütücü tesisinin dış görünümü" loading="lazy" decoding="async">
+<!-- Phase 91: horizontal-scroll exhibition gallery, replacing the old
+     2-col image-card grid. Same 4 items/images/i18n keys — just paneled
+     instead of gridded. See initHorizontalGallery (common.js), called
+     from main-etki.js as initHorizontalGallery('industries-track'). At
+     below-lg or under reduced-motion this renders as a plain stacked
+     column (base.css default), never a half-configured horizontal one. -->
+<section class="relative bg-white fade-in-section" id="industries">
+<div class="horizontal-gallery-wrap overflow-hidden">
+<div class="horizontal-gallery-track" id="industries-track">
+<div class="horizontal-gallery-panel relative flex items-end px-safe-margin-mobile md:px-16 py-16">
+<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_digester_dome" src="/images/digester-dome-facility.jpg" alt="Biyogaz çürütücü tesisinin dış görünümü" loading="lazy" decoding="async">
+<div class="absolute inset-0 bg-black/50"></div>
+<div class="relative z-10 max-w-xl text-white">
+<span class="font-label-caps text-label-caps text-[#ffc700] tracking-widest block mb-2" data-i18n="industries.list.eyebrow">Sektörel Etki</span>
+<span class="block text-7xl lg:text-8xl font-bold text-[#2d9937] leading-none mb-4">01</span>
+<span class="font-label-caps text-label-caps text-white/70" data-i18n="industries.list.item1_title">Belediye Biyokütle Enerjisi</span>
+<h3 class="text-3xl lg:text-5xl font-bold tracking-tighter mt-2 mb-4" data-i18n="industries.list.item1_subtitle">Katı Kentsel Atık İşleme · Temiz Yerel Enerji Üretimi</h3>
+<p class="text-base text-white/80 max-w-lg" data-i18n="industries.list.item1_desc">Kentsel organik atığı kesintisiz yeşil enerjiye dönüştürmek için belediyelerle ortaklık kuruyoruz. Gelişmiş biyo-çürütme teknolojimiz depolama alanına bağımlılığı azaltır ve yerel toplulukları temiz bir şekilde güçlendirir.</p>
 </div>
-<span class="font-label-caps text-label-caps text-[var(--brand)]" data-i18n="industries.list.item1_title">Belediye Biyokütle Enerjisi</span>
-<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="industries.list.item1_subtitle">Katı Kentsel Atık İşleme · Temiz Yerel Enerji Üretimi</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="industries.list.item1_desc">Kentsel organik atığı kesintisiz yeşil enerjiye dönüştürmek için belediyelerle ortaklık kuruyoruz. Gelişmiş biyo-çürütme teknolojimiz depolama alanına bağımlılığı azaltır ve yerel toplulukları temiz bir şekilde güçlendirir.</p>
 </div>
-<div class="transition-all duration-300 hover:-translate-y-0.5">
-<div class="rounded-xl overflow-hidden mb-5 aspect-[16/10]">
-<img class="w-full h-full object-cover" data-img-key="industry_mixer_motor" src="/images/mixer-motor-closeup.jpg" alt="Çürütücü tankına monte edilmiş karıştırma motoru" loading="lazy" decoding="async">
+<div class="horizontal-gallery-panel relative flex items-end px-safe-margin-mobile md:px-16 py-16">
+<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_mixer_motor" src="/images/mixer-motor-closeup.jpg" alt="Çürütücü tankına monte edilmiş karıştırma motoru" loading="lazy" decoding="async">
+<div class="absolute inset-0 bg-black/50"></div>
+<div class="relative z-10 max-w-xl text-white">
+<span class="block text-7xl lg:text-8xl font-bold text-[#2d9937] leading-none mb-4">02</span>
+<span class="font-label-caps text-label-caps text-white/70" data-i18n="industries.list.item2_title">Endüstriyel Atık Çözümleri</span>
+<h3 class="text-3xl lg:text-5xl font-bold tracking-tighter mt-2 mb-4" data-i18n="industries.list.item2_subtitle">Gıda Endüstrisi Atık Arıtımı · Çevre Dostu Atıksu Bertarafı</h3>
+<p class="text-base text-white/80 max-w-lg" data-i18n="industries.list.item2_desc">Endüstriyel organik atıksu ve fabrika gıda atıkları için özel olarak tasarlanmış yüksek kapasiteli biyogaz sistemleri sunuyoruz. Tesislerimiz bertaraf maliyetlerini önemli ölçüde azaltırken sahada yeşil elektrik ve ısı üretir.</p>
 </div>
-<span class="font-label-caps text-label-caps text-[var(--brand)]" data-i18n="industries.list.item2_title">Endüstriyel Atık Çözümleri</span>
-<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="industries.list.item2_subtitle">Gıda Endüstrisi Atık Arıtımı · Çevre Dostu Atıksu Bertarafı</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="industries.list.item2_desc">Endüstriyel organik atıksu ve fabrika gıda atıkları için özel olarak tasarlanmış yüksek kapasiteli biyogaz sistemleri sunuyoruz. Tesislerimiz bertaraf maliyetlerini önemli ölçüde azaltırken sahada yeşil elektrik ve ısı üretir.</p>
 </div>
-<div class="transition-all duration-300 hover:-translate-y-0.5">
-<div class="rounded-xl overflow-hidden mb-5 aspect-[16/10] bg-[var(--surface-2)]">
-<img class="w-full h-full object-cover" data-img-key="industry_auger_conveyor" src="/images/auger-conveyor-equipment.png" alt="Tesiste substrat besleme ekipmanı" loading="lazy" decoding="async">
+<div class="horizontal-gallery-panel relative flex items-end px-safe-margin-mobile md:px-16 py-16">
+<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_auger_conveyor" src="/images/auger-conveyor-equipment.png" alt="Tesiste substrat besleme ekipmanı" loading="lazy" decoding="async">
+<div class="absolute inset-0 bg-black/50"></div>
+<div class="relative z-10 max-w-xl text-white">
+<span class="block text-7xl lg:text-8xl font-bold text-[#2d9937] leading-none mb-4">03</span>
+<span class="font-label-caps text-label-caps text-white/70" data-i18n="industries.list.item3_title">Tarımsal Atık Enerjisi</span>
+<h3 class="text-3xl lg:text-5xl font-bold tracking-tighter mt-2 mb-4" data-i18n="industries.list.item3_subtitle">Organik Biyokütle Dönüşümü · Yüksek Verimli Metan Üretimi</h3>
+<p class="text-base text-white/80 max-w-lg" data-i18n="industries.list.item3_desc">Tarımsal artıkları ve mahsul atıklarını temiz, sürdürülebilir enerjiye dönüştürüyoruz. Mühendislik çözümlerimiz metan çıktısını en üst düzeye çıkarırken çevre dostu tarım için yüksek kaliteli organik gübreler sağlar.</p>
 </div>
-<span class="font-label-caps text-label-caps text-[var(--brand)]" data-i18n="industries.list.item3_title">Tarımsal Atık Enerjisi</span>
-<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="industries.list.item3_subtitle">Organik Biyokütle Dönüşümü · Yüksek Verimli Metan Üretimi</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="industries.list.item3_desc">Tarımsal artıkları ve mahsul atıklarını temiz, sürdürülebilir enerjiye dönüştürüyoruz. Mühendislik çözümlerimiz metan çıktısını en üst düzeye çıkarırken çevre dostu tarım için yüksek kaliteli organik gübreler sağlar.</p>
 </div>
-<div class="transition-all duration-300 hover:-translate-y-0.5">
-<div class="rounded-xl overflow-hidden mb-5 aspect-[16/10] bg-[var(--surface-2)]">
-<img class="w-full h-full object-cover" data-img-key="industry_digester_render" src="/images/digester-dome-render.png" alt="Çürütücü tankı görselleştirmesi" loading="lazy" decoding="async">
+<div class="horizontal-gallery-panel relative flex items-end px-safe-margin-mobile md:px-16 py-16">
+<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_digester_render" src="/images/digester-dome-render.png" alt="Çürütücü tankı görselleştirmesi" loading="lazy" decoding="async">
+<div class="absolute inset-0 bg-black/50"></div>
+<div class="relative z-10 max-w-xl text-white">
+<span class="block text-7xl lg:text-8xl font-bold text-[#2d9937] leading-none mb-4">04</span>
+<span class="font-label-caps text-label-caps text-white/70" data-i18n="industries.list.item4_title">Hayvancılık Gübre Yönetimi</span>
+<h3 class="text-3xl lg:text-5xl font-bold tracking-tighter mt-2 mb-4" data-i18n="industries.list.item4_subtitle">Çevre Dostu Gübre Stabilizasyonu · Koku Emisyonunun Giderilmesi</h3>
+<p class="text-base text-white/80 max-w-lg" data-i18n="industries.list.item4_desc">Büyük ölçekli çiftliklerin gelişmiş anaerobik çürütme yoluyla hayvan gübresini verimli bir şekilde yönetmesine yardımcı oluyoruz. Biyogaz tesislerimiz zararlı sera gazlarını ortadan kaldırır, kokuyu giderir ve kârlı yeşil enerji yaratır.</p>
 </div>
-<span class="font-label-caps text-label-caps text-[var(--brand)]" data-i18n="industries.list.item4_title">Hayvancılık Gübre Yönetimi</span>
-<h3 class="font-headline-md text-headline-md mt-2 mb-2" data-i18n="industries.list.item4_subtitle">Çevre Dostu Gübre Stabilizasyonu · Koku Emisyonunun Giderilmesi</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="industries.list.item4_desc">Büyük ölçekli çiftliklerin gelişmiş anaerobik çürütme yoluyla hayvan gübresini verimli bir şekilde yönetmesine yardımcı oluyoruz. Biyogaz tesislerimiz zararlı sera gazlarını ortadan kaldırır, kokuyu giderir ve kârlı yeşil enerji yaratır.</p>
 </div>
 </div>
 </div>
@@ -219,30 +225,22 @@
 </section>
 
 <!-- Footer -->
-<footer class="bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-16 pb-8 fade-in-section" id="site-footer">
-<div class="max-w-[theme(spacing.container-max)] mx-auto">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-b border-slate-200 py-8 mb-8">
-<div class="flex flex-col gap-2 fade-in-element">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Menü</span>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
+<svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
+<path class="footer-curve-path" d="M-50 60 C 350 260, 1050 -60, 1450 340" stroke="#2d9937" stroke-width="2" fill="none" pathLength="1000"></path>
+</svg>
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto flex flex-col items-center gap-10 text-center">
+<span class="text-[10px] font-mono uppercase tracking-widest text-black/40">İletişime Geçin</span>
+<a class="text-[11vw] md:text-[7vw] leading-[0.95] font-bold tracking-tighter text-black break-all hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">HELLO@IONA.COM</a>
+<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 mt-6 fade-in-element">
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.privacy"></a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.terms"></a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.impact_report"></a>
 </div>
-<div class="flex flex-col gap-2 fade-in-element delay-100">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Yasal</span>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.privacy"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.terms"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.impact_report"></a>
-</div>
-<div class="flex flex-col gap-2 md:items-end md:text-right fade-in-element delay-200">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Iona</span>
-<p class="text-sm text-black/60 max-w-[240px]">Where advanced fluid dynamics meet accelerated return on investment.</p>
-</div>
-</div>
-<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4">
-<h2 class="text-[16vw] leading-[0.8] font-bold tracking-tighter text-black select-none" aria-hidden="true">iona</h2>
-<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/50 whitespace-nowrap pb-2" data-i18n="footer.copyright"></p>
-</div>
+<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/50 mt-8" data-i18n="footer.copyright"></p>
 </div>
 </footer>
 

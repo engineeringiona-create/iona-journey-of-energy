@@ -8,7 +8,10 @@
    light-mode flash.
 ---------------------------------------------------------------- */
 :root {
-    --bg: #f7f6f1;
+    /* Phase 91: was #f7f6f1 (a warm off-white) — brief calls for a
+       strictly pure-white canvas sitewide, no off-white tint anywhere.
+       Dark mode's own --bg (below) is untouched. */
+    --bg: #ffffff;
     --surface: #ffffff;
     --surface-2: #f2f0ea;
     --text: #14181a;
@@ -38,7 +41,12 @@
        slate-50 per the "crisp, clinical slate-50 (#F8FAFC)" ask — pairs
        with .statement-card and .bento-card's now-flat white/slate-200
        treatment below (no more glow/blur layer competing with it). */
-    --section-alt: #f8fafc;
+    /* Phase 91: was #f8fafc (slate-50, this token's own name/comment
+       above literally called it "soft off-white") — now the same pure
+       white as --surface, so no section on the page carries any
+       off-white tint. Sections no longer alternate tone; hairlines
+       (border-t/border-b) are the separator now, brutalist-grid style. */
+    --section-alt: #ffffff;
     /* Green stays out of large section fills entirely now (that read as
        a big washed-out block, not a brand accent) — --border-green is
        the only surviving brand-tinted token, kept for thin top-border
@@ -1271,6 +1279,103 @@ html {
     border: 2px solid var(--brand-yellow);
 }
 
+/* Phase 91: MPA "curtain" page transition — a distinct element from
+   #preloader above/below (that one intentionally follows the site's
+   light/dark theme per an earlier explicit correction; this is a new,
+   deliberately fixed-brand-green element, not a recolor of it). z-index
+   90, just under #preloader's own z-[100] (index.html), so on first
+   load the preloader's bubble/logo animation still shows on top while
+   this sits beneath it already covering the page; see initPageCurtain
+   in common.js for why the JS side never touches transform directly. */
+#iona-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: #2d9937;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(0);
+    transition: transform 600ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+#iona-curtain.is-revealed {
+    transform: translateY(-100%);
+    pointer-events: none;
+}
+
+#iona-curtain .iona-wordmark-text {
+    color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #iona-curtain {
+        transition: none;
+    }
+}
+
+/* Phase 91: footer "gradient curve" — draws itself in via
+   stroke-dasharray/dashoffset once #site-footer scrolls into view (see
+   initFooterCurve, common.js). pathLength="1000" (set on the <path> in
+   HTML) normalizes the dash math to a fixed 1000 regardless of the
+   curve's actual geometry, so no JS getTotalLength() call is needed. */
+.footer-curve {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.footer-curve-path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    transition: stroke-dashoffset 1.8s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.footer-curve-path.is-drawn {
+    stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-curve-path {
+        transition: none;
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Phase 91: horizontal-scroll exhibition gallery (etki.html's
+   Sektörler, hakkimizda.html's Neden Iona — see initHorizontalGallery,
+   common.js). Mobile-first: a plain stacked column by default (each
+   panel a normal-height block, natural vertical flow) — the pin +
+   horizontal pan only ever gets set up by JS at lg+ and skipped
+   entirely under prefers-reduced-motion, so small screens and reduced-
+   motion visitors just get a normal scrolling section, never a
+   sideways-locked one. */
+.horizontal-gallery-track {
+    display: flex;
+    flex-direction: column;
+}
+
+.horizontal-gallery-panel {
+    width: 100%;
+    min-height: 70vh;
+}
+
+@media (min-width: 1024px) {
+    .horizontal-gallery-track.is-horizontal {
+        flex-direction: row;
+        height: 100vh;
+    }
+
+    .horizontal-gallery-track.is-horizontal .horizontal-gallery-panel {
+        width: 100vw;
+        height: 100vh;
+        min-height: 0;
+        flex-shrink: 0;
+    }
+}
+
 /* Intro preloader (Phase 77): follows the active light/dark theme via
    var(--bg)/var(--brand) again — reverted from the first pass's fixed dark
    titanium backdrop after explicit user correction; the site's own
@@ -1928,10 +2033,15 @@ body:has(#preloader) {
    collide with a section that already uses ::before or an overlay div
    for something else (the homepage section's own radial glow-orb div,
    kept as-is, sits on top of this fine — two different effects). */
+/* Phase 91: re-themed from the old bluish "titanium" gradient to a
+   strict pure-black (#0a0a0a) SCADA/command-center surface — still a
+   radial sheen at the top, just green->yellow (the brand's own accent
+   pair) instead of a neutral white/green tint, so it reads as a
+   terminal glow rather than a metallic highlight. */
 .ionaflux-titanium-bg {
     background:
-        radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.04) 0%, rgba(120, 220, 119, 0.03) 40%, transparent 80%),
-        linear-gradient(to bottom, #111722, #161e2e, #0e131d);
+        radial-gradient(120% 80% at 50% 0%, rgba(45, 153, 55, 0.07) 0%, rgba(255, 199, 0, 0.03) 40%, transparent 80%),
+        #0a0a0a;
 }
 
 /* Frosted "SCADA glass" panel for text/telemetry blocks sitting on top of
@@ -1939,12 +2049,12 @@ body:has(#preloader) {
    replacing) Phase 70's slightly different rgba/blur values on the phone's
    own metric/sparkline/alert/report cards below. */
 .ionaflux-glass-panel {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(10, 10, 10, 0.7);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(45, 153, 55, 0.25);
     border-radius: 1.5rem;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* Phase 73: the homepage teaser's feature-grid bullets (Canlı SCADA

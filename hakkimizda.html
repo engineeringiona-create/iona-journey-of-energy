@@ -12,6 +12,13 @@
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- Phase 91: MPA curtain page transition. Base CSS state already
+     covers the viewport with no flash (no JS needed for that part); JS
+     reveals it on load and re-covers before any internal link navigates.
+     See initPageCurtain in common.js and #iona-curtain in base.css. -->
+<div id="iona-curtain" aria-hidden="true">
+<span class="iona-wordmark-text" style="font-size:32px">iona</span>
+</div>
 <!-- Phase 90: sitewide living DNA/helix watermark — fixed, z-index:0,
      first in body (see .iona-dna-bg in base.css for why not z-[-1]).
      Same pattern the hero used to own alone (Phase 87); now global. -->
@@ -182,26 +189,35 @@
 </section>
 
 <!-- Why choose us -->
-<section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="why-us">
-<div class="max-w-[theme(spacing.container-max)] mx-auto">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="about.why.eyebrow">Neden Iona</span>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="about.why.title">Yüksek Performanslı Biyogaz Mühendisliği</h2>
-<div class="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-10 fade-in-element delay-200">
-<div>
-<h3 class="font-label-caps text-label-caps text-[var(--brand)] mb-2" data-i18n="about.why.item1_title">Akıllı Teknoloji</h3>
-<p class="text-body-md text-sm text-[var(--text-muted)]" data-i18n="about.why.item1_desc">Maksimum verimlilik için gelişmiş otomasyon sistemleri entegre ediyoruz.</p>
+<!-- Phase 91: horizontal-scroll exhibition gallery, replacing the old
+     4-col text grid. Same 4 items/i18n keys — no stock photos exist for
+     this section (unlike etki.html's Sektörler, which has real facility
+     shots), so panels stay typography-only: massive number + title +
+     desc on a plain black panel. See initHorizontalGallery (common.js),
+     called from main-hakkimizda.js as initHorizontalGallery('why-us-track'). -->
+<section class="bg-black fade-in-section" id="why-us">
+<div class="horizontal-gallery-wrap overflow-hidden">
+<div class="horizontal-gallery-track" id="why-us-track">
+<div class="horizontal-gallery-panel flex flex-col justify-center px-safe-margin-mobile md:px-16 py-16 text-white">
+<span class="font-label-caps text-label-caps text-[#ffc700] tracking-widest block mb-6">Neden Iona</span>
+<span class="block text-8xl lg:text-9xl font-bold text-[#2d9937] leading-none mb-8">01</span>
+<h3 class="text-4xl lg:text-6xl font-bold tracking-tighter mb-4" data-i18n="about.why.item1_title">Akıllı Teknoloji</h3>
+<p class="text-lg text-white/70 max-w-lg" data-i18n="about.why.item1_desc">Maksimum verimlilik için gelişmiş otomasyon sistemleri entegre ediyoruz.</p>
 </div>
-<div>
-<h3 class="font-label-caps text-label-caps text-[var(--brand)] mb-2" data-i18n="about.why.item2_title">Operasyonel Maliyet Tasarrufu</h3>
-<p class="text-body-md text-sm text-[var(--text-muted)]" data-i18n="about.why.item2_desc">Optimize edilmiş tesislerle işletme maliyetlerini düşürüyoruz.</p>
+<div class="horizontal-gallery-panel flex flex-col justify-center px-safe-margin-mobile md:px-16 py-16 text-white">
+<span class="block text-8xl lg:text-9xl font-bold text-[#2d9937] leading-none mb-8">02</span>
+<h3 class="text-4xl lg:text-6xl font-bold tracking-tighter mb-4" data-i18n="about.why.item2_title">Operasyonel Maliyet Tasarrufu</h3>
+<p class="text-lg text-white/70 max-w-lg" data-i18n="about.why.item2_desc">Optimize edilmiş tesislerle işletme maliyetlerini düşürüyoruz.</p>
 </div>
-<div>
-<h3 class="font-label-caps text-label-caps text-[var(--brand)] mb-2" data-i18n="about.why.item3_title">Kesintisiz Üretim</h3>
-<p class="text-body-md text-sm text-[var(--text-muted)]" data-i18n="about.why.item3_desc">Gelişmiş tasarımlarımız sürekli ve kesintisiz getiriyi garanti eder.</p>
+<div class="horizontal-gallery-panel flex flex-col justify-center px-safe-margin-mobile md:px-16 py-16 text-white">
+<span class="block text-8xl lg:text-9xl font-bold text-[#2d9937] leading-none mb-8">03</span>
+<h3 class="text-4xl lg:text-6xl font-bold tracking-tighter mb-4" data-i18n="about.why.item3_title">Kesintisiz Üretim</h3>
+<p class="text-lg text-white/70 max-w-lg" data-i18n="about.why.item3_desc">Gelişmiş tasarımlarımız sürekli ve kesintisiz getiriyi garanti eder.</p>
 </div>
-<div>
-<h3 class="font-label-caps text-label-caps text-[var(--brand)] mb-2" data-i18n="about.why.item4_title">7/24 Destek</h3>
-<p class="text-body-md text-sm text-[var(--text-muted)]" data-i18n="about.why.item4_desc">Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.</p>
+<div class="horizontal-gallery-panel flex flex-col justify-center px-safe-margin-mobile md:px-16 py-16 text-white">
+<span class="block text-8xl lg:text-9xl font-bold text-[#2d9937] leading-none mb-8">04</span>
+<h3 class="text-4xl lg:text-6xl font-bold tracking-tighter mb-4" data-i18n="about.why.item4_title">7/24 Destek</h3>
+<p class="text-lg text-white/70 max-w-lg" data-i18n="about.why.item4_desc">Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.</p>
 </div>
 </div>
 </div>
@@ -232,30 +248,22 @@
 </section>
 
 <!-- Footer -->
-<footer class="bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-16 pb-8 fade-in-section" id="site-footer">
-<div class="max-w-[theme(spacing.container-max)] mx-auto">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-b border-slate-200 py-8 mb-8">
-<div class="flex flex-col gap-2 fade-in-element">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Menü</span>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
+<svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
+<path class="footer-curve-path" d="M-50 60 C 350 260, 1050 -60, 1450 340" stroke="#2d9937" stroke-width="2" fill="none" pathLength="1000"></path>
+</svg>
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto flex flex-col items-center gap-10 text-center">
+<span class="text-[10px] font-mono uppercase tracking-widest text-black/40">İletişime Geçin</span>
+<a class="text-[11vw] md:text-[7vw] leading-[0.95] font-bold tracking-tighter text-black break-all hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">HELLO@IONA.COM</a>
+<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 mt-6 fade-in-element">
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.privacy"></a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.terms"></a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.impact_report"></a>
 </div>
-<div class="flex flex-col gap-2 fade-in-element delay-100">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Yasal</span>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.privacy"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.terms"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.impact_report"></a>
-</div>
-<div class="flex flex-col gap-2 md:items-end md:text-right fade-in-element delay-200">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Iona</span>
-<p class="text-sm text-black/60 max-w-[240px]">Where advanced fluid dynamics meet accelerated return on investment.</p>
-</div>
-</div>
-<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4">
-<h2 class="text-[16vw] leading-[0.8] font-bold tracking-tighter text-black select-none" aria-hidden="true">iona</h2>
-<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/50 whitespace-nowrap pb-2" data-i18n="footer.copyright"></p>
-</div>
+<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/50 mt-8" data-i18n="footer.copyright"></p>
 </div>
 </footer>
 

@@ -1,4 +1,4 @@
-import { initFadeIn, initThemeToggle, initSiteSearch, initMobileNav, initSmoothScroll } from '../common.js';
+import { initFadeIn, initThemeToggle, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { getSupabase } from '../lib/supabaseClient.js';
@@ -7,6 +7,8 @@ import { openAnnouncementModal } from '../lib/announcements.js';
 
 await initI18n();
 initSmoothScroll();
+initPageCurtain();
+initFooterCurve();
 initLangSwitcher();
 initQuoteModal();
 initFadeIn();

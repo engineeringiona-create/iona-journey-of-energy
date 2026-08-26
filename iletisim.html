@@ -12,6 +12,13 @@
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- Phase 91: MPA curtain page transition. Base CSS state already
+     covers the viewport with no flash (no JS needed for that part); JS
+     reveals it on load and re-covers before any internal link navigates.
+     See initPageCurtain in common.js and #iona-curtain in base.css. -->
+<div id="iona-curtain" aria-hidden="true">
+<span class="iona-wordmark-text" style="font-size:32px">iona</span>
+</div>
 <!-- Phase 90: sitewide living DNA/helix watermark — fixed, z-index:0,
      first in body (see .iona-dna-bg in base.css for why not z-[-1]).
      Same pattern the hero used to own alone (Phase 87); now global. -->
@@ -196,30 +203,22 @@ aria-label="Kırkkonaklar Mah. 358. Sok. No:13/5, Çankaya, Ankara"
 </section>
 
 <!-- Footer -->
-<footer class="bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-16 pb-8 fade-in-section" id="site-footer">
-<div class="max-w-[theme(spacing.container-max)] mx-auto">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-b border-slate-200 py-8 mb-8">
-<div class="flex flex-col gap-2 fade-in-element">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Menü</span>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
+<svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
+<path class="footer-curve-path" d="M-50 60 C 350 260, 1050 -60, 1450 340" stroke="#2d9937" stroke-width="2" fill="none" pathLength="1000"></path>
+</svg>
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto flex flex-col items-center gap-10 text-center">
+<span class="text-[10px] font-mono uppercase tracking-widest text-black/40">İletişime Geçin</span>
+<a class="text-[11vw] md:text-[7vw] leading-[0.95] font-bold tracking-tighter text-black break-all hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">HELLO@IONA.COM</a>
+<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 mt-6 fade-in-element">
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.privacy"></a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.terms"></a>
+<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.impact_report"></a>
 </div>
-<div class="flex flex-col gap-2 fade-in-element delay-100">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Yasal</span>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.privacy"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.terms"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.impact_report"></a>
-</div>
-<div class="flex flex-col gap-2 md:items-end md:text-right fade-in-element delay-200">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/50">Iona</span>
-<p class="text-sm text-black/60 max-w-[240px]">Where advanced fluid dynamics meet accelerated return on investment.</p>
-</div>
-</div>
-<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4">
-<h2 class="text-[16vw] leading-[0.8] font-bold tracking-tighter text-black select-none" aria-hidden="true">iona</h2>
-<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/50 whitespace-nowrap pb-2" data-i18n="footer.copyright"></p>
-</div>
+<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/50 mt-8" data-i18n="footer.copyright"></p>
 </div>
 </footer>
 

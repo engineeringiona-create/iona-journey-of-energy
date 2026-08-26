@@ -13,6 +13,13 @@
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<!-- Phase 91: MPA curtain page transition. Base CSS state already
+     covers the viewport with no flash (no JS needed for that part); JS
+     reveals it on load and re-covers before any internal link navigates.
+     See initPageCurtain in common.js and #iona-curtain in base.css. -->
+<div id="iona-curtain" aria-hidden="true">
+<span class="iona-wordmark-text" style="font-size:32px">iona</span>
+</div>
 <!-- Phase 90: sitewide living DNA/helix watermark — fixed, z-index:0,
      first in body (see .iona-dna-bg in base.css for why not z-[-1]).
      Same pattern the hero used to own alone (Phase 87); now global. -->
@@ -113,7 +120,7 @@
      trick index.html's hero relies on). Typography, spacing rhythm and
      corner-radius language are unchanged from the light pages; only
      color is re-themed. Iona's own brand-orange stays the action color
-     (CTAs), matching every other page — Iona Green (#22703c) is layered
+     (CTAs), matching every other page — Iona Green (#2d9937) is layered
      in specifically for glows, hairline borders and active states, per
      the brand-aligned dark mode brief, not swapped in for actions. -->
 <section class="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-24 px-safe-margin-mobile md:px-safe-margin-desktop ionaflux-titanium-bg fade-in-section" id="flux-hero">
@@ -137,7 +144,7 @@
 
 <!-- Live monitoring: full-width image reveal, not a split — the first
      of several deliberately different section families on this page. -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#22703c]/35 fade-in-section" id="flux-live">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#2d9937]/35 fade-in-section" id="flux-live">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <div class="max-w-2xl fade-in-element">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="flux.live.eyebrow">Canlı İzleme</span>
@@ -213,7 +220,7 @@
 <!-- Fleet: data-only stats band, mirroring teknoloji.html's Performance
      Metrics section exactly — no screenshot at all, the strongest visual
      contrast to the image-heavy sections above. -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#22703c]/35 fade-in-section" id="flux-fleet">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#2d9937]/35 fade-in-section" id="flux-fleet">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="flux.fleet.eyebrow">Çoklu Tesis</span>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm max-w-2xl fade-in-element" data-i18n="flux.fleet.title">Tek Panelden, Birbirinden İzole Yönetilen Tesisler.</h2>
@@ -253,30 +260,22 @@
 <!-- Footer: pinned to the same fixed dark surface as the sections above
      so there's no seam at the bottom when the site itself is in light
      mode (footer is normally bg-transparent, inheriting var(--bg)). -->
-<footer class="bg-black border-t border-white/10 px-safe-margin-mobile md:px-safe-margin-desktop pt-16 pb-8 fade-in-section" id="site-footer">
-<div class="max-w-[theme(spacing.container-max)] mx-auto">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-b border-white/10 py-8 mb-8">
-<div class="flex flex-col gap-2 fade-in-element">
-<span class="text-[10px] font-mono uppercase tracking-widest text-white/50">Menü</span>
-<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
-<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
-<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<footer class="relative bg-black border-t border-white/10 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
+<svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
+<path class="footer-curve-path" d="M-50 60 C 350 260, 1050 -60, 1450 340" stroke="#ffc700" stroke-width="2" fill="none" pathLength="1000"></path>
+</svg>
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto flex flex-col items-center gap-10 text-center">
+<span class="text-[10px] font-mono uppercase tracking-widest text-white/40">İletişime Geçin</span>
+<a class="text-[11vw] md:text-[7vw] leading-[0.95] font-bold tracking-tighter text-white break-all hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">HELLO@IONA.COM</a>
+<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 mt-6 fade-in-element">
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.privacy"></a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.terms"></a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.impact_report"></a>
 </div>
-<div class="flex flex-col gap-2 fade-in-element delay-100">
-<span class="text-[10px] font-mono uppercase tracking-widest text-white/50">Yasal</span>
-<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.privacy"></a>
-<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.terms"></a>
-<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.impact_report"></a>
-</div>
-<div class="flex flex-col gap-2 md:items-end md:text-right fade-in-element delay-200">
-<span class="text-[10px] font-mono uppercase tracking-widest text-white/50">Iona</span>
-<p class="text-sm text-white/60 max-w-[240px]">Where advanced fluid dynamics meet accelerated return on investment.</p>
-</div>
-</div>
-<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4">
-<h2 class="text-[16vw] leading-[0.8] font-bold tracking-tighter text-white select-none" aria-hidden="true">iona</h2>
-<p class="font-label-caps text-[11px] uppercase tracking-widest text-white/50 whitespace-nowrap pb-2" data-i18n="footer.copyright"></p>
-</div>
+<p class="font-label-caps text-[11px] uppercase tracking-widest text-white/50 mt-8" data-i18n="footer.copyright"></p>
 </div>
 </footer>
 

@@ -1,4 +1,4 @@
-import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll } from '../common.js';
+import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { initExpoScene } from '../three/expo-scene.js';
@@ -6,6 +6,8 @@ import { initServicesShowcase } from '../lib/servicesShowcase.js';
 
 await initI18n();
 initSmoothScroll();
+initPageCurtain();
+initFooterCurve();
 initLangSwitcher();
 initQuoteModal();
 initFadeIn();
