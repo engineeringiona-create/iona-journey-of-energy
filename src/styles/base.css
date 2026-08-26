@@ -954,20 +954,37 @@ html {
     border-left-color: var(--brand);
 }
 
-/* Intro preloader (Phase 77): fixed dark-titanium backdrop, independent of the
-   site's light/dark toggle — a deliberate departure from the previous
-   theme-following preloader, matching the new brand-launch spec exactly.
+/* Real wordmark, not an image: swapped in after the first hand-drawn SVG
+   mark didn't read as "iona" at all next to the reference lockup. Quicksand
+   is the closest widely-available rounded geometric sans to that reference
+   (soft terminals, single-story a) — plain styled text stays crisp at every
+   size and never needs re-drawing again. */
+.iona-wordmark-text {
+    font-family: 'Quicksand', 'Inter', sans-serif;
+    font-weight: 700;
+    color: #3fae66;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    display: inline-block;
+}
+
+/* Intro preloader (Phase 77): follows the active light/dark theme via
+   var(--bg)/var(--brand) again — reverted from the first pass's fixed dark
+   titanium backdrop after explicit user correction; the site's own
+   theme-following behavior wins over the phase brief's literal hex value.
    Scroll stays locked for as long as #preloader exists in the DOM; no JS
-   class needed before first paint. Letter stroke-draw + fill-settle timing
-   is driven by GSAP in main-anasayfa.js (id-targeted, see runPreloader());
-   the CSS below only owns the static look, the bubble drift loop, the
-   slogan shimmer, and the exit-dissolve state. */
+   class needed before first paint. The mark is real Quicksand text now
+   (see .iona-wordmark-text above), not hand-drawn SVG line art, so the
+   per-letter reveal is a blur/opacity/rise-in rather than a literal
+   stroke-draw; timing is driven by GSAP in main-anasayfa.js (id-targeted,
+   see runPreloader()). The CSS below only owns the static look, the bubble
+   drift loop, the slogan shimmer, and the exit-dissolve state. */
 body:has(#preloader) {
     overflow: hidden;
 }
 
 #preloader {
-    background: #0A0F1A;
+    background-color: var(--bg);
 }
 
 #preloader.is-leaving {
@@ -978,16 +995,36 @@ body:has(#preloader) {
 }
 
 #preloader-glow {
-    background: radial-gradient(circle, rgba(63, 174, 102, 0.35), transparent 70%);
+    background-color: var(--brand);
+    opacity: 0.22;
+}
+
+:root.dark #preloader-glow {
+    opacity: 0.32;
+}
+
+.preloader-wordmark {
+    font-size: 44px;
+    display: flex;
+}
+
+@media (min-width: 768px) {
+    .preloader-wordmark {
+        font-size: 56px;
+    }
 }
 
 .preloader-letter {
     opacity: 0;
+    filter: blur(6px);
+    transform: translateY(10px);
 }
 
-.preloader-letter.is-drawing,
-.preloader-letter.is-filled {
+.preloader-letter.is-in {
     opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+    transition: opacity 380ms ease-out, filter 380ms ease-out, transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .preloader-slogan {
@@ -1036,8 +1073,7 @@ body:has(#preloader) {
     width: 6px;
     height: 6px;
     border-radius: 9999px;
-    background: #3fae66;
-    box-shadow: 0 0 8px 1px rgba(63, 174, 102, 0.65);
+    background: var(--brand);
     opacity: 0;
     animation: preloader-rise 4.2s ease-in infinite;
 }

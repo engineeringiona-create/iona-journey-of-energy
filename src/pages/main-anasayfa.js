@@ -19,16 +19,16 @@ initParallax();
 initCardSpotlight();
 
 /* ---------------- Intro preloader (Phase 77: IonaPreloader) ----------------
-   Sequential i -> o -> n -> a stroke-draw (SVG pathLength=1 normalizes every
-   shape's dash math to 0..1 regardless of its real geometry, so one tween
-   shape covers a circle, a line, and a curved path alike), a quick
-   back.out "settle" scale standing in for an oil-paint fill pass, then the
-   slogan shimmers in. Exit waits for both a minimum read-time AND the
-   window 'load' event (this is a static multi-page site with no client
-   hydration step, so 'load' is the closest equivalent to "asset-hydration
-   ready"), capped by a safety timeout so a slow asset can never strand the
-   preloader on screen. The dissolve itself is a pure CSS class
-   (#preloader.is-leaving) so it never fights this timeline. */
+   The mark is real Quicksand text (.iona-wordmark-text), not hand-drawn SVG
+   line art — an earlier stroke-draw version looked nothing like the actual
+   iona logo, so this reveals the four letters in sequence with a
+   blur/opacity/rise-in instead (CSS transition on .preloader-letter.is-in,
+   see base.css), then the slogan shimmers in. Exit waits for both a minimum
+   read-time AND the window 'load' event (this is a static multi-page site
+   with no client hydration step, so 'load' is the closest equivalent to
+   "asset-hydration ready"), capped by a safety timeout so a slow asset can
+   never strand the preloader on screen. The dissolve itself is a pure CSS
+   class (#preloader.is-leaving) so it never fights this timeline. */
 function runPreloader() {
   const preloader = document.getElementById('preloader');
   if (!preloader) return;
@@ -48,28 +48,12 @@ function runPreloader() {
     transformOrigin: '50% 50%'
   });
 
-  const STEP = 0.36;
-  const tl = gsap.timeline();
+  const STEP = 0.22;
   letters.forEach((letter, i) => {
-    const strokes = letter.querySelectorAll('[pathLength]');
-    const t = i * STEP;
-    tl.call(() => letter.classList.add('is-drawing'), null, t);
-    tl.fromTo(
-      strokes,
-      { strokeDashoffset: 1, strokeDasharray: 1 },
-      { strokeDashoffset: 0, duration: 0.34, ease: 'power2.inOut', stagger: 0.03 },
-      t
-    );
-    tl.fromTo(
-      letter,
-      { scale: 0.92, transformOrigin: '50% 50%' },
-      { scale: 1, duration: 0.22, ease: 'back.out(2.4)' },
-      t + 0.26
-    );
-    tl.call(() => letter.classList.add('is-filled'), null, t + 0.32);
+    gsap.delayedCall(i * STEP, () => letter.classList.add('is-in'));
   });
-  const sloganAt = letters.length * STEP + 0.1;
-  tl.call(() => slogan.classList.add('is-in'), null, sloganAt);
+  const sloganAt = letters.length * STEP + 0.15;
+  gsap.delayedCall(sloganAt, () => slogan.classList.add('is-in'));
 
   const minVisibleMs = (sloganAt + 0.55) * 1000;
 

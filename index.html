@@ -12,17 +12,16 @@
 <link rel="icon" type="image/svg+xml" href="/images/iona-icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
-<!-- Intro Preloader: fixed dark-titanium backdrop (always dark, independent of
-     the site's light/dark toggle — an intentional departure from the old
-     theme-following preloader, per the new brand-launch spec) with a
-     letter-by-letter stroke-draw of the iona wordmark and drifting bio-bubbles.
-     Scroll is locked for as long as this element exists in the DOM via the
-     body:has(#preloader) rule in base.css — no JS race to add/remove a lock
-     class before first paint. -->
+<!-- Intro Preloader: follows the site's light/dark theme via var(--bg)/
+     var(--brand) (set on <html> before first paint by the inline script
+     above), same as before Phase 77. Scroll is locked for as long as this
+     element exists in the DOM via the body:has(#preloader) rule in
+     base.css — no JS race to add/remove a lock class before first paint. -->
 <div class="fixed inset-0 z-[100] flex items-center justify-center" id="preloader">
 <div class="preloader-bubbles" aria-hidden="true">
 <span class="preloader-bubble"></span>
@@ -36,36 +35,19 @@
 </div>
 <div class="relative flex flex-col items-center gap-5">
 <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-3xl -z-10" id="preloader-glow" aria-hidden="true"></div>
-<svg id="preloader-wordmark" class="relative w-[200px] md:w-[260px] h-auto" viewBox="-8 -6 219 100" fill="none" aria-hidden="true">
-<defs>
-<linearGradient id="preloaderGrad" x1="0" y1="0" x2="211" y2="94" gradientUnits="userSpaceOnUse">
-<stop offset="0" stop-color="#4fc47e"></stop>
-<stop offset="1" stop-color="#1B833E"></stop>
-</linearGradient>
-</defs>
-<g class="preloader-letter" id="pl-letter-i">
-<circle cx="17" cy="13" r="8" fill="url(#preloaderGrad)"></circle>
-<line x1="17" y1="30" x2="17" y2="78" stroke="url(#preloaderGrad)" stroke-width="14" stroke-linecap="round" pathLength="1"></line>
-</g>
-<g class="preloader-letter" id="pl-letter-o">
-<circle cx="60" cy="54" r="22" fill="none" stroke="url(#preloaderGrad)" stroke-width="14" pathLength="1"></circle>
-</g>
-<g class="preloader-letter" id="pl-letter-n">
-<path d="M95,78 L95,40 Q95,28 110,28 Q125,28 125,40 L125,78" fill="none" stroke="url(#preloaderGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" pathLength="1"></path>
-</g>
-<g class="preloader-letter" id="pl-letter-a">
-<path d="M125,72 Q134,82 143,70" fill="none" stroke="url(#preloaderGrad)" stroke-width="7" stroke-linecap="round" opacity="0.85" pathLength="1"></path>
-<circle cx="163" cy="54" r="20" fill="none" stroke="url(#preloaderGrad)" stroke-width="14" pathLength="1"></circle>
-<line x1="183" y1="38" x2="183" y2="78" stroke="url(#preloaderGrad)" stroke-width="14" stroke-linecap="round" pathLength="1"></line>
-</g>
-</svg>
+<div class="iona-wordmark-text preloader-wordmark" aria-hidden="true">
+<span class="preloader-letter" id="pl-letter-i">i</span>
+<span class="preloader-letter" id="pl-letter-o">o</span>
+<span class="preloader-letter" id="pl-letter-n">n</span>
+<span class="preloader-letter" id="pl-letter-a">a</span>
+</div>
 <p class="preloader-slogan" id="preloader-slogan">Simply, <span>Engineered!</span></p>
 </div>
 </div>
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex justify-between items-center px-safe-margin-desktop py-5 transition-all duration-500 hidden md:flex" id="top-nav">
 <a class="flex flex-col leading-none gap-1 hover:opacity-80 transition-opacity duration-300" href="/">
-<img src="/images/iona-wordmark.svg" alt="iona" width="112" height="36" class="h-8 w-auto">
+<span class="iona-wordmark-text" style="font-size:26px">iona</span>
 <span class="font-label-caps text-[8px] tracking-[0.14em] text-[var(--text-muted)]" data-i18n="nav.tagline">SIMPLY, ENGINEERED</span>
 </a>
 <div class="flex items-center gap-6">
@@ -117,7 +99,7 @@
 <!-- Mobile nav: hamburger + dropdown (desktop nav above is hidden md:flex) -->
 <nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex md:hidden justify-between items-center px-safe-margin-mobile py-4" id="mobile-nav">
 <a class="flex items-center" href="/">
-<img src="/images/iona-wordmark.svg" alt="iona" width="93" height="30" class="h-7 w-auto">
+<span class="iona-wordmark-text" style="font-size:21px">iona</span>
 </a>
 <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
 <span class="material-symbols-outlined text-[26px]" id="mobile-nav-icon">menu</span>
@@ -465,7 +447,7 @@
 <!-- Footer -->
 <footer class="bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
 <div class="flex items-center gap-3 fade-in-element">
-<img src="/images/iona-wordmark.svg" alt="iona" width="75" height="24" class="h-5 w-auto opacity-70">
+<span class="iona-wordmark-text opacity-70" style="font-size:16px">iona</span>
 <p class="font-label-caps text-label-caps text-[var(--text-muted)]" data-i18n="footer.copyright"></p>
 </div>
 <div class="flex gap-6 fade-in-element">

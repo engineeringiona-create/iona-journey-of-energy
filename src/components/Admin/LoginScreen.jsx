@@ -21,7 +21,7 @@ export default function LoginScreen({ onSuccess }) {
     <div className="min-h-screen w-full flex items-center justify-center bg-[var(--bg)] px-6">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <img src="/images/iona-wordmark.svg" alt="iona" width="140" height="45" className="h-10 w-auto mb-3" />
+          <span className="iona-wordmark-text mb-3" style={{ fontSize: '34px' }}>iona</span>
           <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--text)]">
             <span className="text-[var(--brand)]">Admin</span>
           </h1>

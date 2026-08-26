@@ -8,13 +8,14 @@
 <link rel="stylesheet" href="/src/styles/tailwind.css">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex justify-between items-center px-safe-margin-desktop py-5 transition-all duration-500 hidden md:flex" id="top-nav">
 <a class="flex flex-col leading-none gap-1 hover:opacity-80 transition-opacity duration-300" href="/">
-<img src="/images/iona-wordmark.svg" alt="iona" width="112" height="36" class="h-8 w-auto">
+<span class="iona-wordmark-text" style="font-size:26px">iona</span>
 <span class="font-label-caps text-[8px] tracking-[0.14em] text-[var(--text-muted)]" data-i18n="nav.tagline">SIMPLY, ENGINEERED</span>
 </a>
 <div class="flex items-center gap-6">
@@ -66,7 +67,7 @@
 <!-- Mobile nav: hamburger + dropdown (desktop nav above is hidden md:flex) -->
 <nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex md:hidden justify-between items-center px-safe-margin-mobile py-4" id="mobile-nav">
 <a class="flex items-center" href="/">
-<img src="/images/iona-wordmark.svg" alt="iona" width="93" height="30" class="h-7 w-auto">
+<span class="iona-wordmark-text" style="font-size:21px">iona</span>
 </a>
 <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
 <span class="material-symbols-outlined text-[26px]" id="mobile-nav-icon">menu</span>
@@ -238,7 +239,7 @@
      mode (footer is normally bg-transparent, inheriting var(--bg)). -->
 <footer class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
 <div class="flex items-center gap-3 fade-in-element">
-<img src="/images/iona-wordmark.svg" alt="iona" width="75" height="24" class="h-5 w-auto opacity-70">
+<span class="iona-wordmark-text opacity-70" style="font-size:16px">iona</span>
 <p class="font-label-caps text-label-caps text-neutral-500" data-i18n="footer.copyright"></p>
 </div>
 <div class="flex gap-6 fade-in-element">
