@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { ContactShadows, Grid, Html, OrbitControls, useGLTF } from '@react-three/drei';
+import { ContactShadows, Grid, Html, Line, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { reduceMotion } from '../../three/scene-utils.js';
@@ -1190,17 +1190,20 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         uniformsList.push(attachHoverWormShader(wallMaterial));
         structureNamedMaterials.set(DIGESTER_WALL_MESH_NAME, wallMaterial);
 
-        /* Glossy painted-metal dome — reference render shows a strong
-           specular highlight and visible panel-seam shading, quite
-           different from the matte clay used everywhere else. Keeps
-           clearcoat (unlike the wall) since the dome reads as a smooth
-           painted/coated cap, not bare trapez sac. */
+        /* Phase 81: brushed satin aluminium instead of the earlier
+           glossy painted-metal clearcoat look — bare metal with a
+           directional (anisotropic) brush pattern rather than a smooth
+           painted/coated cap, per the architectural-makeover spec's own
+           roughness/metalness numbers. anisotropyRotation runs the
+           brush lines circumferentially around the dome (matching a
+           real rolled/brushed aluminium cap) rather than radially. No
+           clearcoat: satin brushed metal, not a lacquered finish. */
         const domeMaterial = new THREE.MeshPhysicalMaterial({
-          color: '#e4e4e2',
-          metalness: 0.3,
-          roughness: 0.22,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.08,
+          color: '#d7d9da',
+          metalness: 0.7,
+          roughness: 0.35,
+          anisotropy: 0.55,
+          anisotropyRotation: Math.PI / 2,
           depthWrite: true,
           depthTest: true,
         });
@@ -2102,16 +2105,20 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
         blur={2}
         color="#2e2e2e"
       />
-      {/* Faint architectural/engineering floor grid so the facility reads
-         as grounded on a surface instead of floating in a white void,
-         now that the solid grey base disc is gone. Sits a hair below the
-         contact-shadow plane (same groundY) to avoid z-fighting between
-         the two coplanar meshes. Rotated flat the same way the old
-         circular base mesh was (-90° on X — PlaneGeometry is vertical,
-         XY-facing, by default). cellSize/sectionSize scaled up from
-         drei's defaults (0.5/1) to suit this facility's real ~90x78
-         unit footprint — the defaults would read as visual noise at
-         this scale. */}
+      {/* Phase 81 architectural floor: razor-thin, low-opacity CAD axis
+         lines on the porcelain backdrop (#iona-digital-twin-root's own
+         background, see base.css — the R3F canvas itself stays
+         transparent) instead of the previous mid-grey engineering grid.
+         Colors match the site's own slate-200/300 hairline family
+         (Phase 80/83) rather than drei's defaults, so the floor reads as
+         part of the same architectural-print system as the hero copy
+         around it. Sits a hair below the contact-shadow plane (same
+         groundY) to avoid z-fighting between the two coplanar meshes.
+         Rotated flat the same way the old circular base mesh was (-90°
+         on X — PlaneGeometry is vertical, XY-facing, by default).
+         cellSize/sectionSize scaled up from drei's defaults (0.5/1) to
+         suit this facility's real ~90x78 unit footprint — the defaults
+         would read as visual noise at this scale. */}
       <Grid
         position={[0, groundY - 0.01, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -2120,12 +2127,29 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
         fadeDistance={30}
         fadeStrength={1}
         cellSize={2}
-        cellThickness={0.6}
-        cellColor="#d4d4d4"
+        cellThickness={0.5}
+        cellColor="#e2e8f0"
         sectionSize={10}
-        sectionThickness={1}
-        sectionColor="#b5b5b5"
+        sectionThickness={0.8}
+        sectionColor="#cbd5e1"
       />
+      {/* CAD crosshair coordinate mark at the plant origin — the same
+         "pafta stamp" motif as the hero's corner coordinate/REF labels
+         (index.html), just placed in-scene instead of as a DOM overlay. */}
+      <group position={[0, groundY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <Line points={[[-3.2, 0, 0], [3.2, 0, 0]]} color="#cbd5e1" lineWidth={1} transparent opacity={0.7} />
+        <Line points={[[0, -3.2, 0], [0, 3.2, 0]]} color="#cbd5e1" lineWidth={1} transparent opacity={0.7} />
+        <Line
+          points={Array.from({ length: 33 }, (_, i) => {
+            const a = (i / 32) * Math.PI * 2;
+            return [Math.cos(a) * 1.4, Math.sin(a) * 1.4, 0];
+          })}
+          color="#cbd5e1"
+          lineWidth={1}
+          transparent
+          opacity={0.7}
+        />
+      </group>
     </>
   );
 });
@@ -2442,6 +2466,13 @@ export default function GltfTwinScene() {
           shadow-bias={-0.0005}
         />
         <directionalLight position={[-25, 15, -20]} intensity={0.4} />
+        {/* Phase 81: third light in the studio setup — a low, cool rim/
+           back light tinted the same brand emerald as the hover-rim
+           shader (HOVER_WORM_COLOR_A) for a subtle edge-bounce along
+           structure silhouettes, instead of a flat key+fill render. No
+           shadow casting: rim lights are about edge highlight, not
+           occlusion, in a real studio setup either. */}
+        <directionalLight position={[-10, 12, -35]} intensity={0.35} color="#3fae66" />
 
         <Model
           plantRootRef={plantRootRef}
