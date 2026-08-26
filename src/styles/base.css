@@ -126,75 +126,217 @@ html {
     }
 }
 
-/* ---------------- Mobile nav (hamburger + dropdown panel) ----------------
-   A separate, self-contained bar shown only below the md breakpoint.
-   The desktop nav (#top-nav) stays `hidden md:flex` and never renders
-   here, so there's no id collision with its search/language/theme
-   widgets — this bar only needs the logo, a menu toggle, and links. */
+/* ---------------- Phase 89: fullscreen MNBAQ mega menu ----------------
+   Was a small dropdown card shown only below md (a separate desktop nav
+   handled the wide-viewport case with its own inline search/lang/links
+   cluster) — now the ONE nav overlay at every breakpoint, so it also
+   owns the search widget, language switcher, and theme toggle folded
+   in from the old desktop bar (see index.html's #mobile-nav-panel).
+   Class names (.mobile-nav-*) and the toggle/panel/icon IDs are kept
+   from the old mobile-only version on purpose: initMobileNav in
+   common.js already opens/closes this correctly via `.is-open`, and
+   every page's entry script already calls it. Sizing/weight utilities
+   (text-6xl, font-bold, ...) live on the elements in HTML, not here —
+   base.css loads after tailwind.css (see the text-headline-md note
+   above), so any font-size/weight set here would silently win over
+   those Tailwind classes; this block only owns structural/animation
+   properties. */
 .mobile-nav-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
-    color: var(--text);
+    color: #000000;
 }
 
 .mobile-nav-panel {
     position: fixed;
-    top: 72px;
-    left: 0;
-    right: 0;
+    inset: 0;
     z-index: 49;
-    max-height: 0;
-    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    background: #ffffff;
     opacity: 0;
-    transform: translateY(-8px) translateZ(0);
-    transition: max-height 400ms ease, opacity 300ms ease, transform 300ms ease;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    box-shadow: 0 25px 60px -25px rgba(20, 24, 20, 0.35);
-    will-change: transform, opacity;
-    backface-visibility: hidden;
+    visibility: hidden;
+    overflow-y: auto;
+    transition: opacity 400ms ease, visibility 0s linear 400ms;
 }
 
 .mobile-nav-panel.is-open {
-    max-height: 520px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 400ms ease, visibility 0s linear 0s;
+}
+
+.mobile-nav-panel-inner {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 140px 32px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+}
+
+/* Staggered slide-up reveal, per spec's cubic-bezier(0.76,0,0.24,1) —
+   pure CSS (transition-delay per nth-child) rather than a JS timeline,
+   since the open/close state is already a single class toggle. */
+.mobile-nav-link {
+    display: block;
+    padding: 10px 0;
+    color: #000000;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    opacity: 0;
+    transform: translateY(28px);
+    transition: color 300ms ease, opacity 550ms cubic-bezier(0.76, 0, 0.24, 1), transform 550ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.mobile-nav-link:hover {
+    color: #2d9937;
+}
+
+.mobile-nav-link.is-current {
+    color: #2d9937;
+}
+
+.mobile-nav-panel.is-open .mobile-nav-link {
     opacity: 1;
     transform: translateY(0);
 }
 
-.mobile-nav-link {
-    display: block;
-    padding: 16px 24px;
-    font-family: Arial, sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.01em;
-    color: var(--text);
-    border-bottom: 1px solid var(--border);
-    transition: color 300ms ease;
+.mobile-nav-panel.is-open .mobile-nav-link:nth-child(1) { transition-delay: 60ms; }
+.mobile-nav-panel.is-open .mobile-nav-link:nth-child(2) { transition-delay: 110ms; }
+.mobile-nav-panel.is-open .mobile-nav-link:nth-child(3) { transition-delay: 160ms; }
+.mobile-nav-panel.is-open .mobile-nav-link:nth-child(4) { transition-delay: 210ms; }
+.mobile-nav-panel.is-open .mobile-nav-link:nth-child(5) { transition-delay: 260ms; }
+.mobile-nav-panel.is-open .mobile-nav-link:nth-child(6) { transition-delay: 310ms; }
+.mobile-nav-panel.is-open .mobile-nav-link:nth-child(7) { transition-delay: 360ms; }
+
+/* Folded-in utility cluster (search / language / theme) below the big
+   links — small, quiet, deliberately not competing with the massive
+   nav-link typography above it. */
+.mobile-nav-utility {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-.mobile-nav-link.is-current {
-    color: var(--brand);
+.mobile-nav-utility-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.mobile-nav-utility-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mobile-nav-utility-btn:hover {
+    color: #2d9937;
+}
+
+.mobile-nav-search-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 12px;
+    z-index: 1;
+}
+
+.mobile-nav-search-input {
+    width: 100%;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #000000;
+}
+
+.mobile-nav-search-input:focus {
+    outline: none;
+    border-color: #2d9937;
+}
+
+.mobile-nav-search-results {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.mobile-nav-search-results a {
+    display: block;
+    padding: 8px 6px;
+    font-size: 14px;
+    color: #000000;
+}
+
+.mobile-nav-search-results a:hover {
+    color: #2d9937;
+}
+
+.mobile-nav-lang-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+    z-index: 1;
+}
+
+.mobile-nav-lang-panel button {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 14px;
+    color: #000000;
+}
+
+.mobile-nav-lang-panel button:hover {
+    color: #2d9937;
 }
 
 .mobile-nav-cta {
-    display: block;
-    margin: 16px 24px 20px;
-    padding: 14px;
-    border-radius: 999px;
+    display: inline-block;
+    margin-top: 8px;
+    padding: 16px 32px;
     text-align: center;
-    background: var(--brand-orange);
+    background: #000000;
     color: #ffffff;
-    font-family: Arial, sans-serif;
     font-weight: 700;
     font-size: 14px;
+    letter-spacing: 0.02em;
+    width: fit-content;
+    transition: background-color 300ms ease;
+}
+
+.mobile-nav-cta:hover {
+    background: #2d9937;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .mobile-nav-panel { transition: none; }
+    .mobile-nav-panel,
+    .mobile-nav-link {
+        transition: none;
+    }
 }
 
 /* ---------------- Theme toggle switch ---------------- */
@@ -600,6 +742,61 @@ html {
     color: #000000;
 }
 
+/* Phase 89: Services Exhibition rows — a full-width numbered list, not
+   cards. Grid instead of flex so the number/title/description columns
+   line up across all 4 rows regardless of how long each title/desc
+   runs. Hover swaps #services-exhibit-image's src via
+   initServicesExhibition (main-anasayfa.js); the row itself only owns
+   the text-side hover feedback (color + number). */
+.services-exhibit-row {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 8px 24px;
+    align-items: baseline;
+    padding: 28px 0;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    color: #000000;
+}
+
+#services-exhibit-list a.services-exhibit-row:last-child {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.services-exhibit-number {
+    font-family: monospace;
+    font-size: 14px;
+    color: #2d9937;
+    font-weight: 700;
+}
+
+.services-exhibit-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    transition: color 250ms ease;
+}
+
+.services-exhibit-desc {
+    grid-column: 2;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.55);
+    max-width: 640px;
+}
+
+@media (min-width: 1024px) {
+    .services-exhibit-row {
+        grid-template-columns: 80px 1fr 340px;
+    }
+    .services-exhibit-desc {
+        grid-column: 3;
+        align-self: center;
+    }
+}
+
+.services-exhibit-row:hover .services-exhibit-title {
+    color: #2d9937;
+}
+
 /* Phase 88: custom "identity cursor" — morphs into the brand's circle+
    ring motif over the 3D canvas and the hero CTA (see initCustomCursor
    in main-anasayfa.js). Hidden/scaled-to-0 by default, not display:none,
@@ -866,15 +1063,6 @@ html {
 
 .link-underline:hover::after {
     transform: scaleX(1);
-}
-
-/* Primary nav only: the underline pops in brand orange rather than
-   following currentColor (green, same as the hover text). Every other
-   .link-underline usage sitewide (CTAs, footer, body copy) is untouched —
-   this is a deliberate, scoped accent so orange reads as "navigation",
-   not sprinkled everywhere. */
-#top-nav .link-underline::after {
-    background: var(--brand-orange);
 }
 
 /* ---------------- Card hover spotlight ----------------

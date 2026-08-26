@@ -172,7 +172,11 @@ function initCustomCursor() {
     { passive: true }
   );
 
-  document.querySelectorAll('.iona-cursor-target').forEach((el) => {
+  /* Phase 89: widened from just the hero CTA/3D canvas to every
+     clickable item worth calling out — the mega-menu's own big links
+     and the services exhibition rows, both index.html-only elements
+     added this phase. */
+  document.querySelectorAll('.iona-cursor-target, .mobile-nav-link, .mobile-nav-cta, .services-exhibit-row').forEach((el) => {
     el.addEventListener('mouseenter', () => cursor.classList.add('is-active'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('is-active'));
   });
@@ -202,6 +206,32 @@ function initMagneticButtons() {
   });
 }
 initMagneticButtons();
+
+/* ---------------- Phase 89: Services Exhibition hover reveal ----------------
+   Swaps the floating #services-exhibit-image's src to whichever row's
+   own data-image is hovered (desktop only — see index.html's `hidden
+   lg:block` on the image itself; wiring listeners on touch devices
+   would just fire on tap-scroll with nothing useful for the visitor to
+   see). Fades out entirely on mouseleave rather than reverting to a
+   "default" row so nothing is left looking hovered on the way out. */
+function initServicesExhibition() {
+  const image = document.getElementById('services-exhibit-image');
+  const rows = document.querySelectorAll('.services-exhibit-row');
+  if (!image || !rows.length) return;
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  rows.forEach((row) => {
+    row.addEventListener('mouseenter', () => {
+      const src = row.getAttribute('data-image');
+      if (src) image.src = src;
+      image.style.opacity = '1';
+    });
+    row.addEventListener('mouseleave', () => {
+      image.style.opacity = '0';
+    });
+  });
+}
+initServicesExhibition();
 
 /* ---------------- Services: stagger fade-in on scroll ---------------- */
 function initServiceCards() {

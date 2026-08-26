@@ -14,81 +14,74 @@
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
 <!-- TopNavBar -->
-<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex justify-between items-center px-safe-margin-desktop py-5 transition-all duration-500 hidden md:flex" id="top-nav">
-<a class="flex flex-col leading-none gap-1 hover:opacity-80 transition-opacity duration-300" href="/">
-<span class="iona-wordmark-text" style="font-size:26px">iona</span>
-<span class="font-label-caps text-[8px] tracking-[0.14em] text-[var(--text-muted)]" data-i18n="nav.tagline">SIMPLY, ENGINEERED</span>
+<!-- Phase 89: MNBAQ minimalist nav -- one unified bar (logo + MENU
+     trigger) at every breakpoint, replacing the old two-nav setup (an
+     always-desktop bar with inline search/lang/links, plus a separate
+     mobile-only hamburger). Search, language switcher and theme toggle
+     aren't gone -- they're folded into the fullscreen overlay this
+     trigger opens. IDs below (mobile-nav-toggle/panel/icon) are kept
+     from the old mobile-only bar on purpose: initMobileNav in
+     common.js already wires these up correctly and every page's entry
+     script already calls it, so reusing them avoids touching all 7
+     pages' scripts for a purely cosmetic rename. Active-link
+     highlighting is computed at runtime from location.pathname (see
+     initMobileNav) instead of hardcoded per page. -->
+<nav class="fixed top-0 w-full z-50 bg-white border-b border-slate-200 flex justify-between items-center px-safe-margin-mobile md:px-safe-margin-desktop py-5" id="mobile-nav">
+<a class="flex items-center" href="/">
+<span class="iona-wordmark-text" style="font-size:24px;color:#000">iona</span>
 </a>
-<div class="flex items-center gap-6">
-<div class="h-6 w-px bg-[var(--border)]"></div>
-<div class="relative">
-<button class="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="nav-search-toggle" type="button" data-i18n-aria-label="nav.search">
-<span class="material-symbols-outlined text-[20px]">search</span>
-<span class="font-label-caps text-[13px] font-bold tracking-[0.08em]" data-i18n="nav.search">Ara</span>
+<button class="flex items-center gap-3" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
+<span class="font-label-caps text-[13px] font-bold tracking-[0.2em] text-black">MENU</span>
+<span class="material-symbols-outlined text-[26px] text-black" id="mobile-nav-icon">menu</span>
 </button>
-<div class="hidden absolute top-12 left-1/2 -translate-x-1/2 w-80 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-4" id="nav-search-panel">
-<input class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-lg px-4 py-2.5 text-[14px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" id="nav-search-input" type="text" data-i18n-placeholder="nav.search_placeholder">
-<div class="mt-3 flex flex-col gap-1 max-h-64 overflow-y-auto" id="nav-search-results"></div>
-</div>
-</div>
-<div class="relative">
-<button class="flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-300" id="lang-toggle" type="button" aria-label="Dil / Language">
-<span class="material-symbols-outlined text-[20px]">language</span>
-<span class="font-label-caps text-[12px] font-bold tracking-[0.05em]" id="lang-current">TR</span>
-</button>
-<div class="hidden absolute top-12 right-0 w-44 bg-[var(--surface)] border border-[var(--border-strong)] rounded-xl shadow-[0_25px_60px_-25px_rgba(20,24,20,0.35)] p-2" id="lang-panel">
-<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="tr">Türkçe</button>
-<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="en">English</button>
-<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="de">Deutsch</button>
-<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="es">Español</button>
-<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="fr">Français</button>
-<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="ru">Русский</button>
-<button class="w-full text-left px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200" type="button" data-lang="hi">हिन्दी</button>
-</div>
-</div>
-<div class="h-6 w-px bg-[var(--border)]"></div>
-<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/" data-i18n="nav.home">Anasayfa</a>
-<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
-<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
-<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
-<a class="inline-flex items-center gap-1.5 rounded-full pl-2.5 pr-3.5 py-1.5 font-label-caps text-[12px] tracking-[0.06em] font-bold bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/25 hover:bg-[var(--brand)]/15 hover:border-[var(--brand)]/40 transition-colors duration-300" href="/ionaflux.html" aria-current="page"><span class="material-symbols-outlined text-[15px]">bolt</span><span data-i18n="nav.ionaflux">IonaFlux</span></a>
-<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
-<a class="font-label-caps text-[13px] tracking-[0.08em] font-bold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 link-underline" href="/duyurular.html" data-i18n="nav.news">Duyurular</a>
-</div>
-<div class="flex items-center gap-6">
-<button class="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
-<span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
-</button>
-<a class="group font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white pl-6 pr-5 py-3.5 rounded-full hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] flex items-center gap-2" href="/iletisim.html#contact-form">
-<span data-i18n="nav.cta">Teklif Alın</span> <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
-</a>
-</div>
 </nav>
 
-<!-- Mobile nav: hamburger + dropdown (desktop nav above is hidden md:flex) -->
-<nav class="fixed top-0 w-full z-50 glass-blur border-b border-[var(--border)] flex md:hidden justify-between items-center px-safe-margin-mobile py-4" id="mobile-nav">
-<a class="flex items-center" href="/">
-<span class="iona-wordmark-text" style="font-size:21px">iona</span>
-</a>
-<button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
-<span class="material-symbols-outlined text-[26px]" id="mobile-nav-icon">menu</span>
-</button>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+<div class="mobile-nav-panel-inner">
+<nav class="flex flex-col" aria-label="Ana menü">
+<a class="mobile-nav-link text-6xl lg:text-8xl font-bold tracking-tighter" href="/" data-i18n="nav.home">Anasayfa</a>
+<a class="mobile-nav-link text-6xl lg:text-8xl font-bold tracking-tighter" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="mobile-nav-link text-6xl lg:text-8xl font-bold tracking-tighter" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="mobile-nav-link text-6xl lg:text-8xl font-bold tracking-tighter" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="mobile-nav-link text-6xl lg:text-8xl font-bold tracking-tighter" href="/ionaflux.html" data-i18n="nav.ionaflux">IonaFlux</a>
+<a class="mobile-nav-link text-6xl lg:text-8xl font-bold tracking-tighter" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+<a class="mobile-nav-link text-6xl lg:text-8xl font-bold tracking-tighter" href="/duyurular.html" data-i18n="nav.news">Duyurular</a>
 </nav>
-<div class="mobile-nav-panel md:hidden" id="mobile-nav-panel">
-<a class="mobile-nav-link" href="/" data-i18n="nav.home">Anasayfa</a>
-<a class="mobile-nav-link" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
-<a class="mobile-nav-link" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
-<a class="mobile-nav-link" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
-<a class="mobile-nav-link is-current flex items-center gap-2" href="/ionaflux.html" aria-current="page"><span class="material-symbols-outlined text-[16px] text-[var(--brand)]">bolt</span><span class="text-[var(--brand)] font-bold" data-i18n="nav.ionaflux">IonaFlux</span></a>
-<a class="mobile-nav-link" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
-<a class="mobile-nav-link" href="/duyurular.html" data-i18n="nav.news">Duyurular</a>
-<div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-<span class="font-body-md text-[15px] text-[var(--text)]" data-i18n="nav.theme_toggle">Karanlık modu değiştir</span>
+<div class="mobile-nav-utility">
+<div class="mobile-nav-utility-row">
+<button class="mobile-nav-utility-btn" id="nav-search-toggle" type="button" data-i18n-aria-label="nav.search">
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span data-i18n="nav.search">Ara</span>
+</button>
+<div class="hidden mobile-nav-search-panel" id="nav-search-panel">
+<input class="mobile-nav-search-input" id="nav-search-input" type="text" data-i18n-placeholder="nav.search_placeholder">
+<div class="mobile-nav-search-results" id="nav-search-results"></div>
+</div>
+</div>
+<div class="mobile-nav-utility-row relative">
+<button class="mobile-nav-utility-btn" id="lang-toggle" type="button" aria-label="Dil / Language">
+<span class="material-symbols-outlined text-[18px]">language</span>
+<span id="lang-current">TR</span>
+</button>
+<div class="hidden mobile-nav-lang-panel" id="lang-panel">
+<button type="button" data-lang="tr">Türkçe</button>
+<button type="button" data-lang="en">English</button>
+<button type="button" data-lang="de">Deutsch</button>
+<button type="button" data-lang="es">Español</button>
+<button type="button" data-lang="fr">Français</button>
+<button type="button" data-lang="ru">Русский</button>
+<button type="button" data-lang="hi">हिन्दी</button>
+</div>
+</div>
+<div class="mobile-nav-utility-row">
+<span class="text-sm text-black/70" data-i18n="nav.theme_toggle">Karanlık modu değiştir</span>
 <button class="theme-toggle" type="button" role="switch" aria-checked="false" data-i18n-aria-label="nav.theme_toggle">
 <span class="theme-toggle-knob"><span class="material-symbols-outlined theme-toggle-icon">light_mode</span></span>
 </button>
 </div>
 <a class="mobile-nav-cta" href="/iletisim.html#contact-form" data-i18n="nav.cta">Teklif Alın</a>
+</div>
+</div>
 </div>
 
 <!-- IonaFlux is a standalone software product, so this whole page runs a
@@ -238,18 +231,30 @@
 <!-- Footer: pinned to the same fixed dark surface as the sections above
      so there's no seam at the bottom when the site itself is in light
      mode (footer is normally bg-transparent, inheriting var(--bg)). -->
-<footer class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
-<div class="flex flex-col gap-1 fade-in-element">
-<div class="flex items-center gap-3">
-<span class="iona-wordmark-text opacity-70" style="font-size:16px">iona</span>
-<p class="font-label-caps text-label-caps text-neutral-500" data-i18n="footer.copyright"></p>
+<footer class="bg-black border-t border-white/10 px-safe-margin-mobile md:px-safe-margin-desktop pt-16 pb-8 fade-in-section" id="site-footer">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-b border-white/10 py-8 mb-8">
+<div class="flex flex-col gap-2 fade-in-element">
+<span class="text-[10px] font-mono uppercase tracking-widest text-white/50">Menü</span>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
 </div>
-<p class="text-[11px] italic text-neutral-500 opacity-70">Where advanced fluid dynamics meet accelerated return on investment.</p>
+<div class="flex flex-col gap-2 fade-in-element delay-100">
+<span class="text-[10px] font-mono uppercase tracking-widest text-white/50">Yasal</span>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.privacy"></a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.terms"></a>
+<a class="text-sm font-semibold text-white hover:text-[#2d9937] transition-colors w-fit" href="#" data-i18n="footer.impact_report"></a>
 </div>
-<div class="flex gap-6 fade-in-element">
-<a class="font-label-caps text-label-caps text-neutral-500 hover:text-[#3fae66] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.privacy"></a>
-<a class="font-label-caps text-label-caps text-neutral-500 hover:text-[#3fae66] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.terms"></a>
-<a class="font-label-caps text-label-caps text-neutral-500 hover:text-[#3fae66] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.impact_report"></a>
+<div class="flex flex-col gap-2 md:items-end md:text-right fade-in-element delay-200">
+<span class="text-[10px] font-mono uppercase tracking-widest text-white/50">Iona</span>
+<p class="text-sm text-white/60 max-w-[240px]">Where advanced fluid dynamics meet accelerated return on investment.</p>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4">
+<h2 class="text-[16vw] leading-[0.8] font-bold tracking-tighter text-white select-none" aria-hidden="true">iona</h2>
+<p class="font-label-caps text-[11px] uppercase tracking-widest text-white/50 whitespace-nowrap pb-2" data-i18n="footer.copyright"></p>
+</div>
 </div>
 </footer>
 

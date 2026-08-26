@@ -198,15 +198,32 @@ export function initSiteSearch() {
   });
 }
 
-/* Mobile hamburger menu (see the separate #mobile-nav bar +
-   #mobile-nav-panel dropdown in each page's markup, shown only below
-   the md breakpoint — the desktop nav has its own search/lang/links
-   cluster that's simply hidden on mobile, no overlap with this). */
+/* Phase 89: the ONE nav overlay now (logo + MENU trigger opens this
+   fullscreen panel at every breakpoint) — was mobile-only, with a
+   separate always-on desktop nav carrying its own inline search/lang/
+   links cluster; that bar is gone, folded into this panel instead (see
+   index.html and its 6 sibling pages). Kept the export name and the
+   toggle/panel/icon element IDs unchanged from the old mobile-only
+   version so every page's entry script (which already imports and
+   calls initMobileNav) didn't need touching for what's really just a
+   styling + scope change. .is-current highlighting used to be hand-
+   written per page (a hardcoded aria-current/class on whichever link
+   matched); now computed once here from location.pathname since the
+   same markup ships on all 7 pages. */
 export function initMobileNav() {
   const toggle = document.getElementById('mobile-nav-toggle');
   const panel = document.getElementById('mobile-nav-panel');
   const icon = document.getElementById('mobile-nav-icon');
   if (!toggle || !panel) return;
+
+  const here = window.location.pathname.replace(/index\.html$/, '') || '/';
+  panel.querySelectorAll('a.mobile-nav-link').forEach((link) => {
+    const linkPath = new URL(link.href, window.location.origin).pathname.replace(/index\.html$/, '') || '/';
+    if (linkPath === here) {
+      link.classList.add('is-current');
+      link.setAttribute('aria-current', 'page');
+    }
+  });
 
   function open() {
     panel.classList.add('is-open');
