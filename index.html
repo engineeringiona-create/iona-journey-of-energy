@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
 <link rel="stylesheet" href="/src/styles/base.css">
 </head>
@@ -207,7 +208,7 @@
 </div>
 <div class="relative z-10 max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
 <div class="md:col-span-6 fade-in-element">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="home.about.eyebrow">Hakkımızda</span>
+<div class="flex items-center mb-4"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest" data-i18n="home.about.eyebrow">Hakkımızda</span></div>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-lg" data-i18n="home.about.title">Yalın Mühendislik.</h2>
 <p class="font-body-md text-body-md text-[var(--text-muted)] max-w-md mb-stack-md" data-i18n="home.about.body">Iona Biogas, güçlü çevresel sorumlulukla yenilikçi mühendislik çözümleri geliştiren bir enerji şirketidir. Patentli teknolojik ekipmanlarımızla geleneksel biyogaz tesislerinin karşılaştığı zorlukların üstesinden gelerek daha güvenilir ve dayanıklı bir işletme sağlıyoruz.</p>
 <a class="inline-flex items-center gap-2 border-b border-[var(--brand)]/30 pb-1 hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] transition-colors duration-300 font-label-caps text-label-caps" href="/hakkimizda.html">
@@ -257,7 +258,7 @@
 <section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section" id="why-choose-us">
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
 <div class="md:sticky md:top-32 self-start fade-in-element">
-<span class="font-label-caps text-label-caps text-orange-600 font-semibold tracking-widest block mb-4" data-i18n="home.why.eyebrow">Neden Iona</span>
+<div class="flex items-center mb-4"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-orange-600 font-semibold tracking-widest" data-i18n="home.why.eyebrow">Neden Iona</span></div>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-md" data-i18n="home.why.title">Neden Bizi Seçmelisiniz?</h2>
 <p class="font-body-md text-body-md text-slate-600 max-w-md mb-stack-md" data-i18n="home.why.body">Mühendislik uzmanlığımızı ve yenilikçi teknolojiyi bir araya getirerek dünya genelinde yüksek verimli, güvenilir ve sürdürülebilir biyogaz çözümleri sunuyoruz.</p>
 <a class="inline-block font-label-caps text-label-caps bg-[var(--brand)] text-white px-8 py-4 hover:bg-[var(--brand-hover)] transition-colors duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)]" href="/hakkimizda.html#why-us">
@@ -320,7 +321,7 @@
 <!-- Navigation cards to the other pages -->
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="explore">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="home.explore.eyebrow">Keşfedin</span>
+<div class="flex items-center mb-4 fade-in-element"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest" data-i18n="home.explore.eyebrow">Keşfedin</span></div>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="home.explore.title">Iona'yı Daha Yakından Tanıyın</h2>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 fade-in-element delay-200">
 <a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/teknoloji.html">
@@ -449,9 +450,12 @@
 
 <!-- Footer -->
 <footer class="bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
-<div class="flex items-center gap-3 fade-in-element">
+<div class="flex flex-col gap-1 fade-in-element">
+<div class="flex items-center gap-3">
 <span class="iona-wordmark-text opacity-70" style="font-size:16px">iona</span>
 <p class="font-label-caps text-label-caps text-[var(--text-muted)]" data-i18n="footer.copyright"></p>
+</div>
+<p class="text-[11px] italic text-[var(--text-muted)] opacity-70">Where advanced fluid dynamics meet accelerated return on investment.</p>
 </div>
 <div class="flex gap-6 fade-in-element">
 <a class="font-label-caps text-label-caps text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.privacy"></a>

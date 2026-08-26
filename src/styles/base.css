@@ -16,8 +16,16 @@
     --border: rgba(0, 0, 0, 0.06);
     --border-strong: rgba(0, 0, 0, 0.1);
     --nav-bg: rgba(255, 255, 255, 0.62);
-    --brand: #22703c;
-    --brand-hover: #2c8a4a;
+    /* Phase 82: brand identity manual's official primary green
+       (#2D9937) replaces the old #22703c/#3fae66 "generic emerald"
+       pair — every consumer of var(--brand)/var(--brand-hover) picks
+       this up automatically (buttons, links, borders, icons sitewide).
+       --brand-yellow is new: the manual's accent, for telemetry rings/
+       highlights/callout badges specifically, not a general-purpose
+       replacement for --brand-orange (the CTA color elsewhere). */
+    --brand: #2D9937;
+    --brand-hover: #3AB347;
+    --brand-yellow: #FFC700;
     --brand-orange: #ff751f;
     --shadow-ambient: rgba(20, 24, 20, 0.25);
     /* The sitewide section-background alternation token: every content
@@ -48,8 +56,9 @@
     --border: rgba(255, 255, 255, 0.08);
     --border-strong: rgba(255, 255, 255, 0.14);
     --nav-bg: rgba(14, 18, 16, 0.68);
-    --brand: #3fae66;
-    --brand-hover: #57c47c;
+    --brand: #3FBF4C;
+    --brand-hover: #56D164;
+    --brand-yellow: #FFC700;
     --brand-orange: #ff8a3d;
     --shadow-ambient: rgba(0, 0, 0, 0.55);
     --section-alt: var(--surface-2);
@@ -581,7 +590,7 @@ html {
 }
 
 .hero-editorial-cta:hover {
-    background: #15823B;
+    background: var(--brand);
 }
 
 :root.dark .hero-editorial-cta {
@@ -664,13 +673,19 @@ html {
     transform: rotate(45deg);
 }
 
+/* Phase 82: numbered steps use the brand manual's accent yellow, in the
+   "bold technical numbering" weight/tracking it calls for, rather than
+   the section's own green — the yellow is specifically for
+   highlights/callout badges, and a step index reads as exactly that. */
 .accordion-item .accordion-number {
     transition: color 400ms ease;
+    font-weight: 800;
+    letter-spacing: 0.02em;
 }
 
 .accordion-item:hover .accordion-number,
 .accordion-item.is-active .accordion-number {
-    color: var(--brand);
+    color: var(--brand-yellow);
 }
 
 .accordion-item .accordion-row {
@@ -953,10 +968,47 @@ html {
 .iona-wordmark-text {
     font-family: 'Quicksand', 'Inter', sans-serif;
     font-weight: 700;
-    color: #3fae66;
+    color: var(--brand);
     letter-spacing: -0.01em;
     line-height: 1;
     display: inline-block;
+}
+
+/* Phase 82 heading descriptor: the brand manual's "interlocking green
+   circle + yellow ring" motif, next to a representative set of primary
+   section eyebrows (not swept across every heading sitewide — see the
+   commit message for that scope call). Pure CSS (two pseudo-elements),
+   not an SVG file, so it inherits the tokens directly and never needs
+   re-exporting if the palette changes again. */
+.brand-motif {
+    position: relative;
+    display: inline-block;
+    width: 26px;
+    height: 18px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.brand-motif::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--brand);
+}
+
+.brand-motif::after {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--brand-yellow);
 }
 
 /* Intro preloader (Phase 77): follows the active light/dark theme via

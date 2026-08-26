@@ -93,15 +93,24 @@ export default {
         'section-padding': '10vh',
         'stack-md': '40px',
       },
+      /* Phase 82: brand identity manual sets the site's global font to
+         Montserrat — Arial stays as the fallback (same role it always
+         played here) for the split second before the webfont loads, or
+         if it fails to. Every one of these 8 tokens feeds a class used
+         sitewide (font-body-md alone is the base text on every page),
+         so this one edit is the actual site-wide lever, not per-element
+         overrides. Font weights (700/600 headings, 500/400/300 body)
+         are set per fontSize step below, not here — fontFamily doesn't
+         carry weight. */
       fontFamily: {
-        'label-caps': ['Arial', 'sans-serif'],
-        'headline-md': ['Arial', 'sans-serif'],
-        'headline-lg-mobile': ['Arial', 'sans-serif'],
-        'headline-lg': ['Arial', 'sans-serif'],
-        'body-md': ['Arial', 'sans-serif'],
-        'display-hero': ['Arial', 'sans-serif'],
-        'body-lg': ['Arial', 'sans-serif'],
-        'display-hero-mobile': ['Arial', 'sans-serif'],
+        'label-caps': ['Montserrat', 'Arial', 'sans-serif'],
+        'headline-md': ['Montserrat', 'Arial', 'sans-serif'],
+        'headline-lg-mobile': ['Montserrat', 'Arial', 'sans-serif'],
+        'headline-lg': ['Montserrat', 'Arial', 'sans-serif'],
+        'body-md': ['Montserrat', 'Arial', 'sans-serif'],
+        'display-hero': ['Montserrat', 'Arial', 'sans-serif'],
+        'body-lg': ['Montserrat', 'Arial', 'sans-serif'],
+        'display-hero-mobile': ['Montserrat', 'Arial', 'sans-serif'],
       },
       fontSize: {
         'label-caps': ['12px', { lineHeight: '100%', letterSpacing: '0.1em', fontWeight: '700' }],
