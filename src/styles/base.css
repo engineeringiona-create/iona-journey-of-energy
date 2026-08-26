@@ -596,19 +596,28 @@ html {
 }
 
 .hero-hairline {
-    border-color: rgba(226, 232, 240, 0.7);
+    /* Phase 85: 0.7 -> 0.8 to land exactly on Tailwind's slate-200/80,
+       the one thing separating the strip from the hero now that its own
+       fill is gone (see .hero-metric-strip-bg below). */
+    border-color: rgba(226, 232, 240, 0.8);
 }
 
 :root.dark .hero-hairline {
     border-color: var(--border);
 }
 
+/* Phase 85: dropped the near-opaque rgba(251,251,253,0.95) fill — a
+   cool near-white that read as a harsh solid bar against the warmer
+   --bg the rest of the hero sits on now that the canvas backdrop itself
+   is transparent (Phase 84). Fully transparent in both themes so the
+   strip just inherits whatever surface it's sitting on; .hero-hairline's
+   border-t is what separates it from the hero above. */
 .hero-metric-strip-bg {
-    background: rgba(251, 251, 253, 0.95);
+    background: transparent;
 }
 
 :root.dark .hero-metric-strip-bg {
-    background: color-mix(in srgb, var(--surface) 95%, transparent);
+    background: transparent;
 }
 
 .hero-metric-value {

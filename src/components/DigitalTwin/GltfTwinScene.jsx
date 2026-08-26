@@ -23,11 +23,13 @@ const CAMERA_EASE = 'power2.inOut';
    bake effect for why. Soft/low-frequency shadows (slow propeller
    spin, slow beacon pulse) show no visible stepping at this rate. */
 const SHADOW_BAKE_INTERVAL = 1 / 12;
-/* Narrowed from 48 to 42 for a more "premium product shot" compression
-   (less wide-angle bulge/distortion, edges read more parallel/imposing)
-   — frameBox always fits the whole box to the frame regardless of FOV,
-   so this changes the look/feel, not crop safety. */
-const CAMERA_FOV = 42;
+/* Narrowed 48 -> 42 -> 35 across phases for progressively more
+   "premium product shot" compression (less wide-angle bulge/distortion,
+   edges read more parallel/imposing, closer to a telephoto architectural
+   photo) — frameBox always fits the whole box to the frame regardless of
+   FOV, so this is purely a lens-feel knob, not the size lever (that's
+   OVERVIEW_MARGIN below). */
+const CAMERA_FOV = 35;
 /* Fixed isometric "hero" angle — no longer user-adjustable now that
    OrbitControls interaction is off, so this direction alone defines
    what visitors see. (1, 0.8, 1) is a classic elevated 3/4 view
@@ -43,13 +45,16 @@ const OVERVIEW_DIR = new THREE.Vector3(1, 0.8, 1).normalize();
    after repeated client feedback that feed_pool kept getting cropped —
    correctness over "looks bigger" this round; trim down later only
    once a real screenshot confirms the bottom edge has room to spare. */
-const OVERVIEW_MARGIN = 1.1;
+/* Phase 85: pushed past exact-fit (1.0) on purpose — client wants the
+   facility to dominate the frame like a "grand architectural mockup",
+   worst-case-axis edges cropping slightly is an accepted trade for that.
+   Was 1.25 (Phase 83, zero-crop) -> 1.1 (Phase 84) -> 0.9 now. */
+const OVERVIEW_MARGIN = 0.9;
 /* Portrait phones fit to height only (verticalOnly, see frameBox's own
-   comment) — that alone still left the facility reading as "not quite
-   fitting"/too large on an actual narrow phone screen once the mobile
-   hero activation shipped, so portrait gets its own, more generous
-   margin on top of the shared 1.25 rather than reusing it as-is. */
-const OVERVIEW_MARGIN_PORTRAIT = 1.35;
+   comment) — kept above 1.0 unlike the desktop margin above: a narrow
+   phone screen has much less horizontal room to spare, so cropping here
+   loses actual content (structures), not just empty-space margin. */
+const OVERVIEW_MARGIN_PORTRAIT = 1.05;
 /* Fraction of the box's own height to drop the camera position AND
    target by, together (see the vertical-drop block in Rig's framing
    effect for why position+target move together, not target alone).
@@ -2515,13 +2520,16 @@ export default function GltfTwinScene() {
          competes with the hero title (now pinned near the top, see
          #hero in base.css) or the offset-zoomed model. Gone the instant
          hasInteracted flips true. */}
+      {/* Phase 85: was a solid pill (border/bg/shadow/backdrop-blur) —
+         swapped for a bare floating label + pulsing dot so it reads as
+         an architectural cue, not a UI chrome element sitting on the
+         model. */}
       {!hasInteracted && (
         <div className="pointer-events-none absolute inset-x-0 bottom-10 z-20 flex justify-center">
-          <div className="animate-pulse rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/70 px-6 py-3 shadow-lg backdrop-blur-md">
-            <span className="font-label-caps text-label-caps text-[var(--text)]">
-              Tesisi Keşfetmek İçin Yapıları Seçin
-            </span>
-          </div>
+          <span className="text-[10px] tracking-[0.2em] text-slate-400 font-mono uppercase flex items-center justify-center gap-2 mt-4">
+            <span className="w-1.5 h-1.5 bg-[#2D9937] rounded-full animate-pulse" aria-hidden="true" />
+            Tesisi Keşfetmek İçin Yapıları Seçin
+          </span>
         </div>
       )}
     </div>
