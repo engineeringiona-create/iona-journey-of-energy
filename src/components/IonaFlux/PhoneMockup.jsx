@@ -179,6 +179,11 @@ export default function PhoneMockup() {
   const hoverPoint = hoverIndex !== null ? sparklineCoords[hoverIndex] : null;
   const hoverValue = hoverIndex !== null ? Math.round(sparkline[hoverIndex]) : null;
   const hoursAgo = hoverIndex !== null ? sparkline.length - 1 - hoverIndex : null;
+  /* Phase 76.1: same translateX-slide technique as the real app's own
+     FloatingTabBar (layout.tsx) — one highlight pill, moved behind
+     whichever tab is active, instead of 4 buttons independently
+     tracking their own "am I active" background. */
+  const activeTabIndex = TABS.findIndex((t) => t.id === tab);
 
   return (
     <div className="ionaflux-phone-stage">
@@ -259,7 +264,7 @@ export default function PhoneMockup() {
                         <svg viewBox="0 0 64 64" className="ionaflux-load-ring-svg" aria-hidden="true">
                           <circle cx="32" cy="32" r={LOAD_RING_R} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="5" />
                           <circle
-                            cx="32" cy="32" r={LOAD_RING_R} fill="none" stroke="#78dc77" strokeWidth="5"
+                            cx="32" cy="32" r={LOAD_RING_R} fill="none" stroke="#2eae73" strokeWidth="5"
                             strokeLinecap="round" strokeDasharray={LOAD_RING_CIRC} strokeDashoffset={loadRingOffset}
                             transform="rotate(-90 32 32)" className="ionaflux-load-ring-progress"
                           />
@@ -324,11 +329,11 @@ export default function PhoneMockup() {
                           onMouseMove={handleChartMove}
                           onMouseLeave={() => setHoverIndex(null)}
                         >
-                          <path d={sparklinePath} fill="none" stroke="#78dc77" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d={sparklinePath} fill="none" stroke="#2eae73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           {hoverPoint && (
                             <>
                               <line x1={hoverPoint.x} y1="0" x2={hoverPoint.x} y2={CHART_H} stroke="rgba(148,163,184,0.35)" strokeWidth="1" />
-                              <circle cx={hoverPoint.x} cy={hoverPoint.y} r="3.5" fill="#78dc77" stroke="#0b0f19" strokeWidth="1.5" />
+                              <circle cx={hoverPoint.x} cy={hoverPoint.y} r="3.5" fill="#2eae73" stroke="#0b0f19" strokeWidth="1.5" />
                             </>
                           )}
                         </svg>
@@ -404,6 +409,7 @@ export default function PhoneMockup() {
             </div>
 
             <div className="ionaflux-bottom-nav">
+              <div className="ionaflux-nav-highlight" style={{ transform: `translateX(${activeTabIndex * 100}%)` }} aria-hidden="true" />
               {TABS.map((t) => (
                 <button
                   key={t.id}

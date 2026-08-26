@@ -1702,7 +1702,12 @@ html {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #0a0e17;
+    /* Phase 76.1: matched to the real IONA app's own dark surface token
+       (--iona-bg, HSL 160 10% 6%) — a warm dark green-black, not the
+       cooler navy-slate this used before. See the big comment further
+       down (right before .ionaflux-live-badge) for the full source of
+       this realignment. */
+    background: #0e1210;
     border-radius: 40px;
     overflow: hidden;
     display: flex;
@@ -1742,14 +1747,30 @@ html {
     color: #f8fafc;
 }
 
+/* ---------------- Phase 76.1: real-app color realignment ----------------
+   Cloned the real IonaFlux/İona Control Panel repo (private, GitHub:
+   engineeringiona-create/iona-control-panel — the live product this
+   marketing phone mockup is standing in for) and read its actual design
+   tokens (src/styles/iona-tokens.css) and floating nav bar CSS
+   (src/index.css). The real app's green is a muted sage (--iona-green
+   #2eae73 / --iona-green-strong #20834f / nav-pill accent #22a76b) —
+   explicitly documented there as "yumuşak sage/mint yeşil (sert
+   kelly-green DEĞİL)" (soft sage/mint green, NOT hard kelly-green).
+   #78dc77 (this WEBSITE's own brand green, DESIGN.md) is a brighter
+   kelly-green and stays exactly where it already was everywhere outside
+   this phone's screen content (the demo badge, ground shadow, and every
+   other site section) — only the simulated APP UI inside the screen
+   moves to the real product's own palette, per explicit request: "olay
+   veriler değil uygulama nasıl gözüküyorsa o olsun" (it's not about the
+   data, make it look like the real app looks). */
 .ionaflux-live-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     font-size: 9px;
     font-weight: 700;
-    color: #78dc77;
-    background: rgba(120, 220, 119, 0.12);
+    color: #2eae73;
+    background: rgba(46, 174, 115, 0.15);
     padding: 3px 8px;
     border-radius: 999px;
     white-space: nowrap;
@@ -1759,13 +1780,13 @@ html {
     width: 6px;
     height: 6px;
     border-radius: 999px;
-    background: #78dc77;
+    background: #2eae73;
     animation: ionaflux-pulse 1.6s ease-in-out infinite;
 }
 
 @keyframes ionaflux-pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(120, 220, 119, 0.5); }
-    50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(120, 220, 119, 0); }
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46, 174, 115, 0.5); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(46, 174, 115, 0); }
 }
 
 .ionaflux-app-body {
@@ -1807,11 +1828,15 @@ html {
 .ionaflux-metric-card,
 .ionaflux-sparkline-card,
 .ionaflux-alert-item {
-    background: rgba(15, 23, 42, 0.6);
+    /* Phase 76.1: real app's --iona-surface (dark) is HSL 160 9% 10% —
+       a warm dark green-gray, not slate-900's cool blue-gray. Radius
+       bumped 1rem -> 22px to match the real app's --iona-r-card token
+       exactly (see the big comment above .ionaflux-live-badge). */
+    background: rgba(23, 28, 25, 0.6);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
+    border-radius: 22px;
     padding: 10px;
     box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
@@ -1840,7 +1865,7 @@ html {
 }
 
 @keyframes ionaflux-value-flash {
-    0% { color: #78dc77; }
+    0% { color: #2eae73; }
     100% { color: inherit; }
 }
 
@@ -1878,7 +1903,7 @@ html {
     align-items: center;
     gap: 1px;
     background: rgba(11, 15, 25, 0.92);
-    border: 1px solid rgba(120, 220, 119, 0.4);
+    border: 1px solid rgba(46, 174, 115, 0.4);
     border-radius: 8px;
     padding: 5px 8px;
     font-size: 10px;
@@ -1888,7 +1913,7 @@ html {
 }
 
 .ionaflux-chart-tooltip strong {
-    color: #78dc77;
+    color: #2eae73;
     font-size: 11px;
 }
 
@@ -1907,13 +1932,44 @@ html {
     line-height: 1.4;
 }
 
+/* Phase 76.1: rebuilt as a floating glass capsule with a sliding
+   highlight pill, matching the real app's own FloatingTabBar
+   (layout.tsx) instead of a flush rectangular bar — the real component
+   drags/slides a rounded highlight behind whichever tab is active
+   (translateX, driven by activeIndex in PhoneMockup.jsx); this mirrors
+   that exact technique rather than approximating it with a border or
+   underline. Colors matched to layout.tsx's dark .iona-navglass/
+   .iona-navpill rules. */
 .ionaflux-bottom-nav {
+    position: relative;
     display: flex;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 8px 12px 14px;
+    margin: 0 10px 10px;
+    padding: 6px;
+    border-radius: 999px;
+    background: rgba(6, 20, 13, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 18px 44px -14px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.ionaflux-nav-highlight {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 6px;
+    width: calc((100% - 12px) / 4);
+    border-radius: 999px;
+    background: linear-gradient(160deg, rgba(34, 167, 107, 0.34), rgba(34, 167, 107, 0.14));
+    border: 1px solid rgba(34, 167, 107, 0.42);
+    box-shadow: 0 0 22px rgba(34, 167, 107, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    pointer-events: none;
 }
 
 .ionaflux-nav-btn {
+    position: relative;
+    z-index: 1;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -1924,13 +1980,14 @@ html {
     color: #64748b;
     font-size: 9px;
     font-weight: 700;
-    padding: 4px;
+    padding: 6px 4px;
     cursor: pointer;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .ionaflux-nav-btn.is-active {
-    color: #78dc77;
+    color: #2eae73;
+    transform: scale(1.05);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1968,7 +2025,7 @@ html {
    frosted-glass treatment (Phase 72) applies everywhere for free. */
 .ionaflux-scroll {
     scrollbar-width: thin;
-    scrollbar-color: rgba(120, 220, 119, 0.35) transparent;
+    scrollbar-color: rgba(46, 174, 115, 0.35) transparent;
 }
 
 .ionaflux-scroll::-webkit-scrollbar {
@@ -1980,7 +2037,7 @@ html {
 }
 
 .ionaflux-scroll::-webkit-scrollbar-thumb {
-    background: rgba(120, 220, 119, 0.35);
+    background: rgba(46, 174, 115, 0.35);
     border-radius: 999px;
 }
 
@@ -2020,13 +2077,13 @@ html {
 
 .ionaflux-schematic-node .material-symbols-outlined {
     font-size: 20px;
-    color: #78dc77;
+    color: #2eae73;
 }
 
 .ionaflux-schematic-link {
     flex: 1;
     height: 1px;
-    background: repeating-linear-gradient(90deg, rgba(120, 220, 119, 0.5) 0 4px, transparent 4px 8px);
+    background: repeating-linear-gradient(90deg, rgba(46, 174, 115, 0.5) 0 4px, transparent 4px 8px);
     margin: 0 4px;
     align-self: center;
     margin-bottom: 14px;
@@ -2141,8 +2198,8 @@ html {
 }
 
 .ionaflux-status-unloading {
-    background: rgba(120, 220, 119, 0.15);
-    color: #78dc77;
+    background: rgba(46, 174, 115, 0.15);
+    color: #2eae73;
 }
 
 .ionaflux-status-done {
@@ -2188,19 +2245,19 @@ html {
 .ionaflux-report-download {
     width: 100%;
     text-align: center;
-    background: rgba(120, 220, 119, 0.12);
-    border: 1px solid rgba(120, 220, 119, 0.4);
+    background: rgba(46, 174, 115, 0.12);
+    border: 1px solid rgba(46, 174, 115, 0.4);
     border-radius: 12px;
     padding: 12px;
     font-size: 11px;
     font-weight: 700;
-    color: #78dc77;
+    color: #2eae73;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .ionaflux-report-download:hover {
-    background: rgba(120, 220, 119, 0.2);
+    background: rgba(46, 174, 115, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {
