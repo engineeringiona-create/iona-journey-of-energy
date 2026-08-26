@@ -155,6 +155,15 @@
      orientation change too, so rotating the phone re-frames the whole
      facility to the new aspect ratio instead of staying sized for
      whichever orientation happened to be active on load. -->
+<!-- Phase 80: editorial/Swiss-grid hero furniture layered on top of the
+     unchanged 3D twin system above. Nothing about the canvas's own
+     positioning, sizing, or resize/frameBox logic changes here — see the
+     big comment above this section for why that stays exactly as-is;
+     this only restyles #hero-copy's content and adds two new decorative
+     layers (the top-right coordinate/ref stamps and the bottom metric
+     strip), all literal porcelain/slate colors with :root.dark overrides
+     back to the theme tokens (see .hero-meta-label etc. in base.css) so
+     dark mode isn't left with near-black text on a dark canvas. -->
 <section class="hero-zone px-safe-margin-mobile md:px-safe-margin-desktop overflow-hidden" id="hero">
 <div class="absolute inset-0 w-full h-full" id="iona-digital-twin-root"></div>
 <button type="button" class="absolute top-20 right-4 z-30 w-11 h-11 rounded-full bg-[var(--surface)] border border-[var(--border-strong)] text-[var(--text)] pointer-events-auto shadow-[0_10px_30px_-10px_rgba(20,24,20,0.45)]" id="mobile-3d-close" data-i18n-aria-label="digitalTwin.ui.close" aria-label="Kapat">
@@ -167,14 +176,39 @@
      just hints that landscape reads better. -->
 <p class="hidden absolute bottom-8 inset-x-0 z-20 mx-auto w-fit max-w-[85%] text-center px-4 py-2 rounded-full pointer-events-none font-label-caps text-label-caps text-[var(--text)] bg-[var(--surface)]/80 backdrop-blur-sm" id="mobile-3d-landscape-hint" data-i18n="home.hero.landscape_hint">Daha iyi bir deneyim için cihazınızı yatay çevirin</p>
 
-<div class="relative z-10 text-left max-w-md pointer-events-none transition-opacity duration-500 ease-out" id="hero-copy">
-<span class="font-label-caps text-label-caps text-[var(--text)] bg-[var(--surface)]/80 border border-[var(--border-strong)] rounded-full px-4 py-2 tracking-widest mb-stack-sm inline-block backdrop-blur-sm" data-i18n="home.hero.badge">20+ Yıllık Deneyim &middot; Yalın Mühendislik</span>
-<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm tracking-tighter text-[var(--text)] font-bold" data-i18n="home.hero.slide1_title">Biyogaz Çözümleriyle Geleceğe Güç Veriyoruz.</h1>
-<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-sm" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
-<button type="button" class="md:hidden pointer-events-auto mt-stack-sm inline-flex items-center gap-2 rounded-full bg-[var(--brand)] text-white pl-5 pr-6 py-3 font-label-caps text-label-caps hover:bg-[var(--brand-hover)] transition-colors duration-300" id="mobile-3d-cta">
+<!-- Pafta corner stamps: pure decoration, desktop-only (no room for them
+     without crowding the copy on a narrow viewport). -->
+<div class="hidden md:block absolute top-[124px] right-8 z-20 text-right pointer-events-none" aria-hidden="true">
+<div class="hero-meta-label text-[10px] tracking-widest font-mono">[ 39°55'N 32°50'E ]</div>
+<div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
+</div>
+
+<div class="relative z-10 max-w-xl pointer-events-none transition-opacity duration-500 ease-out md:border-l hero-hairline md:pl-6 lg:pl-8" id="hero-copy">
+<span class="hero-meta-label block text-[10px] tracking-widest font-mono uppercase mb-8 md:mb-12" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
+<h1 class="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight hero-editorial-title leading-[0.95] mb-6" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
+<p class="text-lg md:text-xl hero-editorial-sub max-w-xl font-normal leading-relaxed mb-8" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
+<a class="hero-editorial-cta pointer-events-auto inline-flex items-center px-8 py-4 text-sm font-medium tracking-wide transition-all duration-300 rounded-none" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
+<button type="button" class="md:hidden pointer-events-auto mt-4 flex items-center gap-2 hero-editorial-title text-sm font-medium tracking-wide border hero-hairline px-5 py-3" id="mobile-3d-cta">
 <span class="material-symbols-outlined text-[18px]" aria-hidden="true">deployed_code</span>
 <span data-i18n="home.hero.view3d_cta">3D Modeli Görüntüle</span>
 </button>
+</div>
+
+<!-- Live engineering metric strip: desktop-only, the 48px figures are too
+     dense for a phone-width column. -->
+<div class="hidden md:grid absolute inset-x-0 bottom-0 z-20 grid-cols-3 border-t hero-hairline hero-metric-strip-bg backdrop-blur-sm pointer-events-none">
+<div class="border-r hero-hairline px-8 py-6 lg:py-8">
+<div class="text-[48px] leading-none font-medium hero-metric-value">1.2 MWe</div>
+<div class="hero-meta-label text-[10px] tracking-widest font-mono uppercase mt-2" data-i18n="home.hero.metric1_label">Ortalama Kurulu Güç</div>
+</div>
+<div class="border-r hero-hairline px-8 py-6 lg:py-8">
+<div class="text-[48px] leading-none font-medium hero-metric-value">%98.4</div>
+<div class="hero-meta-label text-[10px] tracking-widest font-mono uppercase mt-2" data-i18n="home.hero.metric2_label">SCADA Operasyonel Verim</div>
+</div>
+<div class="px-8 py-6 lg:py-8">
+<div class="text-[48px] leading-none font-medium hero-metric-value">Sıfır Atık</div>
+<div class="hero-meta-label text-[10px] tracking-widest font-mono uppercase mt-2" data-i18n="home.hero.metric3_label">Döngüsel Karbon Emisyonu</div>
+</div>
 </div>
 </section>
 

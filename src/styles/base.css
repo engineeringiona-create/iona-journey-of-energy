@@ -517,22 +517,92 @@ html {
     }
 }
 
-/* Radial depth behind the transparent 3D canvas: white center fading to a
-   cool light grey edge, instead of a flat single-color fill. Was
-   hardcoded to this one light gradient regardless of theme — client
-   reported the hero going unreadable in dark mode, and this was why:
-   #hero-copy's own text color swaps to the light --text value in dark
-   mode (correctly, for a dark page), but was landing on this still-
-   bright-white gradient underneath it, so light-on-light. The dark
-   variant below mirrors the same center-to-edge falloff using the
-   theme's own dark surface tones instead of a second hardcoded pair,
-   so it stays in sync with :root.dark's palette automatically. */
+/* Backdrop behind the transparent 3D canvas. Phase 80 (editorial/Swiss
+   grid redesign) asks for a flat architectural porcelain canvas
+   (#FBFBFD) instead of the old radial white->grey falloff — this is
+   what #iona-digital-twin-root's own background paints, since the R3F
+   <Canvas> itself is transparent, so this div IS the visible hero
+   backdrop the model floats against. Dark mode is untouched on purpose:
+   the porcelain canvas is a light-mode-only editorial choice (like the
+   fixed-dark IonaFlux teaser section further down this same page is a
+   dark-only one), so the previous radial dark-surface falloff stays as
+   the dark-mode backdrop rather than forcing porcelain-on-dark. */
 #iona-digital-twin-root {
-    background: radial-gradient(circle at center, #ffffff 0%, #f0f0f5 100%);
+    background: #FBFBFD;
 }
 
 :root.dark #iona-digital-twin-root {
     background: radial-gradient(circle at center, var(--surface-2) 0%, var(--bg) 100%);
+}
+
+/* Phase 80 editorial hero furniture: literal slate/porcelain colors by
+   design (an architectural-print look, not the site's normal theme
+   palette), but each one gets a :root.dark override back to the site's
+   own tokens so dark-mode readers aren't left with near-black text on
+   a now-dark #iona-digital-twin-root backdrop. */
+.hero-meta-label {
+    color: #94a3b8;
+}
+
+:root.dark .hero-meta-label {
+    color: var(--text-muted);
+}
+
+.hero-editorial-title {
+    color: #020617;
+}
+
+:root.dark .hero-editorial-title {
+    color: var(--text);
+}
+
+.hero-editorial-sub {
+    color: #475569;
+}
+
+:root.dark .hero-editorial-sub {
+    color: var(--text-muted);
+}
+
+.hero-editorial-cta {
+    background: #020617;
+    color: #ffffff;
+}
+
+.hero-editorial-cta:hover {
+    background: #15823B;
+}
+
+:root.dark .hero-editorial-cta {
+    background: var(--brand);
+}
+
+:root.dark .hero-editorial-cta:hover {
+    background: var(--brand-hover);
+}
+
+.hero-hairline {
+    border-color: rgba(226, 232, 240, 0.7);
+}
+
+:root.dark .hero-hairline {
+    border-color: var(--border);
+}
+
+.hero-metric-strip-bg {
+    background: rgba(251, 251, 253, 0.95);
+}
+
+:root.dark .hero-metric-strip-bg {
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
+}
+
+.hero-metric-value {
+    color: #020617;
+}
+
+:root.dark .hero-metric-value {
+    color: var(--text);
 }
 
 /* Mobile-only legibility scrim behind #hero-copy. On a narrow viewport
