@@ -1463,6 +1463,55 @@ html {
     filter: grayscale(1) invert(0.92) contrast(0.9) brightness(0.95) hue-rotate(180deg);
 }
 
+/* ---------------- Phase 72: shared IonaFlux titanium canvas ----------------
+   One class, used on both index.html's #ionaflux-teaser and every section
+   of ionaflux.html, so the two views share the exact same background
+   instead of drifting apart (Phase 70 gave the homepage section its own
+   bg-gradient-to-tr Tailwind utility; ionaflux.html's sections were still
+   on the original bg-neutral-950 — this replaces both with one rule).
+   Layers the radial metallic sheen directly into the `background`
+   shorthand rather than a separate pseudo-element/div, so it can't
+   collide with a section that already uses ::before or an overlay div
+   for something else (the homepage section's own radial glow-orb div,
+   kept as-is, sits on top of this fine — two different effects). */
+.ionaflux-titanium-bg {
+    background:
+        radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.04) 0%, rgba(120, 220, 119, 0.03) 40%, transparent 80%),
+        linear-gradient(to bottom, #111722, #161e2e, #0e131d);
+}
+
+/* Frosted "SCADA glass" panel for text/telemetry blocks sitting on top of
+   .ionaflux-titanium-bg — exact spec from this phase, distinct from (and
+   replacing) Phase 70's slightly different rgba/blur values on the phone's
+   own metric/sparkline/alert/report cards below. */
+.ionaflux-glass-panel {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Diffused emerald "ground shadow" the phone appears to sit on, on top of
+   the titanium canvas — a soft blurred ellipse behind the phone stage,
+   not another drop-shadow layer (those are neutral/black; this one is
+   colored, reading as ambient reflected light off the canvas rather than
+   a shadow). */
+.ionaflux-phone-ground {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 60px;
+    background: rgba(120, 220, 119, 0.12);
+    filter: blur(32px);
+    border-radius: 999px;
+    z-index: -1;
+    pointer-events: none;
+}
+
 /* ---------------- Phase 68/71: IonaFlux phone mockup ----------------
    CSS-only smartphone hardware frame (titanium bezel, Dynamic Island,
    Action/Volume/Power button notches, glossy edge, floating shadow)
@@ -1483,6 +1532,7 @@ html {
    smoothly instead of snapping frame-to-frame), and a real Dynamic
    Island (was a plain decorative notch) that expands on hover/click. */
 .ionaflux-phone-stage {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1696,24 +1746,28 @@ html {
     margin-bottom: 10px;
 }
 
-/* Phase 70: "SCADA glass" — frosted dark glass instead of the flat
+/* Phase 70/72: "SCADA glass" — frosted dark glass instead of the flat
    4%-white tint these had before, matching the same Apple-Pro-style
-   treatment as the titanium canvas the phone sits on. backdrop-blur
-   only does anything meaningful with content actually moving behind it
-   (scroll, the ambient glow orb drifting) — kept anyway since it's
-   cheap here (small, low card count, not the page-wide nav blur that
-   base.css already special-cases off mobile for cost reasons). */
+   treatment as the titanium canvas the phone sits on. Phase 72 tightened
+   the exact rgba/blur/shadow numbers to match .ionaflux-glass-panel
+   above, so the phone's own cards and the surrounding text/telemetry
+   panels read as one consistent glass system rather than two similar-
+   but-not-quite-matching ones. backdrop-blur only does anything
+   meaningful with content actually moving behind it (scroll, the
+   ambient glow orb drifting) — kept anyway since it's cheap here (small,
+   low card count, not the page-wide nav blur that base.css already
+   special-cases off mobile for cost reasons). */
 .ionaflux-metric-card,
 .ionaflux-sparkline-card,
 .ionaflux-alert-item,
 .ionaflux-report-card {
-    background: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1rem;
     padding: 10px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .ionaflux-metric-card {

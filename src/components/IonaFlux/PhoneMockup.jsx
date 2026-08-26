@@ -119,6 +119,8 @@ export default function PhoneMockup() {
     <div className="ionaflux-phone-stage">
       <div className="ionaflux-demo-badge">✨ İnteraktif Canlı Demo — Sekmelere Dokunun</div>
 
+      <div className="ionaflux-phone-ground" aria-hidden="true" />
+
       <div
         ref={wrapRef}
         className="ionaflux-phone"

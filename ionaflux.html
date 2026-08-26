@@ -94,7 +94,7 @@
 </div>
 
 <!-- IonaFlux is a standalone software product, so this whole page runs a
-     fixed dark surface (bg-neutral-950), independent of the site's own
+     fixed dark surface (ionaflux-titanium-bg), independent of the site's own
      light/dark toggle — nav/footer stay on the shared theme-aware chrome
      (the glass-blur nav already reads fine over a dark section, same
      trick index.html's hero relies on). Typography, spacing rhythm and
@@ -103,7 +103,7 @@
      (CTAs), matching every other page — Iona Green (#22703c) is layered
      in specifically for glows, hairline borders and active states, per
      the brand-aligned dark mode brief, not swapped in for actions. -->
-<section class="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-24 px-safe-margin-mobile md:px-safe-margin-desktop bg-neutral-950 fade-in-section" id="flux-hero">
+<section class="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-24 px-safe-margin-mobile md:px-safe-margin-desktop ionaflux-titanium-bg fade-in-section" id="flux-hero">
 <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-50" style="background:radial-gradient(circle,rgba(34,112,60,0.22),transparent 70%)" aria-hidden="true"></div>
 <div class="relative max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-12 lg:gap-10 items-center">
 <div class="max-w-xl fade-in-element">
@@ -128,7 +128,7 @@
 
 <!-- Live monitoring: full-width image reveal, not a split — the first
      of several deliberately different section families on this page. -->
-<section class="bg-neutral-950 px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#22703c]/35 fade-in-section" id="flux-live">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#22703c]/35 fade-in-section" id="flux-live">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <div class="max-w-2xl fade-in-element">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="flux.live.eyebrow">Canlı İzleme</span>
@@ -144,7 +144,7 @@
 <!-- Text-only catalog: mirrors teknoloji.html's Çözümlerimiz pattern
      (icon + title + description, no screenshots) so not every topic on
      this page is presented as an image card. -->
-<section class="bg-neutral-950 px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-catalog">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-catalog">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-xl max-w-2xl fade-in-element" data-i18n="flux.catalog.title">Sahadan Ofise, Uçtan Uca Yönetim.</h2>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10 fade-in-element delay-200">
@@ -175,7 +175,7 @@
 <!-- QR diagnostics: split again, but the image is a narrow phone
      screenshot rather than a wide dashboard, so it reads differently
      from the hero split even though the layout family repeats. -->
-<section class="bg-neutral-950 px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-qr">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-qr">
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_0.7fr] gap-12 lg:gap-16 items-center">
 <div class="max-w-lg fade-in-element">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="flux.qr.eyebrow">QR ile Tanı</span>
@@ -189,7 +189,7 @@
 </section>
 
 <!-- Lab to production: split, image on the left this time. -->
-<section class="bg-neutral-950 px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-lab">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-lab">
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 <div class="fade-in-element order-2 lg:order-1 rounded-xl overflow-hidden border border-white/10">
 <img class="w-full h-auto" src="/images/ionaflux/lab.jpg" alt="IonaFlux laboratuvar sonuçları ve verim skoru: FOS/TAC, pH, amonyum azotu, kuru madde" loading="lazy" decoding="async">
@@ -204,7 +204,7 @@
 <!-- Fleet: data-only stats band, mirroring teknoloji.html's Performance
      Metrics section exactly — no screenshot at all, the strongest visual
      contrast to the image-heavy sections above. -->
-<section class="bg-neutral-950 px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#22703c]/35 fade-in-section" id="flux-fleet">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#22703c]/35 fade-in-section" id="flux-fleet">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="flux.fleet.eyebrow">Çoklu Tesis</span>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm max-w-2xl fade-in-element" data-i18n="flux.fleet.title">Tek Panelden, Birbirinden İzole Yönetilen Tesisler.</h2>
@@ -227,7 +227,7 @@
 </section>
 
 <!-- Demo video + closing CTA -->
-<section class="bg-neutral-950 px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-28 border-t border-white/[0.08] fade-in-section" id="flux-video">
+<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-28 border-t border-white/[0.08] fade-in-section" id="flux-video">
 <div class="pointer-events-none absolute left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full opacity-40" style="background:radial-gradient(circle,rgba(34,112,60,0.18),transparent 70%)" aria-hidden="true"></div>
 <div class="relative max-w-4xl mx-auto text-center fade-in-element">
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.video.title">IonaFlux'u İki Dakikada İzleyin.</h2>
@@ -244,7 +244,7 @@
 <!-- Footer: pinned to the same fixed dark surface as the sections above
      so there's no seam at the bottom when the site itself is in light
      mode (footer is normally bg-transparent, inheriting var(--bg)). -->
-<footer class="bg-neutral-950 px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
+<footer class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-stack-md border-t border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-stack-sm fade-in-section">
 <p class="font-label-caps text-label-caps text-neutral-500 fade-in-element" data-i18n="footer.copyright"></p>
 <div class="flex gap-6 fade-in-element">
 <a class="font-label-caps text-label-caps text-neutral-500 hover:text-[#3fae66] transition-colors duration-500 opacity-80 hover:opacity-100 link-underline" href="#" data-i18n="footer.privacy"></a>
