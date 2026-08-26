@@ -472,26 +472,20 @@ html {
 /* index.html's hero specifically (id="hero", the only one hosting the 3D
    model) — NOT the shared .hero-zone default above, which the other
    three pages' hero sections (about-hero/contact-hero/etki-hero) also
-   use and must keep unchanged. Client feedback: the title needs to sit
-   "significantly higher, toward the top-left" rather than vertically
-   centered, so this drops the centering entirely (flex-start) and pins
-   it just under the fixed top nav (nav is ~80px tall: py-5 + logo). */
+   use and must keep unchanged. Phase 83 replaced the old flex-centered/
+   full-bleed-canvas layout with a real grid (max-w-7xl grid grid-cols-12
+   min-h-[80vh], set directly on the inner wrapper div in index.html) —
+   .hero-zone's own min-height:100vh/flex column/justify-content would
+   otherwise fight that inner grid's own sizing, so all three are
+   neutralized here, leaving padding-top (clearing the fixed nav) as the
+   only thing this id still needs to own. The old desktop-only
+   `#hero-copy h1 { font-size: 68px }` bump is gone too — the h1 is sized
+   by its own Tailwind classes now (text-5xl lg:text-6xl), and that
+   leftover ID-selector rule would have outranked them on specificity. */
 #hero {
-    justify-content: flex-start;
+    display: block;
+    min-height: 0;
     padding-top: 120px;
-}
-
-/* Slight desktop-only size bump on the hero title, per client feedback
-   — an inline override that only touches font-size, not
-   font-headline-lg's bundled line-height/letter-spacing/weight (which
-   the h1's other classes still provide). Deliberately not raised in the
-   shared headline-lg token itself (public/tailwind-config.js) since
-   that would resize every other use of text-headline-lg sitewide, not
-   just this one hero instance. */
-@media (min-width: 768px) {
-    #hero-copy h1 {
-        font-size: 68px;
-    }
 }
 
 /* text-headline-md sitewide mobile scale-down. The token ships one fixed
@@ -517,18 +511,35 @@ html {
     }
 }
 
-/* Backdrop behind the transparent 3D canvas. Phase 80 (editorial/Swiss
-   grid redesign) asks for a flat architectural porcelain canvas
-   (#FBFBFD) instead of the old radial white->grey falloff — this is
-   what #iona-digital-twin-root's own background paints, since the R3F
-   <Canvas> itself is transparent, so this div IS the visible hero
-   backdrop the model floats against. Dark mode is untouched on purpose:
-   the porcelain canvas is a light-mode-only editorial choice (like the
-   fixed-dark IonaFlux teaser section further down this same page is a
-   dark-only one), so the previous radial dark-surface falloff stays as
-   the dark-mode backdrop rather than forcing porcelain-on-dark. */
+/* Backdrop behind the transparent 3D canvas. Phase 83 asks for
+   #F8FAFC/slate-50 specifically (superseding Phase 80's very-close
+   #FBFBFD) — this is what #iona-digital-twin-root's own background
+   paints, since the R3F <Canvas> itself is transparent, so this div IS
+   the visible hero backdrop the model floats against. Dark mode is
+   untouched on purpose: the porcelain canvas is a light-mode-only
+   editorial choice (like the fixed-dark IonaFlux teaser section further
+   down this same page is a dark-only one), so the previous radial
+   dark-surface falloff stays as the dark-mode backdrop rather than
+   forcing porcelain-on-dark.
+
+   touch-action: Phase 83 also retired the old mobile-only "faded
+   background + tap-to-activate" system (#mobile-3d-cta/#mobile-3d-close/
+   #mobile-3d-landscape-hint are gone from index.html, along with the
+   legibility scrim #hero-copy used to need) — the 3D box is a normal-
+   flow, always-interactive element at every viewport size now, not
+   overlaid on the copy. OrbitControls has rotate/zoom/pan all disabled
+   (see Rig — the camera is fully GSAP-scripted), so the canvas never
+   needs to capture a drag gesture, but R3F's <Canvas> still sets
+   touch-action:none on its own element by default; left alone, a
+   scroll swipe starting on top of the now-always-live 450px 3D box on
+   mobile would have that scroll eaten — the exact "page not scrollable
+   by finger" complaint the old fade-by-default system existed to avoid,
+   just returning for a different reason. pan-y keeps vertical scroll
+   passing through unconditionally (taps for structure-selection are
+   unaffected by touch-action). */
 #iona-digital-twin-root {
-    background: #FBFBFD;
+    background: #F8FAFC;
+    touch-action: pan-y;
 }
 
 :root.dark #iona-digital-twin-root {
@@ -605,96 +616,6 @@ html {
     color: var(--text);
 }
 
-/* Mobile-only legibility scrim behind #hero-copy. On a narrow viewport
-   there's no empty space left of the 3D facility model the way there is
-   on desktop — the title/badge/paragraph sit directly on top of the
-   model render, and the paragraph (--text-muted, already the lowest-
-   contrast text color on the page) all but disappears against the
-   model's own light grey tones. A soft translucent card behind the
-   whole copy block (same var(--bg)/blur treatment already used on the
-   badge, just extended to the rest of the copy instead of only the
-   pill) restores contrast without needing a full-bleed dark overlay
-   that would dim the model itself. Desktop is unaffected — #hero-copy's
-   max-w-md plus the model's own layout already leaves it clear of the
-   model there, matching the original client feedback that led to the
-   top-left pin in #hero above. */
-@media (max-width: 767px) {
-    #hero-copy {
-        position: relative;
-        padding: 20px;
-        margin: 0 -20px;
-        /* DESIGN.md's largest non-pill radius step (rounded.xl = 0.75rem) */
-        border-radius: 0.75rem;
-    }
-
-    #hero-copy::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        border-radius: inherit;
-        background: color-mix(in srgb, var(--bg) 82%, transparent);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-}
-
-/* Mobile hero 3D twin: embedded-but-faded background by default (not
-   the earlier separate "rotate to landscape" full-screen modal — see
-   index.html's hero comment for why that changed), activated by
-   #mobile-3d-cta. #hero-copy's own opacity is handled in JS
-   (initHeroTwin, main-anasayfa.js) instead of a CSS rule here — it's
-   already flipped by the 'twinlevelchange' listener via inline
-   style.opacity, and a second, CSS-class-driven opacity rule fighting
-   that same property would be a specificity footgun (inline style
-   always wins, so the class rule would silently do nothing the moment
-   twinlevelchange had fired even once). The canvas itself and the
-   close button have no such conflict, so they're plain CSS here. */
-@media (max-width: 767px) {
-    #iona-digital-twin-root {
-        opacity: 0.32;
-        pointer-events: none;
-        /* Belt-and-suspenders alongside pointer-events:none: R3F's
-           <Canvas> sets touch-action:none on its own canvas element by
-           default (so OrbitControls' drag gestures don't fight the
-           browser's native scroll) — that's meant to apply once the
-           canvas is actually reachable, but pinning pan-y here too
-           means a stray touch during the fade-in transition, or any
-           browser quirk that lets a pointer-events:none descendant's
-           touch-action still get consulted, can't end up eating the
-           page scroll. Client reported exactly that: page not
-           scrollable by finger while the twin was still in its
-           inactive/faded state. */
-        touch-action: pan-y;
-        transition: opacity 700ms ease;
-    }
-
-    #hero.twin-active #iona-digital-twin-root {
-        opacity: 1;
-        pointer-events: auto;
-        touch-action: none;
-    }
-
-    #mobile-3d-close {
-        display: none;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #hero.twin-active #mobile-3d-close {
-        display: flex;
-    }
-}
-
-@media (max-width: 767px) and (orientation: portrait) {
-    #hero.twin-active #mobile-3d-landscape-hint {
-        display: block;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    #iona-digital-twin-root { transition: none; }
-}
 
 .parallax-media {
     position: absolute;

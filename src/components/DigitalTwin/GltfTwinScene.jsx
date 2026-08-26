@@ -4,8 +4,6 @@ import { ContactShadows, Grid, Html, OrbitControls, useGLTF } from '@react-three
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { reduceMotion } from '../../three/scene-utils.js';
-import StaticDotGridBackground from './StaticDotGridBackground.jsx';
-import SonarRings from './SonarRings.jsx';
 import { applyStructureOverrides } from './plantStructureOverrides.js';
 
 /* Real facility scan, dropped in by the user (biyogaz-tesisi.glb ->
@@ -1011,8 +1009,8 @@ function FeedPipeGapFill() {
    onSelect, onReset) is a stable ref/useCallback identity except
    `selected`, so without this, Model re-runs its whole ~350-mesh JSX
    reconciliation on every unrelated parent state change too (groundY,
-   ringPositions, hasInteracted, selectedSubIndex...) — none of which
-   this component even reads. Plain shallow-prop memo, no custom
+   hasInteracted, selectedSubIndex...) — none of which this component
+   even reads. Plain shallow-prop memo, no custom
    comparator needed, since nothing here is passed as a fresh
    object/array literal each render. */
 const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected, flowActive }) {
@@ -1895,7 +1893,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
    useFrame. memo'd for the same reason as Model above — every prop
    here is a ref/state value it genuinely reacts to, but the parent
    also re-renders for state this component doesn't touch at all
-   (ringPositions, hasInteracted, selectedSubIndex). */
+   (hasInteracted, selectedSubIndex). */
 const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, shadowFar, keyLightRef }) {
   const { camera, gl } = useThree();
   const controlsRef = useRef(null);
@@ -2002,30 +2000,6 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plantRootRef.current]);
 
-  /* Mobile "3D Modeli Görüntüle" activation cue (see #mobile-3d-cta /
-     initHeroTwin in main-anasayfa.js) — a small, one-shot dolly toward
-     whatever the camera's currently looking at, just enough to read as
-     "this just came alive/became interactive" without re-framing or
-     fighting the overview/focus positions those own effects already
-     own. Purely cosmetic: doesn't touch controls.target, so it doesn't
-     interfere with frameBox's own math either. */
-  useEffect(() => {
-    function handleMobileActivate() {
-      if (!controlsRef.current || reduceMotion) return;
-      const target = controlsRef.current.target;
-      const offset = camera.position.clone().sub(target);
-      const closer = target.clone().add(offset.multiplyScalar(0.82));
-      gsap.to(camera.position, {
-        x: closer.x,
-        y: closer.y,
-        z: closer.z,
-        duration: CAMERA_DURATION,
-        ease: CAMERA_EASE,
-      });
-    }
-    document.addEventListener('mobiletwinactivate', handleMobileActivate);
-    return () => document.removeEventListener('mobiletwinactivate', handleMobileActivate);
-  }, [camera]);
 
   useEffect(() => {
     if (!controlsRef.current) return;
@@ -2238,8 +2212,17 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
   if (!structure) return null;
   const sub = subIndex != null ? structure.subComponents[subIndex] : null;
 
+  /* Phase 83: fixed (viewport-relative), not absolute. The 3D canvas's
+     own wrapper div — this component's nearest positioned ancestor — used
+     to span roughly the whole hero, so `absolute` effectively read as
+     viewport-relative anyway; now that the canvas is confined to its own
+     right-column box (h-[450px]/h-[600px]), an `absolute` panel here
+     would be positioned (and, worse, clipped by #hero's overflow-hidden)
+     relative to that small box instead. `fixed` keeps the exact same
+     top-24/right-10/etc math working the way it always visually did,
+     independent of the 3D box's own size. */
   return (
-    <div className="absolute z-20 top-24 left-4 right-4 max-h-[70vh] sm:max-h-[85vh] sm:top-1/2 sm:left-auto sm:right-10 sm:-translate-y-1/2 sm:w-[450px] sm:min-h-[75vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6">
+    <div className="fixed z-20 top-24 left-4 right-4 max-h-[70vh] sm:max-h-[85vh] sm:top-1/2 sm:left-auto sm:right-10 sm:-translate-y-1/2 sm:w-[450px] sm:min-h-[75vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-3">
         {sub ? (
           <button
@@ -2348,11 +2331,12 @@ export default function GltfTwinScene() {
   const [groundY, setGroundY] = useState(0);
   const [groundScale, setGroundScale] = useState(120);
   const [shadowFar, setShadowFar] = useState(40);
-  const [ringPositions, setRingPositions] = useState([]);
-  /* First-click discoverability affordances (floating pill + sonar
-     rings) live until the visitor proves they've found the interaction
-     — then gone for the rest of the session. Deliberately not persisted
-     (no localStorage) since a full reload is a fresh visit. */
+  /* First-click discoverability pill (bottom-center hint) lives until the
+     visitor proves they've found the interaction — then gone for the
+     rest of the session. Deliberately not persisted (no localStorage)
+     since a full reload is a fresh visit. Phase 83 removed the sonar
+     rings this used to also gate (see SonarRings.jsx, now unused — the
+     "floating circular halo/neon rings" flagged for removal). */
   const [hasInteracted, setHasInteracted] = useState(false);
   /* "Proses Akışı (Canlı)" toggle — off by default (spec), and forced
      off + hidden below the 768px breakpoint (mobile GPUs/thermal budget
@@ -2385,21 +2369,6 @@ export default function GltfTwinScene() {
        the plant fall outside the baked shadow render entirely. */
     setGroundScale(Math.max(size.x, size.z) * 1.3);
     setShadowFar(Math.max(size.y * 4, 20));
-
-    /* One sonar-ring anchor per real clickable structure (site_piping
-       excluded, same rule Model's handleClick uses), positioned at each
-       structure's own roof center rather than a single shared height —
-       the 5 structures are very different sizes (digester vs. a small
-       pump room), so one global "top" would float above the shorter
-       ones instead of sitting on them. */
-    const rings = [];
-    plantRoot.children.forEach((structure) => {
-      if (!Object.prototype.hasOwnProperty.call(plantData, structure.name)) return;
-      const structureBox = new THREE.Box3().setFromObject(structure);
-      const center = structureBox.getCenter(new THREE.Vector3());
-      rings.push({ name: structure.name, position: [center.x, structureBox.max.y + 1.2, center.z] });
-    });
-    setRingPositions(rings);
   }, []);
 
   const handleSelect = useCallback((node) => {
@@ -2444,7 +2413,6 @@ export default function GltfTwinScene() {
 
   return (
     <div className="relative w-full h-full">
-      <StaticDotGridBackground />
       <Canvas
         className="relative z-10"
         shadows
@@ -2492,7 +2460,6 @@ export default function GltfTwinScene() {
           shadowFar={shadowFar}
           keyLightRef={keyLightRef}
         />
-        <SonarRings rings={ringPositions} active={!hasInteracted} />
       </Canvas>
 
       {selected && (
@@ -2530,7 +2497,7 @@ export default function GltfTwinScene() {
       {/* First-click discoverability hint — bottom-center so it never
          competes with the hero title (now pinned near the top, see
          #hero in base.css) or the offset-zoomed model. Gone the instant
-         hasInteracted flips true, same trigger as SonarRings above. */}
+         hasInteracted flips true. */}
       {!hasInteracted && (
         <div className="pointer-events-none absolute inset-x-0 bottom-10 z-20 flex justify-center">
           <div className="animate-pulse rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/70 px-6 py-3 shadow-lg backdrop-blur-md">

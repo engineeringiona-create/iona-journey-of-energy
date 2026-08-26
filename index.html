@@ -122,92 +122,61 @@
 <a class="mobile-nav-cta" href="/iletisim.html#contact-form" data-i18n="nav.cta">Teklif Alın</a>
 </div>
 
-<!-- Hero: full-screen interactive 3D facility twin (Phase 1 of the
-     drill-down redesign — replaces the old 3-slide image slider).
-     React/R3F scene (src/components/DigitalTwin/GltfTwinScene.jsx)
-     mounted via src/components/DigitalTwin/mount.jsx into
-     #iona-digital-twin-root — same GLB/component that used to power
-     the mid-page "Dijital İkiz" section further down the page,
-     promoted here (and removed from there, so the 5.7MB facility
-     model isn't loaded/rendered twice on one page).
-     Clicking a structure drives GltfTwinScene's internal currentLevel
-     (0 overview / 1 focused) and offset-zooms the camera so the
-     object lands in the left 40% of the screen, leaving the right
-     side clear for the detail UI a later phase adds there. On that
-     same level change this section's own title/badge fades out of
-     the way (see the 'twinlevelchange' listener in
-     main-anasayfa.js) instead of overlapping the zoomed object.
+<!-- Hero (Phase 83): interactive 3D facility twin confined to its own
+     right-column viewport — replaces the earlier full-bleed absolute
+     canvas (Phase 1 / Phase 80), which could visually collide with the
+     left copy column depending on viewport size. React/R3F scene
+     (src/components/DigitalTwin/GltfTwinScene.jsx) mounted via
+     src/components/DigitalTwin/mount.jsx into #iona-digital-twin-root.
+     Clicking a structure still drives GltfTwinScene's internal
+     currentLevel (0 overview / >0 focused); #hero-copy still fades on
+     that change (see the 'twinlevelchange' listener in
+     main-anasayfa.js) since the DetailPanel that appears on focus wants
+     the room.
 
-     Mobile behavior (second pass — an earlier version opened a
-     separate full-screen "rotate to landscape" modal; client asked for
-     the model back in the hero itself instead): #iona-digital-twin-root
-     stays mounted and visible on mobile now, just faded and
-     non-interactive by default (see the `@media (max-width: 767px)`
-     rule in base.css) so it reads as a background behind the copy
-     instead of competing with it. #mobile-3d-cta activates it —
-     initHeroTwin (main-anasayfa.js) fades #hero-copy out, brings the
-     canvas to full opacity + pointer-events, shows #mobile-3d-close,
-     and dispatches 'mobiletwinactivate' for GltfTwinScene's own small
-     zoom-in cue (Rig's activation effect). #mobile-3d-close reverses
-     all of that. The model's actual on-screen scale for portrait vs.
-     landscape isn't a CSS trick — GltfTwinScene's frameBox-based
-     auto-fit (previously a one-shot on mount) now re-runs on resize/
-     orientation change too, so rotating the phone re-frames the whole
-     facility to the new aspect ratio instead of staying sized for
-     whichever orientation happened to be active on load. -->
-<!-- Phase 80: editorial/Swiss-grid hero furniture layered on top of the
-     unchanged 3D twin system above. Nothing about the canvas's own
-     positioning, sizing, or resize/frameBox logic changes here — see the
-     big comment above this section for why that stays exactly as-is;
-     this only restyles #hero-copy's content and adds two new decorative
-     layers (the top-right coordinate/ref stamps and the bottom metric
-     strip), all literal porcelain/slate colors with :root.dark overrides
-     back to the theme tokens (see .hero-meta-label etc. in base.css) so
-     dark mode isn't left with near-black text on a dark canvas. -->
+     Mobile: the old "faded background + tap-to-activate + close button"
+     system (mobile-3d-cta/mobile-3d-close/landscape-hint) is retired.
+     The 3D viewport is now a normal-flow, always-full-opacity, always-
+     interactive box (h-[450px], the grid just stacks it below the copy
+     below the lg breakpoint) at every viewport size, not just desktop —
+     a dedicated box in normal flow can't overlap the text above it the
+     way a full-bleed absolute layer could, so there's no separate
+     activation state needed on small screens anymore. -->
 <section class="hero-zone px-safe-margin-mobile md:px-safe-margin-desktop overflow-hidden" id="hero">
-<div class="absolute inset-0 w-full h-full" id="iona-digital-twin-root"></div>
-<button type="button" class="absolute top-20 right-4 z-30 w-11 h-11 rounded-full bg-[var(--surface)] border border-[var(--border-strong)] text-[var(--text)] pointer-events-auto shadow-[0_10px_30px_-10px_rgba(20,24,20,0.45)]" id="mobile-3d-close" data-i18n-aria-label="digitalTwin.ui.close" aria-label="Kapat">
-<span class="material-symbols-outlined" aria-hidden="true">close</span>
-</button>
-<!-- Only shown while active AND actually in portrait (see the nested
-     `@media (max-width:767px) and (orientation:portrait)` rule in
-     base.css) — a soft suggestion, not a gate like the earlier "rotate
-     to landscape" modal was; the model stays usable in portrait, this
-     just hints that landscape reads better. -->
-<p class="hidden absolute bottom-8 inset-x-0 z-20 mx-auto w-fit max-w-[85%] text-center px-4 py-2 rounded-full pointer-events-none font-label-caps text-label-caps text-[var(--text)] bg-[var(--surface)]/80 backdrop-blur-sm" id="mobile-3d-landscape-hint" data-i18n="home.hero.landscape_hint">Daha iyi bir deneyim için cihazınızı yatay çevirin</p>
-
-<!-- Pafta corner stamps: pure decoration, desktop-only (no room for them
-     without crowding the copy on a narrow viewport). -->
-<div class="hidden md:block absolute top-[124px] right-8 z-20 text-right pointer-events-none" aria-hidden="true">
+<!-- Pafta corner stamps: pure decoration, desktop-only. -->
+<div class="hidden lg:block absolute top-[124px] right-8 z-20 text-right pointer-events-none" aria-hidden="true">
 <div class="hero-meta-label text-[10px] tracking-widest font-mono">[ 39°55'N 32°50'E ]</div>
 <div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
 </div>
 
-<div class="relative z-10 max-w-xl pointer-events-none transition-opacity duration-500 ease-out md:border-l hero-hairline md:pl-6 lg:pl-8" id="hero-copy">
-<span class="hero-meta-label block text-[10px] tracking-widest font-mono uppercase mb-8 md:mb-12" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
-<h1 class="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight hero-editorial-title leading-[0.95] mb-6" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
-<p class="text-lg md:text-xl hero-editorial-sub max-w-xl font-normal leading-relaxed mb-8" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
-<a class="hero-editorial-cta pointer-events-auto inline-flex items-center px-8 py-4 text-sm font-medium tracking-wide transition-all duration-300 rounded-none" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
-<button type="button" class="md:hidden pointer-events-auto mt-4 flex items-center gap-2 hero-editorial-title text-sm font-medium tracking-wide border hero-hairline px-5 py-3" id="mobile-3d-cta">
-<span class="material-symbols-outlined text-[18px]" aria-hidden="true">deployed_code</span>
-<span data-i18n="home.hero.view3d_cta">3D Modeli Görüntüle</span>
-</button>
+<div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 min-h-[80vh] items-center gap-8">
+<div class="lg:col-span-5 z-10 flex flex-col justify-center transition-opacity duration-500 ease-out" id="hero-copy">
+<span class="hero-meta-label block text-xs font-mono tracking-widest mb-6 uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
+<h1 class="text-5xl lg:text-6xl font-bold tracking-tight hero-editorial-title leading-[1.05] mb-6" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
+<p class="text-base lg:text-lg hero-editorial-sub font-normal leading-relaxed mb-8 max-w-md" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
+<a class="hero-editorial-cta inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
+</div>
+<div class="lg:col-span-7 h-[450px] lg:h-[600px] relative w-full">
+<div class="absolute inset-0 w-full h-full" id="iona-digital-twin-root"></div>
+</div>
 </div>
 
-<!-- Live engineering metric strip: desktop-only, the 48px figures are too
-     dense for a phone-width column. -->
-<div class="hidden md:grid absolute inset-x-0 bottom-0 z-20 grid-cols-3 border-t hero-hairline hero-metric-strip-bg backdrop-blur-sm pointer-events-none">
-<div class="border-r hero-hairline px-8 py-6 lg:py-8">
-<div class="text-[48px] leading-none font-medium hero-metric-value">1.2 MWe</div>
-<div class="hero-meta-label text-[10px] tracking-widest font-mono uppercase mt-2" data-i18n="home.hero.metric1_label">Ortalama Kurulu Güç</div>
+<!-- Live engineering metric bar. Uses hero-hairline (not a raw
+     divide-slate-* utility) for the dividers so they keep the
+     :root.dark override back to the theme border token, same as
+     everything else in this hero — see base.css. -->
+<div class="hero-hairline border-t hero-metric-strip-bg backdrop-blur-sm mt-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3">
+<div class="hero-hairline border-b md:border-b-0 md:border-r p-6 lg:p-8">
+<div class="text-4xl lg:text-5xl font-bold hero-metric-value">1.2 MWe</div>
+<div class="hero-meta-label text-xs tracking-wider uppercase mt-1 font-mono" data-i18n="home.hero.metric1_label">Ortalama Kurulu Güç</div>
 </div>
-<div class="border-r hero-hairline px-8 py-6 lg:py-8">
-<div class="text-[48px] leading-none font-medium hero-metric-value">%98.4</div>
-<div class="hero-meta-label text-[10px] tracking-widest font-mono uppercase mt-2" data-i18n="home.hero.metric2_label">SCADA Operasyonel Verim</div>
+<div class="hero-hairline border-b md:border-b-0 md:border-r p-6 lg:p-8">
+<div class="text-4xl lg:text-5xl font-bold hero-metric-value">%98.4</div>
+<div class="hero-meta-label text-xs tracking-wider uppercase mt-1 font-mono" data-i18n="home.hero.metric2_label">SCADA Operasyonel Verim</div>
 </div>
-<div class="px-8 py-6 lg:py-8">
-<div class="text-[48px] leading-none font-medium hero-metric-value">Sıfır Atık</div>
-<div class="hero-meta-label text-[10px] tracking-widest font-mono uppercase mt-2" data-i18n="home.hero.metric3_label">Döngüsel Karbon Emisyonu</div>
+<div class="p-6 lg:p-8">
+<div class="text-4xl lg:text-5xl font-bold hero-metric-value">Sıfır Atık</div>
+<div class="hero-meta-label text-xs tracking-wider uppercase mt-1 font-mono" data-i18n="home.hero.metric3_label">Döngüsel Karbon Emisyonu</div>
 </div>
 </div>
 </section>

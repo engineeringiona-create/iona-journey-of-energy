@@ -12,12 +12,10 @@
    DigitalTwinScene.jsx (hand-built procedural stations, no GLB) — the
    latter is left in the repo unwired, same as before.
 
-   #iona-digital-twin-root is visible (faded/non-interactive, see
-   base.css) on mobile too now, not `hidden md:block` — mobile just
-   shows it dimmed behind the hero copy until #mobile-3d-cta activates
-   it (initHeroTwin, main-anasayfa.js). Since the container is laid out
-   and in-viewport on both mobile and desktop now, this same
-   IntersectionObserver mounts the twin for both — no separate mobile
+   #iona-digital-twin-root is a normal-flow, always-visible box on every
+   viewport size (Phase 83's 2-column grid stacks it below the copy on
+   mobile, not `hidden md:block`), so this same IntersectionObserver
+   mounts the twin for both mobile and desktop — no separate mobile
    mount path needed. */
 const container = document.getElementById('iona-digital-twin-root');
 

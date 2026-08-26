@@ -74,71 +74,26 @@ function runPreloader() {
 }
 runPreloader();
 
-/* ---------------- Hero: 3D twin drill-down + mobile activation ----------------
+/* ---------------- Hero: 3D twin drill-down ----------------
    The hero canvas + click/zoom logic live in React (GltfTwinScene.jsx);
-   the title/badge overlay is plain markup here. Two independent things
-   both want to control #hero-copy's opacity, so they're combined into
-   one function instead of two separate listeners fighting the same
-   inline style:
-   1. GltfTwinScene dispatches 'twinlevelchange' whenever its internal
-      currentLevel state changes (0 overview / >0 focused) — the copy
-      should be out of the way whenever a structure is focused.
-   2. On mobile, #mobile-3d-cta "activates" the twin (see below) — the
-      copy should also be out of the way for as long as that's active,
-      independent of currentLevel.
-   syncHeroCopy() applies both conditions together so neither one can
-   silently undo the other (e.g. drilling into a structure while
-   mobile-activated, then backing out, must NOT bring the copy back
-   since mobile activation is still on).
+   the title/badge overlay is plain markup here. GltfTwinScene dispatches
+   'twinlevelchange' whenever its internal currentLevel state changes (0
+   overview / >0 focused) — the copy fades out of the way whenever a
+   structure is focused, since the DetailPanel that appears then wants
+   the room.
 
-   Mobile 3D activation: #iona-digital-twin-root is visible everywhere
-   now (faded/non-interactive by default on mobile — see the `@media
-   (max-width: 767px)` rule in base.css), not gated behind a separate
-   full-screen modal. #mobile-3d-cta brings it to full opacity +
-   pointer-events and reveals #mobile-3d-close; 'mobiletwinactivate' is
-   dispatched for GltfTwinScene's own small zoom-in cue on activation
-   (see Rig in GltfTwinScene.jsx). No manual mount call needed here —
-   the container's already laid out/in-viewport on mobile now, so
-   mount.jsx's own IntersectionObserver mounts it the same way it does
-   on desktop. */
+   Phase 83 retired the old mobile-only "tap #mobile-3d-cta to activate,
+   #mobile-3d-close to back out" system this function used to also own —
+   the 3D box is a normal-flow, always-interactive element in its own
+   right-hand grid column (stacked below the copy on narrow viewports)
+   now, not a faded full-bleed layer behind the text needing a separate
+   activation state. */
 function initHeroTwin() {
-  const hero = document.getElementById('hero');
   const copy = document.getElementById('hero-copy');
-  const cta = document.getElementById('mobile-3d-cta');
-  const closeBtn = document.getElementById('mobile-3d-close');
-  if (!hero || !copy) return;
-
-  let twinLevel = 0;
-  let mobileActive = false;
-
-  function syncHeroCopy() {
-    copy.style.opacity = twinLevel === 0 && !mobileActive ? '1' : '0';
-  }
-
+  if (!copy) return;
   document.addEventListener('twinlevelchange', (e) => {
-    twinLevel = e.detail.level;
-    syncHeroCopy();
+    copy.style.opacity = e.detail.level === 0 ? '1' : '0';
   });
-
-  if (cta && closeBtn) {
-    cta.addEventListener('click', () => {
-      mobileActive = true;
-      hero.classList.add('twin-active');
-      syncHeroCopy();
-      document.dispatchEvent(new CustomEvent('mobiletwinactivate'));
-    });
-    closeBtn.addEventListener('click', () => {
-      mobileActive = false;
-      hero.classList.remove('twin-active');
-      syncHeroCopy();
-    });
-    window.matchMedia('(min-width: 768px)').addEventListener('change', (e) => {
-      if (!e.matches || !mobileActive) return;
-      mobileActive = false;
-      hero.classList.remove('twin-active');
-      syncHeroCopy();
-    });
-  }
 }
 initHeroTwin();
 
