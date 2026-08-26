@@ -1,16 +1,69 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 const TABS = [
-  { id: 'params', label: 'Genel', icon: 'speed' },
-  { id: 'alerts', label: 'Uyarılar', icon: 'notifications' },
-  { id: 'report', label: 'Raporlar', icon: 'summarize' }
+  { id: 'scada', label: 'SCADA', icon: 'precision_manufacturing' },
+  { id: 'logistics', label: 'Lojistik', icon: 'local_shipping' },
+  { id: 'lab', label: 'Laboratuvar', icon: 'science' },
+  { id: 'alerts', label: 'Uyarılar', icon: 'warning' }
 ];
 
-const BASELINE = { methane: 58.4, temp: 38.2, power: 1180, flow: 425 };
+/* SCADA tab's live-ticking values — everything else in this file (truck
+   fleet, lab readings, alert log) is static content, matching what the
+   task actually asked to animate (Tab 1 only). */
+const BASELINE = {
+  methane: 58.5,
+  temp: 37.6,
+  pressure: 14.2,
+  h2s: 12,
+  motorLoad: 96.4,
+  motorPower: 1196,
+  gasStorage: 82
+};
 const TICK_MS = 3000;
 const CHART_W = 240;
 const CHART_H = 56;
 const MAX_TILT_DEG = 8;
+const LOAD_RING_R = 26;
+const LOAD_RING_CIRC = 2 * Math.PI * LOAD_RING_R;
+
+const TRUCKS = [
+  {
+    plate: '06 ABC 412',
+    farm: 'Yeşil Vadi Mandırası',
+    waste: '24.8 Ton Sıvı Sığır Gübresi',
+    time: 'Giriş: 15:24 · 14 dk alım süresi',
+    status: 'unloading',
+    statusLabel: 'Boşaltılıyor - Çukur 1'
+  },
+  {
+    plate: '06 IONA 88',
+    farm: 'Anadolu Çiftliği',
+    waste: '18.2 Ton Mısır Silajı',
+    time: 'Giriş: 14:10 · Çıkış: 14:38 (28 dk)',
+    status: 'done',
+    statusLabel: 'Tamamlandı - Kantar'
+  },
+  {
+    plate: '34 KM 109',
+    farm: 'Doğu Mandıra Grubu',
+    waste: '21.0 Ton Peyniraltı Suyu',
+    time: 'ETA 16:15',
+    status: 'enroute',
+    statusLabel: 'Yolda - ETA 16:15'
+  }
+];
+
+const LAB_ROWS = [
+  { label: 'FOS/TAC Oranı', value: '0.26', note: 'Optimal Aralık: 0.20 - 0.30 · Asitlenme Riski Yok' },
+  { label: 'pH Değeri', value: '7.78', note: 'Stabil Mezofilik Aralık' },
+  { label: 'Kuru Madde (KM / TS)', value: '%9.4', note: 'Organik KM (oTS): %78.2' },
+  { label: 'Amonyum Azotu (NH4-N)', value: '2.450 mg/L', note: 'Güvenli Bölge' }
+];
+
+const ALERTS = [
+  { severity: 'warn', text: 'Digester 2 Mikser 2 akım değeri 18.4A (Normal limit: 20A)' },
+  { severity: 'ok', text: 'Kojenerasyon yağ basıncı nominal seviyede' }
+];
 
 function jitter(value, amount) {
   return value + (Math.random() - 0.5) * 2 * amount;
@@ -20,13 +73,13 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-/* 24 points standing in for a day of gas-flow readings — a gentle wave
-   plus noise, not real telemetry (there's no backend feeding this; see
-   the module doc below). */
+/* 24 points standing in for a day of gas/power generation readings — a
+   gentle wave plus noise, not real telemetry (there's no backend
+   feeding this; see the module doc below). */
 function buildInitialSparkline() {
   return Array.from({ length: 24 }, (_, i) => {
     const wave = Math.sin((i / 23) * Math.PI * 1.4) * 30;
-    return Math.max(0, BASELINE.flow - 60 + wave + (Math.random() - 0.5) * 12);
+    return Math.max(0, BASELINE.motorPower - 60 + wave + (Math.random() - 0.5) * 12);
   });
 }
 
@@ -46,7 +99,7 @@ function sparklineGeometry(points) {
   return { path, coords };
 }
 
-/* Phase 68/71: a phone-shaped mockup of a hypothetical IonaFlux
+/* Phase 68/71/75: a phone-shaped mockup of a hypothetical IonaFlux
    companion app, running entirely client-side. The numbers "ticking"
    every few seconds are a self-contained jitter simulation (setInterval
    nudging each metric a little from its baseline) — cosmetic realism
@@ -54,9 +107,11 @@ function sparklineGeometry(points) {
    IonaFlux backend. No chart library: the sparkline is a hand-built SVG
    path from plain data, and the hover tooltip's "Xsa önce" labels are
    just an index-to-hours-ago mapping over that same simulated window,
-   not real timestamps. */
+   not real timestamps. Truck fleet / lab readings / alert log are
+   static example content, not simulated live feeds — nothing in the
+   task asked those to tick, only the SCADA tab's own metrics. */
 export default function PhoneMockup() {
-  const [tab, setTab] = useState('params');
+  const [tab, setTab] = useState('scada');
   const [metrics, setMetrics] = useState(BASELINE);
   const [sparkline, setSparkline] = useState(buildInitialSparkline);
   const [clock, setClock] = useState(() => new Date());
@@ -65,6 +120,7 @@ export default function PhoneMockup() {
   const [islandHovering, setIslandHovering] = useState(false);
   const [islandPinned, setIslandPinned] = useState(false);
   const [hoverIndex, setHoverIndex] = useState(null);
+  const [reportDownloaded, setReportDownloaded] = useState(false);
   const wrapRef = useRef(null);
 
   useEffect(() => {
@@ -72,8 +128,11 @@ export default function PhoneMockup() {
       setMetrics((m) => ({
         methane: clamp(jitter(m.methane, 0.3), 0, 99.9),
         temp: clamp(jitter(m.temp, 0.15), 0, 99.9),
-        power: Math.round(clamp(jitter(m.power, 15), 0, 9999)),
-        flow: Math.round(clamp(jitter(m.flow, 8), 0, 9999))
+        pressure: clamp(jitter(m.pressure, 0.4), 0, 99.9),
+        h2s: Math.round(clamp(jitter(m.h2s, 2), 0, 99)),
+        motorLoad: clamp(jitter(m.motorLoad, 1.2), 0, 100),
+        motorPower: Math.round(clamp(jitter(m.motorPower, 15), 0, 9999)),
+        gasStorage: clamp(jitter(m.gasStorage, 1.5), 0, 100)
       }));
       setSparkline((s) => [...s.slice(1), clamp(jitter(s[s.length - 1], 10), 0, 9999)]);
       setClock(new Date());
@@ -85,6 +144,7 @@ export default function PhoneMockup() {
   const { path: sparklinePath, coords: sparklineCoords } = useMemo(() => sparklineGeometry(sparkline), [sparkline]);
   const timeLabel = clock.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
   const islandExpanded = islandHovering || islandPinned;
+  const loadRingOffset = LOAD_RING_CIRC * (1 - metrics.motorLoad / 100);
 
   /* 3D parallax tilt: cursor position relative to the phone's own
      center, normalized to [-1, 1] on each axis, mapped to a small
@@ -109,6 +169,11 @@ export default function PhoneMockup() {
     const rect = svg.getBoundingClientRect();
     const fraction = clamp((e.clientX - rect.left) / rect.width, 0, 1);
     setHoverIndex(Math.round(fraction * (sparkline.length - 1)));
+  }
+
+  function handleDownloadReport() {
+    setReportDownloaded(true);
+    setTimeout(() => setReportDownloaded(false), 2200);
   }
 
   const hoverPoint = hoverIndex !== null ? sparklineCoords[hoverIndex] : null;
@@ -161,42 +226,97 @@ export default function PhoneMockup() {
               </span>
             </div>
 
-            <div className="ionaflux-app-body">
+            <div className="ionaflux-app-body ionaflux-scroll">
               <div key={tab} className="ionaflux-tab-panel">
-                {tab === 'params' && (
+                {tab === 'scada' && (
                   <>
+                    {/* Mini plant schematic: Digester 1/2 + CHP motor, with a
+                       pulsing fault pin on Digester 2. */}
+                    <div className="ionaflux-sparkline-card ionaflux-schematic-card">
+                      <span className="ionaflux-metric-label ionaflux-sparkline-label">Tesis Şeması</span>
+                      <div className="ionaflux-schematic">
+                        <div className="ionaflux-schematic-node">
+                          <span className="material-symbols-outlined" aria-hidden="true">propane_tank</span>
+                          <span>Çürütücü 1</span>
+                        </div>
+                        <span className="ionaflux-schematic-link" aria-hidden="true" />
+                        <div className="ionaflux-schematic-node ionaflux-schematic-node-fault">
+                          <span className="ionaflux-fault-pin" aria-hidden="true">⚠️</span>
+                          <span className="material-symbols-outlined" aria-hidden="true">propane_tank</span>
+                          <span>Çürütücü 2</span>
+                        </div>
+                        <span className="ionaflux-schematic-link" aria-hidden="true" />
+                        <div className="ionaflux-schematic-node">
+                          <span className="material-symbols-outlined" aria-hidden="true">bolt</span>
+                          <span>CHP Motor</span>
+                        </div>
+                      </div>
+                      <p className="ionaflux-fault-note">⚠️ Mikser #2: Akım Eşiği %85</p>
+                    </div>
+
+                    <div className="ionaflux-widget-grid">
+                      <div className="ionaflux-metric-card ionaflux-load-widget">
+                        <svg viewBox="0 0 64 64" className="ionaflux-load-ring-svg" aria-hidden="true">
+                          <circle cx="32" cy="32" r={LOAD_RING_R} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="5" />
+                          <circle
+                            cx="32" cy="32" r={LOAD_RING_R} fill="none" stroke="#78dc77" strokeWidth="5"
+                            strokeLinecap="round" strokeDasharray={LOAD_RING_CIRC} strokeDashoffset={loadRingOffset}
+                            transform="rotate(-90 32 32)" className="ionaflux-load-ring-progress"
+                          />
+                          <text x="32" y="37" textAnchor="middle" className="ionaflux-load-ring-text">{metrics.motorLoad.toFixed(0)}%</text>
+                        </svg>
+                        <div>
+                          <span className="ionaflux-metric-label">🟢 Motor Çalışma Yükü</span>
+                          <span key={`motor-${tick}`} className="ionaflux-metric-value ionaflux-flash ionaflux-metric-value-sm">
+                            {metrics.motorPower.toLocaleString('tr-TR')} kWe · 1500 RPM
+                          </span>
+                        </div>
+                      </div>
+                      <div className="ionaflux-metric-card ionaflux-balloon-widget">
+                        <span className="ionaflux-balloon-icon" aria-hidden="true">🎈</span>
+                        <div>
+                          <span className="ionaflux-metric-label">Gaz Depolama / Balon</span>
+                          <span key={`storage-${tick}`} className="ionaflux-metric-value ionaflux-flash ionaflux-metric-value-sm">
+                            %{metrics.gasStorage.toFixed(0)} Doluluk
+                          </span>
+                          <span className="ionaflux-metric-label">1.840 m³ Gaz Hazır</span>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="ionaflux-metric-grid">
                       <div className="ionaflux-metric-card">
                         <span className="ionaflux-metric-icon" aria-hidden="true">🟢</span>
                         <span key={`methane-${tick}`} className="ionaflux-metric-value ionaflux-flash">
                           {metrics.methane.toFixed(1)}% <span className="ionaflux-metric-unit">CH4</span>
                         </span>
-                        <span className="ionaflux-metric-label">Metan Oranı · Optimal</span>
+                        <span className="ionaflux-metric-label">Metan Oranı</span>
                       </div>
                       <div className="ionaflux-metric-card">
                         <span className="ionaflux-metric-icon" aria-hidden="true">🌡️</span>
                         <span key={`temp-${tick}`} className="ionaflux-metric-value ionaflux-flash">
                           {metrics.temp.toFixed(1)} <span className="ionaflux-metric-unit">°C</span>
                         </span>
-                        <span className="ionaflux-metric-label">Reaktör Sıcaklığı · Mezofilik</span>
+                        <span className="ionaflux-metric-label">Sıcaklık</span>
                       </div>
                       <div className="ionaflux-metric-card">
-                        <span className="ionaflux-metric-icon" aria-hidden="true">⚡</span>
-                        <span key={`power-${tick}`} className="ionaflux-metric-value ionaflux-flash">
-                          {metrics.power.toLocaleString('tr-TR')} <span className="ionaflux-metric-unit">kWe</span>
+                        <span className="ionaflux-metric-icon" aria-hidden="true">📈</span>
+                        <span key={`pressure-${tick}`} className="ionaflux-metric-value ionaflux-flash">
+                          {metrics.pressure.toFixed(1)} <span className="ionaflux-metric-unit">mbar</span>
                         </span>
-                        <span className="ionaflux-metric-label">Elektrik Üretimi</span>
+                        <span className="ionaflux-metric-label">Basınç</span>
                       </div>
                       <div className="ionaflux-metric-card">
-                        <span className="ionaflux-metric-icon" aria-hidden="true">💨</span>
-                        <span key={`flow-${tick}`} className="ionaflux-metric-value ionaflux-flash">
-                          {metrics.flow.toLocaleString('tr-TR')} <span className="ionaflux-metric-unit">m³/h</span>
+                        <span className="ionaflux-metric-icon" aria-hidden="true">🛡️</span>
+                        <span key={`h2s-${tick}`} className="ionaflux-metric-value ionaflux-flash">
+                          {metrics.h2s} <span className="ionaflux-metric-unit">ppm</span>
                         </span>
-                        <span className="ionaflux-metric-label">Gaz Debisi</span>
+                        <span className="ionaflux-metric-label">H2S</span>
                       </div>
                     </div>
+
                     <div className="ionaflux-sparkline-card">
-                      <span className="ionaflux-metric-label ionaflux-sparkline-label">Son 24 Saat Gaz Trendi</span>
+                      <span className="ionaflux-metric-label ionaflux-sparkline-label">24s Gaz &amp; Güç Üretim Trendi</span>
                       <div className="ionaflux-chart-wrap">
                         <svg
                           viewBox={`0 0 ${CHART_W} ${CHART_H}`}
@@ -213,11 +333,8 @@ export default function PhoneMockup() {
                           )}
                         </svg>
                         {hoverPoint && (
-                          <div
-                            className="ionaflux-chart-tooltip"
-                            style={{ left: `${(hoverPoint.x / CHART_W) * 100}%` }}
-                          >
-                            <strong>{hoverValue} m³/h</strong>
+                          <div className="ionaflux-chart-tooltip" style={{ left: `${(hoverPoint.x / CHART_W) * 100}%` }}>
+                            <strong>{hoverValue} kWe</strong>
                             <span>{hoursAgo === 0 ? 'Şimdi' : `${hoursAgo}sa önce`}</span>
                           </div>
                         )}
@@ -226,19 +343,62 @@ export default function PhoneMockup() {
                   </>
                 )}
 
-                {tab === 'alerts' && (
-                  <div className="ionaflux-alerts-list">
-                    <div className="ionaflux-alert-item">✅ Besleme Pompası 1: Planlı dozaj tamamlandı</div>
-                    <div className="ionaflux-alert-item">🛡️ H2S Filtresi: 14 ppm (Güvenli Eşik)</div>
-                  </div>
+                {tab === 'logistics' && (
+                  <>
+                    <div className="ionaflux-sparkline-card ionaflux-intake-summary">
+                      <span className="ionaflux-metric-label">Günlük Girdi Özeti</span>
+                      <span className="ionaflux-metric-value ionaflux-metric-value-sm">Toplam Girdi: 284.5 Ton</span>
+                      <span className="ionaflux-metric-label">12 Sefer</span>
+                    </div>
+                    <div className="ionaflux-truck-list">
+                      {TRUCKS.map((truck) => (
+                        <div key={truck.plate} className="ionaflux-metric-card ionaflux-truck-card">
+                          <div className="ionaflux-truck-header">
+                            <span>🚛 {truck.plate}</span>
+                            <span className={`ionaflux-status-badge ionaflux-status-${truck.status}`}>{truck.statusLabel}</span>
+                          </div>
+                          <span className="ionaflux-metric-label ionaflux-truck-farm">{truck.farm}</span>
+                          <span className="ionaflux-truck-waste">{truck.waste}</span>
+                          <span className="ionaflux-metric-label">{truck.time}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
 
-                {tab === 'report' && (
-                  <div className="ionaflux-report-card">
-                    <span className="ionaflux-metric-label ionaflux-report-label">Günlük Biyogaz Verimi</span>
-                    <span className="ionaflux-report-value">10.240 m³</span>
-                    <span className="ionaflux-metric-label">Hedefin %104'ü</span>
-                  </div>
+                {tab === 'lab' && (
+                  <>
+                    <div className="ionaflux-lab-list">
+                      {LAB_ROWS.map((row) => (
+                        <div key={row.label} className="ionaflux-metric-card ionaflux-lab-row">
+                          <span className="ionaflux-metric-label">{row.label}</span>
+                          <span className="ionaflux-metric-value ionaflux-metric-value-sm">{row.value}</span>
+                          <span className="ionaflux-metric-label ionaflux-lab-note">{row.note}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="ionaflux-metric-label ionaflux-lab-footer">
+                      Numune Saati: 14:00 · Onaylayan: Kimya/Biyoloji Lab
+                    </p>
+                  </>
+                )}
+
+                {tab === 'alerts' && (
+                  <>
+                    <div className="ionaflux-alerts-list">
+                      {ALERTS.map((alert) => (
+                        <div key={alert.text} className="ionaflux-alert-item ionaflux-alert-item-severity">
+                          <span className={`ionaflux-status-badge ionaflux-status-${alert.severity === 'warn' ? 'unloading' : 'done'}`}>
+                            {alert.severity === 'warn' ? '⚠️ Uyarı' : '✅ Sistem'}
+                          </span>
+                          <span>{alert.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button type="button" className="ionaflux-report-download" onClick={handleDownloadReport}>
+                      {reportDownloaded ? '✓ İndirildi' : '📄 Günlük Üretim Raporu İndir (PDF)'}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
