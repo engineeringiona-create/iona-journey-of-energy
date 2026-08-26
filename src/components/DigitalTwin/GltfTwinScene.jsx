@@ -43,13 +43,13 @@ const OVERVIEW_DIR = new THREE.Vector3(1, 0.8, 1).normalize();
    after repeated client feedback that feed_pool kept getting cropped —
    correctness over "looks bigger" this round; trim down later only
    once a real screenshot confirms the bottom edge has room to spare. */
-const OVERVIEW_MARGIN = 1.25;
+const OVERVIEW_MARGIN = 1.1;
 /* Portrait phones fit to height only (verticalOnly, see frameBox's own
    comment) — that alone still left the facility reading as "not quite
    fitting"/too large on an actual narrow phone screen once the mobile
    hero activation shipped, so portrait gets its own, more generous
    margin on top of the shared 1.25 rather than reusing it as-is. */
-const OVERVIEW_MARGIN_PORTRAIT = 1.6;
+const OVERVIEW_MARGIN_PORTRAIT = 1.35;
 /* Fraction of the box's own height to drop the camera position AND
    target by, together (see the vertical-drop block in Rig's framing
    effect for why position+target move together, not target alone).
@@ -2451,11 +2451,13 @@ export default function GltfTwinScene() {
            bought. */
         dpr={1}
         gl={{ antialias: true, powerPreference: 'high-performance', alpha: true }}
+        onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
         onPointerMissed={handleReset}
       >
-        {/* No flat <color background> anymore — canvas stays transparent
-           so the radial-gradient CSS on #iona-digital-twin-root (base.css)
-           shows through instead, for perceived depth vs. a flat fill. */}
+        {/* Phase 84: no flat <color background> and an explicit zero-alpha
+           clear color — #iona-digital-twin-root (base.css) is transparent
+           too now, so the facility floats straight on the page's own
+           background with no boxed-in seam. */}
         <ambientLight intensity={0.55} />
         <directionalLight
           ref={keyLightRef}
@@ -2504,26 +2506,10 @@ export default function GltfTwinScene() {
         />
       )}
 
-      {/* Flow toggle pill — top-right corner, out of the way of the
-         bottom-center discoverability hint and the offset-zoomed
-         DetailPanel (which docks right on desktop, see FOCUS_OFFSET_FRACTION's
-         own comment, but only once a structure is actually selected).
-         `hidden md:inline-flex`: Tailwind's `md` is exactly the 768px
-         spec breakpoint, so this reuses the same threshold as the
-         `isMobileViewport` state instead of a second hardcoded number. */}
-      <button
-        type="button"
-        onClick={() => setFlowActive((v) => !v)}
-        aria-pressed={flowActive}
-        className={`hidden md:inline-flex absolute top-4 right-4 sm:top-6 sm:right-6 z-20 items-center gap-2 rounded-full border px-5 py-2.5 shadow-lg backdrop-blur-md transition-colors ${
-          flowActive
-            ? 'border-[var(--brand)] bg-[var(--brand)]/20 text-[var(--brand)]'
-            : 'border-[var(--border-strong)] bg-[var(--surface)]/70 text-[var(--text)]'
-        }`}
-      >
-        <span aria-hidden="true">⚡</span>
-        <span className="font-label-caps text-label-caps">Proses Akışı (Canlı)</span>
-      </button>
+      {/* Phase 84: killed the floating "Proses Akışı (Canlı)" toggle pill —
+         flagged as clutter on the hero. flowActive stays wired up (default
+         false, forced off on mobile) so Model's flow-line shader prop is
+         still valid, it's just no longer user-toggleable from here. */}
 
       {/* First-click discoverability hint — bottom-center so it never
          competes with the hero title (now pinned near the top, see

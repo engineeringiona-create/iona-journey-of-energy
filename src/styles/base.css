@@ -520,16 +520,11 @@ html {
     }
 }
 
-/* Backdrop behind the transparent 3D canvas. Phase 83 asks for
-   #F8FAFC/slate-50 specifically (superseding Phase 80's very-close
-   #FBFBFD) — this is what #iona-digital-twin-root's own background
-   paints, since the R3F <Canvas> itself is transparent, so this div IS
-   the visible hero backdrop the model floats against. Dark mode is
-   untouched on purpose: the porcelain canvas is a light-mode-only
-   editorial choice (like the fixed-dark IonaFlux teaser section further
-   down this same page is a dark-only one), so the previous radial
-   dark-surface falloff stays as the dark-mode backdrop rather than
-   forcing porcelain-on-dark.
+/* Phase 84: killed the porcelain #F8FAFC backdrop panel — it read as a
+   distinct "white box" the model sat inside instead of floating on the
+   page. No background at all now (light or dark): the R3F <Canvas> is
+   already alpha:true/transparent, so with this div transparent too the
+   facility floats directly on the page's own surface color, seamless.
 
    touch-action: Phase 83 also retired the old mobile-only "faded
    background + tap-to-activate" system (#mobile-3d-cta/#mobile-3d-close/
@@ -547,12 +542,8 @@ html {
    passing through unconditionally (taps for structure-selection are
    unaffected by touch-action). */
 #iona-digital-twin-root {
-    background: #F8FAFC;
+    background: transparent;
     touch-action: pan-y;
-}
-
-:root.dark #iona-digital-twin-root {
-    background: radial-gradient(circle at center, var(--surface-2) 0%, var(--bg) 100%);
 }
 
 /* Phase 80 editorial hero furniture: literal slate/porcelain colors by
@@ -590,6 +581,9 @@ html {
 }
 
 .hero-editorial-cta:hover {
+    /* Phase 84 spec calls for hover:bg-[#2D9937] — that's just var(--brand)
+       itself (Phase 82's official primary green), not a one-off hex, so
+       route through the token instead of duplicating the literal value. */
     background: var(--brand);
 }
 
@@ -598,7 +592,7 @@ html {
 }
 
 :root.dark .hero-editorial-cta:hover {
-    background: var(--brand-hover);
+    background: var(--brand);
 }
 
 .hero-hairline {
