@@ -1463,36 +1463,74 @@ html {
     filter: grayscale(1) invert(0.92) contrast(0.9) brightness(0.95) hue-rotate(180deg);
 }
 
-/* ---------------- Phase 68: IonaFlux phone mockup ----------------
-   CSS-only smartphone hardware frame (titanium bezel, notch, side
-   buttons, glossy edge, floating shadow) wrapping a simulated app
-   screen — see src/components/IonaFlux/PhoneMockup.jsx (mounted into
+/* ---------------- Phase 68/71: IonaFlux phone mockup ----------------
+   CSS-only smartphone hardware frame (titanium bezel, Dynamic Island,
+   Action/Volume/Power button notches, glossy edge, floating shadow)
+   wrapping a simulated app screen — see
+   src/components/IonaFlux/PhoneMockup.jsx (mounted into
    #ionaflux-phone-mockup-root by mount.jsx, same lazy-mount pattern as
    the Digital Twin's GLTF scene) for the markup/state this styles.
    Sits inside index.html's #ionaflux-teaser, which is already
    permanently dark (see the section rule further down) — every color
    here is a fixed hex, not a theme variable, since this mockup should
-   look identical regardless of the site's light/dark toggle. */
+   look identical regardless of the site's light/dark toggle.
+
+   Phase 71: scaled way up (200-270px wide -> 260-410px) to actually
+   fill the teaser's right column instead of reading as a small static
+   screenshot, plus the floating "interactive demo" invitation badge,
+   3D mouse-tilt (transform set inline from React state in
+   PhoneMockup.jsx; the transition here is what makes that follow
+   smoothly instead of snapping frame-to-frame), and a real Dynamic
+   Island (was a plain decorative notch) that expands on hover/click. */
+.ionaflux-phone-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+}
+
+.ionaflux-demo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #d1fae5;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(120, 220, 119, 0.45);
+    padding: 8px 16px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px rgba(120, 220, 119, 0.15), 0 0 24px rgba(120, 220, 119, 0.25);
+    animation: ionaflux-badge-float 3.2s ease-in-out infinite;
+}
+
+@keyframes ionaflux-badge-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
 .ionaflux-phone {
     display: flex;
     justify-content: center;
-    /* Phase 70: two stacked drop-shadows instead of one — a big soft
-       ambient throw plus a tighter, closer one standing in for a
-       realistic diffused contact shadow where the phone "sits" on the
-       titanium canvas. */
+    /* Two stacked drop-shadows instead of one — a big soft ambient
+       throw plus a tighter, closer one standing in for a realistic
+       diffused contact shadow where the phone "sits" on the titanium
+       canvas. */
     filter: drop-shadow(0 40px 70px rgba(0, 0, 0, 0.55)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
 }
 
 .ionaflux-phone-frame {
     position: relative;
-    width: clamp(200px, 22vw, 270px);
+    width: clamp(260px, 30vw, 410px);
     aspect-ratio: 9 / 19.5;
     background: linear-gradient(160deg, #3a3d42 0%, #1a1b1e 45%, #3a3d42 100%);
-    border-radius: 2.75rem;
-    padding: 12px;
+    border-radius: 3.25rem;
+    padding: 14px;
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.06) inset,
         0 2px 0 rgba(255, 255, 255, 0.08) inset;
+    transition: transform 0.15s ease-out;
+    transform-style: preserve-3d;
 }
 
 .ionaflux-phone-frame::before {
@@ -1504,38 +1542,66 @@ html {
     pointer-events: none;
 }
 
-.ionaflux-phone-buttons::before,
-.ionaflux-phone-buttons::after {
-    content: '';
+.ionaflux-phone-btn {
     position: absolute;
     background: #131417;
     border-radius: 2px;
+    box-shadow: -1px 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
-.ionaflux-phone-buttons::before {
+.ionaflux-phone-btn-action {
     left: -3px;
-    top: 18%;
+    top: 16%;
     width: 3px;
-    height: 40px;
+    height: 26px;
 }
 
-.ionaflux-phone-buttons::after {
-    right: -3px;
-    top: 24%;
+.ionaflux-phone-btn-volume {
+    left: -3px;
+    top: 26%;
     width: 3px;
     height: 60px;
 }
 
-.ionaflux-phone-notch {
+.ionaflux-phone-btn-power {
+    right: -3px;
+    top: 24%;
+    width: 3px;
+    height: 70px;
+}
+
+.ionaflux-dynamic-island {
     position: absolute;
-    top: 12px;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
-    width: 84px;
-    height: 20px;
+    width: 112px;
+    height: 28px;
     background: #000;
     border-radius: 999px;
     z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    border: none;
+    cursor: pointer;
+    /* Overshoot-then-settle cubic-bezier approximates an iOS spring
+       curve without needing a real physics-based animation lib. */
+    transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ionaflux-dynamic-island.is-expanded {
+    width: 168px;
+    padding: 0 14px;
+}
+
+.ionaflux-island-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: #d1fae5;
+    white-space: nowrap;
 }
 
 .ionaflux-phone-screen {
@@ -1611,6 +1677,18 @@ html {
     padding: 14px 16px;
 }
 
+/* Remounted with a fresh `key={tab}` each time the bottom nav switches
+   tabs (PhoneMockup.jsx), so this animation restarts on every switch —
+   a lightweight slide-and-fade instead of an instant swap. */
+.ionaflux-tab-panel {
+    animation: ionaflux-tab-in 0.28s ease-out;
+}
+
+@keyframes ionaflux-tab-in {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
 .ionaflux-metric-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1654,6 +1732,18 @@ html {
     font-variant-numeric: tabular-nums;
 }
 
+/* Remounted with a fresh key every tick (PhoneMockup.jsx), so this
+   one-shot flash restarts exactly when new (simulated) data lands
+   instead of drifting out of sync with a separately-timed CSS loop. */
+.ionaflux-flash {
+    animation: ionaflux-value-flash 0.6s ease-out;
+}
+
+@keyframes ionaflux-value-flash {
+    0% { color: #78dc77; }
+    100% { color: inherit; }
+}
+
 .ionaflux-metric-unit {
     font-size: 10px;
     font-weight: 600;
@@ -1669,6 +1759,41 @@ html {
 .ionaflux-sparkline-label {
     display: block;
     margin-bottom: 4px;
+}
+
+.ionaflux-chart-wrap {
+    position: relative;
+}
+
+.ionaflux-chart-wrap svg {
+    cursor: crosshair;
+}
+
+.ionaflux-chart-tooltip {
+    position: absolute;
+    top: -6px;
+    transform: translate(-50%, -100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    background: rgba(11, 15, 25, 0.92);
+    border: 1px solid rgba(120, 220, 119, 0.4);
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.ionaflux-chart-tooltip strong {
+    color: #78dc77;
+    font-size: 11px;
+}
+
+.ionaflux-chart-tooltip span {
+    color: #94a3b8;
 }
 
 .ionaflux-alerts-list {
@@ -1733,6 +1858,22 @@ html {
     }
     .ionaflux-nav-btn {
         transition: none;
+    }
+    .ionaflux-demo-badge {
+        animation: none;
+    }
+    .ionaflux-phone-frame {
+        transition: none;
+        transform: none !important;
+    }
+    .ionaflux-dynamic-island {
+        transition: none;
+    }
+    .ionaflux-tab-panel {
+        animation: none;
+    }
+    .ionaflux-flash {
+        animation: none;
     }
 }
 
