@@ -165,3 +165,11 @@ create policy "public update site_content_revisions" on site_content_revisions
 -- Per-image framing (objectFit/aspectRatio/borderRadius/maxWidthPercent/
 -- placement) is just more keys in the existing per-image patch object
 -- already stored at site_content.content.images[imgKey] (Phase 32).
+
+-- Phase 62: floating click-to-edit text popover. Again no schema change —
+-- site_content.content.textStyles[i18nKey] = { fontSize, color,
+-- fontWeight, textAlign }, a sibling bucket to content.images with the
+-- exact same shape/save path, applied via applyTextStyleOverrides() in
+-- src/i18n.js. Replaces the old click-to-contentEditable-in-place flow;
+-- the text content itself still goes through the existing per-lang
+-- content.<lang>[i18nKey] bucket (Phase 1), unchanged.

@@ -102,6 +102,26 @@ function applyImageFraming(el, patch, isImg) {
   }
 }
 
+/* Phase 62 floating text-popover styling: content.textStyles is
+   { [i18nKey]: { fontSize, color, fontWeight, textAlign } }, applied as
+   inline style on the matching [data-i18n="key"] element — same
+   "sibling bucket to images, key is the element's own existing
+   attribute" shape as content.images above. Runs before applyDict()
+   rewrites innerHTML for the same elements (see loadDict/initI18n),
+   which is fine: innerHTML only replaces an element's children, never
+   its own style attribute, so this ordering can't get clobbered. */
+function applyTextStyleOverrides(textStyles) {
+  if (!textStyles) return;
+  Object.entries(textStyles).forEach(([key, patch]) => {
+    const el = document.querySelector(`[data-i18n="${key}"]`);
+    if (!el) return;
+    if (patch.fontSize) el.style.fontSize = `${patch.fontSize}px`;
+    if (patch.color) el.style.color = patch.color;
+    if (patch.fontWeight) el.style.fontWeight = patch.fontWeight;
+    if (patch.textAlign) el.style.textAlign = patch.textAlign;
+  });
+}
+
 /* Section visibility + order (Phase 33, extended Phase 61): content.sections
    is { [sectionId]: true, _order: [id, id, ...] } where each id is a
    section element's own existing DOM id — every <section> on this site
@@ -161,6 +181,7 @@ async function fetchContentOverrides(lang) {
   const supabase = getSupabase();
   if (!supabase) {
     applyImageOverrides(readLocalImages(pageId));
+    applyTextStyleOverrides(readLocalBucket(`textStyles:${pageId}`));
     applySectionLayout(readLocalBucket(`sections:${pageId}`));
     applySeoOverrides(readLocalBucket(`seo:${pageId}`));
     const local = readLocalContent(lang);
@@ -172,6 +193,7 @@ async function fetchContentOverrides(lang) {
     const { data, error } = await supabase.from('site_content').select('*').eq('id', pageId).maybeSingle();
     if (error || !data || !data.content) return null;
     applyImageOverrides(data.content.images);
+    applyTextStyleOverrides(data.content.textStyles);
     applySectionLayout(data.content.sections);
     applySeoOverrides(data.content.seo);
     if (!data.content[lang]) return null;

@@ -5,6 +5,7 @@ import { writeLocalImages, clearLocalImages } from '../../lib/imageContent.js';
 import { readLocalBucket, writeLocalBucket, clearLocalBucket } from '../../lib/adminStore.js';
 import { PAGES, pageIdForPath } from '../../lib/pages.js';
 import ImageSettingsModal from './ImageSettingsModal.jsx';
+import TextEditPopover from './TextEditPopover.jsx';
 import Toast from './Toast.jsx';
 import InboxDrawer from './InboxDrawer.jsx';
 import SeoModal from './SeoModal.jsx';
@@ -38,16 +39,41 @@ const TOOLS = [
   { id: 'history', label: 'Geçmiş', icon: 'history' }
 ];
 
+/* getComputedStyle().color always resolves to "rgb(r, g, b)" (or
+   "rgba(...)") regardless of how the color was originally authored — the
+   TextEditPopover's preset swatches and native <input type="color"> both
+   need a #rrggbb string to compare against/seed from. */
+function rgbStringToHex(rgb) {
+  const match = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(rgb || '');
+  if (!match) return '#14181a';
+  const toHex = (n) => Number(n).toString(16).padStart(2, '0');
+  return `#${toHex(match[1])}${toHex(match[2])}${toHex(match[3])}`;
+}
+
 function injectEditorStyles(doc) {
   if (doc.getElementById(STYLE_ID)) return;
   const style = doc.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    .iona-edit-mode .iona-admin-editable { outline-offset: 2px; cursor: text; }
-    .iona-edit-mode .iona-admin-editable:hover { outline: 1px dashed #10b981; }
-    .iona-edit-mode .iona-admin-editable[contenteditable="true"] {
-      outline: 2px solid #10b981;
-      background: rgba(16, 185, 129, 0.08);
+    /* Phase 62: text elements now open the floating TextEditPopover on
+       click (see LiveEditor's openTextPopover) instead of turning
+       contentEditable in place, so the cursor reads as a click target
+       (pointer), not a text-insertion caret. The ✏️ badge is pure hover
+       affordance — pointer-events:none so it never steals the click. */
+    .iona-edit-mode .iona-admin-editable { outline-offset: 2px; cursor: pointer; position: relative; }
+    .iona-edit-mode .iona-admin-editable:hover { outline: 1px dashed #78dc77; }
+    .iona-edit-mode .iona-admin-editable:hover::after {
+      content: '✏️';
+      position: absolute;
+      top: -9px;
+      right: -9px;
+      font-size: 12px;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .iona-edit-mode .iona-admin-editable.iona-admin-text-active {
+      outline: 2px solid #78dc77;
+      background: rgba(120, 220, 119, 0.08);
       border-radius: 2px;
     }
     .iona-edit-mode [data-img-key] { pointer-events: auto; cursor: pointer; }
@@ -99,8 +125,11 @@ export default function LiveEditor({ onLogout }) {
   const imageOriginalsRef = useRef({});
   const seoOriginalsRef = useRef({});
   const sectionsListRef = useRef([]);
+  const textElRef = useRef(null);
+  const textOriginalsRef = useRef({});
   const [edits, setEdits] = useState({});
   const [imageEdits, setImageEdits] = useState({});
+  const [textStyleEdits, setTextStyleEdits] = useState({});
   const [seoEdits, setSeoEdits] = useState({});
   const [sectionEdits, setSectionEdits] = useState({});
   const [themeEdits, setThemeEdits] = useState({});
@@ -110,6 +139,8 @@ export default function LiveEditor({ onLogout }) {
   const [globalSettings, setGlobalSettings] = useState({ theme: {}, announcement: {}, hotspots: {}, announcements: {} });
   const [activeImageKey, setActiveImageKey] = useState(null);
   const [imagePosition, setImagePosition] = useState(null);
+  const [activeTextKey, setActiveTextKey] = useState(null);
+  const [textPopoverPosition, setTextPopoverPosition] = useState(null);
   const [panel, setPanel] = useState(null);
   const [lang, setLangState] = useState('tr');
   const [selectedPage, setSelectedPage] = useState(PAGES[0].id);
@@ -169,6 +200,17 @@ export default function LiveEditor({ onLogout }) {
 
   const recordImageEdit = useCallback((key, patch) => {
     setImageEdits((current) => ({ ...current, [key]: { ...(current[key] || {}), ...patch } }));
+    setSaved(false);
+  }, []);
+
+  /* Phase 62: fontSize/color/fontWeight/textAlign from the floating
+     TextEditPopover — a sibling bucket to imageEdits above, same shape,
+     saved into content.textStyles[key] alongside content.images[key]. The
+     popover's actual text content still goes through recordEdit (below),
+     since that's the exact same per-i18n-key text bucket the old inline
+     contentEditable flow already wrote to — no reason to duplicate it. */
+  const recordTextStyleEdit = useCallback((key, patch) => {
+    setTextStyleEdits((current) => ({ ...current, [key]: { ...(current[key] || {}), ...patch } }));
     setSaved(false);
   }, []);
 
@@ -306,26 +348,57 @@ export default function LiveEditor({ onLogout }) {
     const loadedPageId = pageIdForPath(iframeRef.current.contentWindow.location.pathname);
     if (loadedPageId) setSelectedPage((current) => (current === loadedPageId ? current : loadedPageId));
 
-    let activeEl = null;
-    let activeOriginal = '';
-
-    function enterEdit(el) {
-      activeEl = el;
-      activeOriginal = el.textContent;
-      el.contentEditable = 'true';
-      el.focus();
-      const range = doc.createRange();
-      range.selectNodeContents(el);
-      const sel = doc.defaultView.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-
-    function commit(el) {
-      el.contentEditable = 'false';
+    /* Phase 62: clicking a [data-i18n] element opens the floating
+       TextEditPopover instead of turning it contentEditable in place —
+       same "compute a position next to the clicked element, read its
+       current live values as the modal's `initial`" pattern openImageModal
+       already uses for images, just for text (content + fontSize/color/
+       fontWeight/textAlign) instead of crop/framing. Values are read from
+       computed style lazily here (not prescanned for every text node up
+       front the way images are) since there can be hundreds of text
+       elements per page and only the one actually clicked needs it. */
+    function openTextPopover(el) {
       const key = el.dataset.i18n;
-      if (key) recordEdit(key, el.textContent.trim());
-      activeEl = null;
+      if (!key) return;
+      textElRef.current = el;
+      const cs = doc.defaultView.getComputedStyle(el);
+      textOriginalsRef.current[key] = {
+        text: el.textContent.trim(),
+        fontSize: Math.round(parseFloat(cs.fontSize)) || 16,
+        color: rgbStringToHex(cs.color),
+        fontWeight: String(cs.fontWeight === 'normal' ? 400 : cs.fontWeight === 'bold' ? 700 : cs.fontWeight),
+        textAlign: cs.textAlign === 'start' ? 'left' : cs.textAlign === 'end' ? 'right' : cs.textAlign
+      };
+
+      const iframeRect = iframeRef.current.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const POPOVER_W = 300;
+      const POPOVER_MIN_H = 320;
+      const MARGIN = 8;
+      let left = iframeRect.left + elRect.left;
+      if (left + POPOVER_W > window.innerWidth) left = window.innerWidth - POPOVER_W - MARGIN;
+      if (left < MARGIN) left = MARGIN;
+
+      /* Anchor just below the clicked element by default; if there isn't
+         POPOVER_MIN_H of room below it, anchor above it instead — same
+         "pick whichever side has room" idea as openImageModal's left/right
+         flip, just on the vertical axis since this popover opens below/
+         above rather than beside. */
+      const belowTop = iframeRect.top + elRect.bottom + 8;
+      const roomBelow = window.innerHeight - belowTop - MARGIN;
+      let top;
+      if (roomBelow >= POPOVER_MIN_H || iframeRect.top + elRect.top < POPOVER_MIN_H) {
+        top = Math.min(belowTop, window.innerHeight - POPOVER_MIN_H - MARGIN);
+      } else {
+        top = Math.max(MARGIN, iframeRect.top + elRect.top - POPOVER_MIN_H - 8);
+      }
+      top = Math.max(top, MARGIN);
+      const maxHeight = Math.min(window.innerHeight * 0.8, window.innerHeight - top - MARGIN);
+      setTextPopoverPosition({ top, left, maxHeight });
+
+      doc.querySelectorAll('.iona-admin-text-active').forEach((n) => n.classList.remove('iona-admin-text-active'));
+      el.classList.add('iona-admin-text-active');
+      setActiveTextKey(key);
     }
 
     function openImageModal(el) {
@@ -365,25 +438,8 @@ export default function LiveEditor({ onLogout }) {
       }
       if (e.target.closest('a')) e.preventDefault();
       const el = e.target.closest('[data-i18n]');
-      if (!el || el.isContentEditable) return;
-      enterEdit(el);
-    }
-
-    function onFocusOut(e) {
-      const el = e.target.closest?.('[data-i18n]');
-      if (el && el.isContentEditable) commit(el);
-    }
-
-    function onKeyDown(e) {
-      if (!activeEl) return;
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        activeEl.textContent = activeOriginal;
-        activeEl.blur();
-      } else if (e.key === 'Enter' && activeEl.tagName !== 'P') {
-        e.preventDefault();
-        activeEl.blur();
-      }
+      if (!el) return;
+      openTextPopover(el);
     }
 
     function onI18nChange(e) {
@@ -391,19 +447,15 @@ export default function LiveEditor({ onLogout }) {
     }
 
     doc.addEventListener('click', onClick, true);
-    doc.addEventListener('focusout', onFocusOut, true);
-    doc.addEventListener('keydown', onKeyDown, true);
     doc.addEventListener('i18nchange', onI18nChange);
 
     cleanupRef.current = () => {
       doc.removeEventListener('click', onClick, true);
-      doc.removeEventListener('focusout', onFocusOut, true);
-      doc.removeEventListener('keydown', onKeyDown, true);
       doc.removeEventListener('i18nchange', onI18nChange);
     };
 
     setReady(true);
-  }, [recordEdit]);
+  }, []);
 
   useEffect(() => () => cleanupRef.current?.(), []);
 
@@ -412,7 +464,6 @@ export default function LiveEditor({ onLogout }) {
     const doc = iframeRef.current?.contentDocument;
     if (!doc) return;
     doc.documentElement.classList.toggle('iona-edit-mode', mode === 'edit');
-    if (mode === 'navigate' && doc.activeElement?.isContentEditable) doc.activeElement.blur();
   }, [mode]);
 
   useEffect(() => {
@@ -458,9 +509,11 @@ export default function LiveEditor({ onLogout }) {
     if (nextPageId === selectedPage) return;
     setEdits({});
     setImageEdits({});
+    setTextStyleEdits({});
     setSeoEdits({});
     setSectionEdits({});
     setActiveImageKey(null);
+    setActiveTextKey(null);
     setPanel(null);
     setSaved(false);
     setSaveError('');
@@ -472,6 +525,7 @@ export default function LiveEditor({ onLogout }) {
     setSaveError('');
     const hasTextEdits = Object.keys(edits).length > 0;
     const hasImageEdits = Object.keys(imageEdits).length > 0;
+    const hasTextStyleEdits = Object.keys(textStyleEdits).length > 0;
     const hasSeoEdits = Object.keys(seoEdits).length > 0;
     const hasSectionEdits = Object.keys(sectionEdits).length > 0;
 
@@ -480,12 +534,14 @@ export default function LiveEditor({ onLogout }) {
       console.warn('[IONA Admin] Supabase yapılandırılmamış (.env eksik) — değişiklik veritabanına yazılmadı.');
       if (hasTextEdits) Object.entries(edits).forEach(([langCode, patch]) => writeLocalContent(langCode, patch));
       if (hasImageEdits) writeLocalImages(currentPage.id, imageEdits);
+      if (hasTextStyleEdits) writeLocalBucket(`textStyles:${currentPage.id}`, textStyleEdits);
       if (hasSeoEdits) writeLocalBucket(`seo:${currentPage.id}`, seoEdits);
       if (hasSectionEdits) writeLocalBucket(`sections:${currentPage.id}`, sectionEdits);
       await flushGlobalEdits();
       setSaveError('Supabase bağlı değil — .env dosyasına VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY ekleyin.');
       setEdits({});
       setImageEdits({});
+      setTextStyleEdits({});
       setSeoEdits({});
       setSectionEdits({});
       setReady(false);
@@ -521,6 +577,13 @@ export default function LiveEditor({ onLogout }) {
       });
       payload.images = mergedImages;
     }
+    if (hasTextStyleEdits) {
+      const mergedTextStyles = { ...(payload.textStyles || {}) };
+      Object.entries(textStyleEdits).forEach(([key, patch]) => {
+        mergedTextStyles[key] = { ...(mergedTextStyles[key] || {}), ...patch };
+      });
+      payload.textStyles = mergedTextStyles;
+    }
     if (hasSeoEdits) payload.seo = { ...(payload.seo || {}), ...seoEdits };
     if (hasSectionEdits) payload.sections = { ...(payload.sections || {}), ...sectionEdits };
 
@@ -543,6 +606,7 @@ export default function LiveEditor({ onLogout }) {
 
     setEdits({});
     setImageEdits({});
+    setTextStyleEdits({});
     setSeoEdits({});
     setSectionEdits({});
     setSaved(true);
@@ -585,12 +649,14 @@ export default function LiveEditor({ onLogout }) {
 
     setEdits({});
     setImageEdits({});
+    setTextStyleEdits({});
     setSeoEdits({});
     setSectionEdits({});
     setThemeEdits({});
     setGlobalSettings((g) => ({ ...g, theme: {} }));
     setSaved(false);
     setActiveImageKey(null);
+    setActiveTextKey(null);
     setPanel(null);
     setReady(false);
     iframeRef.current?.contentWindow?.location.reload();
@@ -611,6 +677,7 @@ export default function LiveEditor({ onLogout }) {
     showToast('success', 'Sürüm geri yüklendi.');
     setEdits({});
     setImageEdits({});
+    setTextStyleEdits({});
     setSeoEdits({});
     setSectionEdits({});
     setReady(false);
@@ -634,6 +701,7 @@ export default function LiveEditor({ onLogout }) {
   const editCount =
     textEditCount +
     Object.keys(imageEdits).length +
+    Object.keys(textStyleEdits).length +
     Object.keys(seoEdits).length +
     Object.keys(sectionEdits).length +
     Object.keys(themeEdits).length +
@@ -643,6 +711,46 @@ export default function LiveEditor({ onLogout }) {
   const activeImageInitial = activeImageOriginal
     ? { ...activeImageOriginal, ...(imageEdits[activeImageKey] || {}) }
     : null;
+  const activeTextOriginal = activeTextKey ? textOriginalsRef.current[activeTextKey] : null;
+  const activeTextInitial = activeTextOriginal
+    ? {
+        ...activeTextOriginal,
+        ...(textStyleEdits[activeTextKey] || {}),
+        ...(edits[lang]?.[activeTextKey] !== undefined ? { text: edits[lang][activeTextKey] } : {})
+      }
+    : null;
+
+  /* Kaydet in the popover: text goes through recordEdit (the same
+     per-i18n-key bucket the old inline contentEditable flow wrote to —
+     this is a UI change, not a new storage shape), style knobs through
+     recordTextStyleEdit. İptal/outside-click/Escape (handled inside
+     TextEditPopover itself) just closes without calling this at all. */
+  function handleTextPopoverSave(patch) {
+    const { text, ...style } = patch;
+    if (text !== undefined) recordEdit(activeTextKey, text);
+    if (Object.keys(style).length > 0) recordTextStyleEdit(activeTextKey, style);
+    const doc = iframeRef.current?.contentDocument;
+    doc?.querySelectorAll('.iona-admin-text-active').forEach((n) => n.classList.remove('iona-admin-text-active'));
+    setActiveTextKey(null);
+  }
+
+  function handleTextPopoverClose() {
+    /* Revert the iframe element back to its pre-popover state — the
+       popover live-previewed every keystroke/control change straight
+       onto textElRef.current, same as ImageSettingsModal's cancel does
+       for images, so İptal has to undo that, not just close the panel. */
+    const el = textElRef.current;
+    if (el && activeTextOriginal) {
+      el.textContent = activeTextOriginal.text;
+      el.style.fontSize = `${activeTextOriginal.fontSize}px`;
+      el.style.color = activeTextOriginal.color;
+      el.style.fontWeight = activeTextOriginal.fontWeight;
+      el.style.textAlign = activeTextOriginal.textAlign;
+    }
+    const doc = iframeRef.current?.contentDocument;
+    doc?.querySelectorAll('.iona-admin-text-active').forEach((n) => n.classList.remove('iona-admin-text-active'));
+    setActiveTextKey(null);
+  }
 
   return (
     <div className="fixed inset-0 flex flex-col bg-[#0e1210]">
@@ -775,6 +883,16 @@ export default function LiveEditor({ onLogout }) {
           onChange={(patch) => recordImageEdit(activeImageKey, patch)}
           onClose={() => setActiveImageKey(null)}
           onToast={showToast}
+        />
+      )}
+
+      {activeTextKey && activeTextInitial && textPopoverPosition && (
+        <TextEditPopover
+          position={textPopoverPosition}
+          initial={activeTextInitial}
+          targetEl={textElRef.current}
+          onSave={handleTextPopoverSave}
+          onClose={handleTextPopoverClose}
         />
       )}
 
