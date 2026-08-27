@@ -743,6 +743,13 @@ const DIGESTER_PIPE_MESH_NAMES = new Set([
    a real plant). Named *_GRATING_* still for the material's own
    history, even though the material itself is concrete now. */
 const DIGESTER_GRATING_MESH_NAMES = new Set(['dome_walkway', 'walkway_inner_kerb', 'top_platform', 'stair_tread']);
+/* Phase 105: the perimeter/stair rail kept visible by
+   DIGESTER_WALKWAY_FENCE_MESH_NAMES's own 3-pass history above
+   (walkway_rail/walkway_midrail/walkway_post, plus stair_handrail_1/2
+   which was never part of that hide/show set at all) — real safety
+   railing, distinct dark metal now instead of falling through to the
+   structure's shared ceramic clay. */
+const DIGESTER_RAILING_MESH_NAMES = new Set(['walkway_rail', 'walkway_midrail', 'walkway_post', 'stair_handrail_1', 'stair_handrail_2']);
 /* The 4 new side-entry wall mixers (plantStructureOverrides.js) —
    deliberately distinct names from the GLB's own pre-existing
    mixer_shaft/mixer_motor/mixer_hub/mixer_blade (the dome-mounted top
@@ -1180,12 +1187,20 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
          every chunk name/varying it depends on (#include
          <emissivemap_fragment>, vViewPosition, vNormal) is still there
          regardless of which of these two material classes is used. */
+      /* Phase 105: "premium architectural clay/titanium mockup" palette
+         — base material (everything not named-overridden below,
+         effectively the concrete/tank/ground bucket) goes matte ceramic
+         instead of the glazed-porcelain clearcoat look. Mixers are
+         never touched by any of Phase 105's retuning: they route around
+         this whole per-structure system entirely (see
+         DIGESTER_MIXER_MESH_NAMES's skip-check in the traverse below)
+         and keep their own fixed materials from plantStructureOverrides.js. */
       const material = new THREE.MeshPhysicalMaterial({
-        color: '#eaeaea',
-        roughness: 0.5,
-        metalness: 0.05,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.2,
+        color: '#f8fafc',
+        roughness: 0.85,
+        metalness: 0.0,
+        clearcoat: 0,
+        clearcoatRoughness: 0,
       });
       const uniformsList = [attachHoverWormShader(material)];
       const structureNamedMaterials = new Map();
@@ -1201,9 +1216,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            etc. stay the structure's normal ceramic like every other
            structure's non-foundation meshes. */
         const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#d6d6d3',
-          metalness: 0.15,
-          roughness: 0.55,
+          color: '#f8fafc',
+          metalness: 0.0,
+          roughness: 0.85,
           map: createDigesterWallAlbedoTexture(),
           bumpMap: createDigesterWallCorrugationTexture(),
           bumpScale: DIGESTER_WALL_BUMP_SCALE,
@@ -1229,9 +1244,11 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            real rolled/brushed aluminium cap) rather than radially. No
            clearcoat: satin brushed metal, not a lacquered finish. */
         const domeMaterial = new THREE.MeshPhysicalMaterial({
-          color: '#d7d9da',
+          color: '#e2e8f0',
           metalness: 0.7,
-          roughness: 0.35,
+          roughness: 0.4,
+          clearcoat: 0.2,
+          clearcoatRoughness: 0.15,
           anisotropy: 0.55,
           anisotropyRotation: Math.PI / 2,
           depthWrite: true,
@@ -1246,13 +1263,31 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            ceramic as the dome/rails, matching the reference's visibly
            separate grey piping. */
         const pipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#8a8d90',
-          metalness: 0.75,
-          roughness: 0.35,
+          color: '#333333',
+          metalness: 0.8,
+          roughness: 0.5,
         });
         pipeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(pipeMaterial));
         DIGESTER_PIPE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, pipeMaterial));
+
+        /* Phase 105: walkway_rail/walkway_midrail/walkway_post/
+           stair_handrail_1/2 (DIGESTER_WALKWAY_FENCE_MESH_NAMES's kept
+           counterpart — see that set's own 3-pass history comment) had
+           no dedicated material before this, so they silently rendered
+           as the same ceramic clay as the walkway deck around them. A
+           real handrail is always bare/painted metal, visibly distinct
+           from the deck it's bolted to — giving it the same dark-metal
+           finish as the pipe fittings above is exactly what the
+           "Pipes & Railings" bucket calls for. */
+        const railingMaterial = new THREE.MeshStandardMaterial({
+          color: '#333333',
+          metalness: 0.8,
+          roughness: 0.5,
+        });
+        railingMaterial.needsUpdate = true;
+        uniformsList.push(attachHoverWormShader(railingMaterial));
+        DIGESTER_RAILING_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, railingMaterial));
 
         /* Walkway/landing/stair-tread decking — client tried the
            expanded-metal grating look (createGratingTexture, diagonal
@@ -1265,7 +1300,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            deck rather than literally the same surface as the ground-
            level foundation ring. */
         const gratingMaterial = new THREE.MeshStandardMaterial({
-          color: '#c9c9c5',
+          color: '#f8fafc',
           metalness: 0,
           roughness: 0.85,
           bumpMap: concreteNoiseTexture,
@@ -1283,9 +1318,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            vents each get their own dedicated material further down
            instead of staying on the structure's shared ceramic. */
         const sandwichPanelMaterial = new THREE.MeshStandardMaterial({
-          color: '#f5f5f5',
-          metalness: 0.2,
-          roughness: 0.6,
+          color: '#1a1a1a',
+          metalness: 0.1,
+          roughness: 0.9,
           bumpMap: sandwichPanelTexture,
           bumpScale: 0.5,
         });
@@ -1297,9 +1332,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            glossy than the wall panels, the way a real prefab roof
            reads against its own walls instead of blending into them. */
         const roofMaterial = new THREE.MeshStandardMaterial({
-          color: '#9a9d9f',
-          metalness: 0.35,
-          roughness: 0.5,
+          color: '#1a1a1a',
+          metalness: 0.1,
+          roughness: 0.9,
         });
         roofMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(roofMaterial));
@@ -1403,9 +1438,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            bare-steel finish as the digester's own pipe fittings, so
            piping reads consistently across the whole plant. */
         const buildingPipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#8a8d90',
-          metalness: 0.75,
-          roughness: 0.35,
+          color: '#333333',
+          metalness: 0.8,
+          roughness: 0.5,
         });
         buildingPipeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(buildingPipeMaterial));
@@ -1416,9 +1451,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            buildingPipeMaterial above but its own instance/name, since
            these are load-bearing structure, not fluid-carrying pipe. */
         const structuralSteelMaterial = new THREE.MeshStandardMaterial({
-          color: '#7e8184',
+          color: '#333333',
           metalness: 0.8,
-          roughness: 0.3,
+          roughness: 0.5,
         });
         structuralSteelMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(structuralSteelMaterial));
@@ -1437,9 +1472,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            near-featureless black block under this scene's lighting —
            lighter base colors / lower metalness throughout fixes that). */
         const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#8a8f94',
-          metalness: 0.25,
-          roughness: 0.55,
+          color: '#1a1a1a',
+          metalness: 0.1,
+          roughness: 0.9,
         });
         wallMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(wallMaterial));
@@ -1502,8 +1537,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            roughness 1.0 / bumpScale 0.6 here vs. 0.9 / 0.4 for
            foundations — same grain, different finish. */
         const poolWallMaterial = new THREE.MeshStandardMaterial({
-          color: '#8c8c8c',
-          roughness: 1.0,
+          color: '#f8fafc',
+          metalness: 0.0,
+          roughness: 0.85,
           bumpMap: concreteNoiseTexture,
           bumpScale: 0.6,
         });
@@ -1534,21 +1570,21 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            pointer-over events in the first place — see handlePointerOver's
            own guard — attaching that shader here would be dead code. */
         const feedMaterial = new THREE.MeshStandardMaterial({
-          color: '#8a8d90', metalness: 0.7, roughness: 0.4,
+          color: '#333333', metalness: 0.8, roughness: 0.5,
         });
         feedMaterial.needsUpdate = true;
         flowUniforms.push(attachFlowPulseShader(feedMaterial, FLOW_FEED_COLOR));
         SITE_PIPING_FEED_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, feedMaterial));
 
         const gasMaterial = new THREE.MeshStandardMaterial({
-          color: '#8a8d90', metalness: 0.7, roughness: 0.4,
+          color: '#333333', metalness: 0.8, roughness: 0.5,
         });
         gasMaterial.needsUpdate = true;
         flowUniforms.push(attachFlowPulseShader(gasMaterial, FLOW_GAS_COLOR));
         SITE_PIPING_GAS_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, gasMaterial));
 
         const powerMaterial = new THREE.MeshStandardMaterial({
-          color: '#4a4d50', metalness: 0.55, roughness: 0.5,
+          color: '#333333', metalness: 0.8, roughness: 0.5,
         });
         powerMaterial.needsUpdate = true;
         flowUniforms.push(attachFlowPulseShader(powerMaterial, FLOW_POWER_COLOR));
@@ -1563,8 +1599,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
          FOUNDATION_MESH_NAMES here even though e.g. digester has no
          "slab" and pump_room has no "pool_pad" costs nothing. */
       const concreteMaterial = new THREE.MeshStandardMaterial({
-        color: '#8c8c8c',
-        roughness: 0.9,
+        color: '#f8fafc',
+        metalness: 0.0,
+        roughness: 0.85,
         bumpMap: concreteNoiseTexture,
         roughnessMap: concreteNoiseTexture,
         bumpScale: 0.4,
@@ -2518,7 +2555,20 @@ export default function GltfTwinScene() {
            clear color — #iona-digital-twin-root (base.css) is transparent
            too now, so the facility floats straight on the page's own
            background with no boxed-in seam. */}
-        <ambientLight intensity={0.55} />
+        {/* Phase 105: "studio softbox" pass. The key light's shadow-camera
+           frustum is dynamically fit to the model's real bounding box
+           every frame (see keyLightRef + Rig's own shadow-frustum
+           effect a few hundred lines down) — that's an orthographic
+           directional-light feature with no SpotLight equivalent, so
+           the key light stays a directionalLight rather than becoming
+           one of the "multiple spotlights" the brief describes; turning
+           it into a SpotLight would silently break that fit-to-box
+           system instead of softening anything. shadow-radius softens
+           the shadow's own edge (works on any shadow-casting light
+           type, not spotlight-exclusive) and the two new soft
+           spotlights below add the wraparound studio-fill look without
+           touching the one light actually doing the real shadow pass. */}
+        <ambientLight intensity={0.6} />
         <directionalLight
           ref={keyLightRef}
           position={[30, 45, 20]}
@@ -2526,6 +2576,7 @@ export default function GltfTwinScene() {
           castShadow
           shadow-mapSize={[2048, 2048]}
           shadow-bias={-0.0005}
+          shadow-radius={4}
         />
         <directionalLight position={[-25, 15, -20]} intensity={0.4} />
         {/* Phase 81: third light in the studio setup — a low, cool rim/
@@ -2535,6 +2586,13 @@ export default function GltfTwinScene() {
            shadow casting: rim lights are about edge highlight, not
            occlusion, in a real studio setup either. */}
         <directionalLight position={[-10, 12, -35]} intensity={0.35} color="#3fae66" />
+        {/* Phase 105: two soft fill spotlights, wide penumbra/low
+           intensity so they read as ambient wraparound fill rather than
+           a second set of hard shadows — no castShadow here on purpose,
+           a real studio softbox's fill lights aren't what's casting the
+           model's main shadow either. */}
+        <spotLight position={[20, 30, -25]} angle={0.7} penumbra={1} intensity={0.5} distance={140} decay={1.5} />
+        <spotLight position={[-30, 25, 25]} angle={0.7} penumbra={1} intensity={0.4} distance={140} decay={1.5} />
 
         <Model
           plantRootRef={plantRootRef}
