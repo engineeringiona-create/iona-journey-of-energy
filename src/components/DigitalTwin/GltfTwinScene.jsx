@@ -71,14 +71,19 @@ const OVERVIEW_MARGIN_PORTRAIT = 1.05;
    center — which is what kept leaving the lowest structure hugging the
    bottom edge across two earlier attempts. */
 const OVERVIEW_VERTICAL_BIAS = 0.35;
-/* No horizontal offset on the overview shot anymore — that existed
-   across two earlier rounds specifically to dodge the hero-copy text,
-   which used to sit vertically centered over the same band as the
-   model. Now that the text is pinned near the top (#hero in base.css:
-   justify-content flex-start, not centered) instead of competing for
-   the same vertical space, the model is just centered, no shift needed.
-   applyLateralOffset itself stays — FOCUS_OFFSET_FRACTION below still
-   uses it for the per-structure zoom, unrelated to this. */
+/* Phase 102: restored (this comment used to say "no horizontal offset
+   needed" from back when hero-copy sat vertically above the model
+   instead of beside it — stale since Phase 95, definitely wrong now
+   that #iona-digital-twin-root is a full-bleed absolute layer again
+   with hero-copy floating over its left ~45%). Negative
+   rightFraction shifts the rig LEFT, which per applyLateralOffset's
+   own doc comment makes the framed object appear shifted RIGHT — the
+   idle-state mirror of FOCUS_OFFSET_FRACTION below, which does the
+   opposite (positive, object appears left) to clear the detail panel
+   once a structure is selected. Magnitude kept smaller than
+   FOCUS_OFFSET_FRACTION: idle only has to clear a ~45%-wide text
+   column, not also make room for a floating detail card. */
+const OVERVIEW_OFFSET_FRACTION = -0.32;
 const FOCUS_DIR = new THREE.Vector3(0.65, 0.42, 0.75).normalize();
 const FOCUS_MARGIN = 1.3;
 /* Phase 88: max extra Y rotation (radians) applied to the whole plant
@@ -1961,6 +1966,14 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
         isPortrait
       );
 
+      /* Phase 102: shift the idle framing right (same gate as FOCUS_OFFSET_
+         FRACTION's own sm-breakpoint check below — hero-copy drops to a
+         full-width overlay under lg, so there's no side column left to
+         dodge there). */
+      const lateral = isPortrait
+        ? framed
+        : applyLateralOffset(framed.position, framed.center, camera, OVERVIEW_OFFSET_FRACTION);
+
       /* Direct, hard vertical bias — camera position AND target dropped by
          the same world-space Y amount (not just target alone, which would
          silently steepen OVERVIEW_DIR's chosen elevation angle instead of
@@ -1973,9 +1986,9 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, sh
          generous 1.25 (real headroom, not a near-exact fit), this
          prioritizes "definitely not cropped" over "as tight as possible". */
       const verticalDrop = size.y * OVERVIEW_VERTICAL_BIAS;
-      const position = framed.position.clone();
+      const position = lateral.position.clone();
       position.y -= verticalDrop;
-      const center = framed.center.clone();
+      const center = lateral.center.clone();
       center.y -= verticalDrop;
 
       overviewRef.current = { position, center };
@@ -2286,7 +2299,7 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
      same index.html comment), so this isn't at risk of the clipping an
      earlier `absolute` attempt hit before `fixed` was introduced. */
   return (
-    <div className="absolute z-20 top-1/4 left-4 right-4 lg:left-auto lg:right-8 lg:w-[450px] max-h-[70vh] lg:max-h-[85vh] lg:min-h-[75vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6">
+    <div className="absolute z-20 top-1/4 left-4 right-4 lg:left-auto lg:right-8 lg:w-[400px] max-h-[70vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-3">
         {sub ? (
           <button

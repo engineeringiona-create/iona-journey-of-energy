@@ -196,32 +196,28 @@
 <div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
 </div>
 
-<!-- Phase 98 EMERGENCY REVERT: Phase 97's `absolute inset-0` 3D layer
-     let the model's canvas render into the WHOLE hero section instead
-     of a confined box, which blew its apparent scale way up and let it
-     visually swallow the text column and the metric bar below. Back to
-     a strict lg:grid-cols-12 with the 3D canvas locked into its own
-     right column (lg:col-span-7, explicit h-[550px]/h-[650px]) — text
-     stays lg:col-span-5. This div IS the mount target
-     (#iona-digital-twin-root) and its own nearest positioned ancestor
-     (relative), so DetailPanel can anchor to it with `absolute`
-     (Phase 99) instead of `fixed` to the viewport. No overflow-hidden
-     here on purpose — GltfTwinScene.jsx's own DetailPanel comment
-     warns that clipped it against #hero's overflow-hidden before; the
-     <canvas> itself never paints outside its own box regardless. -->
+<!-- Phase 102: FULL-SCREEN CANVAS OVERRIDE. Phase 98 reverted Phase 97's
+     absolute-inset-0 3D layer back into a grid column because the
+     model rendered huge/centered with nowhere for the camera to go —
+     that was a real bug, but the fix this time is the thing Phase 97
+     was missing: an actual left/right camera pan (OVERVIEW_OFFSET_FRACTION
+     for idle, the pre-existing FOCUS_OFFSET_FRACTION for inspection —
+     see GltfTwinScene.jsx), not just a bigger box. #iona-digital-twin-root
+     is absolute inset-0 of the whole #hero section again; hero-copy and
+     the 3D layer are stacked by z-index, not grid-positioned side by
+     side, so the model has real room to slide left when a part is
+     selected and hero-copy fades. pointer-events-none on hero-copy (it
+     has no background, so it must not block clicks on the canvas
+     behind it) with pointer-events-auto re-enabled on the CTA link,
+     the one actually-clickable thing in the column. -->
+<div class="absolute inset-0 w-full h-full z-0 iona-cursor-target" id="iona-digital-twin-root"></div>
 <!-- Phase 97: cinematic intro backdrop — dims/blurs the hero behind
      the headline while initHeroCinematicIntro (main-anasayfa.js) holds
      it centered + scaled, then fades out as the headline animates into
      its real position. Removed from the DOM by the same JS once its
      fade-out finishes. -->
 <div class="absolute inset-0 z-[5] backdrop-blur-xl bg-white/50 pointer-events-none" id="hero-intro-overlay" aria-hidden="true"></div>
-<!-- Phase 100: BRUTAL LAYOUT OVERRIDE — killed the max-w-[1400px]
-     mx-auto/px-8 centered container. w-full max-w-[100vw], no side
-     padding on the grid itself: the left column owns its own hard-left
-     padding (pl-8 lg:pl-24) and the right column runs flush to the
-     viewport's right edge (pr-0). -->
-<div class="relative z-10 w-full max-w-[100vw] grid grid-cols-1 lg:grid-cols-12 min-h-[80vh] overflow-hidden">
-<div class="lg:col-span-5 relative z-10 flex flex-col justify-center pl-8 lg:pl-24 pr-4 lg:pr-8 transition-opacity duration-500 ease-out" id="hero-copy">
+<div class="absolute left-0 top-0 w-full lg:w-[45%] h-full flex flex-col justify-center px-8 lg:px-24 z-10 pointer-events-none transition-opacity duration-500 ease-out" id="hero-copy">
 <span class="block overflow-hidden mb-6">
 <span class="hero-meta-label js-reveal-line inline-block text-xs font-mono tracking-widest uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
 </span>
@@ -250,17 +246,7 @@
 <h1 class="inline-block text-[clamp(3rem,5vw,5rem)] font-bold tracking-tight hero-editorial-title leading-[0.95] whitespace-normal break-words" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
 </div>
 <p class="text-lg hero-editorial-sub font-light leading-relaxed mb-8 max-w-lg" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
-<a class="hero-editorial-cta iona-cursor-target inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
-</div>
-<!-- Phase 100: edge-to-edge 3D cage — h-[600px]/lg:h-[85vh], pr-0, no
-     right-side gutter. #iona-digital-twin-root (the actual mount
-     target) goes back to being an inner absolute inset-0 layer so the
-     <canvas> R3F renders always exactly fills this outer box, however
-     this box's own height is set, without depending on the canvas's
-     own default inline sizing. -->
-<div class="lg:col-span-7 w-full h-[600px] lg:h-[85vh] relative z-0 pr-0 iona-cursor-target">
-<div class="w-full h-full absolute inset-0" id="iona-digital-twin-root"></div>
-</div>
+<a class="hero-editorial-cta iona-cursor-target pointer-events-auto inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
 </div>
 
 <!-- Live engineering metric bar. hero-hairline/hero-metric-strip-bg are
