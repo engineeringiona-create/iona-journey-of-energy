@@ -172,6 +172,119 @@ body {
     }
 }
 
+/* Phase 112: thematic subpage backgrounds. Same fixed/z-0/first-in-body
+   slot .iona-dna-bg used (see the Phase 90 comment above for why z-0 not
+   z-[-1]) — index.html's helix canvas and these four are siblings in the
+   same architecture, just different visuals per page group. Static, no
+   scroll-tie (initDnaScroll's querySelector('.iona-dna-bg') simply finds
+   nothing on these pages and no-ops, so no JS changes were needed). */
+.iona-bg-blueprint {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(#e2e8f0 1px, transparent 1px),
+        linear-gradient(90deg, #e2e8f0 1px, transparent 1px),
+        linear-gradient(#cbd5e1 1px, transparent 1px),
+        linear-gradient(90deg, #cbd5e1 1px, transparent 1px);
+    background-size: 8px 8px, 8px 8px, 40px 40px, 40px 40px;
+    opacity: 0.5;
+}
+
+.iona-bg-blueprint .crosshair {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+}
+
+.iona-bg-blueprint .crosshair::before,
+.iona-bg-blueprint .crosshair::after {
+    content: '';
+    position: absolute;
+    background: #94a3b8;
+}
+
+.iona-bg-blueprint .crosshair::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    transform: translateY(-50%);
+}
+
+.iona-bg-blueprint .crosshair::after {
+    left: 50%;
+    top: 0;
+    height: 100%;
+    width: 1px;
+    transform: translateX(-50%);
+}
+
+.iona-bg-blueprint .crosshair-tl { top: 24px; left: 24px; }
+.iona-bg-blueprint .crosshair-tr { top: 24px; right: 24px; }
+.iona-bg-blueprint .crosshair-bl { bottom: 24px; left: 24px; }
+.iona-bg-blueprint .crosshair-br { bottom: 24px; right: 24px; }
+
+:root.dark .iona-bg-blueprint { opacity: 0.15; }
+
+.iona-bg-topo {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.08;
+}
+
+.iona-bg-topo svg {
+    width: 100%;
+    height: 100%;
+}
+
+:root.dark .iona-bg-topo { opacity: 0.06; }
+
+.iona-bg-scada {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: #0f172a;
+    background-image: radial-gradient(circle, color-mix(in srgb, var(--brand) 20%, transparent) 1px, transparent 1.5px);
+    background-size: 24px 24px;
+}
+
+.iona-bg-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.iona-bg-mesh::before,
+.iona-bg-mesh::after {
+    content: '';
+    position: absolute;
+    width: 60vmax;
+    height: 60vmax;
+    border-radius: 50%;
+    filter: blur(120px);
+}
+
+.iona-bg-mesh::before {
+    top: -18vmax;
+    right: -18vmax;
+    background: var(--brand);
+    opacity: 0.13;
+}
+
+.iona-bg-mesh::after {
+    bottom: -18vmax;
+    left: -18vmax;
+    background: var(--brand-yellow);
+    opacity: 0.13;
+}
+
 /* Phase 61: "Tipografi & Tema" panel knobs (src/lib/themeVars.js).
    Scaling html's root font-size scales every rem-based size sitewide in
    one shot rather than needing a --font-scale multiply baked into each
