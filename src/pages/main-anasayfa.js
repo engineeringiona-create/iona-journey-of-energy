@@ -22,67 +22,6 @@ initHelixScrollBg(document.getElementById('helix-scroll-bg'));
 initParallax();
 initCardSpotlight();
 
-/* ---------------- Intro preloader (Phase 77: IonaPreloader) ----------------
-   The mark is real Quicksand text (.iona-wordmark-text), not hand-drawn SVG
-   line art — an earlier stroke-draw version looked nothing like the actual
-   iona logo, so this reveals the four letters in sequence with a
-   blur/opacity/rise-in instead (CSS transition on .preloader-letter.is-in,
-   see base.css), then the slogan shimmers in. Exit waits for both a minimum
-   read-time AND the window 'load' event (this is a static multi-page site
-   with no client hydration step, so 'load' is the closest equivalent to
-   "asset-hydration ready"), capped by a safety timeout so a slow asset can
-   never strand the preloader on screen. The dissolve itself is a pure CSS
-   class (#preloader.is-leaving) so it never fights this timeline. */
-function runPreloader() {
-  const preloader = document.getElementById('preloader');
-  if (!preloader) return;
-  const glow = document.getElementById('preloader-glow');
-  const slogan = document.getElementById('preloader-slogan');
-  const letters = ['pl-letter-i', 'pl-letter-o', 'pl-letter-n', 'pl-letter-a']
-    .map((id) => document.getElementById(id))
-    .filter(Boolean);
-
-  const glowPulse = gsap.to(glow, {
-    opacity: 0.85,
-    scale: 1.15,
-    duration: 1.3,
-    repeat: -1,
-    yoyo: true,
-    ease: 'sine.inOut',
-    transformOrigin: '50% 50%'
-  });
-
-  const STEP = 0.22;
-  letters.forEach((letter, i) => {
-    gsap.delayedCall(i * STEP, () => letter.classList.add('is-in'));
-  });
-  const sloganAt = letters.length * STEP + 0.15;
-  gsap.delayedCall(sloganAt, () => slogan.classList.add('is-in'));
-
-  const minVisibleMs = (sloganAt + 0.55) * 1000;
-
-  const exit = () => {
-    glowPulse.kill();
-    preloader.classList.add('is-leaving');
-    /* Phase 97: lets initHeroCinematicIntro start its own 1.5s hold the
-       moment the preloader actually starts dissolving, instead of on a
-       fixed timer from script-eval — otherwise that hold would tick
-       away invisibly while the opaque preloader still covers it. */
-    document.dispatchEvent(new CustomEvent('preloaderdone'));
-    preloader.addEventListener('transitionend', () => preloader.remove(), { once: true });
-  };
-
-  const pageReady = new Promise((resolve) => {
-    if (document.readyState === 'complete') resolve();
-    else window.addEventListener('load', () => resolve(), { once: true });
-  });
-  const minTimer = new Promise((resolve) => setTimeout(resolve, minVisibleMs));
-  const safetyCap = new Promise((resolve) => setTimeout(resolve, 4000));
-
-  Promise.race([Promise.all([pageReady, minTimer]), safetyCap]).then(exit);
-}
-runPreloader();
-
 /* ---------------- Hero: 3D twin drill-down ----------------
    The hero canvas + click/zoom logic live in React (GltfTwinScene.jsx);
    the title/badge overlay is plain markup here. GltfTwinScene dispatches
@@ -131,25 +70,23 @@ function initHeroReveal() {
 }
 initHeroReveal();
 
-/* ---------------- Phase 97: cinematic hero intro ----------------
+/* ---------------- Phase 97/110: cinematic hero intro ----------------
    The headline starts perfectly centered on screen at scale 1.2 over a
-   blurred/dimmed backdrop (#hero-intro-overlay), holds there while the
-   preloader is still up, then — once the preloader actually starts
-   dissolving (see the 'preloaderdone' dispatch in runPreloader above)
-   — waits 1.5s and animates back to its real in-flow position as the
-   overlay fades out. This is a FLIP-style transform (measure the real
-   rect, gsap.set an offsetting transform, tween back to identity)
-   rather than a Framer Motion layout animation: the site's whole
-   motion layer is already GSAP end to end (see initHeroReveal just
-   above, initMagneticButtons below), and the 3D inspection mode this
-   headline hands off to (click-to-select, camera fit, X-ray dimming,
-   the slide-in detail panel) already exists and works inside
-   GltfTwinScene.jsx — pulling in a second animation library for just
-   this one element would fight that existing system for no visual
-   gain. The gsap.set below runs at script-eval time, before the
-   preloader has dissolved, so there's no flash of the headline
-   snapping into its offset position — the opaque preloader is still
-   covering it. */
+   blurred/dimmed backdrop (#hero-intro-overlay), holds there briefly,
+   then animates back to its real in-flow position as the overlay fades
+   out. This is a FLIP-style transform (measure the real rect, gsap.set
+   an offsetting transform, tween back to identity) rather than a Framer
+   Motion layout animation: the site's whole motion layer is already
+   GSAP end to end (see initHeroReveal just above, initMagneticButtons
+   below), and the 3D inspection mode this headline hands off to
+   (click-to-select, camera fit, X-ray dimming, the slide-in detail
+   panel) already exists and works inside GltfTwinScene.jsx — pulling
+   in a second animation library for just this one element would fight
+   that existing system for no visual gain.
+   Phase 110: the intro preloader this used to sync against (via a
+   'preloaderdone' event) is gone — client asked for the bubble-effect
+   loading screen removed entirely. The hold is now a plain gsap
+   delayedCall from script-eval time instead of an event wait. */
 function initHeroCinematicIntro() {
   const overlay = document.getElementById('hero-intro-overlay');
   const headline = document.querySelector('#hero-copy h1');
@@ -165,23 +102,19 @@ function initHeroCinematicIntro() {
   const dy = window.innerHeight / 2 - (rect.top + rect.height / 2);
   gsap.set(headline, { x: dx, y: dy, scale: 1.2, transformOrigin: '50% 50%' });
 
-  document.addEventListener(
-    'preloaderdone',
-    () => {
-      const tl = gsap.timeline({ delay: 1.5 });
-      tl.to(overlay, {
-        opacity: 0,
-        duration: 0.9,
-        ease: 'power2.out',
-        onComplete: () => overlay.remove()
-      }).to(
-        headline,
-        { x: 0, y: 0, scale: 1, duration: 1.2, ease: 'power3.inOut' },
-        '<'
-      );
-    },
-    { once: true }
-  );
+  gsap.delayedCall(0.8, () => {
+    const tl = gsap.timeline();
+    tl.to(overlay, {
+      opacity: 0,
+      duration: 0.9,
+      ease: 'power2.out',
+      onComplete: () => overlay.remove()
+    }).to(
+      headline,
+      { x: 0, y: 0, scale: 1, duration: 1.2, ease: 'power3.inOut' },
+      '<'
+    );
+  });
 }
 initHeroCinematicIntro();
 
