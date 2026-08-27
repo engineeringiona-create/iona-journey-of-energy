@@ -576,54 +576,19 @@ function attachFlowPulseShader(material, color) {
    apart, independent of whatever the material of the day is. */
 const DIGESTER_WALL_MESH_NAME = 'tank_wall';
 const DIGESTER_WALL_STRIPE_REPEAT_X = 200;
-/* Ridge depth in world units (meters), dialed back from earlier passes
-   (0.035 → 0.6 → 0.8 → 0.35) once the albedo below carried most of the
-   ridge read-out — kept at that same 0.35 now that the corrugation is
-   back after a brief "plain white" detour. */
-const DIGESTER_WALL_BUMP_SCALE = 0.35;
+/* Phase 109: the bump-map ridge texture (createDigesterWallCorrugationTexture,
+   DIGESTER_WALL_BUMP_SCALE) that used to pair with the albedo map below
+   is gone — client asked for a perfectly smooth matte clay tank, no
+   bump/normal noise, so wallMaterial no longer sets `bumpMap` at all.
+   The albedo texture below stays (still gives the wall its painted
+   ridge-color pattern, just no longer has raised-looking geometry). */
 
-/* Corrugation as an actual <canvas>, not a DataTexture or external
-   image file. One crisp light/dark half-and-half tile — not a gradient
-   — so `repeat.set(200, 1)` alone controls ridge density exactly (200
-   ridge pairs around the tank). Grays are 235/40, not pure 255/0: pure
-   black crushes to nothing under the plant's ambient lighting, so a
-   hair off pure keeps both the lit crest and shadowed valley legible.
-   generateMipmaps off + NearestFilter on both filters avoids the
-   mipmap trap this exact texture hit in earlier passes (both canvas and
-   DataTexture went invisible at this high a `repeat` value without it). */
-function createDigesterWallCorrugationTexture() {
-  const size = 512;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-
-  ctx.fillStyle = 'rgb(235, 235, 235)';
-  ctx.fillRect(0, 0, size / 2, size);
-  ctx.fillStyle = 'rgb(40, 40, 40)';
-  ctx.fillRect(size / 2, 0, size / 2, size);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(DIGESTER_WALL_STRIPE_REPEAT_X, 1);
-  texture.generateMipmaps = false;
-  texture.minFilter = THREE.NearestFilter;
-  texture.magFilter = THREE.NearestFilter;
-  texture.needsUpdate = true;
-  return texture;
-}
-
-/* Same ridge pattern as the bump texture above, but as an actual
-   albedo/color map — kept at the low-contrast pair from the last
-   tuning pass (both tones a close light warm-grey) rather than the
-   original high-contrast 205/120 version, which read as a harsh
-   striped/barcode pattern instead of a real corrugated panel once the
-   client's own CAD reference showed uniform, near-flat panel color
-   with only soft ridge shading. Separate texture (not the bump one
-   reused) so the bump texture's own contrast, tuned for shading rather
-   than color, stays untouched; same size/repeat so the bands still
-   line up with the bump ridges. */
+/* The albedo/color map for the digester wall — kept at the low-contrast
+   pair from the last tuning pass (both tones a close light warm-grey)
+   rather than the original high-contrast 205/120 version, which read
+   as a harsh striped/barcode pattern instead of a real corrugated
+   panel once the client's own CAD reference showed uniform, near-flat
+   panel color with only soft ridge shading. */
 function createDigesterWallAlbedoTexture() {
   const size = 512;
   const canvas = document.createElement('canvas');
@@ -795,45 +760,6 @@ const FEED_POOL_HARDWARE_MESH_NAMES = new Set([
   'pool_mixer_blade',
   'pool_rim',
 ]);
-
-/* Plain per-pixel random grayscale — concrete's actual grain has no
-   directionality or repeating structure the way corrugated metal does,
-   so unlike the wall texture this has no pattern logic at all, just
-   noise. Band clamped to roughly 90-209 rather than the full 0-255 range so no
-   pixel bottoms out pure black or tops out pure white — real aggregate/
-   pore variation reads as this mid-range speckle, not pure white
-   flecks in soot, which would look like sensor noise rather than
-   material grain. Same mipmap trap as the wall texture applies here
-   too — arguably worse, since pure noise is the single worst case for
-   mip-averaging (it flattens to a dead uniform gray fastest of any
-   pattern) — so the same generateMipmaps/NearestFilter fix is
-   non-negotiable here as well. */
-function createConcreteBaseNoiseTexture() {
-  const size = 256;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  const imageData = ctx.createImageData(size, size);
-  for (let i = 0; i < imageData.data.length; i += 4) {
-    const gray = 90 + Math.floor(Math.random() * 120);
-    imageData.data[i] = gray;
-    imageData.data[i + 1] = gray;
-    imageData.data[i + 2] = gray;
-    imageData.data[i + 3] = 255;
-  }
-  ctx.putImageData(imageData, 0, 0);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(15, 15);
-  texture.generateMipmaps = false;
-  texture.minFilter = THREE.NearestFilter;
-  texture.magFilter = THREE.NearestFilter;
-  texture.needsUpdate = true;
-  return texture;
-}
 
 /* Expanded-metal walkway grating — a diagonal criss-cross of dark lines
    over a light metal base, the same visual shorthand real plant CAD
@@ -1150,15 +1076,11 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
        and tweened on toggle by the outer component — see flowUniformsRef
        below and its own comment. */
     const flowUniforms = [];
-    /* One concrete-noise texture, shared by every structure's own
-       concrete material instance below — sharing a *texture* across
-       materials is fine (it's a stateless GPU resource); it's sharing a
-       *material* across structures that would break the per-structure
-       opacity/hover isolation this file depends on (see materialsRef's
-       own comment), which is exactly why each structure still gets its
-       own `new THREE.MeshStandardMaterial(...)` for its foundation. */
-    const concreteNoiseTexture = createConcreteBaseNoiseTexture();
-    /* Shared the same way concreteNoiseTexture is — one texture, one
+    /* Phase 109: concreteNoiseTexture/createConcreteBaseNoiseTexture are
+       gone — client asked for a perfectly smooth matte clay concrete/
+       base look, no bump/roughness noise, so nothing below sets a
+       bumpMap/roughnessMap anymore. */
+    /* Shared the same way a texture would be — one texture, one
        instance each of the material that uses it, per building (see
        BUILDING_WALL_MESH_NAMES's own comment on why one shared
        repeat/spacing across differing real wall heights is acceptable
@@ -1197,7 +1119,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
          and keep their own fixed materials from plantStructureOverrides.js. */
       const material = new THREE.MeshPhysicalMaterial({
         color: '#f8fafc',
-        roughness: 0.85,
+        roughness: 1.0,
         metalness: 0.0,
         clearcoat: 0,
         clearcoatRoughness: 0,
@@ -1218,10 +1140,8 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         const wallMaterial = new THREE.MeshStandardMaterial({
           color: '#f8fafc',
           metalness: 0.0,
-          roughness: 0.85,
+          roughness: 1.0,
           map: createDigesterWallAlbedoTexture(),
-          bumpMap: createDigesterWallCorrugationTexture(),
-          bumpScale: DIGESTER_WALL_BUMP_SCALE,
           /* Explicit, not just relying on THREE's own defaults (which
              already match this at rest) — the X-ray effect below only
              ever toggles .transparent/.opacity on select, never these,
@@ -1302,10 +1222,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         const gratingMaterial = new THREE.MeshStandardMaterial({
           color: '#f8fafc',
           metalness: 0,
-          roughness: 0.85,
-          bumpMap: concreteNoiseTexture,
-          roughnessMap: concreteNoiseTexture,
-          bumpScale: 0.35,
+          roughness: 1.0,
         });
         gratingMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(gratingMaterial));
@@ -1318,9 +1235,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            vents each get their own dedicated material further down
            instead of staying on the structure's shared ceramic. */
         const sandwichPanelMaterial = new THREE.MeshStandardMaterial({
-          color: '#1a1a1a',
+          color: '#3f3f46',
           metalness: 0.1,
-          roughness: 0.9,
+          roughness: 0.7,
           bumpMap: sandwichPanelTexture,
           bumpScale: 0.5,
         });
@@ -1332,9 +1249,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            glossy than the wall panels, the way a real prefab roof
            reads against its own walls instead of blending into them. */
         const roofMaterial = new THREE.MeshStandardMaterial({
-          color: '#1a1a1a',
+          color: '#3f3f46',
           metalness: 0.1,
-          roughness: 0.9,
+          roughness: 0.7,
         });
         roofMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(roofMaterial));
@@ -1472,9 +1389,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            near-featureless black block under this scene's lighting —
            lighter base colors / lower metalness throughout fixes that). */
         const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#1a1a1a',
+          color: '#3f3f46',
           metalness: 0.1,
-          roughness: 0.9,
+          roughness: 0.7,
         });
         wallMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(wallMaterial));
@@ -1539,9 +1456,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         const poolWallMaterial = new THREE.MeshStandardMaterial({
           color: '#f8fafc',
           metalness: 0.0,
-          roughness: 0.85,
-          bumpMap: concreteNoiseTexture,
-          bumpScale: 0.6,
+          roughness: 1.0,
         });
         poolWallMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(poolWallMaterial));
@@ -1601,10 +1516,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       const concreteMaterial = new THREE.MeshStandardMaterial({
         color: '#f8fafc',
         metalness: 0.0,
-        roughness: 0.85,
-        bumpMap: concreteNoiseTexture,
-        roughnessMap: concreteNoiseTexture,
-        bumpScale: 0.4,
+        roughness: 1.0,
       });
       concreteMaterial.needsUpdate = true;
       uniformsList.push(attachHoverWormShader(concreteMaterial));
@@ -2569,10 +2481,18 @@ export default function GltfTwinScene() {
            spotlights below add the wraparound studio-fill look without
            touching the one light actually doing the real shadow pass. */}
         <ambientLight intensity={0.6} />
+        {/* Phase 109: fills the now-dark anthracite buildings/roofs with
+           soft, direction-independent sky/ground bounce so their edges
+           still catch light instead of reading as flat silhouettes —
+           the plain ambientLight above is uniform in every direction,
+           this adds a top-vs-bottom gradient (sky tint from above,
+           ground-bounce tint from below) the way real diffuse outdoor
+           light actually falls on a dark surface. */}
+        <hemisphereLight args={[0xffffff, 0x444444, 1.0]} />
         <directionalLight
           ref={keyLightRef}
           position={[30, 45, 20]}
-          intensity={1.6}
+          intensity={1.5}
           castShadow
           shadow-mapSize={[2048, 2048]}
           shadow-bias={-0.0005}
