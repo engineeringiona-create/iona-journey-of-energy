@@ -445,22 +445,34 @@
 </section>
 
 <!-- Footer -->
-<footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
-<svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
-<path class="footer-curve-path" d="M-50 60 C 350 260, 1050 -60, 1450 340" stroke="#2d9937" stroke-width="2" fill="none" pathLength="1000"></path>
-</svg>
-<div class="relative max-w-[theme(spacing.container-max)] mx-auto flex flex-col items-center gap-10 text-center">
-<span class="text-[10px] font-mono uppercase tracking-widest text-black/40">İletişime Geçin</span>
-<a class="text-[11vw] md:text-[7vw] leading-[0.95] font-bold tracking-tighter text-black break-all hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">HELLO@IONA.COM</a>
-<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 mt-6 fade-in-element">
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.privacy"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.terms"></a>
-<a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="#" data-i18n="footer.impact_report"></a>
+<!-- Phase 107: compact architectural footer — see hakkimizda.html's own
+     copy of this comment for the full rationale (homepage keeps the
+     old brutalist footer, subpages get this instead). -->
+<footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop py-16 fade-in-section" id="site-footer">
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto pl-8 md:pl-10">
+<div class="absolute left-0 top-0 h-full w-[2px]" style="background:linear-gradient(180deg,#2d9937,#ffc700)" aria-hidden="true"></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 fade-in-element">
+<div>
+<span class="iona-wordmark-text" style="font-size:22px;color:#000">iona</span>
+<p class="text-sm text-black/60 mt-4 max-w-xs">Organik atığı sürdürülebilir yeşil enerjiye dönüştüren mühendislik çözümleri.</p>
 </div>
-<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/50 mt-8" data-i18n="footer.copyright"></p>
+<div class="flex flex-col gap-2 text-sm">
+<span class="text-[11px] font-mono uppercase tracking-widest text-black/40 mb-2">İletişim</span>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">hello@iona.com</a>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="tel:+905402464662">+90 540 246 4662</a>
+<span class="text-black/60">Kırkkonaklar Mah. 358. Sok. 13/5<br>Çankaya, Ankara / Türkiye</span>
+</div>
+<div class="flex flex-col gap-2 text-sm">
+<span class="text-[11px] font-mono uppercase tracking-widest text-black/40 mb-2">Hızlı Bağlantılar</span>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="/ionaflux.html" data-i18n="nav.ionaflux">IonaFlux</a>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="/duyurular.html" data-i18n="nav.news">Duyurular</a>
+<a class="text-black hover:text-[#2d9937] transition-colors" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+</div>
+</div>
+<p class="font-label-caps text-[11px] uppercase tracking-widest text-black/40 mt-10 pt-6 border-t border-slate-200" data-i18n="footer.copyright"></p>
 </div>
 </footer>
 

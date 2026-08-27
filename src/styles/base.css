@@ -107,12 +107,25 @@ body {
    being the first element in body achieves the same "behind every real
    section" result without that trap, since every section after it is
    normal-flow/z-index:auto and paints on top by DOM order alone. */
+/* Phase 107: shifted right-of-center (was dead-centered) and enlarged
+   ~25% via the svg's own transform below — left:55% + translateX(-50%)
+   re-centers the box's own midpoint at 55vw instead of 50vw (still
+   spans a full viewport-width box either way, so coverage doesn't
+   shrink, just the tile pattern's phase/alignment against the
+   viewport shifts). z-index stays 0, not the literal z-[-1] the brief
+   describes — see the Phase 90 comment above for why: body's own
+   opaque background paints over a negative z-index on a fixed child
+   of body, the exact trap that comment already documents. */
 .iona-dna-bg {
     position: fixed;
-    inset: 0;
+    top: 0;
+    bottom: 0;
+    left: 55%;
+    width: 100%;
+    transform: translateX(-50%);
     z-index: 0;
     overflow: hidden;
-    opacity: 0.15;
+    opacity: 0.2;
     pointer-events: none;
     perspective: 1200px;
 }
@@ -128,7 +141,11 @@ body {
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-    transform: rotateY(calc(var(--scroll-progress, 0) * 360deg)) translateY(calc(var(--scroll-progress, 0) * -100px));
+    /* Phase 107: scale(1.25) is the "enlarge ~25%" ask — folded into
+       this same transform rather than resized via the tile pattern's
+       own width/height/coordinates (duplicated inline markup across
+       6 pages), one shared rule instead of six near-identical edits. */
+    transform: scale(1.25) rotateY(calc(var(--scroll-progress, 0) * 360deg)) translateY(calc(var(--scroll-progress, 0) * -100px));
 }
 
 /* Single shared keyframe (both stroke and fill authored in each step) —

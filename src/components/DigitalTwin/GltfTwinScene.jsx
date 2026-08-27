@@ -2255,7 +2255,7 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
      same index.html comment), so this isn't at risk of the clipping an
      earlier `absolute` attempt hit before `fixed` was introduced. */
   return (
-    <div className="absolute z-50 top-1/4 right-8 left-4 lg:left-auto lg:w-[400px] max-h-[70vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6">
+    <div className="absolute z-50 top-1/4 right-8 left-4 lg:left-auto lg:w-[400px] max-h-[70vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6 cursor-auto pointer-events-auto">
       <div className="flex items-start justify-between gap-3">
         {sub ? (
           <button
