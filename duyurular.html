@@ -130,10 +130,16 @@
 </div>
 </section>
 
-<!-- Announcements grid -->
+<!-- Phase 108: Dezeen/ArchDaily-style editorial grid. First item (the
+     latest announcement) is a massive lg:col-span-8 feature; every item
+     after it is lg:col-span-4 — 8+4=12 fills row one exactly, then 3
+     secondaries per row fill every row after (4+4+4=12), pure CSS grid
+     auto-placement, no manual row bookkeeping (see cardHtml,
+     main-duyurular.js). gap-0 + each card's own border-b/border-r is
+     what draws the ruled-line grid look instead of card gutters. -->
 <section class="px-safe-margin-mobile md:px-safe-margin-desktop pb-20 md:pb-24 fade-in-section">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="announcements-grid"></div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-0 border-t border-slate-200" id="announcements-grid"></div>
 <p class="text-center text-[var(--text-muted)] py-16 hidden" id="announcements-empty">Henüz duyuru bulunmuyor.</p>
 </div>
 </section>

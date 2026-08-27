@@ -33,19 +33,38 @@ function escapeHtml(str) {
   return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function cardHtml(a) {
+/* Phase 108: Dezeen/ArchDaily-style editorial magazine layout. index 0
+   is the featured article (lg:col-span-8, massive headline/image); every
+   other card is a secondary (lg:col-span-4, smaller/punchy). Solid
+   bg-white on every card — no backdrop-blur, no transparency — is what
+   actually fixes the readability/scroll-lag complaint against the
+   .iona-dna-bg watermark behind this page; sharp corners everywhere
+   (no rounded-*) for the brutalist grid look; the only hover cost is a
+   pure-CSS group-hover:scale-105 on the image, nothing else animates. */
+function cardHtml(a, index) {
+  const isFeatured = index === 0;
   const bannerHtml = a.bannerImage
-    ? `<img src="${a.bannerImage}" alt="" class="w-full h-44 object-cover" loading="lazy" decoding="async">`
-    : `<div class="w-full h-44 bg-[var(--surface-2)]"></div>`;
+    ? `<img src="${a.bannerImage}" alt="" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy" decoding="async">`
+    : `<div class="w-full h-full bg-[var(--surface-2)]"></div>`;
+  const metaParts = [a.category, a.date].filter(Boolean).map(escapeHtml).join(' &middot; ');
+  const metaHtml = metaParts ? `<span class="text-xs uppercase tracking-widest mb-4 block font-bold" style="color:#2d9937">${metaParts}</span>` : '';
+
+  if (isFeatured) {
+    return `
+      <button type="button" class="group text-left bg-white lg:col-span-8 lg:border-r border-b border-slate-200 p-8 lg:p-12 flex flex-col" data-announcement-card>
+        <div class="w-full aspect-video overflow-hidden mb-6">${bannerHtml}</div>
+        ${metaHtml}
+        <h2 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight">${escapeHtml(a.title)}</h2>
+        <p class="text-base text-black/60 max-w-2xl">${escapeHtml((a.description || '').slice(0, 220))}${(a.description || '').length > 220 ? '…' : ''}</p>
+      </button>
+    `;
+  }
   return `
-    <button type="button" class="text-left rounded-2xl overflow-hidden bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors duration-300 flex flex-col" data-announcement-card>
-      ${bannerHtml}
-      <div class="p-6 flex flex-col gap-2">
-        ${a.category ? `<span class="font-label-caps text-[11px] font-bold tracking-[0.08em] text-[var(--brand-orange)]">${escapeHtml(a.category)}</span>` : ''}
-        ${a.date ? `<span class="text-[12px] text-[var(--text-muted)]">${escapeHtml(a.date)}</span>` : ''}
-        <h3 class="font-headline-md text-headline-md">${escapeHtml(a.title)}</h3>
-        <p class="text-body-md text-[var(--text-muted)] line-clamp-3">${escapeHtml((a.description || '').slice(0, 160))}${(a.description || '').length > 160 ? '…' : ''}</p>
-      </div>
+    <button type="button" class="group text-left bg-white lg:col-span-4 border-b border-slate-200 p-6 lg:p-8 flex flex-col" data-announcement-card>
+      <div class="w-full aspect-video overflow-hidden mb-4">${bannerHtml}</div>
+      ${metaHtml}
+      <h3 class="text-2xl font-bold mb-3 leading-tight">${escapeHtml(a.title)}</h3>
+      <p class="text-sm text-black/60 line-clamp-3">${escapeHtml((a.description || '').slice(0, 140))}${(a.description || '').length > 140 ? '…' : ''}</p>
     </button>
   `;
 }
