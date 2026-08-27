@@ -158,7 +158,10 @@ body {
 
 .iona-dna-bg path,
 .iona-dna-bg line,
-.iona-dna-bg circle {
+.iona-dna-bg circle,
+#ionaflux-dna-origin path,
+#ionaflux-dna-origin line,
+#ionaflux-dna-origin circle {
     animation: dna-color-shift 12s ease-in-out infinite alternate;
 }
 
@@ -166,7 +169,10 @@ body {
     .iona-dna-bg svg,
     .iona-dna-bg path,
     .iona-dna-bg line,
-    .iona-dna-bg circle {
+    .iona-dna-bg circle,
+    #ionaflux-dna-origin path,
+    #ionaflux-dna-origin line,
+    #ionaflux-dna-origin circle {
         animation: none;
         transform: none;
     }
@@ -174,9 +180,10 @@ body {
 
 /* Phase 112: thematic subpage backgrounds. Same fixed/z-0/first-in-body
    slot .iona-dna-bg used (see the Phase 90 comment above for why z-0 not
-   z-[-1]) — index.html's helix canvas and these four are siblings in the
-   same architecture, just different visuals per page group. Static, no
-   scroll-tie (initDnaScroll's querySelector('.iona-dna-bg') simply finds
+   z-[-1]) — the homepage's own DNA moved off this pattern entirely in
+   Phase 113 (see #ionaflux-dna-origin below), these four are siblings in
+   the same architecture on the other 6 pages, just different visuals per
+   page group. Static, no scroll-tie (initDnaScroll's querySelector('.iona-dna-bg') simply finds
    nothing on these pages and no-ops, so no JS changes were needed). */
 .iona-bg-blueprint {
     position: fixed;

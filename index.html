@@ -25,16 +25,13 @@
 <div id="iona-curtain" aria-hidden="true">
 <span class="iona-wordmark-text" style="font-size:32px">iona</span>
 </div>
-<!-- Phase 103: homepage-only upgrade of the sitewide flat-SVG DNA
-     watermark (still .iona-dna-bg on the other 6 pages) to a real
-     Three.js scroll-driven double-helix, ported from a claude.ai/design
-     import ("Three.js sarmalı scroll animasyonu" — see
-     src/three/helix-scroll-bg.js for the full port notes). Same fixed/
-     inset-0/z-0/first-in-body placement convention as .iona-dna-bg so
-     it sits behind every section exactly the same way; initHelixScrollBg
-     (main-anasayfa.js) mounts into this canvas by id, same
-     initXScene(canvas) shape as expo-scene.js/genset-scene.js. -->
-<canvas class="helix-scroll-bg" id="helix-scroll-bg" aria-hidden="true"></canvas>
+<!-- Phase 113: the Phase 103 global fixed Three.js helix canvas is gone —
+     the DNA no longer washes over the whole page. It now originates at
+     #ionaflux-teaser and flows down through the sections below it as a
+     flat, tilted SVG (#ionaflux-dna-origin, inside the .relative wrapper
+     around ionaflux-teaser + everything under it). helix-scroll-bg.js
+     stays in the tree unused, not deleted, in case the WebGL version is
+     wanted again later. -->
 <!-- TopNavBar -->
 <!-- Phase 94: brought inline desktop nav links back — client disliked
      the Phase 89 hide-everything-behind-MENU approach for desktop.
@@ -384,6 +381,36 @@
 </div>
 </section>
 
+<!-- Phase 113: storytelling DNA origin. Everything from ionaflux-teaser
+     down through biogaz-hesaplayici (the last section before the
+     footer) now lives inside one .relative wrapper so a single tilted
+     DNA SVG, anchored top-0/right-[-10%] of THIS wrapper, can span the
+     full stack behind all of it — one continuous flow instead of a
+     sitewide fixed watermark. z-[-1] means it paints under each
+     section's own background, so it actually shows through wherever
+     that background isn't a flat fill (glass panels, gaps, anything the
+     Phase 114 editorial pass opens up) rather than sitting on top of
+     everything indiscriminately. -->
+<div class="relative">
+<div id="ionaflux-dna-origin" class="absolute right-[-10%] top-0 h-full w-[60%] z-[-1] pointer-events-none -rotate-12 overflow-hidden" aria-hidden="true">
+<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs>
+<pattern id="ionaFluxDnaOrigin" width="140" height="200" patternUnits="userSpaceOnUse">
+<path d="M10 0 C 70 50, 70 150, 130 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
+<path d="M130 0 C 70 50, 70 150, 10 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
+<line x1="34" y1="42" x2="106" y2="42" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="34" cy="42" r="2.5" fill="#2d9937"></circle>
+<circle cx="106" cy="42" r="2.5" fill="#2d9937"></circle>
+<line x1="70" y1="100" x2="70" y2="100" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="70" cy="100" r="2.5" fill="#2d9937"></circle>
+<line x1="34" y1="158" x2="106" y2="158" stroke="#2d9937" stroke-width="1"></line>
+<circle cx="34" cy="158" r="2.5" fill="#2d9937"></circle>
+<circle cx="106" cy="158" r="2.5" fill="#2d9937"></circle>
+</pattern>
+</defs>
+<rect width="400" height="800" fill="url(#ionaFluxDnaOrigin)"></rect>
+</svg>
+</div>
 <!-- IonaFlux product spotlight: deliberately NOT the site's light section
      chrome. IonaFlux is a standalone software product, not a service
      line, so this section stays visually separated from the corporate
@@ -392,10 +419,14 @@
      one accent, distinct from the corporate brand-orange CTA color used
      everywhere else on this page. Moved here (just above Services) from
      its old spot further down the page — client wanted it leading into
-     Services instead of sitting between Why-Choose-Us and Explore. -->
+     Services instead of sitting between Why-Choose-Us and Explore.
+     Phase 113: right side cleared for the DNA origin above — both
+     glass panels now stack in a single lg:w-1/2 left column instead of
+     the old two-column grid. -->
 <section class="relative isolate overflow-hidden ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 fade-in-section" id="ionaflux-teaser">
 <div class="pointer-events-none absolute -top-32 right-0 w-[560px] h-[560px] rounded-full opacity-40" style="background:radial-gradient(circle,rgba(63,174,102,0.18),transparent 70%)" aria-hidden="true"></div>
-<div class="relative max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-12 items-center">
+<div class="relative max-w-[theme(spacing.container-max)] mx-auto">
+<div class="lg:w-1/2 flex flex-col gap-8">
 <div class="ionaflux-glass-panel max-w-lg p-8 md:p-10 fade-in-element">
 <span class="inline-flex items-center gap-2 mb-6">
 <img src="/images/iona-star-mark.png" alt="" width="20" height="20" class="shrink-0" aria-hidden="true">
@@ -405,13 +436,14 @@
 <p class="text-body-md mb-stack-md max-w-md" style="color:#c2cac3" data-i18n="home.ionaflux.body">IonaFlux, Iona mühendisliği tarafından geliştirilen ve müşterilerimize teslim edilen dijital işletme platformudur. Canlı SCADA verisi, arıza yönetimi ve saha raporlaması tek panelde birleşir.</p>
 <a class="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] transition-transform duration-150 ease-out active:scale-[0.97]" style="background:#3fae66;color:#04160a" href="/ionaflux.html" data-i18n="home.ionaflux.cta">IonaFlux'u Keşfedin &amp; Canlı Demo</a>
 </div>
-<div class="ionaflux-glass-panel p-6 fade-in-element delay-200">
+<div class="ionaflux-glass-panel max-w-lg p-6 fade-in-element delay-200">
 <img class="w-full h-auto rounded-2xl mb-5" src="/images/ionaflux/scada.jpg" alt="IonaFlux canlı SCADA görünümü: çürütücü sıcaklığı, debi ve jeneratör durumları" loading="lazy" decoding="async">
 <div class="grid grid-cols-2 gap-3">
 <span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">bolt</span>Canlı SCADA Verisi</span>
 <span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">build</span>Arıza Yönetimi</span>
 <span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">qr_code_scanner</span>QR Makine Tanısı</span>
 <span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">summarize</span>Saha Raporlama</span>
+</div>
 </div>
 </div>
 </div>
@@ -622,7 +654,7 @@
 </div>
 </div>
 </section>
-
+</div>
 <!-- Footer -->
 <footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
 <svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
