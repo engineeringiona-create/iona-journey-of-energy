@@ -45,18 +45,25 @@ const OVERVIEW_DIR = new THREE.Vector3(1, 0.8, 1).normalize();
    after repeated client feedback that feed_pool kept getting cropped —
    correctness over "looks bigger" this round; trim down later only
    once a real screenshot confirms the bottom edge has room to spare. */
-/* Phase 100 pushed this to 0.7 for a more "massive/imposing" frame, but
-   that's exactly back into the territory the Phase 83 comment above
-   warns about — margin below ~0.9 starts cropping the worst-case axis,
-   and Phase 101 confirmed it: feed_pool (the bottom structure) started
-   getting cut off again, the same complaint that pushed this value up
-   from 0.7-ish territory the first two times (see the 1.25 -> 1.1 ->
-   0.9 history above). Restored to 0.9, the last value that was
-   actually confirmed crop-free — "massive" has to lose to "not cut
-   off" when they conflict. If bigger is wanted again later, that's a
-   fresh, deliberately-tested trade-off, not a silent regression.
-   Was 1.25 (Phase 83, zero-crop) -> 1.1 (Phase 84) -> 0.9 (Phase 85) -> 0.7 (Phase 100, cropped) -> 0.9 (Phase 101, restored). */
-const OVERVIEW_MARGIN = 0.9;
+/* Phase 104: the hero's own on-screen box got shorter again (100dvh
+   minus the fixed nav's reserved 120px minus the metric bar's own
+   height, see index.html) — a more letterboxed aspect than 0.9 was
+   ever tuned against, so it started cropping BOTH ends of the
+   worst-case (vertical) axis at once: the dome at the top and the
+   tanks at the bottom, per the client report. NOT fixed with a raw
+   camera.position.z/y nudge — applyOverviewFraming below
+   unconditionally recomputes and overwrites camera.position on every
+   mount/resize/orientationchange (see frameBox + the vertical-drop
+   block a few dozen lines down), so any one-off offset set elsewhere
+   would just get discarded the moment that runs, same dead-end this
+   file's history already ran into. margin=1.0 is frameBox's own
+   documented "exact fit, zero crop" value — bumped straight to it
+   rather than nudging by tenths again, since this aspect ratio is
+   more extreme than anything margin=0.9 was ever confirmed against.
+   Was 1.25 (Phase 83) -> 1.1 (P84) -> 0.9 (P85) -> 0.7 (P100, cropped)
+   -> 0.9 (P101, restored) -> 1.0 (P104, restored again for the new,
+   shorter hero box). */
+const OVERVIEW_MARGIN = 1.0;
 /* Portrait phones fit to height only (verticalOnly, see frameBox's own
    comment) — kept above 1.0 unlike the desktop margin above: a narrow
    phone screen has much less horizontal room to spare, so cropping here
