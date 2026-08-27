@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { ContactShadows, Grid, Html, Line, OrbitControls, useGLTF } from '@react-three/drei';
+import { ContactShadows, Environment, Grid, Html, Line, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { reduceMotion } from '../../three/scene-utils.js';
@@ -1183,9 +1183,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            ceramic as the dome/rails, matching the reference's visibly
            separate grey piping. */
         const pipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#333333',
-          metalness: 0.8,
-          roughness: 0.5,
+          color: '#64748b',
+          metalness: 0.1,
+          roughness: 0.8,
         });
         pipeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(pipeMaterial));
@@ -1201,9 +1201,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            finish as the pipe fittings above is exactly what the
            "Pipes & Railings" bucket calls for. */
         const railingMaterial = new THREE.MeshStandardMaterial({
-          color: '#333333',
-          metalness: 0.8,
-          roughness: 0.5,
+          color: '#64748b',
+          metalness: 0.1,
+          roughness: 0.8,
         });
         railingMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(railingMaterial));
@@ -1235,9 +1235,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            vents each get their own dedicated material further down
            instead of staying on the structure's shared ceramic. */
         const sandwichPanelMaterial = new THREE.MeshStandardMaterial({
-          color: '#3f3f46',
-          metalness: 0.1,
-          roughness: 0.7,
+          color: '#94a3b8',
+          metalness: 0.2,
+          roughness: 0.6,
           bumpMap: sandwichPanelTexture,
           bumpScale: 0.5,
         });
@@ -1249,9 +1249,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            glossy than the wall panels, the way a real prefab roof
            reads against its own walls instead of blending into them. */
         const roofMaterial = new THREE.MeshStandardMaterial({
-          color: '#3f3f46',
+          color: '#64748b',
           metalness: 0.1,
-          roughness: 0.7,
+          roughness: 0.8,
         });
         roofMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(roofMaterial));
@@ -1355,9 +1355,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            bare-steel finish as the digester's own pipe fittings, so
            piping reads consistently across the whole plant. */
         const buildingPipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#333333',
-          metalness: 0.8,
-          roughness: 0.5,
+          color: '#64748b',
+          metalness: 0.1,
+          roughness: 0.8,
         });
         buildingPipeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(buildingPipeMaterial));
@@ -1368,9 +1368,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            buildingPipeMaterial above but its own instance/name, since
            these are load-bearing structure, not fluid-carrying pipe. */
         const structuralSteelMaterial = new THREE.MeshStandardMaterial({
-          color: '#333333',
-          metalness: 0.8,
-          roughness: 0.5,
+          color: '#64748b',
+          metalness: 0.1,
+          roughness: 0.8,
         });
         structuralSteelMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(structuralSteelMaterial));
@@ -1389,9 +1389,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            near-featureless black block under this scene's lighting —
            lighter base colors / lower metalness throughout fixes that). */
         const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#3f3f46',
-          metalness: 0.1,
-          roughness: 0.7,
+          color: '#94a3b8',
+          metalness: 0.2,
+          roughness: 0.6,
         });
         wallMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(wallMaterial));
@@ -1485,21 +1485,21 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
            pointer-over events in the first place — see handlePointerOver's
            own guard — attaching that shader here would be dead code. */
         const feedMaterial = new THREE.MeshStandardMaterial({
-          color: '#333333', metalness: 0.8, roughness: 0.5,
+          color: '#64748b', metalness: 0.1, roughness: 0.8,
         });
         feedMaterial.needsUpdate = true;
         flowUniforms.push(attachFlowPulseShader(feedMaterial, FLOW_FEED_COLOR));
         SITE_PIPING_FEED_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, feedMaterial));
 
         const gasMaterial = new THREE.MeshStandardMaterial({
-          color: '#333333', metalness: 0.8, roughness: 0.5,
+          color: '#64748b', metalness: 0.1, roughness: 0.8,
         });
         gasMaterial.needsUpdate = true;
         flowUniforms.push(attachFlowPulseShader(gasMaterial, FLOW_GAS_COLOR));
         SITE_PIPING_GAS_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, gasMaterial));
 
         const powerMaterial = new THREE.MeshStandardMaterial({
-          color: '#333333', metalness: 0.8, roughness: 0.5,
+          color: '#64748b', metalness: 0.1, roughness: 0.8,
         });
         powerMaterial.needsUpdate = true;
         flowUniforms.push(attachFlowPulseShader(powerMaterial, FLOW_POWER_COLOR));
@@ -2481,14 +2481,24 @@ export default function GltfTwinScene() {
            spotlights below add the wraparound studio-fill look without
            touching the one light actually doing the real shadow pass. */}
         <ambientLight intensity={0.6} />
-        {/* Phase 109: fills the now-dark anthracite buildings/roofs with
-           soft, direction-independent sky/ground bounce so their edges
-           still catch light instead of reading as flat silhouettes —
-           the plain ambientLight above is uniform in every direction,
-           this adds a top-vs-bottom gradient (sky tint from above,
-           ground-bounce tint from below) the way real diffuse outdoor
-           light actually falls on a dark surface. */}
-        <hemisphereLight args={[0xffffff, 0x444444, 1.0]} />
+        {/* Phase 109/110: fills the buildings/roofs with soft, direction-
+           independent sky/ground bounce so their edges still catch
+           light instead of reading as flat silhouettes — the plain
+           ambientLight above is uniform in every direction, this adds
+           a top-vs-bottom gradient (sky tint from above, ground-bounce
+           tint from below) the way real diffuse outdoor light actually
+           falls on a surface. Bumped 1.0 -> 1.2 (Phase 110) alongside
+           the lighter Space Grey palette (was too dark even at
+           anthracite) so nothing reads as a flat black silhouette. */}
+        <hemisphereLight args={[0xffffff, 0x444444, 1.2]} />
+        {/* Phase 110: Environment adds real image-based reflections/soft
+           global illumination on top of the explicit light rig above —
+           the metallic/grey surfaces (dome, pipes, now-lighter walls)
+           had nothing to reflect before this, which read as flat no
+           matter how the direct lights were angled. environmentIntensity
+           keeps it as a supplementary fill (0.8), not a replacement for
+           the tuned key/fill/rim + hemisphere setup already here. */}
+        <Environment preset="studio" environmentIntensity={0.8} />
         <directionalLight
           ref={keyLightRef}
           position={[30, 45, 20]}
