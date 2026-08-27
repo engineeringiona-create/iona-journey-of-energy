@@ -4,6 +4,7 @@ import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpot
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { initBiogasCalculator } from '../lib/biogasCalculator.js';
+import { initHelixScrollBg } from '../three/helix-scroll-bg.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
@@ -17,6 +18,7 @@ initFadeIn();
 initThemeToggle();
 initSiteSearch();
 initMobileNav();
+initHelixScrollBg(document.getElementById('helix-scroll-bg'));
 initParallax();
 initCardSpotlight();
 

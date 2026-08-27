@@ -25,13 +25,24 @@
 <div id="iona-curtain" aria-hidden="true">
 <span class="iona-wordmark-text" style="font-size:32px">iona</span>
 </div>
-<!-- Phase 113: the Phase 103 global fixed Three.js helix canvas is gone —
-     the DNA no longer washes over the whole page. It now originates at
-     #ionaflux-teaser and flows down through the sections below it as a
-     flat, tilted SVG (#ionaflux-dna-origin, inside the .relative wrapper
-     around ionaflux-teaser + everything under it). helix-scroll-bg.js
-     stays in the tree unused, not deleted, in case the WebGL version is
-     wanted again later. -->
+<!-- Phase 115: EMERGENCY FIX — Phase 113's move to a section-scoped flat
+     SVG (#ionaflux-dna-origin, z-[-1]) put the DNA behind every
+     section's own opaque background per normal CSS stacking, which
+     made it invisible in practice (flagged as a risk when it shipped,
+     confirmed broken here). Reverted to the exact Phase 103 original:
+     the real Three.js helix, ported faithfully from the claude.ai/design
+     source "Three.js sarmalı scroll animasyonu" / Helix Background.dc.html
+     (verified byte-for-byte against that source's ramp/turns/dotSize/
+     radius/height constants this phase — see src/three/helix-scroll-bg.js).
+     That source's own onScroll math drives off whole-document scroll
+     progress, confirming this was always meant to be a full-page fixed
+     background, not scoped to one section — so the Phase 113 concept
+     wasn't just buggy, it was a deviation from the original design.
+     Same fixed/inset-0/z-0/first-in-body placement convention as
+     .iona-dna-bg (see the Phase 90 comment further down); initHelixScrollBg
+     (main-anasayfa.js) mounts into this canvas by id, same initXScene(canvas)
+     shape as expo-scene.js/genset-scene.js. -->
+<canvas class="helix-scroll-bg" id="helix-scroll-bg" aria-hidden="true"></canvas>
 <!-- TopNavBar -->
 <!-- Phase 94: brought inline desktop nav links back — client disliked
      the Phase 89 hide-everything-behind-MENU approach for desktop.
@@ -381,36 +392,6 @@
 </div>
 </section>
 
-<!-- Phase 113: storytelling DNA origin. Everything from ionaflux-teaser
-     down through biogaz-hesaplayici (the last section before the
-     footer) now lives inside one .relative wrapper so a single tilted
-     DNA SVG, anchored top-0/right-[-10%] of THIS wrapper, can span the
-     full stack behind all of it — one continuous flow instead of a
-     sitewide fixed watermark. z-[-1] means it paints under each
-     section's own background, so it actually shows through wherever
-     that background isn't a flat fill (glass panels, gaps, anything the
-     Phase 114 editorial pass opens up) rather than sitting on top of
-     everything indiscriminately. -->
-<div class="relative">
-<div id="ionaflux-dna-origin" class="absolute right-[-10%] top-0 h-full w-[60%] z-[-1] pointer-events-none -rotate-12 overflow-hidden" aria-hidden="true">
-<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-<defs>
-<pattern id="ionaFluxDnaOrigin" width="140" height="200" patternUnits="userSpaceOnUse">
-<path d="M10 0 C 70 50, 70 150, 130 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
-<path d="M130 0 C 70 50, 70 150, 10 200" stroke="#2d9937" stroke-width="1.5" fill="none"></path>
-<line x1="34" y1="42" x2="106" y2="42" stroke="#2d9937" stroke-width="1"></line>
-<circle cx="34" cy="42" r="2.5" fill="#2d9937"></circle>
-<circle cx="106" cy="42" r="2.5" fill="#2d9937"></circle>
-<line x1="70" y1="100" x2="70" y2="100" stroke="#2d9937" stroke-width="1"></line>
-<circle cx="70" cy="100" r="2.5" fill="#2d9937"></circle>
-<line x1="34" y1="158" x2="106" y2="158" stroke="#2d9937" stroke-width="1"></line>
-<circle cx="34" cy="158" r="2.5" fill="#2d9937"></circle>
-<circle cx="106" cy="158" r="2.5" fill="#2d9937"></circle>
-</pattern>
-</defs>
-<rect width="400" height="800" fill="url(#ionaFluxDnaOrigin)"></rect>
-</svg>
-</div>
 <!-- IonaFlux product spotlight: deliberately NOT the site's light section
      chrome. IonaFlux is a standalone software product, not a service
      line, so this section stays visually separated from the corporate
@@ -420,9 +401,9 @@
      everywhere else on this page. Moved here (just above Services) from
      its old spot further down the page — client wanted it leading into
      Services instead of sitting between Why-Choose-Us and Explore.
-     Phase 113: right side cleared for the DNA origin above — both
-     glass panels now stack in a single lg:w-1/2 left column instead of
-     the old two-column grid. -->
+     Phase 113 stacked both glass panels into a single lg:w-1/2 left
+     column (was a two-column grid); kept as-is after the Phase 115 DNA
+     revert since it's an independent, unrelated layout call. -->
 <section class="relative isolate overflow-hidden ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 fade-in-section" id="ionaflux-teaser">
 <div class="pointer-events-none absolute -top-32 right-0 w-[560px] h-[560px] rounded-full opacity-40" style="background:radial-gradient(circle,rgba(63,174,102,0.18),transparent 70%)" aria-hidden="true"></div>
 <div class="relative max-w-[theme(spacing.container-max)] mx-auto">
@@ -664,7 +645,7 @@
 </div>
 </div>
 </section>
-</div>
+
 <!-- Footer -->
 <footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
 <svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
