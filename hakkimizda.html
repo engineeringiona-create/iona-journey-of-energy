@@ -144,34 +144,63 @@
 </div>
 </section>
 
-<!-- Mission, Vision, Values, Sustainability -->
+<!-- Mission, Vision, Values, Sustainability + Stats -->
+<!-- Phase 117: "Bento Box UI" rebuild — folds the old standalone #stats
+     section's 4 numbers into this grid as their own tiles (destroys
+     that plain grid entirely) and moves the Mission/Vision tile to a
+     massive 2-row pitch-black anchor. Backgrounds now deliberately mix
+     white, brand green (.bento-card-brand) and pitch black
+     (.bento-card-dark) instead of every tile being white. Stat counters
+     (data-count-target) keep their GSAP count-up — see main-hakkimizda.js,
+     trigger retargeted from #stats to #statements. -->
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section bg-decorated" id="statements">
 <div class="bg-ghost-text" aria-hidden="true"><span>VISION</span></div>
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="about.statements.eyebrow">Değere ve Size Bağlılığımız</span>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="about.statements.title">Misyonumuz, Vizyonumuz ve Değerlerimiz</h2>
-<div class="grid grid-cols-1 md:grid-cols-4 gap-5 fade-in-element delay-200">
-<!-- Card A: Misyon & Vizyon -->
-<div class="bento-card md:col-span-2">
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 fade-in-element delay-200">
+<!-- Tile A: Misyon & Vizyon — massive 2x2 anchor, pitch black -->
+<div class="bento-card bento-card-dark md:col-span-2 md:row-span-2">
 <span class="bento-pill">Misyon &amp; Vizyon</span>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="about.statements.mission_title">Yüksek Performanslı Yeşil Enerji Çözümleri Mühendisliği</h3>
-<p class="text-body-md text-[var(--text-muted)] mb-5" data-i18n="about.statements.mission_body">Misyonumuz, atık zorluklarını dünya genelindeki topluluklar ve endüstriler için sürdürülebilir ekonomik ve çevresel değere dönüştüren gelişmiş ve güvenilir biyogaz tesisleri tasarlamaktır.</p>
+<p class="text-body-md mb-5" data-i18n="about.statements.mission_body">Misyonumuz, atık zorluklarını dünya genelindeki topluluklar ve endüstriler için sürdürülebilir ekonomik ve çevresel değere dönüştüren gelişmiş ve güvenilir biyogaz tesisleri tasarlamaktır.</p>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="about.statements.vision_title">Yenilenebilir Biyoenerjiye Küresel Geçişte Öncülük Etmek</h3>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="about.statements.vision_body">Organik atığın tamamen geri dönüştürülerek kesintisiz temiz enerjiye dönüştüğü bir gelecek hayal ediyoruz. IONA, döngüsel ekonominin halkasını kapatmada dünyanın en güvenilir küresel ortağı olmayı hedefliyor.</p>
+<p class="text-body-md" data-i18n="about.statements.vision_body">Organik atığın tamamen geri dönüştürülerek kesintisiz temiz enerjiye dönüştüğü bir gelecek hayal ediyoruz. IONA, döngüsel ekonominin halkasını kapatmada dünyanın en güvenilir küresel ortağı olmayı hedefliyor.</p>
 </div>
-<!-- Card B: Stat -->
+<!-- Tile B: the bento's own original stat, kept — navy, not pitch black
+     (distinct from Tile A's #0a0a0a so "one pitch black" still holds) -->
 <div class="bento-card bento-card-stat">
 <span class="bento-spark" aria-hidden="true">⚡</span>
 <span class="bento-stat-number">99.4%</span>
 <p class="bento-stat-label">Yıllık Kesintisiz Tesis Çalışma Verimi</p>
 </div>
-<!-- Card C: Media -->
+<!-- Tile C: metric, brand green -->
+<div class="bento-card bento-card-brand">
+<span class="bento-stat-number" data-count-target="20" data-count-suffix="+">0+</span>
+<p class="bento-stat-label" data-i18n="stats.experience_label">Yıllık Deneyim</p>
+</div>
+<!-- Tile D: media -->
 <div class="bento-card bento-card-media">
 <img data-img-key="about_bento_media" src="/images/digester-dome-facility.jpg" alt="Saha ve reaktör mühendisliği" loading="lazy" decoding="async">
 <div class="bento-media-caption">Saha &amp; Reaktör Mühendisliği</div>
 </div>
-<!-- Card D: Değerlerimiz & Sürdürülebilirlik -->
-<div class="bento-card md:col-span-2">
+<!-- Tile E: metric, white -->
+<div class="bento-card flex flex-col justify-center text-center">
+<span class="bento-stat-number" style="color:var(--brand)" data-count-target="100" data-count-suffix="+">0+</span>
+<p class="bento-stat-label" style="color:var(--text-muted)" data-i18n="stats.projects_label">Tamamlanan Proje</p>
+</div>
+<!-- Tile F: metric, white -->
+<div class="bento-card flex flex-col justify-center text-center">
+<span class="bento-stat-number" style="color:var(--brand)" data-count-target="2" data-count-suffix="">0</span>
+<p class="bento-stat-label" style="color:var(--text-muted)" data-i18n="stats.offices_label">Dünya Genelinde Ofis</p>
+</div>
+<!-- Tile G2: metric, brand green -->
+<div class="bento-card bento-card-brand">
+<span class="bento-stat-number" data-count-target="50" data-count-suffix="+">0+</span>
+<p class="bento-stat-label" data-i18n="stats.engineers_label">Mühendis</p>
+</div>
+<!-- Tile H: Değerlerimiz & Sürdürülebilirlik — wide, white -->
+<div class="bento-card md:col-span-3">
 <span class="bento-pill">Değerlerimiz &amp; Sürdürülebilirlik</span>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="about.statements.values_title">Yenilik, Güvenilirlik ve Mühendislik Mükemmelliği Üzerine İnşa Edildi</h3>
 <p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="about.statements.sustainability_body">Sürdürülebilirlik, tasarımlarımızın özüdür. Metan geri kazanımını en üst düzeye çıkararak, birinci sınıf biyo-gübrelerle toprak sağlığını koruyarak ve küresel karbon ayak izlerini azaltarak yarını güvence altına alıyoruz.</p>
@@ -215,30 +244,6 @@
 <span class="block text-8xl lg:text-9xl font-bold text-[#2d9937] leading-none mb-8">04</span>
 <h3 class="text-4xl lg:text-6xl font-bold tracking-tighter mb-4" data-i18n="about.why.item4_title">7/24 Destek</h3>
 <p class="text-lg text-white/70 max-w-lg" data-i18n="about.why.item4_desc">Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.</p>
-</div>
-</div>
-</div>
-</section>
-
-<!-- Stats -->
-<section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="stats">
-<div class="max-w-[theme(spacing.container-max)] mx-auto text-center">
-<div class="grid grid-cols-2 md:grid-cols-4 gap-x-10 gap-y-10 fade-in-element">
-<div class="flex flex-col items-center">
-<span class="font-headline-md text-headline-md text-[var(--brand)]" data-count-target="20" data-count-suffix="+">0+</span>
-<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.experience_label">Yıllık Deneyim</span>
-</div>
-<div class="flex flex-col items-center">
-<span class="font-headline-md text-headline-md text-[var(--brand)]" data-count-target="100" data-count-suffix="+">0+</span>
-<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.projects_label">Tamamlanan Proje</span>
-</div>
-<div class="flex flex-col items-center">
-<span class="font-headline-md text-headline-md text-[var(--brand)]" data-count-target="2" data-count-suffix="">0</span>
-<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.offices_label">Dünya Genelinde Ofis</span>
-</div>
-<div class="flex flex-col items-center">
-<span class="font-headline-md text-headline-md text-[var(--brand)]" data-count-target="50" data-count-suffix="+">0+</span>
-<span class="font-label-caps text-label-caps text-[var(--text-muted)] mt-2" data-i18n="stats.engineers_label">Mühendis</span>
 </div>
 </div>
 </div>

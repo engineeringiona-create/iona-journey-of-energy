@@ -1697,12 +1697,15 @@ html {
    Dark mode still swaps white for a solid dark surface (not translucent
    glass) so the same crispness holds regardless of theme. */
 /* Phase 114: editorial pass — dropped the last trace of shadow and
-   tightened the radius; the hairline border alone does the framing now. */
+   tightened the radius; the hairline border alone does the framing now.
+   Phase 117: bumped back up to a uniform rounded-2xl (1rem) per the
+   "premium Bento Box" brief — deliberately re-adds visible rounding
+   this one component asked for, doesn't touch the sitewide 114 look. */
 .bento-card {
     position: relative;
     background: #ffffff;
     border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 0.5rem;
+    border-radius: 1rem;
     padding: 2rem;
     transition: border-color 0.25s ease;
 }
@@ -1838,6 +1841,125 @@ html {
     .bento-card {
         transition: none;
     }
+}
+
+/* Phase 117: two more solid-fill bento tile variants — "some white, some
+   brand green, one pitch black" per the brief. Numbers stay massive via
+   the existing .bento-stat-number rule (shared, not duplicated here). */
+.bento-card-dark {
+    background: #0a0a0a;
+    border-color: #0a0a0a;
+    color: #ffffff;
+}
+
+.bento-card-dark:hover {
+    border-color: #78dc77;
+}
+
+.bento-card-dark .bento-pill {
+    background: rgba(120, 220, 119, 0.12);
+    color: #94f990;
+    border-color: rgba(120, 220, 119, 0.3);
+}
+
+.bento-card-dark p {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.bento-card-brand {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.bento-card-brand:hover {
+    border-color: #0a0a0a;
+}
+
+.bento-card-brand .bento-stat-number {
+    color: #ffffff;
+}
+
+.bento-card-brand .bento-stat-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Phase 117: "thick, high-tech industrial" range input — replaces the
+   browser-default thumb/track with a wide brand-green groove and a
+   squared-off, deep thumb. Firefox and WebKit need separate
+   pseudo-element rules; there's no shared shorthand for range styling. */
+.iona-slider-industrial {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 0;
+    background: linear-gradient(90deg, var(--brand) var(--iona-slider-fill, 50%), var(--border-strong) var(--iona-slider-fill, 50%));
+    outline: none;
+}
+
+.iona-slider-industrial::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 28px;
+    border-radius: 2px;
+    background: #0a0a0a;
+    border: 2px solid var(--brand);
+    cursor: pointer;
+    margin-top: 0;
+}
+
+.iona-slider-industrial::-moz-range-thumb {
+    width: 14px;
+    height: 28px;
+    border-radius: 2px;
+    background: #0a0a0a;
+    border: 2px solid var(--brand);
+    cursor: pointer;
+}
+
+.iona-slider-industrial::-moz-range-track {
+    height: 10px;
+    border-radius: 0;
+    background: transparent;
+}
+
+/* Phase 117: reactive data-vis for the calculator outputs — a circular
+   ring around the headline "Kurulu Güç" figure, slim horizontal fill
+   bars under the other three. Both read the same --iona-fill (0-100)
+   custom property, written by biogasCalculator.js on every recalculate,
+   so there's one source of truth instead of duplicated JS math. */
+.iona-progress-ring-track {
+    stroke: var(--border-strong);
+    fill: none;
+}
+
+.iona-progress-ring-fill {
+    stroke: var(--brand);
+    fill: none;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.4s ease;
+}
+
+.iona-fill-bar-track {
+    height: 4px;
+    width: 100%;
+    background: var(--border-strong);
+    overflow: hidden;
+}
+
+.iona-fill-bar-fill {
+    height: 100%;
+    width: var(--iona-fill, 0%);
+    background: var(--brand);
+    transition: width 0.4s ease;
 }
 
 /* ---------------- Phase 67: "Neden Bizi Seçmelisiniz" reverted to light --

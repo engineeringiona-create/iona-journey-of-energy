@@ -55,6 +55,19 @@ function formatTon(ton) {
   return `${ton.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} Ton/yıl`;
 }
 
+/* Phase 117: reactive fill for the ring/bars — one shared percentage
+   (the slider's own position in its 10-500 range) rather than a
+   separate invented "typical max" per metric. All four outputs scale
+   linearly with tonsPerDay for a fixed waste profile, so this single
+   number stays visually honest for each of them. */
+const TON_MIN = 10;
+const TON_MAX = 500;
+const RING_CIRCUMFERENCE = 2 * Math.PI * 34;
+
+function fillPercent(tonsPerDay) {
+  return ((tonsPerDay - TON_MIN) / (TON_MAX - TON_MIN)) * 100;
+}
+
 export function initBiogasCalculator() {
   const section = document.getElementById('biogaz-hesaplayici');
   if (!section) return;
@@ -67,6 +80,10 @@ export function initBiogasCalculator() {
   const outElectricity = document.getElementById('biogaz-out-electricity');
   const outThermal = document.getElementById('biogaz-out-thermal');
   const outCo2 = document.getElementById('biogaz-out-co2');
+  const powerRing = document.getElementById('biogaz-out-power-ring');
+  const electricityBar = document.getElementById('biogaz-out-electricity-bar');
+  const thermalBar = document.getElementById('biogaz-out-thermal-bar');
+  const co2Bar = document.getElementById('biogaz-out-co2-bar');
   const ctaButton = document.getElementById('biogaz-cta');
   if (!pillsContainer || !slider || !numberInput || !ctaButton) return;
 
@@ -80,6 +97,15 @@ export function initBiogasCalculator() {
     outThermal.textContent = formatThermal(result.installedThermalKWth);
     outElectricity.textContent = formatMWh(result.annualElectricityMWh);
     outCo2.textContent = formatTon(result.annualCO2AvoidedTon);
+
+    const pct = fillPercent(tonsPerDay);
+    slider.style.setProperty('--iona-slider-fill', `${pct}%`);
+    if (powerRing) {
+      powerRing.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - pct / 100));
+    }
+    [electricityBar, thermalBar, co2Bar].forEach((bar) => {
+      if (bar) bar.style.setProperty('--iona-fill', `${pct}%`);
+    });
   }
 
   function setTons(value) {

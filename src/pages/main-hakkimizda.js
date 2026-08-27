@@ -19,11 +19,13 @@ initDnaScroll();
 initParallax();
 initHorizontalGallery('why-us-track');
 
-/* Stat counters (20+ Yıllık Deneyim, etc.) */
+/* Stat counters (20+ Yıllık Deneyim, etc.) — Phase 117 folded the old
+   standalone #stats section into the #statements bento grid, so the
+   trigger moved with it. */
 const counters = document.querySelectorAll('[data-count-target]');
 if (counters.length) {
   ScrollTrigger.create({
-    trigger: '#stats',
+    trigger: '#statements',
     start: 'top 85%',
     once: true,
     onEnter: () => {

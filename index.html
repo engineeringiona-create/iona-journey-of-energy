@@ -593,9 +593,17 @@
 <p class="text-body-lg text-[var(--text-muted)] mt-4 max-w-2xl mx-auto">Atık türünüzü ve günlük miktarınızı girin, tesisinizin yaklaşık enerji potansiyelini anında görün.</p>
 </div>
 
+<!-- Phase 117: Glassmorphism + reactive data-vis. Inputs/outputs panels
+     both get the frosted-glass treatment; the range input is
+     re-skinned as a thick industrial slider (.iona-slider-industrial,
+     base.css); each output grows a fill indicator driven by
+     biogasCalculator.js's setTons() — one shared --iona-fill percentage
+     (0-100%, the slider's own position in its min/max range) so a
+     ring/bar always agrees with where the slider actually sits, no
+     separate per-metric scale to invent or keep in sync by hand. -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 fade-in-element">
 <!-- Inputs -->
-<div class="bg-white border border-slate-200 p-8 md:p-10">
+<div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] p-8 md:p-10">
 <div class="mb-8">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Atık Türü</span>
 <div id="biogaz-atik-pills" class="flex flex-wrap gap-2.5 mt-3">
@@ -611,10 +619,10 @@
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Günlük Miktar</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)]"><span id="biogaz-ton-value">50</span><span class="text-body-lg text-[var(--text-muted)]"> Ton/Gün</span></span>
 </div>
-<input type="range" id="biogaz-ton-slider" min="10" max="500" step="5" value="50" class="w-full mt-4" style="accent-color:var(--brand);">
+<input type="range" id="biogaz-ton-slider" min="10" max="500" step="5" value="50" class="iona-slider-industrial mt-4">
 <div class="flex items-center justify-between mt-2">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">10</span>
-<input type="number" id="biogaz-ton-input" min="10" max="500" step="5" value="50" class="w-24 text-center bg-white border border-slate-200 py-1.5 text-[var(--text)] text-body-md">
+<input type="number" id="biogaz-ton-input" min="10" max="500" step="5" value="50" class="w-24 text-center bg-white/80 border border-white/60 py-1.5 text-[var(--text)] text-body-md">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">500</span>
 </div>
 </div>
@@ -624,21 +632,30 @@
 
 <!-- Outputs -->
 <div class="grid grid-cols-2 gap-5">
-<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
+<div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] col-span-2 p-6 flex items-center gap-6">
+<svg viewBox="0 0 80 80" class="shrink-0" width="80" height="80" aria-hidden="true">
+<circle class="iona-progress-ring-track" cx="40" cy="40" r="34" stroke-width="8"></circle>
+<circle class="iona-progress-ring-fill" id="biogaz-out-power-ring" cx="40" cy="40" r="34" stroke-width="8" stroke-dasharray="213.6" stroke-dashoffset="213.6"></circle>
+</svg>
+<div>
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Tahmini Kurulu Güç</span>
-<span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-power">— kWe</span>
+<span class="font-headline-md text-headline-md text-[var(--brand)] mt-1 block" id="biogaz-out-power">— kWe</span>
 </div>
-<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
+</div>
+<div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] p-6 flex flex-col justify-between">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Yıllık Elektrik Üretimi</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-electricity">— MWh/yıl</span>
+<div class="iona-fill-bar-track mt-3"><div class="iona-fill-bar-fill" id="biogaz-out-electricity-bar"></div></div>
 </div>
-<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
+<div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] p-6 flex flex-col justify-between">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Geri Kazanılan Termal Isı</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-thermal">— kWth</span>
+<div class="iona-fill-bar-track mt-3"><div class="iona-fill-bar-fill" id="biogaz-out-thermal-bar"></div></div>
 </div>
-<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
+<div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] p-6 flex flex-col justify-between">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Yıllık CO₂ Azaltımı</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-co2">— Ton/yıl</span>
+<div class="iona-fill-bar-track mt-3"><div class="iona-fill-bar-fill" id="biogaz-out-co2-bar"></div></div>
 </div>
 <button type="button" id="biogaz-cta" class="col-span-2 mt-1 bg-[var(--brand-orange)] text-white font-label-caps text-label-caps rounded-full py-4 hover:opacity-90 transition-opacity duration-300">Bu Hesaplama ile Teklif İste</button>
 </div>
