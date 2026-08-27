@@ -45,11 +45,20 @@ const OVERVIEW_DIR = new THREE.Vector3(1, 0.8, 1).normalize();
    after repeated client feedback that feed_pool kept getting cropped —
    correctness over "looks bigger" this round; trim down later only
    once a real screenshot confirms the bottom edge has room to spare. */
-/* Phase 85: pushed past exact-fit (1.0) on purpose — client wants the
-   facility to dominate the frame like a "grand architectural mockup",
-   worst-case-axis edges cropping slightly is an accepted trade for that.
-   Was 1.25 (Phase 83, zero-crop) -> 1.1 (Phase 84) -> 0.9 now. */
-const OVERVIEW_MARGIN = 0.9;
+/* Phase 100: client wants the facility MASSIVE/imposing, "filling the
+   entire right side of the screen" — pushed further past exact-fit
+   than Phase 85 ever went. NOT done via camera.position.z or
+   model.scale.set (both explicitly requested) — this scene computes
+   camera distance from the model's real bounding box (~90x78 units,
+   see OVERVIEW_DIR's own comment above) every time frameBox runs, so a
+   hand-picked literal z or scale multiplier would either sit the
+   camera inside the geometry or silently get overridden the next time
+   applyOverviewFraming recalculates on resize. OVERVIEW_MARGIN is the
+   actual "how tightly does the box fill the frame" lever this system
+   was built around — smaller = camera sits closer = model reads
+   bigger, same adaptive fit-to-box math for every viewport.
+   Was 1.25 (Phase 83, zero-crop) -> 1.1 (Phase 84) -> 0.9 (Phase 85) -> 0.7 now. */
+const OVERVIEW_MARGIN = 0.7;
 /* Portrait phones fit to height only (verticalOnly, see frameBox's own
    comment) — kept above 1.0 unlike the desktop margin above: a narrow
    phone screen has much less horizontal room to spare, so cropping here
