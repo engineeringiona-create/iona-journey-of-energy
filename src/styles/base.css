@@ -80,6 +80,23 @@ body {
     transition: background-color 400ms ease, color 400ms ease;
 }
 
+/* Phase 103: index.html traded .iona-dna-bg for a real Three.js
+   scroll-helix canvas (see initHelixScrollBg, src/three/helix-scroll-bg.js)
+   — same fixed/inset-0/z-0/first-in-body placement convention as the
+   rule below, just a <canvas> instead of an <svg>+<pattern>. The other
+   6 pages keep .iona-dna-bg untouched (no reason to pay for a second
+   WebGL context on every page for the same watermark role). */
+.helix-scroll-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.32;
+    pointer-events: none;
+    display: block;
+}
+
 /* Phase 90: sitewide living DNA/helix watermark (.iona-dna-bg, markup
    appended right after <body> on every page — same pattern element/
    pattern the hero used to own alone in Phase 87/88, now global).
