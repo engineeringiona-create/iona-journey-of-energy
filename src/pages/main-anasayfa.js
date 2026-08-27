@@ -204,6 +204,22 @@ function initCustomCursor() {
   if (!cursor) return;
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
+  /* Phase 101: the cursor's own SVG reuses the exact same green-fill/
+     yellow-ring motif as the hero heading icon (see index.html) — with
+     good reason (matching), but that means whenever it's left active
+     over the 3D canvas right as #hero-copy fades into Inspection Mode,
+     it reads as "the icon didn't fade with the rest of the text". It's
+     a separate element that was never going to fade with hero-copy (it
+     has to keep working for the still-visible 3D column), so the real
+     fix is suppressing .is-active for the duration of Inspection Mode
+     instead, via the same 'twinlevelchange' event hero-copy's own fade
+     listens to. */
+  let inspecting = false;
+  document.addEventListener('twinlevelchange', (e) => {
+    inspecting = e.detail.level !== 0;
+    if (inspecting) cursor.classList.remove('is-active');
+  });
+
   window.addEventListener(
     'pointermove',
     (e) => {
@@ -218,7 +234,9 @@ function initCustomCursor() {
      and the services exhibition rows, both index.html-only elements
      added this phase. */
   document.querySelectorAll('.iona-cursor-target, .mobile-nav-link, .mobile-nav-cta, .services-exhibit-row').forEach((el) => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('is-active'));
+    el.addEventListener('mouseenter', () => {
+      if (!inspecting) cursor.classList.add('is-active');
+    });
     el.addEventListener('mouseleave', () => cursor.classList.remove('is-active'));
   });
 }
