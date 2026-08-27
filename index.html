@@ -184,20 +184,26 @@
 <div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
 </div>
 
-<!-- Phase 102: FULL-SCREEN CANVAS OVERRIDE. Phase 98 reverted Phase 97's
-     absolute-inset-0 3D layer back into a grid column because the
-     model rendered huge/centered with nowhere for the camera to go —
-     that was a real bug, but the fix this time is the thing Phase 97
-     was missing: an actual left/right camera pan (OVERVIEW_OFFSET_FRACTION
-     for idle, the pre-existing FOCUS_OFFSET_FRACTION for inspection —
-     see GltfTwinScene.jsx), not just a bigger box. #iona-digital-twin-root
-     is absolute inset-0 of the whole #hero section again; hero-copy and
-     the 3D layer are stacked by z-index, not grid-positioned side by
-     side, so the model has real room to slide left when a part is
-     selected and hero-copy fades. pointer-events-none on hero-copy (it
-     has no background, so it must not block clicks on the canvas
-     behind it) with pointer-events-auto re-enabled on the CTA link,
-     the one actually-clickable thing in the column. -->
+<!-- Phase 103 (rescue): every child in here is `absolute`, which
+     contributes ZERO height to a parent — and #hero itself has been
+     `min-height: 0` since Phase 87 (base.css), on purpose, precisely
+     so an inner wrapper like this one owns hero sizing instead of
+     .hero-zone's default 100vh fighting it. Phase 102 removed that
+     inner wrapper's own explicit height when it dropped the old grid,
+     so #hero collapsed to ~0 and everything below (the metric bar)
+     floated up into it. This div restores that explicit height —
+     h-[85vh]/min-h-[700px] — as the one normal-flow box #hero has, so
+     #hero (and the metric bar after it) sit at their real document-flow
+     position again regardless of what's absolutely positioned inside. -->
+<div class="relative w-full h-[85vh] min-h-[700px] overflow-hidden">
+<!-- Phase 102: full-bleed 3D layer + camera pan (OVERVIEW_OFFSET_FRACTION
+     for idle, FOCUS_OFFSET_FRACTION for inspection — see
+     GltfTwinScene.jsx) instead of a grid column, so the model has real
+     room to slide left when a part is selected and hero-copy fades.
+     pointer-events-none on hero-copy (no background of its own, must
+     not block clicks on the canvas behind it) with pointer-events-auto
+     re-enabled on the CTA link, the one actually-clickable thing in
+     the column. -->
 <div class="absolute inset-0 w-full h-full z-0 iona-cursor-target" id="iona-digital-twin-root"></div>
 <!-- Phase 97: cinematic intro backdrop — dims/blurs the hero behind
      the headline while initHeroCinematicIntro (main-anasayfa.js) holds
@@ -205,7 +211,7 @@
      its real position. Removed from the DOM by the same JS once its
      fade-out finishes. -->
 <div class="absolute inset-0 z-[5] backdrop-blur-xl bg-white/50 pointer-events-none" id="hero-intro-overlay" aria-hidden="true"></div>
-<div class="absolute left-0 top-0 w-full lg:w-[45%] h-full flex flex-col justify-center px-8 lg:px-24 z-10 pointer-events-none transition-opacity duration-500 ease-out" id="hero-copy">
+<div class="absolute left-0 top-0 h-full w-full lg:w-1/2 flex flex-col justify-center pl-8 lg:pl-24 pt-20 z-10 pointer-events-none transition-opacity duration-500 ease-out" id="hero-copy">
 <span class="block overflow-hidden mb-6">
 <span class="hero-meta-label js-reveal-line inline-block text-xs font-mono tracking-widest uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
 </span>
@@ -236,12 +242,19 @@
 <p class="text-lg hero-editorial-sub font-light leading-relaxed mb-8 max-w-lg" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
 <a class="hero-editorial-cta iona-cursor-target pointer-events-auto inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
 </div>
+</div>
 
-<!-- Live engineering metric bar. hero-hairline/hero-metric-strip-bg are
-     hardcoded post-Phase-87 (no more :root.dark swap — #hero is a fixed
-     white/black section now, see base.css). Phase 87 adds the big
-     01/02/03 indicators per the brand's numbered-data-point style. -->
-<div class="relative z-20 bg-white hero-hairline border-t hero-metric-strip-bg mt-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3">
+<!-- Live engineering metric bar. Phase 103 (rescue): explicitly moved
+     OUTSIDE the h-[85vh] 3D/text wrapper above — normal document flow,
+     not sharing that wrapper's `relative` positioning context at all,
+     so it can never end up boxed in with (or clipped by) anything
+     absolutely positioned inside the hero visual again. relative z-20
+     bg-white is a belt-and-suspenders backstop for the same reason.
+     hero-hairline/hero-metric-strip-bg are hardcoded post-Phase-87 (no
+     more :root.dark swap — #hero is a fixed white/black section now,
+     see base.css). Phase 87 adds the big 01/02/03 indicators per the
+     brand's numbered-data-point style. -->
+<div class="relative z-20 bg-white border-t border-slate-200 hero-hairline hero-metric-strip-bg mt-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3">
 <div class="hero-hairline border-b md:border-b-0 md:border-r p-6 lg:p-8 flex items-start gap-4">
 <span class="text-2xl lg:text-3xl font-bold text-[#2d9937]" aria-hidden="true">01</span>
 <div>
