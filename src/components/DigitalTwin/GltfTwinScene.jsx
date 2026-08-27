@@ -2268,17 +2268,18 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
   if (!structure) return null;
   const sub = subIndex != null ? structure.subComponents[subIndex] : null;
 
-  /* Phase 83: fixed (viewport-relative), not absolute. The 3D canvas's
-     own wrapper div — this component's nearest positioned ancestor — used
-     to span roughly the whole hero, so `absolute` effectively read as
-     viewport-relative anyway; now that the canvas is confined to its own
-     right-column box (h-[450px]/h-[600px]), an `absolute` panel here
-     would be positioned (and, worse, clipped by #hero's overflow-hidden)
-     relative to that small box instead. `fixed` keeps the exact same
-     top-24/right-10/etc math working the way it always visually did,
-     independent of the 3D box's own size. */
+  /* Phase 99: `fixed` (viewport-relative) was following the page down as
+     the visitor scrolled past the hero — wrong once the hero has its own
+     confined 3D column again (Phase 98 reverted the full-bleed layer).
+     `absolute` instead, anchored to #iona-digital-twin-root itself (this
+     component's mount target and nearest `position: relative` ancestor,
+     see index.html's Phase 98 comment) — the panel now scrolls away with
+     the hero section like any other in-flow content, instead of
+     trailing the viewport. No overflow-hidden on that ancestor (see the
+     same index.html comment), so this isn't at risk of the clipping an
+     earlier `absolute` attempt hit before `fixed` was introduced. */
   return (
-    <div className="fixed z-20 top-24 left-4 right-4 max-h-[70vh] sm:max-h-[85vh] sm:top-1/2 sm:left-auto sm:right-10 sm:-translate-y-1/2 sm:w-[450px] sm:min-h-[75vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6">
+    <div className="absolute z-20 top-1/4 left-4 right-4 lg:left-auto lg:right-8 lg:w-[450px] max-h-[70vh] lg:max-h-[85vh] lg:min-h-[75vh] overflow-y-auto rounded-3xl border border-white/40 bg-white/75 backdrop-blur-2xl shadow-2xl p-8 text-gray-900 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-3">
         {sub ? (
           <button

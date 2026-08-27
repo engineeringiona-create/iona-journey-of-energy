@@ -196,24 +196,27 @@
 <div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
 </div>
 
-<!-- Phase 97: dropped the grid-column cage from Phase 95. #iona-digital-twin-root
-     is now a borderless absolute inset-0 layer spanning the entire
-     hero section (the 3D scene's own OVERVIEW_DIR framing already
-     composes the facility toward screen-right, so it doesn't need a
-     dedicated grid column to stay clear of the text). hero-copy is
-     normal-flow content stacked on top via z-index, not a grid cell —
-     min-h-[75vh] moved here since the grid that used to own it is
-     gone. -->
-<div class="absolute inset-0 w-full h-full z-0 pointer-events-auto iona-cursor-target" id="iona-digital-twin-root"></div>
-<!-- Phase 97: cinematic intro backdrop — dims/blurs the 3D layer behind
+<!-- Phase 98 EMERGENCY REVERT: Phase 97's `absolute inset-0` 3D layer
+     let the model's canvas render into the WHOLE hero section instead
+     of a confined box, which blew its apparent scale way up and let it
+     visually swallow the text column and the metric bar below. Back to
+     a strict lg:grid-cols-12 with the 3D canvas locked into its own
+     right column (lg:col-span-7, explicit h-[550px]/h-[650px]) — text
+     stays lg:col-span-5. This div IS the mount target
+     (#iona-digital-twin-root) and its own nearest positioned ancestor
+     (relative), so DetailPanel can anchor to it with `absolute`
+     (Phase 99) instead of `fixed` to the viewport. No overflow-hidden
+     here on purpose — GltfTwinScene.jsx's own DetailPanel comment
+     warns that clipped it against #hero's overflow-hidden before; the
+     <canvas> itself never paints outside its own box regardless. -->
+<!-- Phase 97: cinematic intro backdrop — dims/blurs the hero behind
      the headline while initHeroCinematicIntro (main-anasayfa.js) holds
      it centered + scaled, then fades out as the headline animates into
-     its real position. z-[5]: above the 3D layer (z-0), below
-     hero-copy (z-10) so it never blurs the headline itself. Removed
-     from the DOM by the same JS once its fade-out finishes. -->
+     its real position. Removed from the DOM by the same JS once its
+     fade-out finishes. -->
 <div class="absolute inset-0 z-[5] backdrop-blur-xl bg-white/50 pointer-events-none" id="hero-intro-overlay" aria-hidden="true"></div>
-<div class="relative z-10 w-full max-w-[1400px] mx-auto px-8 lg:px-16 min-h-[75vh] flex items-center">
-<div class="w-full lg:max-w-xl relative z-10 flex flex-col justify-center transition-opacity duration-500 ease-out pr-4 lg:pr-8" id="hero-copy">
+<div class="relative z-10 w-full max-w-[1400px] mx-auto px-8 lg:px-16 grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12 min-h-[75vh]">
+<div class="lg:col-span-5 relative z-10 flex flex-col justify-center transition-opacity duration-500 ease-out pr-4 lg:pr-8" id="hero-copy">
 <span class="block overflow-hidden mb-6">
 <span class="hero-meta-label js-reveal-line inline-block text-xs font-mono tracking-widest uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
 </span>
@@ -244,13 +247,14 @@
 <p class="text-lg hero-editorial-sub font-light leading-relaxed mb-8 max-w-lg" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
 <a class="hero-editorial-cta iona-cursor-target inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
 </div>
+<div class="lg:col-span-7 w-full h-[550px] lg:h-[650px] relative z-0 iona-cursor-target" id="iona-digital-twin-root"></div>
 </div>
 
 <!-- Live engineering metric bar. hero-hairline/hero-metric-strip-bg are
      hardcoded post-Phase-87 (no more :root.dark swap — #hero is a fixed
      white/black section now, see base.css). Phase 87 adds the big
      01/02/03 indicators per the brand's numbered-data-point style. -->
-<div class="relative z-10 hero-hairline border-t hero-metric-strip-bg mt-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3">
+<div class="relative z-20 bg-white hero-hairline border-t hero-metric-strip-bg mt-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3">
 <div class="hero-hairline border-b md:border-b-0 md:border-r p-6 lg:p-8 flex items-start gap-4">
 <span class="text-2xl lg:text-3xl font-bold text-[#2d9937]" aria-hidden="true">01</span>
 <div>
