@@ -97,36 +97,35 @@ body {
     overflow: hidden;
     opacity: 0.15;
     pointer-events: none;
+    perspective: 1200px;
 }
 
+/* Phase 96: true 3D twisting double-helix illusion, driven by scroll
+   position instead of the old fixed-duration CSS sway. --scroll-progress
+   is a 0..1 custom property set on this element by initDnaScroll
+   (common.js) from a GSAP ScrollTrigger tied to whole-document scroll —
+   custom properties inherit, so the svg child just reads it straight
+   into a 3D transform. Falls back to 0 (no rotation) if JS hasn't set
+   it yet, e.g. first paint before any scroll tracking has run. */
 .iona-dna-bg svg {
     width: 100%;
     height: 100%;
-    animation: iona-dna-sway 18s ease-in-out infinite alternate;
+    transform-style: preserve-3d;
+    transform: rotateY(calc(var(--scroll-progress, 0) * 360deg)) translateY(calc(var(--scroll-progress, 0) * -100px));
 }
 
-@keyframes iona-dna-sway {
-    0% { transform: translateX(-5%); }
-    100% { transform: translateX(5%); }
-}
-
-@keyframes iona-dna-breathe-stroke {
-    0%, 100% { stroke: #2d9937; }
-    50% { stroke: #ffc700; }
-}
-
-@keyframes iona-dna-breathe-fill {
-    0%, 100% { fill: #2d9937; }
-    50% { fill: #ffc700; }
+/* Single shared keyframe (both stroke and fill authored in each step) —
+   path/line only ever read the stroke half, circle only ever reads the
+   fill half, so one @keyframes block covers all three element types. */
+@keyframes dna-color-shift {
+    0% { stroke: #2d9937; fill: #2d9937; }
+    100% { stroke: #ffc700; fill: #ffc700; }
 }
 
 .iona-dna-bg path,
-.iona-dna-bg line {
-    animation: iona-dna-breathe-stroke 10s ease-in-out infinite;
-}
-
+.iona-dna-bg line,
 .iona-dna-bg circle {
-    animation: iona-dna-breathe-fill 10s ease-in-out infinite;
+    animation: dna-color-shift 12s ease-in-out infinite alternate;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -135,6 +134,7 @@ body {
     .iona-dna-bg line,
     .iona-dna-bg circle {
         animation: none;
+        transform: none;
     }
 }
 
@@ -264,6 +264,19 @@ html {
 
 .mobile-nav-link.is-current {
     color: #2d9937;
+}
+
+/* Phase 94: desktop inline nav — is-current mirrors .mobile-nav-link's
+   own treatment (green text), plus keeps the after:w-0->w-full hover
+   underline (index.html etc.) permanently expanded rather than only on
+   hover, since Tailwind's hover: variant can't be triggered by a plain
+   class. Equal-specificity override relies on base.css loading after
+   tailwind.css, same pattern as this file's other utility overrides. */
+.desktop-nav-link.is-current {
+    color: #2d9937;
+}
+.desktop-nav-link.is-current::after {
+    width: 100%;
 }
 
 .mobile-nav-panel.is-open .mobile-nav-link {
@@ -808,60 +821,10 @@ html {
     color: #000000;
 }
 
-/* Phase 89: Services Exhibition rows — a full-width numbered list, not
-   cards. Grid instead of flex so the number/title/description columns
-   line up across all 4 rows regardless of how long each title/desc
-   runs. Hover swaps #services-exhibit-image's src via
-   initServicesExhibition (main-anasayfa.js); the row itself only owns
-   the text-side hover feedback (color + number). */
-.services-exhibit-row {
-    display: grid;
-    grid-template-columns: 64px 1fr;
-    gap: 8px 24px;
-    align-items: baseline;
-    padding: 28px 0;
-    border-top: 1px solid rgba(226, 232, 240, 0.8);
-    color: #000000;
-}
-
-#services-exhibit-list a.services-exhibit-row:last-child {
-    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.services-exhibit-number {
-    font-family: monospace;
-    font-size: 14px;
-    color: #2d9937;
-    font-weight: 700;
-}
-
-.services-exhibit-title {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    transition: color 250ms ease;
-}
-
-.services-exhibit-desc {
-    grid-column: 2;
-    font-size: 14px;
-    color: rgba(0, 0, 0, 0.55);
-    max-width: 640px;
-}
-
-@media (min-width: 1024px) {
-    .services-exhibit-row {
-        grid-template-columns: 80px 1fr 340px;
-    }
-    .services-exhibit-desc {
-        grid-column: 3;
-        align-self: center;
-    }
-}
-
-.services-exhibit-row:hover .services-exhibit-title {
-    color: #2d9937;
-}
+/* Phase 93: Permanent Asymmetrical Exhibition Grid — image/text layout
+   is now pure Tailwind grid utilities in index.html (see #services-exhibit),
+   so .services-exhibit-row no longer needs a bespoke CSS grid template.
+   Kept as a bare class hook only for initCustomCursor's selector list. */
 
 /* Phase 88: custom "identity cursor" — morphs into the brand's circle+
    ring motif over the 3D canvas and the hero CTA (see initCustomCursor

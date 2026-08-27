@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve } from '../common.js';
+import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initDnaScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { initBiogasCalculator } from '../lib/biogasCalculator.js';
@@ -17,6 +17,7 @@ initFadeIn();
 initThemeToggle();
 initSiteSearch();
 initMobileNav();
+initDnaScroll();
 initParallax();
 initCardSpotlight();
 
@@ -187,32 +188,6 @@ function initMagneticButtons() {
   });
 }
 initMagneticButtons();
-
-/* ---------------- Phase 89: Services Exhibition hover reveal ----------------
-   Swaps the floating #services-exhibit-image's src to whichever row's
-   own data-image is hovered (desktop only — see index.html's `hidden
-   lg:block` on the image itself; wiring listeners on touch devices
-   would just fire on tap-scroll with nothing useful for the visitor to
-   see). Fades out entirely on mouseleave rather than reverting to a
-   "default" row so nothing is left looking hovered on the way out. */
-function initServicesExhibition() {
-  const image = document.getElementById('services-exhibit-image');
-  const rows = document.querySelectorAll('.services-exhibit-row');
-  if (!image || !rows.length) return;
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-  rows.forEach((row) => {
-    row.addEventListener('mouseenter', () => {
-      const src = row.getAttribute('data-image');
-      if (src) image.src = src;
-      image.style.opacity = '1';
-    });
-    row.addEventListener('mouseleave', () => {
-      image.style.opacity = '0';
-    });
-  });
-}
-initServicesExhibition();
 
 /* ---------------- Services: stagger fade-in on scroll ---------------- */
 function initServiceCards() {

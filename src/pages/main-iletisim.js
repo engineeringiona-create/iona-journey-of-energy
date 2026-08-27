@@ -1,4 +1,4 @@
-import { initFadeIn, initThemeToggle, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve } from '../common.js';
+import { initFadeIn, initThemeToggle, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initDnaScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { getSupabase } from '../lib/supabaseClient.js';
@@ -13,6 +13,7 @@ initFadeIn();
 initThemeToggle();
 initSiteSearch();
 initMobileNav();
+initDnaScroll();
 initCardSpotlight();
 
 /* Phase 42: submits straight into contact_submissions — no more mailto:

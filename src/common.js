@@ -217,7 +217,7 @@ export function initMobileNav() {
   if (!toggle || !panel) return;
 
   const here = window.location.pathname.replace(/index\.html$/, '') || '/';
-  panel.querySelectorAll('a.mobile-nav-link').forEach((link) => {
+  document.querySelectorAll('a.mobile-nav-link, a.desktop-nav-link').forEach((link) => {
     const linkPath = new URL(link.href, window.location.origin).pathname.replace(/index\.html$/, '') || '/';
     if (linkPath === here) {
       link.classList.add('is-current');
@@ -248,6 +248,30 @@ export function initMobileNav() {
   });
   window.matchMedia('(min-width: 768px)').addEventListener('change', (e) => {
     if (e.matches) close();
+  });
+}
+
+/* Phase 96: ties the sitewide .iona-dna-bg helix's 3D rotation to overall
+   page scroll progress (0..1 across the whole document), not a fixed
+   CSS-only sway. ScrollTrigger.create with no scroll-triggered tween of
+   its own — just onUpdate writing --scroll-progress onto the element —
+   plugs into the same GSAP/Lenis pipeline every other scroll effect
+   here already shares (Lenis emits 'scroll' -> ScrollTrigger.update,
+   see initSmoothScroll), so this stays in sync with the smoothed
+   scroll position rather than raw window.scrollY. Skipped under
+   reduced motion, same contract as every other motion helper here. */
+export function initDnaScroll() {
+  const bg = document.querySelector('.iona-dna-bg');
+  if (!bg || reduceMotion) return;
+
+  ScrollTrigger.create({
+    trigger: document.documentElement,
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 0.3,
+    onUpdate: (self) => {
+      bg.style.setProperty('--scroll-progress', self.progress.toFixed(4));
+    }
   });
 }
 

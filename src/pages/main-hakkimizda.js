@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initHorizontalGallery } from '../common.js';
+import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initHorizontalGallery, initDnaScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 
@@ -15,6 +15,7 @@ initFadeIn();
 initThemeToggle();
 initSiteSearch();
 initMobileNav();
+initDnaScroll();
 initParallax();
 initHorizontalGallery('why-us-track');
 

@@ -1,4 +1,4 @@
-import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initHorizontalGallery } from '../common.js';
+import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initHorizontalGallery, initDnaScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 
@@ -12,6 +12,7 @@ initFadeIn();
 initThemeToggle();
 initSiteSearch();
 initMobileNav();
+initDnaScroll();
 initParallax();
 initCardSpotlight();
 initHorizontalGallery('industries-track');

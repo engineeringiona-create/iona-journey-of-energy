@@ -75,26 +75,35 @@
 </div>
 </div>
 <!-- TopNavBar -->
-<!-- Phase 89: MNBAQ minimalist nav — one unified bar (logo + MENU
-     trigger) at every breakpoint, replacing the old two-nav setup (an
-     always-desktop bar with inline search/lang/links, plus a separate
-     mobile-only hamburger). Search, language switcher and theme toggle
-     aren't gone — they're folded into the fullscreen overlay this
-     trigger opens. IDs below (mobile-nav-toggle/panel/icon) are kept
-     from the old mobile-only bar on purpose: initMobileNav in
-     common.js already wires these up correctly and every page's entry
-     script already calls it, so reusing them avoids touching all 7
-     pages' scripts for a purely cosmetic rename. Active-link
-     highlighting is computed at runtime from location.pathname (see
-     initMobileNav) instead of hardcoded per page. -->
-<nav class="fixed top-0 w-full z-50 bg-white border-b border-slate-200 flex justify-between items-center px-safe-margin-mobile md:px-safe-margin-desktop py-5" id="mobile-nav">
-<a class="flex items-center" href="/">
+<!-- Phase 94: brought inline desktop nav links back — client disliked
+     the Phase 89 hide-everything-behind-MENU approach for desktop.
+     Hamburger (MENU) is now md:hidden, mobile-only; desktop gets a
+     centered inline link cluster + CTA between the logo and the right
+     edge. mobile-nav-toggle/panel/icon IDs and initMobileNav's wiring
+     are untouched, so the fullscreen overlay still exists and still
+     works on mobile — desktop links are a second, separate
+     hover-underline nav living outside that panel. .desktop-nav-link
+     is a new class initMobileNav (common.js) also scans for
+     is-current highlighting, alongside the existing .mobile-nav-link. -->
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-safe-margin-mobile md:px-safe-margin-desktop py-5" id="mobile-nav">
+<a class="flex items-center flex-1" href="/">
 <span class="iona-wordmark-text" style="font-size:24px;color:#000">iona</span>
 </a>
-<button class="flex items-center gap-3" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
+<div class="hidden md:flex flex-1 items-center justify-center gap-8">
+<a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
+<a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
+<a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/etki.html" data-i18n="nav.industries">Sektörler</a>
+<a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/ionaflux.html" data-i18n="nav.ionaflux">IonaFlux</a>
+<a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/duyurular.html" data-i18n="nav.news">Duyurular</a>
+<a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/iletisim.html" data-i18n="nav.contact">İletişim</a>
+</div>
+<div class="flex flex-1 items-center justify-end gap-4">
+<a class="hidden md:inline-flex items-center justify-center bg-black text-white text-sm font-semibold tracking-wide px-6 py-2.5 transition-colors duration-300 hover:bg-[#2d9937]" href="/iletisim.html#contact-form" data-i18n="nav.cta">Teklif Alın</a>
+<button class="flex items-center gap-3 md:hidden" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-i18n-aria-label="nav.menu" aria-label="Menü">
 <span class="font-label-caps text-[13px] font-bold tracking-[0.2em] text-black">MENU</span>
 <span class="material-symbols-outlined text-[26px] text-black" id="mobile-nav-icon">menu</span>
 </button>
+</div>
 </nav>
 
 <div class="mobile-nav-panel" id="mobile-nav-panel">
@@ -171,7 +180,7 @@
      now covers every page instead of just this section. The sweep
      curve stays: it's a hero-specific directional accent, not part of
      the sitewide watermark. -->
-<svg class="absolute inset-x-0 top-1/4 w-full h-[400px] z-0 pointer-events-none select-none opacity-70" viewBox="0 0 1400 400" preserveAspectRatio="none" aria-hidden="true">
+<svg class="absolute inset-x-0 top-1/4 w-full h-[400px] -z-10 pointer-events-none select-none opacity-70" viewBox="0 0 1400 400" preserveAspectRatio="none" aria-hidden="true">
 <defs>
 <linearGradient id="ionaSweepGrad" x1="0" y1="0" x2="1" y2="0">
 <stop offset="0%" stop-color="#2d9937" stop-opacity="0"></stop>
@@ -187,35 +196,39 @@
 <div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
 </div>
 
-<div class="relative z-10 max-w-[1400px] mx-auto px-8 lg:px-16 grid grid-cols-1 lg:grid-cols-12 items-center gap-12 min-h-[75vh]">
-<div class="lg:col-span-5 z-10 flex flex-col justify-center transition-opacity duration-500 ease-out pr-4 lg:pr-8" id="hero-copy">
+<div class="relative z-10 w-full max-w-[1400px] mx-auto px-8 lg:px-16 grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12 min-h-[75vh]">
+<div class="lg:col-span-5 relative z-10 flex flex-col justify-center transition-opacity duration-500 ease-out pr-4 lg:pr-8" id="hero-copy">
 <span class="block overflow-hidden mb-6">
 <span class="hero-meta-label js-reveal-line inline-block text-xs font-mono tracking-widest uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
 </span>
 <!-- Phase 87: official IONA heading motif — filled brand-green circle
-     intersecting an outlined accent-yellow ring. -->
+     intersecting an outlined accent-yellow ring. Only ONE of these in
+     the hero on purpose (Phase 95) — the visually similar motif near
+     the footer/#iona-cursor is the custom-cursor element, a fixed
+     overlay that tracks the pointer, not a static duplicate sitting in
+     this column. -->
 <svg class="w-14 h-14 lg:w-16 lg:h-16 mb-4" viewBox="0 0 100 100" fill="none" aria-hidden="true">
 <circle cx="38" cy="50" r="30" fill="#2d9937"></circle>
 <circle cx="62" cy="50" r="30" fill="none" stroke="#ffc700" stroke-width="5"></circle>
 </svg>
-<!-- Phase 90: text-9xl (Phase 87) was overflowing lg:col-span-5 and
-     visually colliding with the 3D column at in-between widths —
-     text-[5rem]/[5.5rem] plus whitespace-normal/break-words instead of
-     relying on inline-block's own wrap behavior, so a long word can
-     never push past the column's own right padding. -->
+<!-- Phase 95: sized down further (was text-5xl/[5rem]/[5.5rem]) so the
+     full headline reliably fits inside lg:col-span-5 without clipping
+     at any viewport, on top of the existing whitespace-normal/
+     break-words wrap safety net. -->
 <div class="overflow-hidden mb-6">
-<h1 class="js-reveal-line inline-block text-5xl lg:text-[5rem] xl:text-[5.5rem] font-bold tracking-tighter hero-editorial-title leading-[0.9] whitespace-normal break-words" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
+<h1 class="js-reveal-line inline-block text-[3rem] lg:text-[4rem] xl:text-[5rem] font-bold tracking-tight hero-editorial-title leading-[0.95] whitespace-normal break-words" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
 </div>
 <p class="text-lg hero-editorial-sub font-light leading-relaxed mb-8 max-w-lg" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
 <a class="hero-editorial-cta iona-cursor-target inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
 </div>
 <!-- Phase 88: sticky on lg+ so the twin stays put while hero-copy's
      stacked type/data (and the metric bar below) scroll past it — the
-     "museum wall" effect. Phase 90: strictly boxed to its own column
-     (w-full h-[600px] + overflow-hidden) so the canvas can never bleed
-     past this grid cell regardless of viewport. -->
-<div class="lg:col-span-7 w-full h-[600px] lg:h-screen relative lg:sticky lg:top-0 lg:flex lg:items-center overflow-hidden iona-cursor-target">
-<div class="absolute inset-0 w-full h-full" id="iona-digital-twin-root"></div>
+     "museum wall" effect. Phase 95: h-[600px]/lg:h-screen replaced with
+     min-h so this column can never grow taller than its own grid row
+     needs and bleed past it — h-screen in particular could exceed the
+     row height the sticky twin was meant to stay confined to. -->
+<div class="lg:col-span-7 relative z-10 w-full min-h-[500px] lg:min-h-[650px] lg:sticky lg:top-0 lg:flex lg:items-center overflow-hidden iona-cursor-target">
+<div class="absolute inset-0 w-full h-full bg-transparent" id="iona-digital-twin-root"></div>
 </div>
 </div>
 
@@ -287,55 +300,63 @@
 </div>
 </section>
 
-<!-- Phase 89: Asymmetrical Services Exhibition. A full-width numbered
-     list (not cards) — each row is a hover target: hovering swaps
-     #services-exhibit-image's src to that row's own image (real
-     facility/equipment photography already shipped under
-     public/images, not placeholders) via initServicesExhibition in
-     main-anasayfa.js. Reuses the site's own 4 real service anchors
-     (teknoloji.html#expo-agitator/#expo-genset/#expo-pump/#workflow —
-     same targets common.js's SEARCH_INDEX already points at) rather
-     than inventing new service names.
-
-     Phase 90: the image was `absolute` inside this section, so at some
-     row-count/viewport combos its centered-on-the-section positioning
-     drifted over the text column instead of staying clear of it. Now
-     `fixed` to the viewport (right-10 top-1/4, independent of this
-     section's own layout/scroll position) — it just floats in the same
-     screen corner regardless of which row is hovered or how tall the
-     list gets. -->
-<section class="relative bg-white px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-28 border-t border-slate-200 fade-in-section" id="services-exhibit">
-<div class="max-w-[1400px] mx-auto">
-<div class="flex items-end justify-between mb-12 gap-6 fade-in-element">
+<!-- Phase 93: Permanent Asymmetrical Exhibition Grid. Images are always
+     visible, structural elements of the page (MNBAQ / architectural
+     editorial style) — no more hover-to-reveal. Each row is a
+     full-bleed 12-col grid; odd rows keep natural DOM order (image
+     lg:col-span-7 left, text lg:col-span-5 right), even rows swap sides
+     purely via lg:order so mobile still always stacks image-on-top /
+     text-below regardless of row parity. Same 4 real service anchors
+     as before (teknoloji.html#expo-agitator/#expo-genset/#expo-pump/
+     #workflow). .services-exhibit-row kept as the class name so
+     initCustomCursor's existing selector list still picks these up. -->
+<section class="relative bg-white border-t border-slate-200 fade-in-section" id="services-exhibit">
+<div class="max-w-[1400px] mx-auto px-safe-margin-mobile md:px-safe-margin-desktop pt-20 md:pt-28 pb-12 md:pb-16">
+<div class="flex items-end justify-between gap-6 fade-in-element">
 <h2 class="text-4xl lg:text-6xl font-bold tracking-tighter text-black">Hizmetlerimiz.</h2>
 <span class="hidden md:block text-[10px] font-mono uppercase tracking-widest text-black/40">04 / KATALOG</span>
 </div>
-<div class="relative">
-<img class="hidden lg:block pointer-events-none fixed right-10 top-1/4 w-[400px] h-[500px] object-cover opacity-0 transition-opacity duration-500 z-50" id="services-exhibit-image" src="/images/equipment/digester-mixer.jpg" alt="" aria-hidden="true">
-<div id="services-exhibit-list">
-<a class="services-exhibit-row" href="/teknoloji.html#expo-agitator" data-image="/images/equipment/digester-mixer.jpg">
-<span class="services-exhibit-number">01</span>
-<span class="services-exhibit-title">Twin Karıştırıcı Teknolojisi</span>
-<span class="services-exhibit-desc">Yüzey kabuklaşmasını önleyen, düşük enerjili çift karıştırıcı sistemleri.</span>
-</a>
-<a class="services-exhibit-row" href="/teknoloji.html#expo-genset" data-image="/images/power-cat-gensets.jpg">
-<span class="services-exhibit-number">02</span>
-<span class="services-exhibit-title">Güç Üretimi</span>
-<span class="services-exhibit-desc">Yüksek verimli jeneratör setleriyle biyogazdan elektrik ve ısı.</span>
-</a>
-<a class="services-exhibit-row" href="/teknoloji.html#expo-pump" data-image="/images/equipment/pump-room.jpg">
-<span class="services-exhibit-number">03</span>
-<span class="services-exhibit-title">Mono Pompa Teknolojisi</span>
-<span class="services-exhibit-desc">Aşındırıcı substratlarda kesintisiz çalışan sabit debili pompa istasyonları.</span>
-</a>
-<a class="services-exhibit-row" href="/teknoloji.html#workflow" data-image="/images/hero-facility-aerial.jpg">
-<span class="services-exhibit-number">04</span>
-<span class="services-exhibit-title">Mühendislik İş Akışı</span>
-<span class="services-exhibit-desc">Fizibiliteden devreye almaya, uçtan uca proje yönetimi.</span>
-</a>
 </div>
+<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-agitator">
+<div class="relative overflow-hidden lg:col-span-7">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/digester-mixer.jpg" alt="Twin Karıştırıcı Teknolojisi" loading="lazy" decoding="async">
 </div>
+<div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
+<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">01</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Twin Karıştırıcı Teknolojisi</h3>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüzey kabuklaşmasını önleyen, düşük enerjili çift karıştırıcı sistemleri.</p>
 </div>
+</a>
+<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-genset">
+<div class="relative overflow-hidden lg:col-span-7 lg:order-2">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/power-cat-gensets.jpg" alt="Güç Üretimi" loading="lazy" decoding="async">
+</div>
+<div class="lg:col-span-5 lg:order-1 flex flex-col justify-center p-8 lg:p-16">
+<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">02</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Güç Üretimi</h3>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüksek verimli jeneratör setleriyle biyogazdan elektrik ve ısı.</p>
+</div>
+</a>
+<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-pump">
+<div class="relative overflow-hidden lg:col-span-7">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/pump-room.jpg" alt="Mono Pompa Teknolojisi" loading="lazy" decoding="async">
+</div>
+<div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
+<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">03</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Mono Pompa Teknolojisi</h3>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Aşındırıcı substratlarda kesintisiz çalışan sabit debili pompa istasyonları.</p>
+</div>
+</a>
+<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-b border-slate-200" href="/teknoloji.html#workflow">
+<div class="relative overflow-hidden lg:col-span-7 lg:order-2">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/hero-facility-aerial.jpg" alt="Mühendislik İş Akışı" loading="lazy" decoding="async">
+</div>
+<div class="lg:col-span-5 lg:order-1 flex flex-col justify-center p-8 lg:p-16">
+<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">04</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Mühendislik İş Akışı</h3>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Fizibiliteden devreye almaya, uçtan uca proje yönetimi.</p>
+</div>
+</a>
 </section>
 
 <!-- Phase 89: Brutalist Data Wall — pure typographic infographic, no

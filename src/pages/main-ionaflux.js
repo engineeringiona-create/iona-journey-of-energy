@@ -1,4 +1,4 @@
-import { initFadeIn, initThemeToggle, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve } from '../common.js';
+import { initFadeIn, initThemeToggle, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initDnaScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 
@@ -12,3 +12,4 @@ initFadeIn();
 initThemeToggle();
 initSiteSearch();
 initMobileNav();
+initDnaScroll();
