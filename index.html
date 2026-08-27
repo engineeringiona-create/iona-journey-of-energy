@@ -525,35 +525,45 @@
 </div>
 </section>
 
-<!-- Navigation cards to the other pages -->
+<!-- Navigation index to the other pages -->
+<!-- Phase 114: editorial pass — the 4-up shadow/rounded card grid is now
+     a hairline-ruled index list, each row a full-width link. -->
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="explore">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <div class="flex items-center mb-4 fade-in-element"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest" data-i18n="home.explore.eyebrow">Keşfedin</span></div>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="home.explore.title">Iona'yı Daha Yakından Tanıyın</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 fade-in-element delay-200">
-<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/teknoloji.html">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">Hizmetler</span>
-<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card1_title">İleri Mühendislik, Sürdürülebilir Tesisler İçin</h3>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card1_desc">Çürütücü tasarımından karıştırma teknolojisine, ürün kataloğumuzu ve mühendislik iş akışımızı keşfedin.</p>
-<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+<div class="border-t border-[var(--border)] fade-in-element delay-200">
+<a class="group grid grid-cols-1 lg:grid-cols-[120px_1fr_auto] items-center gap-x-8 gap-y-2 py-8 border-b border-[var(--border)] transition-colors duration-300 hover:bg-[var(--section-alt)]" href="/teknoloji.html">
+<span class="font-mono text-sm text-[var(--brand)]">Hizmetler</span>
+<div>
+<h3 class="font-headline-md text-headline-md mb-1" data-i18n="home.explore.card1_title">İleri Mühendislik, Sürdürülebilir Tesisler İçin</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="home.explore.card1_desc">Çürütücü tasarımından karıştırma teknolojisine, ürün kataloğumuzu ve mühendislik iş akışımızı keşfedin.</p>
+</div>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)] transition-transform duration-300 group-hover:translate-x-1"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
 </a>
-<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/etki.html">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">Sektörler</span>
-<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card2_title">Küresel Ölçekte Kanıtlanmış Etki</h3>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card2_desc">Hizmet verdiğimiz sektörleri ve küresel teknoloji ortaklıklarımızı görün.</p>
-<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+<a class="group grid grid-cols-1 lg:grid-cols-[120px_1fr_auto] items-center gap-x-8 gap-y-2 py-8 border-b border-[var(--border)] transition-colors duration-300 hover:bg-[var(--section-alt)]" href="/etki.html">
+<span class="font-mono text-sm text-[#ffc700]">Sektörler</span>
+<div>
+<h3 class="font-headline-md text-headline-md mb-1" data-i18n="home.explore.card2_title">Küresel Ölçekte Kanıtlanmış Etki</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="home.explore.card2_desc">Hizmet verdiğimiz sektörleri ve küresel teknoloji ortaklıklarımızı görün.</p>
+</div>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)] transition-transform duration-300 group-hover:translate-x-1"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
 </a>
-<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/ionaflux.html">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">IonaFlux</span>
-<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card4_title">Tesisiniz İçin Dijital İkiz</h3>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card4_desc">Müşterilerimize teslim ettiğimiz kendi yazılımımızı, canlı SCADA ve arıza yönetimini keşfedin.</p>
-<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+<a class="group grid grid-cols-1 lg:grid-cols-[120px_1fr_auto] items-center gap-x-8 gap-y-2 py-8 border-b border-[var(--border)] transition-colors duration-300 hover:bg-[var(--section-alt)]" href="/ionaflux.html">
+<span class="font-mono text-sm text-[var(--brand)]">IonaFlux</span>
+<div>
+<h3 class="font-headline-md text-headline-md mb-1" data-i18n="home.explore.card4_title">Tesisiniz İçin Dijital İkiz</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="home.explore.card4_desc">Müşterilerimize teslim ettiğimiz kendi yazılımımızı, canlı SCADA ve arıza yönetimini keşfedin.</p>
+</div>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)] transition-transform duration-300 group-hover:translate-x-1"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
 </a>
-<a class="spotlight-card card-edge-accent block bg-[var(--section-alt)] rounded-xl p-8 shadow-[0_20px_50px_-25px_rgba(20,24,20,0.25)] hover:-translate-y-1 transition-transform duration-300" href="/iletisim.html">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)]">İletişim</span>
-<h3 class="font-headline-md text-headline-md my-3" data-i18n="home.explore.card3_title">Projenizi Konuşalım</h3>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="home.explore.card3_desc">Mühendislik ekibimizle iletişime geçin, projenize özel bir teklif alın.</p>
-<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)]"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+<a class="group grid grid-cols-1 lg:grid-cols-[120px_1fr_auto] items-center gap-x-8 gap-y-2 py-8 border-b border-[var(--border)] transition-colors duration-300 hover:bg-[var(--section-alt)]" href="/iletisim.html">
+<span class="font-mono text-sm text-[#ffc700]">İletişim</span>
+<div>
+<h3 class="font-headline-md text-headline-md mb-1" data-i18n="home.explore.card3_title">Projenizi Konuşalım</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="home.explore.card3_desc">Mühendislik ekibimizle iletişime geçin, projenize özel bir teklif alın.</p>
+</div>
+<span class="inline-flex items-center gap-2 font-label-caps text-label-caps text-[var(--brand)] transition-transform duration-300 group-hover:translate-x-1"><span data-i18n="common.explore_cta">İncele</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
 </a>
 </div>
 </div>
@@ -604,7 +614,7 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 fade-in-element">
 <!-- Inputs -->
-<div class="card-interactive spotlight-card card-edge-accent bg-white/95 backdrop-blur-md shadow-sm border border-slate-200/80 rounded-2xl p-8 md:p-10">
+<div class="bg-white border border-slate-200 p-8 md:p-10">
 <div class="mb-8">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Atık Türü</span>
 <div id="biogaz-atik-pills" class="flex flex-wrap gap-2.5 mt-3">
@@ -623,7 +633,7 @@
 <input type="range" id="biogaz-ton-slider" min="10" max="500" step="5" value="50" class="w-full mt-4" style="accent-color:var(--brand);">
 <div class="flex items-center justify-between mt-2">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">10</span>
-<input type="number" id="biogaz-ton-input" min="10" max="500" step="5" value="50" class="w-24 text-center bg-white/95 backdrop-blur-md shadow-sm border border-slate-200/80 rounded-lg py-1.5 text-[var(--text)] text-body-md">
+<input type="number" id="biogaz-ton-input" min="10" max="500" step="5" value="50" class="w-24 text-center bg-white border border-slate-200 py-1.5 text-[var(--text)] text-body-md">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">500</span>
 </div>
 </div>
@@ -633,19 +643,19 @@
 
 <!-- Outputs -->
 <div class="grid grid-cols-2 gap-5">
-<div class="card-interactive spotlight-card card-edge-accent bg-white/95 backdrop-blur-md shadow-sm border border-slate-200/80 rounded-2xl p-6 flex flex-col justify-between">
+<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Tahmini Kurulu Güç</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-power">— kWe</span>
 </div>
-<div class="card-interactive spotlight-card card-edge-accent bg-white/95 backdrop-blur-md shadow-sm border border-slate-200/80 rounded-2xl p-6 flex flex-col justify-between">
+<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Yıllık Elektrik Üretimi</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-electricity">— MWh/yıl</span>
 </div>
-<div class="card-interactive spotlight-card card-edge-accent bg-white/95 backdrop-blur-md shadow-sm border border-slate-200/80 rounded-2xl p-6 flex flex-col justify-between">
+<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Geri Kazanılan Termal Isı</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-thermal">— kWth</span>
 </div>
-<div class="card-interactive spotlight-card card-edge-accent bg-white/95 backdrop-blur-md shadow-sm border border-slate-200/80 rounded-2xl p-6 flex flex-col justify-between">
+<div class="bg-white border border-slate-200 p-6 flex flex-col justify-between">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Yıllık CO₂ Azaltımı</span>
 <span class="font-headline-md text-headline-md text-[var(--brand)] mt-3" id="biogaz-out-co2">— Ton/yıl</span>
 </div>

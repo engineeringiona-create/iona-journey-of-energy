@@ -1701,13 +1701,14 @@ html {
    shadow-sm instead of Phase 60.1's 2px border + floaty 30px shadow.
    Dark mode still swaps white for a solid dark surface (not translucent
    glass) so the same crispness holds regardless of theme. */
+/* Phase 114: editorial pass — dropped the last trace of shadow and
+   tightened the radius; the hairline border alone does the framing now. */
 .bento-card {
     position: relative;
     background: #ffffff;
     border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     padding: 2rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: border-color 0.25s ease;
 }
 

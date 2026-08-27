@@ -139,27 +139,31 @@
 </a>
 </section>
 
-<!-- Contact info cards -->
+<!-- Contact info -->
+<!-- Phase 114: editorial pass — the 3-up icon+heading+text card grid is
+     now a single hairline-bordered row (border-t/border-l dividers,
+     no boxes) so the section reads as one continuous strip instead of
+     three same-size tiles. -->
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="contact-info">
-<div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 fade-in-element delay-100">
-<div class="card-interactive spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-8">
-<div class="w-11 h-11 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center mb-5"><span class="material-symbols-outlined">location_on</span></div>
+<div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-3 border-t border-b border-slate-200 fade-in-element delay-100">
+<div class="p-8 md:border-r border-slate-200">
+<span class="material-symbols-outlined text-[var(--brand)] text-[22px] mb-4 block" aria-hidden="true">location_on</span>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="contact.info.address_title">Adres</h3>
 <p class="text-body-md text-[var(--text-muted)]" data-i18n="contact.info.address_body">Kırkkonaklar Mah. 358. Sok. 13/5<br>Çankaya, Ankara / Türkiye</p>
 </div>
-<div class="card-interactive spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-8">
-<div class="w-11 h-11 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center mb-5"><span class="material-symbols-outlined">call</span></div>
+<div class="p-8 md:border-r border-slate-200 border-t md:border-t-0">
+<span class="material-symbols-outlined text-[var(--brand)] text-[22px] mb-4 block" aria-hidden="true">call</span>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="contact.info.phone_title">Telefon</h3>
 <p class="text-body-md text-[var(--text-muted)]"><a class="link-underline" href="tel:+905402464662">+90 540 246 4662</a></p>
 </div>
-<div class="card-interactive spotlight-card card-edge-accent border border-[var(--border)] rounded-xl p-8">
-<div class="w-11 h-11 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center mb-5"><span class="material-symbols-outlined">mail</span></div>
+<div class="p-8 border-t md:border-t-0">
+<span class="material-symbols-outlined text-[var(--brand)] text-[22px] mb-4 block" aria-hidden="true">mail</span>
 <h3 class="font-headline-md text-headline-md mb-2" data-i18n="contact.info.email_title">E-posta</h3>
 <p class="text-body-md text-[var(--text-muted)]"><a class="link-underline" href="mailto:info@ionaengineering.com">info@ionaengineering.com</a></p>
 </div>
 </div>
 <div class="max-w-[theme(spacing.container-max)] mx-auto mt-8 fade-in-element delay-100">
-<div class="rounded-2xl border border-white/10 overflow-hidden shadow-2xl h-[320px] md:h-[400px]">
+<div class="border border-slate-200 overflow-hidden h-[320px] md:h-[400px]">
 <iframe
 class="iona-map-frame w-full h-full border-0"
 src="https://www.google.com/maps?q=K%C4%B1rkkonaklar+Mah.+358.+Sok.+No:13%2F5%2C+%C3%87ankaya%2C+Ankara&output=embed"
@@ -173,23 +177,25 @@ aria-label="Kırkkonaklar Mah. 358. Sok. No:13/5, Çankaya, Ankara"
 </section>
 
 <!-- Contact form -->
-<section class="relative bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section bg-decorated" id="contact-form">
-<div class="watermark-edge watermark-right" aria-hidden="true"><span>CONTACT</span></div>
+<!-- Phase 114: the page's high-contrast inversion moment — this is the
+     conversion CTA, so it gets the dark zinc-950 shock treatment
+     instead of the old light bg-decorated/watermark section. -->
+<section class="relative bg-zinc-950 px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-32 fade-in-section" id="contact-form">
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter">
 <div class="md:col-span-5 fade-in-element">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="contact.form.eyebrow">Teklif Alın</span>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-md" data-i18n="contact.form.title">Projenizi Anlatın</h2>
-<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-md" data-i18n="contact.form.body">Formu doldurun; mesajınız doğrudan mühendislik ekibimize iletilecektir.</p>
+<span class="font-label-caps text-label-caps text-[#ffc700] tracking-widest block mb-4" data-i18n="contact.form.eyebrow">Teklif Alın</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-md text-white" data-i18n="contact.form.title">Projenizi Anlatın</h2>
+<p class="font-body-md text-body-md text-white/60 max-w-md" data-i18n="contact.form.body">Formu doldurun; mesajınız doğrudan mühendislik ekibimize iletilecektir.</p>
 </div>
 <div class="md:col-span-6 md:col-start-7 fade-in-element delay-100">
 <form class="flex flex-col gap-5" id="contact-mail-form">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-<input class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" type="text" name="name" placeholder="Adınız Soyadınız" data-i18n-placeholder="contact.form.name_placeholder" required>
-<input class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" type="email" name="email" placeholder="E-posta Adresiniz" data-i18n-placeholder="contact.form.email_placeholder" required>
+<input class="w-full bg-transparent border-b border-white/20 py-3 text-[15px] text-white placeholder:text-white/40 focus:outline-none focus:border-[#2d9937] transition-colors duration-300" type="text" name="name" placeholder="Adınız Soyadınız" data-i18n-placeholder="contact.form.name_placeholder" required>
+<input class="w-full bg-transparent border-b border-white/20 py-3 text-[15px] text-white placeholder:text-white/40 focus:outline-none focus:border-[#2d9937] transition-colors duration-300" type="email" name="email" placeholder="E-posta Adresiniz" data-i18n-placeholder="contact.form.email_placeholder" required>
 </div>
-<input class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300" type="tel" name="phone" placeholder="Telefon Numaranız" data-i18n-placeholder="contact.form.phone_placeholder">
-<textarea class="w-full bg-transparent border-b border-[var(--border-strong)] py-3 text-[15px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors duration-300 resize-none" name="message" rows="4" placeholder="Projeniz hakkında kısaca bilgi verin" data-i18n-placeholder="contact.form.message_placeholder" required></textarea>
-<button class="self-start font-label-caps text-label-caps bg-[var(--brand)] text-white px-8 py-4 rounded-none hover:bg-[var(--brand-hover)] transition-colors duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)] hover:brightness-105 transition-all mt-2" type="submit">
+<input class="w-full bg-transparent border-b border-white/20 py-3 text-[15px] text-white placeholder:text-white/40 focus:outline-none focus:border-[#2d9937] transition-colors duration-300" type="tel" name="phone" placeholder="Telefon Numaranız" data-i18n-placeholder="contact.form.phone_placeholder">
+<textarea class="w-full bg-transparent border-b border-white/20 py-3 text-[15px] text-white placeholder:text-white/40 focus:outline-none focus:border-[#2d9937] transition-colors duration-300 resize-none" name="message" rows="4" placeholder="Projeniz hakkında kısaca bilgi verin" data-i18n-placeholder="contact.form.message_placeholder" required></textarea>
+<button class="self-start font-label-caps text-label-caps bg-[#2d9937] text-white px-8 py-4 rounded-none hover:bg-[#3ab347] transition-colors duration-300 mt-2" type="submit">
 <span data-i18n="contact.form.submit">Mesajı Gönder</span>
 </button>
 </form>
