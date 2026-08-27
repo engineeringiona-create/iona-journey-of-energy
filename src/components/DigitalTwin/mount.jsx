@@ -12,11 +12,11 @@
    DigitalTwinScene.jsx (hand-built procedural stations, no GLB) — the
    latter is left in the repo unwired, same as before.
 
-   #iona-digital-twin-root is a normal-flow, always-visible box on every
-   viewport size (Phase 83's 2-column grid stacks it below the copy on
-   mobile, not `hidden md:block`), so this same IntersectionObserver
-   mounts the twin for both mobile and desktop — no separate mobile
-   mount path needed. */
+   #iona-digital-twin-root is an always-visible box on every viewport
+   size (Phase 97: a borderless `absolute inset-0` layer spanning the
+   whole hero section, not a grid column — see index.html), not
+   `hidden md:block`, so this same IntersectionObserver mounts the twin
+   for both mobile and desktop — no separate mobile mount path needed. */
 const container = document.getElementById('iona-digital-twin-root');
 
 if (container) {

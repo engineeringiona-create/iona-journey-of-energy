@@ -196,8 +196,24 @@
 <div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
 </div>
 
-<div class="relative z-10 w-full max-w-[1400px] mx-auto px-8 lg:px-16 grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12 min-h-[75vh]">
-<div class="lg:col-span-5 relative z-10 flex flex-col justify-center transition-opacity duration-500 ease-out pr-4 lg:pr-8" id="hero-copy">
+<!-- Phase 97: dropped the grid-column cage from Phase 95. #iona-digital-twin-root
+     is now a borderless absolute inset-0 layer spanning the entire
+     hero section (the 3D scene's own OVERVIEW_DIR framing already
+     composes the facility toward screen-right, so it doesn't need a
+     dedicated grid column to stay clear of the text). hero-copy is
+     normal-flow content stacked on top via z-index, not a grid cell —
+     min-h-[75vh] moved here since the grid that used to own it is
+     gone. -->
+<div class="absolute inset-0 w-full h-full z-0 pointer-events-auto iona-cursor-target" id="iona-digital-twin-root"></div>
+<!-- Phase 97: cinematic intro backdrop — dims/blurs the 3D layer behind
+     the headline while initHeroCinematicIntro (main-anasayfa.js) holds
+     it centered + scaled, then fades out as the headline animates into
+     its real position. z-[5]: above the 3D layer (z-0), below
+     hero-copy (z-10) so it never blurs the headline itself. Removed
+     from the DOM by the same JS once its fade-out finishes. -->
+<div class="absolute inset-0 z-[5] backdrop-blur-xl bg-white/50 pointer-events-none" id="hero-intro-overlay" aria-hidden="true"></div>
+<div class="relative z-10 w-full max-w-[1400px] mx-auto px-8 lg:px-16 min-h-[75vh] flex items-center">
+<div class="w-full lg:max-w-xl relative z-10 flex flex-col justify-center transition-opacity duration-500 ease-out pr-4 lg:pr-8" id="hero-copy">
 <span class="block overflow-hidden mb-6">
 <span class="hero-meta-label js-reveal-line inline-block text-xs font-mono tracking-widest uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
 </span>
@@ -211,24 +227,22 @@
 <circle cx="38" cy="50" r="30" fill="#2d9937"></circle>
 <circle cx="62" cy="50" r="30" fill="none" stroke="#ffc700" stroke-width="5"></circle>
 </svg>
-<!-- Phase 95: sized down further (was text-5xl/[5rem]/[5.5rem]) so the
-     full headline reliably fits inside lg:col-span-5 without clipping
-     at any viewport, on top of the existing whitespace-normal/
-     break-words wrap safety net. -->
-<div class="overflow-hidden mb-6">
-<h1 class="js-reveal-line inline-block text-[3rem] lg:text-[4rem] xl:text-[5rem] font-bold tracking-tight hero-editorial-title leading-[0.95] whitespace-normal break-words" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
+<!-- Phase 97: clamp() instead of fixed lg:/xl: steps — scales
+     continuously with viewport width (min 3rem, max 5rem) so there's
+     no breakpoint jump where the old stepped sizes could still land
+     too wide for the column at some in-between width. whitespace-
+     normal/break-words stay as the wrap safety net underneath.
+     No overflow-hidden wrapper and no .js-reveal-line here anymore —
+     the h1 now runs its own cinematic centered->in-place transform
+     (initHeroCinematicIntro, main-anasayfa.js), which needs to travel
+     well outside a small text-line box; combining that with the
+     generic yPercent line-reveal every other .js-reveal-line uses
+     would fight over the same transform property. -->
+<div class="mb-6">
+<h1 class="inline-block text-[clamp(3rem,5vw,5rem)] font-bold tracking-tight hero-editorial-title leading-[0.95] whitespace-normal break-words" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
 </div>
 <p class="text-lg hero-editorial-sub font-light leading-relaxed mb-8 max-w-lg" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
 <a class="hero-editorial-cta iona-cursor-target inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
-</div>
-<!-- Phase 88: sticky on lg+ so the twin stays put while hero-copy's
-     stacked type/data (and the metric bar below) scroll past it — the
-     "museum wall" effect. Phase 95: h-[600px]/lg:h-screen replaced with
-     min-h so this column can never grow taller than its own grid row
-     needs and bleed past it — h-screen in particular could exceed the
-     row height the sticky twin was meant to stay confined to. -->
-<div class="lg:col-span-7 relative z-10 w-full min-h-[500px] lg:min-h-[650px] lg:sticky lg:top-0 lg:flex lg:items-center overflow-hidden iona-cursor-target">
-<div class="absolute inset-0 w-full h-full bg-transparent" id="iona-digital-twin-root"></div>
 </div>
 </div>
 

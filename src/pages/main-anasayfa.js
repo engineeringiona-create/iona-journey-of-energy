@@ -63,6 +63,11 @@ function runPreloader() {
   const exit = () => {
     glowPulse.kill();
     preloader.classList.add('is-leaving');
+    /* Phase 97: lets initHeroCinematicIntro start its own 1.5s hold the
+       moment the preloader actually starts dissolving, instead of on a
+       fixed timer from script-eval — otherwise that hold would tick
+       away invisibly while the opaque preloader still covers it. */
+    document.dispatchEvent(new CustomEvent('preloaderdone'));
     preloader.addEventListener('transitionend', () => preloader.remove(), { once: true });
   };
 
@@ -124,6 +129,60 @@ function initHeroReveal() {
   });
 }
 initHeroReveal();
+
+/* ---------------- Phase 97: cinematic hero intro ----------------
+   The headline starts perfectly centered on screen at scale 1.2 over a
+   blurred/dimmed backdrop (#hero-intro-overlay), holds there while the
+   preloader is still up, then — once the preloader actually starts
+   dissolving (see the 'preloaderdone' dispatch in runPreloader above)
+   — waits 1.5s and animates back to its real in-flow position as the
+   overlay fades out. This is a FLIP-style transform (measure the real
+   rect, gsap.set an offsetting transform, tween back to identity)
+   rather than a Framer Motion layout animation: the site's whole
+   motion layer is already GSAP end to end (see initHeroReveal just
+   above, initMagneticButtons below), and the 3D inspection mode this
+   headline hands off to (click-to-select, camera fit, X-ray dimming,
+   the slide-in detail panel) already exists and works inside
+   GltfTwinScene.jsx — pulling in a second animation library for just
+   this one element would fight that existing system for no visual
+   gain. The gsap.set below runs at script-eval time, before the
+   preloader has dissolved, so there's no flash of the headline
+   snapping into its offset position — the opaque preloader is still
+   covering it. */
+function initHeroCinematicIntro() {
+  const overlay = document.getElementById('hero-intro-overlay');
+  const headline = document.querySelector('#hero-copy h1');
+  if (!overlay || !headline) return;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    overlay.remove();
+    return;
+  }
+
+  const rect = headline.getBoundingClientRect();
+  const dx = window.innerWidth / 2 - (rect.left + rect.width / 2);
+  const dy = window.innerHeight / 2 - (rect.top + rect.height / 2);
+  gsap.set(headline, { x: dx, y: dy, scale: 1.2, transformOrigin: '50% 50%' });
+
+  document.addEventListener(
+    'preloaderdone',
+    () => {
+      const tl = gsap.timeline({ delay: 1.5 });
+      tl.to(overlay, {
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power2.out',
+        onComplete: () => overlay.remove()
+      }).to(
+        headline,
+        { x: 0, y: 0, scale: 1, duration: 1.2, ease: 'power3.inOut' },
+        '<'
+      );
+    },
+    { once: true }
+  );
+}
+initHeroCinematicIntro();
 
 /* Phase 90 note: the old scroll-linked DNA parallax (initDnaParallax,
    targeting a hero-only #hero-dna-grid element) is gone. That element
