@@ -973,47 +973,15 @@ html {
 /* Phase 93: Permanent Asymmetrical Exhibition Grid — image/text layout
    is now pure Tailwind grid utilities in index.html (see #services-exhibit),
    so .services-exhibit-row no longer needs a bespoke CSS grid template.
-   Kept as a bare class hook only for initCustomCursor's selector list. */
+   The class remains only as a plain markup hook. */
 
-/* Phase 88: custom "identity cursor" — morphs into the brand's circle+
-   ring motif over the 3D canvas and the hero CTA (see initCustomCursor
-   in main-anasayfa.js). Hidden/scaled-to-0 by default, not display:none,
-   so the opacity/scale transition actually has something to animate
-   from when it turns on; translate(-50%,-50%) keeps it centered on the
-   tracked point instead of offset by its own size. Desktop-only (a
-   hover-quality cursor is meaningless without a mouse) and skipped
-   entirely for reduced-motion, same guard the 3D scene itself uses. */
-.iona-cursor {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 32px;
-    height: 32px;
-    pointer-events: none;
-    z-index: 999;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.4);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    will-change: transform, opacity;
-}
-
-.iona-cursor.is-active {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-}
-
-@media (hover: none), (pointer: coarse) {
-    .iona-cursor {
-        display: none;
-    }
-}
-
-/* Swapped in on the same hover targets the cursor morphs over — the
-   whole point of a custom cursor is that the OS one gets out of its
-   way while it's active. */
-.iona-cursor-target {
-    cursor: none;
-}
+/* The Phase 88 custom "identity cursor" rule block (.iona-cursor,
+   .iona-cursor.is-active, its coarse-pointer hide, and
+   .iona-cursor-target { cursor: none }) was removed on client request —
+   see the matching comments in index.html and main-anasayfa.js. The
+   `cursor: none` half of it is specifically why the pointer went
+   invisible over the 3D canvas during Inspection Mode, so nothing
+   here may reintroduce a `cursor: none` on the hero/canvas. */
 
 .parallax-media {
     position: absolute;

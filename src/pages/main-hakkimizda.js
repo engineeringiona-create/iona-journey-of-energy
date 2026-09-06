@@ -1,11 +1,13 @@
+import { initEditorialMotion } from '../lib/editorialMotion.js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initHorizontalGallery, initDnaScroll } from '../common.js';
+import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initDnaScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
+initEditorialMotion();
 initSmoothScroll();
 initPageCurtain();
 initFooterCurve();
@@ -17,7 +19,7 @@ initSiteSearch();
 initMobileNav();
 initDnaScroll();
 initParallax();
-initHorizontalGallery('why-us-track');
+
 
 /* Stat counters (20+ Yıllık Deneyim, etc.) — Phase 117 folded the old
    standalone #stats section into the #statements bento grid, so the
@@ -43,3 +45,5 @@ if (counters.length) {
     }
   });
 }
+
+

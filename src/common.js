@@ -37,8 +37,8 @@ export function initSmoothScroll() {
   lenis = new Lenis({
     lerp: 0.08,
     smoothWheel: true,
-    syncTouch: true,
-    touchMultiplier: 1.8,
+    syncTouch: false,
+    touchMultiplier: 1,
     infinite: false
   });
 
@@ -311,6 +311,7 @@ export function initCardSpotlight() {
    crosses the viewport — restrained on purpose, a hint of depth
    rather than a scroll-jacking effect. */
 export function initParallax() {
+  if (reduceMotion) return;
   document.querySelectorAll('.parallax-media').forEach((el) => {
     const section = el.closest('section') || el.parentElement;
     gsap.to(el, {
@@ -333,38 +334,7 @@ export function initParallax() {
    across the page boundary: it closes over the old page, the browser
    does a normal full navigation while hidden behind it, and the new
    page's own copy of this same function reveals it again on arrival. */
-export function initPageCurtain() {
-  const curtain = document.getElementById('iona-curtain');
-  if (!curtain) return;
-
-  requestAnimationFrame(() => curtain.classList.add('is-revealed'));
-
-  if (reduceMotion) return;
-
-  document.addEventListener('click', (e) => {
-    if (e.defaultPrevented || e.button !== 0) return;
-    const link = e.target.closest('a[href]');
-    if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-
-    let url;
-    try {
-      url = new URL(link.href, window.location.href);
-    } catch {
-      return;
-    }
-    if (url.origin !== window.location.origin) return;
-    // Same-page anchors (in-page nav, e.g. #contact-form) skip the
-    // curtain entirely — it's not a real page change.
-    if (url.pathname === window.location.pathname && url.hash) return;
-
-    e.preventDefault();
-    curtain.classList.remove('is-revealed');
-    window.setTimeout(() => {
-      window.location.href = link.href;
-    }, 550);
-  });
-}
+export { initPageCurtain } from './lib/pageAperture.js';
 
 /* Phase 91: footer "gradient curve" draw-on. One-shot: disconnects
    itself the moment it fires, since the curve should only ever draw
@@ -421,3 +391,5 @@ export function initHorizontalGallery(trackId) {
     }
   });
 }
+
+

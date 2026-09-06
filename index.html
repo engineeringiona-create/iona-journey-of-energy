@@ -16,44 +16,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
 <link rel="stylesheet" href="/src/styles/base.css">
+<link rel="stylesheet" href="/src/styles/editorial.css">
 </head>
-<body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
-<!-- Phase 91: MPA curtain page transition. Base CSS state already
-     covers the viewport with no flash (no JS needed for that part); JS
-     reveals it on load and re-covers before any internal link navigates.
-     See initPageCurtain in common.js and #iona-curtain in base.css. -->
+<body class="editorial-home bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+
 <div id="iona-curtain" aria-hidden="true">
 <span class="iona-wordmark-text" style="font-size:32px">iona</span>
 </div>
-<!-- Phase 115: EMERGENCY FIX — Phase 113's move to a section-scoped flat
-     SVG (#ionaflux-dna-origin, z-[-1]) put the DNA behind every
-     section's own opaque background per normal CSS stacking, which
-     made it invisible in practice (flagged as a risk when it shipped,
-     confirmed broken here). Reverted to the exact Phase 103 original:
-     the real Three.js helix, ported faithfully from the claude.ai/design
-     source "Three.js sarmalı scroll animasyonu" / Helix Background.dc.html
-     (verified byte-for-byte against that source's ramp/turns/dotSize/
-     radius/height constants this phase — see src/three/helix-scroll-bg.js).
-     That source's own onScroll math drives off whole-document scroll
-     progress, confirming this was always meant to be a full-page fixed
-     background, not scoped to one section — so the Phase 113 concept
-     wasn't just buggy, it was a deviation from the original design.
-     Same fixed/inset-0/z-0/first-in-body placement convention as
-     .iona-dna-bg (see the Phase 90 comment further down); initHelixScrollBg
-     (main-anasayfa.js) mounts into this canvas by id, same initXScene(canvas)
-     shape as expo-scene.js/genset-scene.js. -->
+
 <canvas class="helix-scroll-bg" id="helix-scroll-bg" aria-hidden="true"></canvas>
-<!-- TopNavBar -->
-<!-- Phase 94: brought inline desktop nav links back — client disliked
-     the Phase 89 hide-everything-behind-MENU approach for desktop.
-     Hamburger (MENU) is now md:hidden, mobile-only; desktop gets a
-     centered inline link cluster + CTA between the logo and the right
-     edge. mobile-nav-toggle/panel/icon IDs and initMobileNav's wiring
-     are untouched, so the fullscreen overlay still exists and still
-     works on mobile — desktop links are a second, separate
-     hover-underline nav living outside that panel. .desktop-nav-link
-     is a new class initMobileNav (common.js) also scans for
-     is-current highlighting, alongside the existing .mobile-nav-link. -->
 <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-safe-margin-mobile md:px-safe-margin-desktop py-5" id="mobile-nav">
 <a class="flex items-center flex-1" href="/">
 <span class="iona-wordmark-text" style="font-size:24px;color:#000">iona</span>
@@ -124,151 +95,26 @@
 </div>
 </div>
 
-<!-- Hero (Phase 83): interactive 3D facility twin confined to its own
-     right-column viewport — replaces the earlier full-bleed absolute
-     canvas (Phase 1 / Phase 80), which could visually collide with the
-     left copy column depending on viewport size. React/R3F scene
-     (src/components/DigitalTwin/GltfTwinScene.jsx) mounted via
-     src/components/DigitalTwin/mount.jsx into #iona-digital-twin-root.
-     Clicking a structure still drives GltfTwinScene's internal
-     currentLevel (0 overview / >0 focused); #hero-copy still fades on
-     that change (see the 'twinlevelchange' listener in
-     main-anasayfa.js) since the DetailPanel that appears on focus wants
-     the room.
-
-     Mobile: the old "faded background + tap-to-activate + close button"
-     system (mobile-3d-cta/mobile-3d-close/landscape-hint) is retired.
-     The 3D viewport is now a normal-flow, always-full-opacity, always-
-     interactive box (h-[450px], the grid just stacks it below the copy
-     below the lg breakpoint) at every viewport size, not just desktop —
-     a dedicated box in normal flow can't overlap the text above it the
-     way a full-bleed absolute layer could, so there's no separate
-     activation state needed on small screens anymore. -->
-<section class="hero-zone px-safe-margin-mobile md:px-safe-margin-desktop overflow-hidden" id="hero">
-<!-- Phase 90: the hero's own DNA-grid patch is gone — superseded by the
-     global fixed .iona-dna-bg watermark (see just after <body>), which
-     now covers every page instead of just this section. The sweep
-     curve stays: it's a hero-specific directional accent, not part of
-     the sitewide watermark. -->
-<svg class="absolute inset-x-0 top-1/4 w-full h-[400px] -z-10 pointer-events-none select-none opacity-70" viewBox="0 0 1400 400" preserveAspectRatio="none" aria-hidden="true">
-<defs>
-<linearGradient id="ionaSweepGrad" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0%" stop-color="#2d9937" stop-opacity="0"></stop>
-<stop offset="50%" stop-color="#2d9937" stop-opacity="0.5"></stop>
-<stop offset="100%" stop-color="#ffc700" stop-opacity="0"></stop>
-</linearGradient>
-</defs>
-<path d="M-50 320 C 350 120, 950 380, 1450 80" stroke="url(#ionaSweepGrad)" stroke-width="1.5" fill="none"></path>
-</svg>
-<!-- Pafta corner stamps: pure decoration, desktop-only. -->
-<div class="hidden lg:block absolute top-[124px] right-8 z-20 text-right pointer-events-none" aria-hidden="true">
-<div class="hero-meta-label text-[10px] tracking-widest font-mono">[ 39°55'N 32°50'E ]</div>
-<div class="hero-meta-label text-[10px] tracking-widest font-mono mt-1">[ REF: IONA-2026 ]</div>
+<section id="hero" aria-labelledby="hero-title">
+<div class="hero-grid">
+<div class="hero-copy" id="hero-copy">
+<p class="hero-kicker" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</p>
+<h1 id="hero-title" class="hero-editorial-title" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
+<p class="hero-editorial-sub" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
+<a class="hero-editorial-cta" href="/iletisim.html#contact-form"><span data-i18n="home.hero.cta">Teklif Alın</span></a>
 </div>
-
-<!-- Phase 104: strict viewport lock so the metric bar sits flush at
-     the bottom of the first screen with zero scroll. `h-[100dvh]`
-     alone would be wrong here — #hero already carries `padding-top:
-     120px` (base.css, reserved for the fixed nav, present since Phase
-     87) — a flat 100dvh child INSIDE that padding would make #hero's
-     total rendered height 100dvh + 120px, pushing the bar back below
-     the fold, the exact bug this phase exists to fix. calc(100dvh -
-     120px) is what actually makes #hero's total height == 100dvh.
-     #mobile-nav itself stays `position: fixed` and OUTSIDE this flex
-     column, unchanged, same as every other page — the brief's "Header:
-     flex-none" is satisfied via that padding-top reservation instead
-     of literally moving the nav into normal flow, which would break
-     the "always pinned while scrolling past the rest of the page"
-     behavior this exact nav element shares with all 7 pages. -->
-<div class="flex flex-col h-[calc(100dvh-120px)] w-full overflow-hidden">
-<!-- Phase 102: full-bleed 3D layer + camera pan (OVERVIEW_OFFSET_FRACTION
-     for idle, FOCUS_OFFSET_FRACTION for inspection — see
-     GltfTwinScene.jsx) instead of a grid column, so the model has real
-     room to slide left when a part is selected and hero-copy fades.
-     pointer-events-none on hero-copy (no background of its own, must
-     not block clicks on the canvas behind it) with pointer-events-auto
-     re-enabled on the CTA link, the one actually-clickable thing in
-     the column. -->
-<div class="flex-1 relative w-full">
-<div class="absolute inset-0 w-full h-full z-0 iona-cursor-target" id="iona-digital-twin-root"></div>
-<!-- Phase 97: cinematic intro backdrop — dims/blurs the hero behind
-     the headline while initHeroCinematicIntro (main-anasayfa.js) holds
-     it centered + scaled, then fades out as the headline animates into
-     its real position. Removed from the DOM by the same JS once its
-     fade-out finishes. -->
-<div class="absolute inset-0 z-[5] backdrop-blur-xl bg-white/50 pointer-events-none" id="hero-intro-overlay" aria-hidden="true"></div>
-<div class="absolute left-0 top-0 h-full w-full lg:w-1/2 flex flex-col justify-center pl-8 lg:pl-24 pt-20 z-10 pointer-events-none transition-opacity duration-500 ease-out" id="hero-copy">
-<span class="block overflow-hidden mb-6">
-<span class="hero-meta-label js-reveal-line inline-block text-xs font-mono tracking-widest uppercase" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</span>
-</span>
-<!-- Phase 87: official IONA heading motif — filled brand-green circle
-     intersecting an outlined accent-yellow ring. Only ONE of these in
-     the hero on purpose (Phase 95) — the visually similar motif near
-     the footer/#iona-cursor is the custom-cursor element, a fixed
-     overlay that tracks the pointer, not a static duplicate sitting in
-     this column. -->
-<svg class="w-14 h-14 lg:w-16 lg:h-16 mb-4" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-<circle cx="38" cy="50" r="30" fill="#2d9937"></circle>
-<circle cx="62" cy="50" r="30" fill="none" stroke="#ffc700" stroke-width="5"></circle>
-</svg>
-<!-- Phase 97: clamp() instead of fixed lg:/xl: steps — scales
-     continuously with viewport width (min 3rem, max 5rem) so there's
-     no breakpoint jump where the old stepped sizes could still land
-     too wide for the column at some in-between width. whitespace-
-     normal/break-words stay as the wrap safety net underneath.
-     No overflow-hidden wrapper and no .js-reveal-line here anymore —
-     the h1 now runs its own cinematic centered->in-place transform
-     (initHeroCinematicIntro, main-anasayfa.js), which needs to travel
-     well outside a small text-line box; combining that with the
-     generic yPercent line-reveal every other .js-reveal-line uses
-     would fight over the same transform property. -->
-<div class="mb-6">
-<h1 class="inline-block text-[clamp(3rem,5vw,5rem)] font-bold tracking-tight hero-editorial-title leading-[0.95] whitespace-normal break-words" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
-</div>
-<p class="text-lg hero-editorial-sub font-light leading-relaxed mb-8 max-w-lg" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
-<a class="hero-editorial-cta iona-cursor-target pointer-events-auto inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 w-fit" href="/iletisim.html#contact-form" data-i18n="home.hero.cta">Teklif Alın</a>
+<div class="hero-model-column">
+<div id="iona-digital-twin-root" aria-label="Etkileşimli biyogaz tesisi"></div>
+<div class="hero-model-caption"><span class="editorial-meta">IONA / TESİS ANATOMİSİ</span><span class="editorial-meta">01—05 / ETKİLEŞİMLİ MODEL</span></div>
 </div>
 </div>
-
-<!-- Live engineering metric bar. Phase 104: flex-none second child of
-     the h-[calc(100dvh-120px)] column above, instead of a normal-flow
-     sibling below a fixed-height hero box — this is what actually
-     pins it flush to the bottom of the first screen (flex-1 above it
-     absorbs all the remaining space) rather than just trailing
-     whatever height the hero happened to render at. relative z-20
-     bg-white border-t is a belt-and-suspenders backstop in case
-     anything in flex-1 ever bleeds past its own box again.
-     hero-hairline/hero-metric-strip-bg are hardcoded post-Phase-87 (no
-     more :root.dark swap — #hero is a fixed white/black section now,
-     see base.css). Phase 87 adds the big 01/02/03 indicators per the
-     brand's numbered-data-point style. -->
-<div class="flex-none relative z-20 bg-white border-t border-slate-200 hero-hairline hero-metric-strip-bg max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 w-full">
-<div class="hero-hairline border-b md:border-b-0 md:border-r p-6 lg:p-8 flex items-start gap-4">
-<span class="text-2xl lg:text-3xl font-bold text-[#2d9937]" aria-hidden="true">01</span>
-<div>
-<div class="text-4xl lg:text-5xl font-bold hero-metric-value">1.2 MWe</div>
-<div class="hero-meta-label text-xs tracking-wider uppercase mt-1 font-mono" data-i18n="home.hero.metric1_label">Ortalama Kurulu Güç</div>
-</div>
-</div>
-<div class="hero-hairline border-b md:border-b-0 md:border-r p-6 lg:p-8 flex items-start gap-4">
-<span class="text-2xl lg:text-3xl font-bold text-[#2d9937]" aria-hidden="true">02</span>
-<div>
-<div class="text-4xl lg:text-5xl font-bold hero-metric-value">%98.4</div>
-<div class="hero-meta-label text-xs tracking-wider uppercase mt-1 font-mono" data-i18n="home.hero.metric2_label">SCADA Operasyonel Verim</div>
-</div>
-</div>
-<div class="p-6 lg:p-8 flex items-start gap-4">
-<span class="text-2xl lg:text-3xl font-bold text-[#2d9937]" aria-hidden="true">03</span>
-<div>
-<div class="text-4xl lg:text-5xl font-bold hero-metric-value">Sıfır Atık</div>
-<div class="hero-meta-label text-xs tracking-wider uppercase mt-1 font-mono" data-i18n="home.hero.metric3_label">Döngüsel Karbon Emisyonu</div>
-</div>
-</div>
-</div>
+<div class="hero-metrics">
+<div class="hero-metric"><span>01</span><div><strong>1.2 MWe</strong><p data-i18n="home.hero.metric1_label">Ortalama Kurulu Güç</p></div></div>
+<div class="hero-metric"><span>02</span><div><strong>%98.4</strong><p data-i18n="home.hero.metric2_label">SCADA Operasyonel Verim</p></div></div>
+<div class="hero-metric"><span>03</span><div><strong>Sıfır Atık</strong><p data-i18n="home.hero.metric3_label">Döngüsel Karbon Emisyonu</p></div></div>
 </div>
 </section>
 
-<!-- About teaser -->
 <section class="relative isolate overflow-hidden bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="about-teaser">
 <div class="blueprint-watermark opacity-[0.03]" aria-hidden="true">
 <svg viewBox="0 0 600 600" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
@@ -301,22 +147,31 @@
                     <span data-i18n="home.about.cta">Devamını Oku</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
 </a>
 </div>
-<div class="md:col-span-5 md:col-start-8 fade-in-element delay-100">
+<div class="engineering-panel md:col-span-5 md:col-start-8 fade-in-element delay-100"><svg class="engineering-drawing" aria-hidden="true" viewBox="0 0 600 600" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+<path d="M70 480 V260 a150 150 0 0 1 300 0 V480" />
+<ellipse cx="220" cy="480" rx="150" ry="24" />
+<ellipse cx="220" cy="260" rx="150" ry="24" stroke-dasharray="4 5" />
+<path d="M170 262 a50 46 0 0 1 100 0" />
+<line x1="220" y1="88" x2="220" y2="440" />
+<circle cx="220" cy="88" r="14" />
+<line x1="176" y1="380" x2="264" y2="380" />
+<line x1="176" y1="336" x2="264" y2="336" />
+<path d="M370 400 H480 V520 H566" />
+<circle cx="480" cy="460" r="16" />
+<path d="M464 460 L496 444 M464 444 L496 460" />
+<path d="M70 320 H8" />
+<rect x="440" y="120" width="90" height="130" rx="6" />
+<line x1="440" y1="162" x2="530" y2="162" />
+<path d="M370 240 H440" />
+<line x1="70" y1="542" x2="370" y2="542" />
+<line x1="70" y1="532" x2="70" y2="552" />
+<line x1="370" y1="532" x2="370" y2="552" />
+</svg>
 <p class="font-label-caps text-label-caps text-[var(--text-muted)] leading-loose" data-i18n="home.about.caption">ULUSLARARASI STANDARTLARDA TEKNİK MÜKEMMELLİK, YATIRIMLARI SIFIR KESİNTİ SÜRESİYLE SERTİFİKALI BAŞARI HİKAYELERİNE DÖNÜŞTÜRÜYOR.</p>
 </div>
 </div>
 </section>
 
-<!-- Phase 93: Permanent Asymmetrical Exhibition Grid. Images are always
-     visible, structural elements of the page (MNBAQ / architectural
-     editorial style) — no more hover-to-reveal. Each row is a
-     full-bleed 12-col grid; odd rows keep natural DOM order (image
-     lg:col-span-7 left, text lg:col-span-5 right), even rows swap sides
-     purely via lg:order so mobile still always stacks image-on-top /
-     text-below regardless of row parity. Same 4 real service anchors
-     as before (teknoloji.html#expo-agitator/#expo-genset/#expo-pump/
-     #workflow). .services-exhibit-row kept as the class name so
-     initCustomCursor's existing selector list still picks these up. -->
 <section class="relative bg-white border-t border-slate-200 fade-in-section" id="services-exhibit">
 <div class="max-w-[1400px] mx-auto px-safe-margin-mobile md:px-safe-margin-desktop pt-20 md:pt-28 pb-12 md:pb-16">
 <div class="flex items-end justify-between gap-6 fade-in-element">
@@ -324,52 +179,48 @@
 <span class="hidden md:block text-[10px] font-mono uppercase tracking-widest text-black/40">04 / KATALOG</span>
 </div>
 </div>
-<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-agitator">
+<a class="services-exhibit-row group service-panel-1 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-agitator">
 <div class="relative overflow-hidden lg:col-span-7">
 <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/digester-mixer.jpg" alt="Twin Karıştırıcı Teknolojisi" loading="lazy" decoding="async">
 </div>
 <div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
 <span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">01</span>
 <h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Twin Karıştırıcı Teknolojisi</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüzey kabuklaşmasını önleyen, düşük enerjili çift karıştırıcı sistemleri.</p>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüzey kabuklaşmasını önleyen, düşük enerjili çift karıştırıcı sistemleri.</p><dl class="service-specs"><div><dt>Sistem</dt><dd>Çift karıştırıcı</dd></div><div><dt>Proses</dt><dd>Anaerobik çürütme</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
 </div>
 </a>
-<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-genset">
+<a class="services-exhibit-row group service-panel-2 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-genset">
 <div class="relative overflow-hidden lg:col-span-7 lg:order-2">
 <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/power-cat-gensets.jpg" alt="Güç Üretimi" loading="lazy" decoding="async">
 </div>
 <div class="lg:col-span-5 lg:order-1 flex flex-col justify-center p-8 lg:p-16">
 <span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">02</span>
 <h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Güç Üretimi</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüksek verimli jeneratör setleriyle biyogazdan elektrik ve ısı.</p>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüksek verimli jeneratör setleriyle biyogazdan elektrik ve ısı.</p><dl class="service-specs"><div><dt>Sistem</dt><dd>Kojenerasyon</dd></div><div><dt>Çıktı</dt><dd>Elektrik + ısı</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
 </div>
 </a>
-<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-pump">
+<a class="services-exhibit-row group service-panel-3 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-pump">
 <div class="relative overflow-hidden lg:col-span-7">
 <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/pump-room.jpg" alt="Mono Pompa Teknolojisi" loading="lazy" decoding="async">
 </div>
 <div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
 <span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">03</span>
 <h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Mono Pompa Teknolojisi</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Aşındırıcı substratlarda kesintisiz çalışan sabit debili pompa istasyonları.</p>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Aşındırıcı substratlarda kesintisiz çalışan sabit debili pompa istasyonları.</p><dl class="service-specs"><div><dt>Sistem</dt><dd>Mono pompa</dd></div><div><dt>Görev</dt><dd>Substrat transferi</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
 </div>
 </a>
-<a class="services-exhibit-row group grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-b border-slate-200" href="/teknoloji.html#workflow">
+<a class="services-exhibit-row group service-panel-4 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-b border-slate-200" href="/teknoloji.html#workflow">
 <div class="relative overflow-hidden lg:col-span-7 lg:order-2">
 <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/hero-facility-aerial.jpg" alt="Mühendislik İş Akışı" loading="lazy" decoding="async">
 </div>
 <div class="lg:col-span-5 lg:order-1 flex flex-col justify-center p-8 lg:p-16">
 <span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">04</span>
 <h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Mühendislik İş Akışı</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Fizibiliteden devreye almaya, uçtan uca proje yönetimi.</p>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Fizibiliteden devreye almaya, uçtan uca proje yönetimi.</p><dl class="service-specs"><div><dt>Kapsam</dt><dd>Fizibilite → devreye alma</dd></div><div><dt>Disiplin</dt><dd>Proses mühendisliği</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
 </div>
 </a>
 </section>
 
-<!-- Phase 89: Brutalist Data Wall — pure typographic infographic, no
-     imagery. Black-on-white, hairline-divided, a single yellow dot per
-     cell as the only accent (per the brand's Technical Gray/Accent
-     Yellow spec). Real published spec figures, not placeholders. -->
 <section class="relative bg-white px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-28 border-t border-slate-200 fade-in-section" id="data-wall">
 <div class="max-w-[1400px] mx-auto">
 <div class="grid grid-cols-1 md:grid-cols-3">
@@ -392,23 +243,11 @@
 </div>
 </section>
 
-<!-- IonaFlux product spotlight: deliberately NOT the site's light section
-     chrome. IonaFlux is a standalone software product, not a service
-     line, so this section stays visually separated from the corporate
-     page around it — a fixed dark surface (independent of the site's
-     light/dark toggle), light text, and the vivid product green as the
-     one accent, distinct from the corporate brand-orange CTA color used
-     everywhere else on this page. Moved here (just above Services) from
-     its old spot further down the page — client wanted it leading into
-     Services instead of sitting between Why-Choose-Us and Explore.
-     Phase 113 stacked both glass panels into a single lg:w-1/2 left
-     column (was a two-column grid); kept as-is after the Phase 115 DNA
-     revert since it's an independent, unrelated layout call. -->
-<section class="relative isolate overflow-hidden ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 fade-in-section" id="ionaflux-teaser">
+<section class="relative ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 fade-in-section" id="ionaflux-teaser">
 <div class="pointer-events-none absolute -top-32 right-0 w-[560px] h-[560px] rounded-full opacity-40" style="background:radial-gradient(circle,rgba(63,174,102,0.18),transparent 70%)" aria-hidden="true"></div>
 <div class="relative max-w-[theme(spacing.container-max)] mx-auto">
-<div class="lg:w-1/2 flex flex-col gap-8">
-<div class="ionaflux-glass-panel max-w-lg p-8 md:p-10 fade-in-element">
+<div class="flux-editorial-grid">
+<div class="flux-editorial-copy fade-in-element">
 <span class="inline-flex items-center gap-2 mb-6">
 <img src="/images/iona-star-mark.png" alt="" width="20" height="20" class="shrink-0" aria-hidden="true">
 <span class="text-[17px] font-extrabold tracking-tight" style="font-family:Arial,sans-serif"><span class="text-white">iona</span><span style="color:#3fae66">flux</span></span>
@@ -417,7 +256,7 @@
 <p class="text-body-md mb-stack-md max-w-md" style="color:#c2cac3" data-i18n="home.ionaflux.body">IonaFlux, Iona mühendisliği tarafından geliştirilen ve müşterilerimize teslim edilen dijital işletme platformudur. Canlı SCADA verisi, arıza yönetimi ve saha raporlaması tek panelde birleşir.</p>
 <a class="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] transition-transform duration-150 ease-out active:scale-[0.97]" style="background:#3fae66;color:#04160a" href="/ionaflux.html" data-i18n="home.ionaflux.cta">IonaFlux'u Keşfedin &amp; Canlı Demo</a>
 </div>
-<div class="ionaflux-glass-panel max-w-lg p-6 fade-in-element delay-200">
+<div class="flux-editorial-media fade-in-element delay-200">
 <img class="w-full h-auto rounded-2xl mb-5" src="/images/ionaflux/scada.jpg" alt="IonaFlux canlı SCADA görünümü: çürütücü sıcaklığı, debi ve jeneratör durumları" loading="lazy" decoding="async">
 <div class="grid grid-cols-2 gap-3">
 <span class="ionaflux-teaser-feature"><span class="material-symbols-outlined text-[#78dc77] text-[18px]" aria-hidden="true">bolt</span>Canlı SCADA Verisi</span>
@@ -430,7 +269,6 @@
 </div>
 </section>
 
-<!-- Why Choose Us: split layout, sticky left + interactive accordion right -->
 <section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border-green)] fade-in-section" id="why-choose-us">
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
 <div class="md:sticky md:top-32 self-start fade-in-element">
@@ -443,62 +281,46 @@
 </div>
 <div class="fade-in-element delay-100">
 <div class="accordion-item is-active bg-white/90 backdrop-blur-sm px-6 py-4">
-<div class="flex items-center justify-between gap-6 cursor-pointer">
-<div class="accordion-heading flex items-center gap-6">
+<button type="button" class="accordion-trigger flex items-center justify-between gap-6" id="why-trigger-1" aria-expanded="true" aria-controls="why-panel-1">
+<span class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">01</span>
-<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion1_title">Akıllı Teknoloji</h3>
-</div>
-<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion1_title">Akıllı Teknoloji</span></span><span class="accordion-plusminus" aria-hidden="true">
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
-</span>
-</div>
-<div class="accordion-row">
+</span></button><div class="accordion-row" id="why-panel-1" role="region" aria-labelledby="why-trigger-1" >
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion1_desc">Maksimum verimlilik için gelişmiş otomasyon sistemleri entegre ediyoruz.</p></div>
 </div>
 </div>
 <div class="accordion-item bg-white/90 backdrop-blur-sm px-6 py-4">
-<div class="flex items-center justify-between gap-6 cursor-pointer">
-<div class="accordion-heading flex items-center gap-6">
+<button type="button" class="accordion-trigger flex items-center justify-between gap-6" id="why-trigger-2" aria-expanded="false" aria-controls="why-panel-2">
+<span class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">02</span>
-<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion2_title">Operasyonel Maliyet Tasarrufu</h3>
-</div>
-<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion2_title">Operasyonel Maliyet Tasarrufu</span></span><span class="accordion-plusminus" aria-hidden="true">
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
-</span>
-</div>
-<div class="accordion-row">
+</span></button><div class="accordion-row" id="why-panel-2" role="region" aria-labelledby="why-trigger-2" inert>
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion2_desc">Optimize edilmiş tesislerle işletme maliyetlerini düşürüyoruz.</p></div>
 </div>
 </div>
 <div class="accordion-item bg-white/90 backdrop-blur-sm px-6 py-4">
-<div class="flex items-center justify-between gap-6 cursor-pointer">
-<div class="accordion-heading flex items-center gap-6">
+<button type="button" class="accordion-trigger flex items-center justify-between gap-6" id="why-trigger-3" aria-expanded="false" aria-controls="why-panel-3">
+<span class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">03</span>
-<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion3_title">Kesintisiz Üretim</h3>
-</div>
-<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion3_title">Kesintisiz Üretim</span></span><span class="accordion-plusminus" aria-hidden="true">
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
-</span>
-</div>
-<div class="accordion-row">
+</span></button><div class="accordion-row" id="why-panel-3" role="region" aria-labelledby="why-trigger-3" inert>
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion3_desc">Gelişmiş tasarımlarımız sürekli ve kesintisiz getiriyi garanti eder.</p></div>
 </div>
 </div>
 <div class="accordion-item bg-white/90 backdrop-blur-sm px-6 py-4">
-<div class="flex items-center justify-between gap-6 cursor-pointer">
-<div class="accordion-heading flex items-center gap-6">
+<button type="button" class="accordion-trigger flex items-center justify-between gap-6" id="why-trigger-4" aria-expanded="false" aria-controls="why-panel-4">
+<span class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">04</span>
-<h3 class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion4_title">7/24 Destek</h3>
-</div>
-<span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion4_title">7/24 Destek</span></span><span class="accordion-plusminus" aria-hidden="true">
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
-</span>
-</div>
-<div class="accordion-row">
+</span></button><div class="accordion-row" id="why-panel-4" role="region" aria-labelledby="why-trigger-4" inert>
 <div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion4_desc">Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.</p></div>
 </div>
 </div>
@@ -506,9 +328,6 @@
 </div>
 </section>
 
-<!-- Navigation index to the other pages -->
-<!-- Phase 114: editorial pass — the 4-up shadow/rounded card grid is now
-     a hairline-ruled index list, each row a full-width link. -->
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="explore">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <div class="flex items-center mb-4 fade-in-element"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest" data-i18n="home.explore.eyebrow">Keşfedin</span></div>
@@ -550,7 +369,6 @@
 </div>
 </section>
 
-<!-- Stats -->
 <section class="bg-[var(--section-alt)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="stats">
 <div class="max-w-[theme(spacing.container-max)] mx-auto text-center">
 <div class="grid grid-cols-2 md:grid-cols-4 gap-x-10 gap-y-10 fade-in-element">
@@ -574,8 +392,7 @@
 </div>
 </section>
 
-<!-- Biogaz Getiri Hesaplayıcı -->
-<section class="relative bg-decorated px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="biogaz-hesaplayici">
+<section class="relative bg-decorated px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="biogaz-hesaplayici" aria-labelledby="biogaz-title">
 <svg class="cad-blueprint-accent" viewBox="0 0 300 200" fill="none" aria-hidden="true">
 <rect x="180" y="30" width="80" height="140" rx="4" stroke="#E2E8F0" stroke-width="1"></rect>
 <line x1="180" y1="70" x2="260" y2="70" stroke="#E2E8F0" stroke-width="1"></line>
@@ -589,24 +406,16 @@
 </svg>
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <div class="text-center mb-14 fade-in-element">
-<h2 class="font-headline-md text-headline-md text-[var(--text)]">Biyogaz &amp; Enerji Getiri Hesaplayıcı</h2>
+<h2 id="biogaz-title" class="font-headline-md text-headline-md text-[var(--text)]">Biyogaz &amp; Enerji Getiri Hesaplayıcı</h2>
 <p class="text-body-lg text-[var(--text-muted)] mt-4 max-w-2xl mx-auto">Atık türünüzü ve günlük miktarınızı girin, tesisinizin yaklaşık enerji potansiyelini anında görün.</p>
 </div>
 
-<!-- Phase 117: Glassmorphism + reactive data-vis. Inputs/outputs panels
-     both get the frosted-glass treatment; the range input is
-     re-skinned as a thick industrial slider (.iona-slider-industrial,
-     base.css); each output grows a fill indicator driven by
-     biogasCalculator.js's setTons() — one shared --iona-fill percentage
-     (0-100%, the slider's own position in its min/max range) so a
-     ring/bar always agrees with where the slider actually sits, no
-     separate per-metric scale to invent or keep in sync by hand. -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 fade-in-element">
-<!-- Inputs -->
+
 <div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] p-8 md:p-10">
 <div class="mb-8">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Atık Türü</span>
-<div id="biogaz-atik-pills" class="flex flex-wrap gap-2.5 mt-3">
+<div id="biogaz-atik-pills" role="group" aria-label="Atık türü" class="flex flex-wrap gap-2.5 mt-3">
 <button type="button" class="biogaz-atik-pill" data-waste="cattle" aria-pressed="true">Büyükbaş Hayvan Gübresi</button>
 <button type="button" class="biogaz-atik-pill" data-waste="poultry" aria-pressed="false">Kanatlı Gübresi</button>
 <button type="button" class="biogaz-atik-pill" data-waste="silage" aria-pressed="false">Tarımsal / Mısır Silajı</button>
@@ -616,22 +425,21 @@
 
 <div>
 <div class="flex items-center justify-between">
-<span class="font-label-caps text-label-caps text-[var(--text-muted)]">Günlük Miktar</span>
+<label id="biogaz-amount-label" for="biogaz-ton-input" class="font-label-caps text-label-caps text-[var(--text-muted)]">Günlük Miktar</label>
 <span class="font-headline-md text-headline-md text-[var(--brand)]"><span id="biogaz-ton-value">50</span><span class="text-body-lg text-[var(--text-muted)]"> Ton/Gün</span></span>
 </div>
-<input type="range" id="biogaz-ton-slider" min="10" max="500" step="5" value="50" class="iona-slider-industrial mt-4">
+<input type="range" id="biogaz-ton-slider" aria-labelledby="biogaz-amount-label" min="10" max="500" step="5" value="50" class="iona-slider-industrial mt-4">
 <div class="flex items-center justify-between mt-2">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">10</span>
-<input type="number" id="biogaz-ton-input" min="10" max="500" step="5" value="50" class="w-24 text-center bg-white/80 border border-white/60 py-1.5 text-[var(--text)] text-body-md">
+<input type="number" id="biogaz-ton-input" aria-describedby="biogaz-amount-help" min="10" max="500" step="5" value="50" class="w-24 text-center bg-white/80 border border-white/60 py-1.5 text-[var(--text)] text-body-md">
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">500</span>
 </div>
 </div>
 
-<p class="text-body-sm text-[var(--text-muted)] mt-8 pt-6 border-t border-[var(--border)]">Bu hesaplama, sektör ortalaması katsayılarına dayanan yaklaşık bir tahmindir. Kesin mühendislik projesi ve teklif için bizimle iletişime geçin.</p>
+<p id="biogaz-amount-help" class="text-body-sm text-[var(--text-muted)] mt-8 pt-6 border-t border-[var(--border)]">Bu hesaplama, sektör ortalaması katsayılarına dayanan yaklaşık bir tahmindir. Kesin mühendislik projesi ve teklif için bizimle iletişime geçin.</p>
 </div>
 
-<!-- Outputs -->
-<div class="grid grid-cols-2 gap-5">
+<div class="calculator-results grid grid-cols-2 gap-5">
 <div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] col-span-2 p-6 flex items-center gap-6">
 <svg viewBox="0 0 80 80" class="shrink-0" width="80" height="80" aria-hidden="true">
 <circle class="iona-progress-ring-track" cx="40" cy="40" r="34" stroke-width="8"></circle>
@@ -639,7 +447,7 @@
 </svg>
 <div>
 <span class="font-label-caps text-label-caps text-[var(--text-muted)]">Tahmini Kurulu Güç</span>
-<span class="font-headline-md text-headline-md text-[var(--brand)] mt-1 block" id="biogaz-out-power">— kWe</span>
+<span class="font-headline-md text-headline-md text-[var(--brand)] mt-1 block" id="biogaz-out-power" aria-live="polite" aria-atomic="true">— kWe</span>
 </div>
 </div>
 <div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] p-6 flex flex-col justify-between">
@@ -663,7 +471,6 @@
 </div>
 </section>
 
-<!-- Footer -->
 <footer class="relative bg-white border-t border-slate-200 px-safe-margin-mobile md:px-safe-margin-desktop pt-24 pb-12 overflow-hidden fade-in-section" id="site-footer">
 <svg class="footer-curve" viewBox="0 0 1400 500" preserveAspectRatio="none" aria-hidden="true">
 <defs>
@@ -689,17 +496,8 @@
 </div>
 </footer>
 
-<!-- Phase 88: custom identity cursor. One shared fixed-position element,
-     toggled/moved from initCustomCursor (main-anasayfa.js) whenever the
-     pointer is over a .iona-cursor-target (hero CTA, 3D canvas). Lives
-     at the end of body, not inside #hero, so its position:fixed isn't
-     at the mercy of any ancestor's overflow-hidden/transform. -->
-<div class="iona-cursor" id="iona-cursor" aria-hidden="true">
-<svg width="32" height="32" viewBox="0 0 100 100" fill="none">
-<circle cx="38" cy="50" r="30" fill="#2d9937"></circle>
-<circle cx="62" cy="50" r="30" fill="none" stroke="#ffc700" stroke-width="6"></circle>
-</svg>
-</div>
 <script type="module" src="/src/pages/main-anasayfa.js"></script>
 <script type="module" src="/src/components/DigitalTwin/mount.jsx"></script>
 </body></html>
+
+

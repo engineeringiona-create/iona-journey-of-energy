@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/base.css">
+<link rel="stylesheet" href="/src/styles/editorial.css">
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
 <!-- Phase 91: MPA curtain page transition. Base CSS state already
@@ -155,13 +156,8 @@
 <section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-catalog">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-xl max-w-2xl fade-in-element" data-i18n="flux.catalog.title">Sahadan Ofise, Uçtan Uca Yönetim.</h2>
-<!-- Phase 117: "Sticky Stacking Cards" — replaces the Phase 114
-     hairline list. relative + h-[300vh] gives each card real scroll
-     distance to stick within; progressive top-24/32/40 + z-10/20/30
-     makes each card slide up and cover the previous one, deck-of-cards
-     style, as the section scrolls past. Pure CSS position:sticky, no
-     JS/scroll-library needed for the stacking itself. -->
-<div class="relative h-[300vh] fade-in-element delay-200" id="flux-catalog-stack">
+<!-- Cards stack within their natural content height. -->
+<div class="relative fade-in-element delay-200" id="flux-catalog-stack">
 <div class="sticky top-24 z-10 bg-zinc-900 border border-zinc-800 rounded-2xl p-8 md:p-10 shadow-2xl mb-8">
 <span class="material-symbols-outlined text-[28px] text-[#3fae66] mb-4 block" aria-hidden="true">description</span>
 <h3 class="font-headline-md text-headline-md text-white mb-2" data-i18n="flux.catalog.item1_title">Markalı Raporlama</h3>
@@ -292,3 +288,4 @@
 <script type="module" src="/src/pages/main-ionaflux.js"></script>
 <script type="module" src="/src/components/IonaFlux/mount.jsx"></script>
 </body></html>
+

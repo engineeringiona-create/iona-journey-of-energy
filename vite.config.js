@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -30,3 +32,4 @@ export default defineConfig({
     }
   }
 });
+

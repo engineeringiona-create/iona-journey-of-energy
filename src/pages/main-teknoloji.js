@@ -1,3 +1,4 @@
+import { initSolutionsCarousel } from '../lib/solutionsCarousel.js';
 import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initDnaScroll } from '../common.js';
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
@@ -5,6 +6,7 @@ import { initExpoScene } from '../three/expo-scene.js';
 import { initServicesShowcase } from '../lib/servicesShowcase.js';
 
 await initI18n();
+initSolutionsCarousel();
 initSmoothScroll();
 initPageCurtain();
 initFooterCurve();
@@ -34,3 +36,4 @@ initServicesShowcase({
   prevBtn: document.getElementById('services-3d-prev'),
   nextBtn: document.getElementById('services-3d-next')
 });
+
