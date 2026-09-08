@@ -219,7 +219,19 @@ async function applyGlobalOverrides() {
     applyThemeOverrides(readLocalBucket('theme'));
     applyAnnouncementBar(readLocalBucket('announcement'));
     if (pageId === 'teknoloji') applyHotspots(readLocalBucket('hotspots')?.list);
-    applyAnnouncementPopup(readLocalBucket('announcements')?.list, pageId);
+    const savedAnnouncements = readLocalBucket('announcements');
+    const localPreview = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+    const announcements = savedAnnouncements?.list ?? (localPreview ? [{
+      title: 'Enerjinin geleceğini birlikte tasarlıyoruz.',
+      category: 'Tasarım önizlemesi',
+      description: 'Yeni IONA duyuru tasarımı: mühendislik haberleri, etkinlikler ve güncellemeler için daha sade bir okuma deneyimi.\n\nBu örnek yalnızca yerel önizlemede gösterilir. Yönetim panelinden duyuru kaydettiğinizde yerini kendi içeriğiniz alır.',
+      bannerImage: '/images/digester-dome-facility.jpg',
+      showInPopup: true,
+      ctaEnabled: true,
+      ctaText: 'Duyuruları İncele',
+      ctaLink: '/duyurular.html'
+    }] : []);
+    applyAnnouncementPopup(announcements, pageId);
     return;
   }
   try {
@@ -355,3 +367,4 @@ export function initLangSwitcher() {
     if (e.key === 'Escape') close();
   });
 }
+

@@ -1,5 +1,7 @@
+import { initProcessAccents } from './processAccents.js';
 /** A two-panel architectural aperture for real multi-page navigation. */
 export function initPageCurtain() {
+  initProcessAccents();
   const curtain = document.getElementById('iona-curtain');
   if (!curtain || curtain.dataset.aperture) return;
   curtain.dataset.aperture = 'true';
@@ -13,8 +15,8 @@ export function initPageCurtain() {
   });
   const signature = document.createElement('div');
   signature.className = 'aperture-signature';
-  const mark = document.createElement('span');
-  mark.className = 'iona-wordmark-text'; mark.textContent = 'iona';
+  const mark = document.createElement('img');
+  mark.className = 'aperture-logo'; mark.src = '/images/iona-connected.svg'; mark.alt = ''; mark.width = 160; mark.height = 58;
   const label = document.createElement('span'); label.className = 'aperture-label';
   signature.append(mark, label); curtain.append(signature);
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -69,3 +71,4 @@ export function initPageCurtain() {
     }
   });
 }
+

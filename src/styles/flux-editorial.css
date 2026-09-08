@@ -1,0 +1,55 @@
+/* IonaFlux: software presented as an IONA engineering product. */
+.flux-editorial { background: #fffdf9; color: #22271f; }
+.flux-editorial > .iona-dna-bg { display: none; }
+.flux-editorial > section[id^='flux-'] { position: relative; isolation: isolate; background: #fffdf9; color: #22271f; border-color: #e2dccf; padding: clamp(3.5rem, 7vw, 7rem) var(--editorial-gutter); }
+.flux-editorial > section[id^='flux-'] > .pointer-events-none { display: none; }
+.flux-editorial [data-i18n^='flux.'] { color: inherit; }
+.flux-editorial h2 { font-size: clamp(2rem, 4vw, 3.8rem); font-weight: 500; line-height: 1.12; letter-spacing: -.045em; }
+.flux-editorial p[data-i18n] { color: #697063; line-height: 1.8; }
+.flux-editorial span[data-i18n$='.eyebrow'] { color: #9c6723; font-size: 11px; font-weight: 500; letter-spacing: .13em; }
+.flux-editorial a[data-i18n^='flux.cta.'] { border-radius: 0; box-shadow: none; font-family: var(--iona-font-body); font-size: 12px; font-weight: 600; letter-spacing: .035em; padding: 16px 22px; background: #edbc64; border: 1px solid #d9a346; color: #30291a; }
+.flux-editorial a[data-i18n^='flux.cta.']:hover { background: #e5aa45; filter: none; }
+.flux-editorial a[data-i18n='flux.cta.watch'] { background: transparent; border: 0; border-bottom: 1px solid #8a8e80; padding-inline: 0; }
+.flux-editorial #flux-hero { padding-top: clamp(8rem, 12vw, 11rem); background: #f5f2e9; overflow: hidden; }
+#flux-hero h1 { font-size: clamp(3rem, 5.4vw, 5.6rem); font-weight: 600; line-height: 1.05; letter-spacing: -.055em; max-width: 12ch; }
+#flux-hero .max-w-xl > span .text-white { color: #22271f; }
+#flux-hero .max-w-xl > span { padding-bottom: 20px; border-bottom: 1px solid #d6cdb9; width: 100%; }
+#flux-hero .max-w-xl > p { font-size: 17px; max-width: 40ch; }
+#flux-hero #ionaflux-phone-mockup-root { position: relative; border-left: 1px solid #dcd3c1; background: radial-gradient(ellipse at 50% 55%, #ead7af 0, transparent 67%); }
+#flux-hero .ionaflux-phone-ground { opacity: .18; }
+/* One dark gallery holds the real monitoring screen. */
+.flux-editorial #flux-live { background: #191e1a; color: #f8f5eb; border: 0; }
+.flux-editorial #flux-live p { color: #afb7aa; }
+.flux-editorial #flux-live span[data-i18n$='.eyebrow'] { color: #e7b95f; }
+#flux-live > div { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+#flux-live > div > div:last-child { margin: 0; border-radius: 0; border: 1px solid #4b5146; box-shadow: 0 18px 50px #0003; }
+#flux-live h2 { font-size: clamp(2rem, 3.4vw, 3.4rem); }
+/* Numbered modules read across like a technical product sheet. */
+.flux-editorial #flux-catalog-stack { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 0; counter-reset: flux-module; border-top: 1px solid #d9d1c0; border-bottom: 1px solid #d9d1c0; }
+#flux-catalog-stack > .sticky { position: relative; top: auto; z-index: auto; margin: 0; padding: 32px 28px; border: 0; border-radius: 0; background: transparent; box-shadow: none; counter-increment: flux-module; }
+#flux-catalog-stack > .sticky + .sticky { border-left: 1px solid #d9d1c0; }
+#flux-catalog-stack > .sticky::before { content: '0' counter(flux-module); display: block; font: 12px/1.5 var(--iona-font-mono); color: #9a7940; margin-bottom: 36px; }
+#flux-catalog-stack > .sticky > .material-symbols-outlined { position: absolute; top: 30px; right: 28px; color: #ad7930; font-size: 28px; }
+#flux-catalog-stack h3 { font-size: 24px; font-weight: 500; letter-spacing: -.03em; line-height: 1.2; margin-bottom: 18px; }
+#flux-catalog-stack p { font-size: 14px; }
+#flux-catalog-stack > .sticky:nth-child(2) { background: #faf1df; }
+#flux-catalog > div > div:last-child { border-radius: 0; border-color: #dbd4c6; margin-top: 40px; max-width: 100%; }
+/* Quiet alternating paper surfaces retain variety without a second theme. */
+.flux-editorial #flux-qr { background: #f6f2e8; }
+#flux-qr > div > div:last-child { border-radius: 0; padding: 16px; border: 1px solid #d6ccb8; box-shadow: 14px 14px 0 #ebe1cb; background: #fffcf6; }
+#flux-lab > div > div:first-child { border-radius: 0; border-color: #d9d1c3; }
+.flux-editorial #flux-fleet { background: #f1f3ec; }
+#flux-fleet .grid > div { padding-top: 24px; border-top: 1px solid #c5cdbe; }
+#flux-fleet .grid .text-white { color: #303b2b; }
+#flux-fleet .grid .bg-white\/10 { background: #dbe1d3; }
+#flux-fleet .grid > div:nth-child(2) .h-full { background: #dca347; }
+#flux-fleet .grid > div:nth-child(2) .text-\[\#3fae66\] { color: #9c6723; }
+.flux-editorial #flux-video { background: #f6f2e8; }
+#flux-video > div { text-align: left; }
+#flux-video p { margin-left: 0; }
+#flux-video > div:has(video) { border: 1px solid #d7cebe; border-radius: 0; box-shadow: none; padding: 10px; background: #fffdf7; }
+.flux-editorial #site-footer { background: #fffdf9; color: #2b3226; border-color: #ddd7ca; }
+.flux-editorial #site-footer .text-white { color: #2b3226; }
+.flux-editorial #site-footer [class*='text-white/'] { color: #747969; }
+@media (max-width: 1023px) { #flux-hero #ionaflux-phone-mockup-root { border-left: 0; border-top: 1px solid #dcd3c1; } #flux-live > div { grid-template-columns: 1fr; } #flux-live > div > div:first-child { max-width: 44rem; } }
+@media (max-width: 760px) { .flux-editorial #flux-catalog-stack { grid-template-columns: 1fr; } #flux-catalog-stack > .sticky + .sticky { border-left: 0; border-top: 1px solid #d9d1c0; } #flux-catalog-stack > .sticky { padding: 26px 20px; } #flux-catalog-stack > .sticky::before { margin-bottom: 24px; } #flux-hero h1 { font-size: clamp(2.8rem, 10vw, 4rem); } }

@@ -1,0 +1,58 @@
+[
+  {
+    "asset": "facility-aerial.webp",
+    "source": "IMG_4404.JPG",
+    "width": 1800,
+    "height": 1350,
+    "bytes": 343354
+  },
+  {
+    "asset": "digester-interior.webp",
+    "source": "IMG_4387.JPG",
+    "width": 1800,
+    "height": 1350,
+    "bytes": 370704
+  },
+  {
+    "asset": "reactor-installation.webp",
+    "source": "IMG_5945.JPEG",
+    "width": 1800,
+    "height": 1350,
+    "bytes": 405008
+  },
+  {
+    "asset": "site-engineer.webp",
+    "source": "IMG_6074.JPEG",
+    "width": 1200,
+    "height": 1600,
+    "bytes": 512756
+  },
+  {
+    "asset": "facility-sunset.webp",
+    "source": "IMG_6507.JPEG",
+    "width": 1200,
+    "height": 1600,
+    "bytes": 115656
+  },
+  {
+    "asset": "process-equipment.webp",
+    "source": "IMG_6731.JPEG",
+    "width": 1800,
+    "height": 1350,
+    "bytes": 379490
+  },
+  {
+    "asset": "reactor-membrane.webp",
+    "source": "IMG_6033.JPEG",
+    "width": 1200,
+    "height": 1600,
+    "bytes": 305190
+  },
+  {
+    "asset": "reactor-exterior.webp",
+    "source": "IMG_4420.JPG",
+    "width": 1800,
+    "height": 1350,
+    "bytes": 242310
+  }
+]

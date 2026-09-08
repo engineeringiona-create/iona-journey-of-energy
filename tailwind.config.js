@@ -103,14 +103,14 @@ export default {
          are set per fontSize step below, not here — fontFamily doesn't
          carry weight. */
       fontFamily: {
-        'label-caps': ['Montserrat', 'Arial', 'sans-serif'],
-        'headline-md': ['Montserrat', 'Arial', 'sans-serif'],
-        'headline-lg-mobile': ['Montserrat', 'Arial', 'sans-serif'],
-        'headline-lg': ['Montserrat', 'Arial', 'sans-serif'],
-        'body-md': ['Montserrat', 'Arial', 'sans-serif'],
-        'display-hero': ['Montserrat', 'Arial', 'sans-serif'],
-        'body-lg': ['Montserrat', 'Arial', 'sans-serif'],
-        'display-hero-mobile': ['Montserrat', 'Arial', 'sans-serif'],
+        'label-caps': ['Inter', 'Arial', 'sans-serif'],
+        'headline-md': ['Manrope', 'Arial', 'sans-serif'],
+        'headline-lg-mobile': ['Manrope', 'Arial', 'sans-serif'],
+        'headline-lg': ['Manrope', 'Arial', 'sans-serif'],
+        'body-md': ['Inter', 'Arial', 'sans-serif'],
+        'display-hero': ['Manrope', 'Arial', 'sans-serif'],
+        'body-lg': ['Inter', 'Arial', 'sans-serif'],
+        'display-hero-mobile': ['Manrope', 'Arial', 'sans-serif'],
       },
       fontSize: {
         'label-caps': ['12px', { lineHeight: '100%', letterSpacing: '0.1em', fontWeight: '700' }],
@@ -126,3 +126,4 @@ export default {
   },
   plugins: [forms, containerQueries],
 };
+

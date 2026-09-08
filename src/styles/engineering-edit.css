@@ -1,0 +1,90 @@
+/* Engineering publication pass. Keep interaction; remove repeated decoration. */
+.engineering-edit { --editorial-space: clamp(4rem, 7vw, 7rem); }
+.engineering-edit .bg-ghost-text, .engineering-edit .iona-bg-blueprint { display: none; }
+.engineering-edit .hero-kicker::before { display: none; }
+.engineering-edit .hero-kicker { letter-spacing: .08em; font-size: .68rem; }
+.engineering-edit #hero .hero-editorial-title { font-size: clamp(2.9rem, 4.8vw, 5.3rem); font-weight: 500; letter-spacing: -.045em; max-width: 12ch; }
+.engineering-edit #hero .hero-editorial-sub { max-width: 39ch; font-size: 1rem; line-height: 1.8; }
+.engineering-edit .hero-metrics { background: #fff; border-top: 1px solid #cdcfc8; box-shadow: none; }
+.engineering-edit .hero-metric, .engineering-edit .hero-metric:nth-child(2), .engineering-edit .hero-metric:nth-child(3) { background: #fff; box-shadow: none; }
+.engineering-edit .hero-metric > span { display: none; }
+.engineering-edit .hero-metric { display: block; }
+.engineering-edit .hero-metric strong, .engineering-edit .hero-metric:nth-child(2) strong { color: #2a3127; font-size: clamp(1.5rem, 2.3vw, 2.4rem); }
+.engineering-edit #about-teaser .engineering-panel { background: #f7f6f1; box-shadow: none; border-color: #dad8ce; }
+.engineering-edit .engineering-drawing { color: #697663; }
+.engineering-edit #about-teaser .engineering-panel p { text-transform: none; letter-spacing: 0; font-size: .85rem; font-weight: 400; line-height: 1.7; }
+.engineering-edit .services-exhibit-row { position: relative; top: auto; min-height: 0; }
+.engineering-edit .services-exhibit-row > div:first-child { min-height: 340px; }
+.engineering-edit .services-exhibit-row > div:last-child { background: #fff; padding: clamp(2rem, 4vw, 4rem); }
+.engineering-edit .services-exhibit-row h3 { font-size: clamp(1.8rem, 2.7vw, 3rem); }
+.engineering-edit .services-exhibit-row > div:last-child > span:first-child { font-size: .8rem; color: #8b7959; margin-bottom: 1.75rem; }
+.engineering-edit .services-exhibit-row img { transform: none; }
+.engineering-edit .service-panel-2, .engineering-edit .service-panel-2 :is(h3,p,dd) { color: #2e352b; }
+.engineering-edit .service-panel-2 .service-specs { border-color: #d6d8d0; }
+.engineering-edit .service-panel-2 .service-specs dt { color: #73796c; }
+.engineering-edit #why-choose-us .accordion-item { background: #fff; border: 0; border-bottom: 1px solid #d8dbd2; box-shadow: none; margin: 0; }
+.engineering-edit #why-choose-us .accordion-item.is-active { background: #f8f7f2; box-shadow: inset 2px 0 #bd9850; }
+.engineering-edit .editorial-bento { gap: 1px; background: #daddd3; border: 1px solid #daddd3; }
+.engineering-edit .editorial-bento .bento-card { border: 0; border-radius: 0; box-shadow: none; background: #fff; color: #2b3227; }
+.engineering-edit .editorial-bento .bento-card-dark { background: #f5f3eb; }
+.engineering-edit .editorial-bento .bento-card p, .engineering-edit .editorial-bento .bento-stat-label { color: #697060; }
+.engineering-edit .editorial-bento .bento-pill { background: transparent; padding: 0; border: 0; color: #887043; letter-spacing: .08em; }
+.engineering-edit .editorial-bento .bento-stat-number { font-size: clamp(2.4rem, 3.6vw, 4rem); color: #394531; }
+.engineering-edit .about-principles, .engineering-edit #partners { background: #fff; }
+.engineering-edit .about-principles-grid { gap: 0; border-top: 1px solid #d8d9d1; }
+.engineering-edit .about-principle { background: #fff; border: 0; border-bottom: 1px solid #d8d9d1; box-shadow: none; }
+.engineering-edit .about-principle::after { display: none; }
+.engineering-edit .about-principle > span { font: .8rem/1.5 var(--iona-font-mono); color: #87734f; margin-bottom: 2rem; }
+.engineering-edit .partner-tile { background: #fff; box-shadow: none; border: 0; border-top: 1px solid #d0d5ca; }
+.engineering-edit .partner-tile:nth-child(1) { background: #f6f4ec; }
+.engineering-edit #biogaz-hesaplayici { background: #f6f5ef; }
+.engineering-edit #biogaz-hesaplayici .bg-white\/70 { background: #fff; box-shadow: none; backdrop-filter: none; border-color: #d7d9cf; }
+.engineering-edit #solutions { background: #f7f6f1; }
+.engineering-edit #solutions .solutions-carousel .solution-tile { border-radius: 4px; }
+.engineering-edit #solutions .solutions-carousel .solution-tile > div:first-child { border-radius: 0; }
+.engineering-edit #solutions .solutions-carousel .solution-tile.is-current { box-shadow: 0 12px 26px #262b2114; }
+.engineering-edit #contact-form { background: #f7f6f1; }
+@media (min-width: 1024px) { .engineering-edit .service-panel-2 > div:first-child, .engineering-edit .service-panel-4 > div:first-child { order: 2; } }
+@media (max-width: 600px) { .engineering-edit #hero .hero-editorial-title { font-size: clamp(2.6rem, 9.5vw, 3.5rem); } .engineering-edit .services-exhibit-row > div:first-child { min-height: 230px; } }
+/* Local design trial: restrained process routing along the page margin. */
+.iona-process-flow { position: absolute; top: 0; left: 0; width: 100%; z-index: 1; pointer-events: none; overflow: hidden; }
+.iona-process-flow svg { display: block; width: 100%; height: 100%; }
+.iona-process-pulse { animation: iona-process-travel 11s linear infinite; opacity: .8; }
+.iona-process-pulse.pulse-1 { animation-duration: 14s; animation-delay: -6s; }
+.iona-process-flow.is-paused .iona-process-pulse, .iona-process-flow.is-outside .iona-process-pulse { animation-play-state: paused; }
+@keyframes iona-process-travel { to { stroke-dashoffset: -598; } }
+@media (prefers-reduced-motion: reduce) { .iona-process-pulse { animation: none; opacity: 0; } }
+/* Full-width facility stage: the plant is the principal exhibit, not a sidebar. */
+.engineering-edit #hero .hero-grid { display: flex; flex-direction: column; align-items: stretch; max-width: 1800px; min-height: 0; }
+.engineering-edit #hero .hero-copy { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); grid-template-areas: 'kicker kicker' 'title description' 'title action'; column-gap: clamp(3rem, 7vw, 8rem); padding: 1.5rem 0 0; align-items: start; }
+.engineering-edit #hero .hero-kicker { grid-area: kicker; margin-bottom: 1.3rem; }
+.engineering-edit #hero .hero-editorial-title { grid-area: title; max-width: 17ch; margin: 0; font-size: clamp(2.6rem, 4.4vw, 4.7rem); }
+.engineering-edit #hero .hero-editorial-sub { grid-area: description; max-width: 47ch; margin: 0 0 .6rem; }
+.engineering-edit #hero .hero-editorial-cta { grid-area: action; justify-self: start; padding: .7rem 0; }
+.engineering-edit #hero .hero-model-column { margin: 0 calc(-1 * var(--editorial-gutter)); padding: 0; width: auto; }
+.engineering-edit #hero .twin-viewport { height: clamp(550px, 76svh, 900px); }
+.engineering-edit #hero #iona-digital-twin-root { min-height: 0; }
+.engineering-edit #hero .hero-model-caption, .engineering-edit #hero .twin-structure-nav { margin-inline: var(--editorial-gutter); }
+.engineering-edit #hero.is-inspecting .hero-copy { display: none; }
+.engineering-edit #hero .twin-surface.is-inspecting { padding-inline: var(--editorial-gutter); }
+@media (max-width: 760px) {
+ .engineering-edit #hero .hero-copy { grid-template-columns: 1fr; grid-template-areas: 'kicker' 'title' 'description' 'action'; gap: 1rem; }
+ .engineering-edit #hero .hero-kicker { margin: 0; }
+ .engineering-edit #hero .hero-editorial-title { font-size: clamp(2.5rem, 8.5vw, 3.6rem); }
+ .engineering-edit #hero .twin-viewport { height: clamp(440px, 95vw, 640px); }
+}
+/* Desktop hero uses measured remaining height; small screens retain natural scroll. */
+@media (min-width: 1024px) and (min-height: 700px) {
+ .engineering-edit #hero { padding-top: 6rem; }
+ .engineering-edit #hero .hero-copy { padding-top: .6rem; column-gap: 4rem; }
+ .engineering-edit #hero .hero-kicker { margin-bottom: .6rem; font-size: .6rem; }
+ .engineering-edit #hero .hero-editorial-title { font-size: clamp(2.5rem, 3.6vw, 4rem); max-width: 18ch; }
+ .engineering-edit #hero .hero-editorial-sub { font-size: .9rem; line-height: 1.6; }
+ .engineering-edit #hero .hero-editorial-cta { padding: .4rem 0; }
+ .engineering-edit #hero .twin-viewport { height: var(--plant-viewport-height, 48svh); }
+ .engineering-edit #hero .hero-model-caption { padding-block: .5rem; }
+ .engineering-edit #hero .twin-structure-nav { padding-block: .35rem; }
+ .engineering-edit #hero .hero-metric { padding-block: .85rem; }
+ .engineering-edit #hero .hero-metric strong { font-size: 1.65rem; }
+ .engineering-edit #hero.is-inspecting .twin-viewport { height: 70svh; }
+}

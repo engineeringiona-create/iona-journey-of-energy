@@ -13,21 +13,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
 <link rel="stylesheet" href="/src/styles/base.css">
 <link rel="stylesheet" href="/src/styles/editorial.css">
+<link rel="stylesheet" href="/src/styles/brand-system.css">
 </head>
-<body class="editorial-home bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
+<body class="iona-brand editorial-home bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
 
 <div id="iona-curtain" aria-hidden="true">
-<span class="iona-wordmark-text" style="font-size:32px">iona</span>
+<img class="iona-brand-logo" src="/images/iona-connected.svg" alt="iona" width="124" height="45">
 </div>
 
-<canvas class="helix-scroll-bg" id="helix-scroll-bg" aria-hidden="true"></canvas>
+
 <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-safe-margin-mobile md:px-safe-margin-desktop py-5" id="mobile-nav">
 <a class="flex items-center flex-1" href="/">
-<span class="iona-wordmark-text" style="font-size:24px;color:#000">iona</span>
+<img class="iona-brand-logo" src="/images/iona-connected.svg" alt="iona" width="124" height="45">
 </a>
 <div class="hidden md:flex flex-1 items-center justify-center gap-8">
 <a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/" data-i18n="nav.home">Anasayfa</a>
@@ -99,9 +100,8 @@
 <div class="hero-grid">
 <div class="hero-copy" id="hero-copy">
 <p class="hero-kicker" data-i18n="home.hero.meta_index">01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ</p>
-<h1 id="hero-title" class="hero-editorial-title" data-i18n="home.hero.slide1_title">Biyogazı Yeniden Mimarlıyoruz.</h1>
-<p class="hero-editorial-sub" data-i18n="home.hero.slide1_sub">Organik atığı sürdürülebilir yeşil enerjiye ve ticari değere dönüştüren yüksek verimli anaerobik çürütme tesisleri tasarlıyoruz.</p>
-<a class="hero-editorial-cta" href="/iletisim.html#contact-form"><span data-i18n="home.hero.cta">Teklif Alın</span></a>
+<h1 id="hero-title" class="hero-editorial-title" data-i18n="home.hero.slide1_title">Biyogaz tesisleri için mühendislik.</h1>
+<p class="hero-editorial-sub" data-i18n="home.hero.slide1_sub">Organik atığın enerjiye dönüşümü için çürütme, karıştırma, pompalama ve kojenerasyon sistemlerini birlikte tasarlıyoruz.</p>
 </div>
 <div class="hero-model-column">
 <div id="iona-digital-twin-root" aria-label="Etkileşimli biyogaz tesisi"></div>
@@ -142,7 +142,7 @@
 <div class="md:col-span-6 fade-in-element">
 <div class="flex items-center mb-4"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest" data-i18n="home.about.eyebrow">Hakkımızda</span></div>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-lg" data-i18n="home.about.title">Yalın Mühendislik.</h2>
-<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-md mb-stack-md" data-i18n="home.about.body">Iona Biogas, güçlü çevresel sorumlulukla yenilikçi mühendislik çözümleri geliştiren bir enerji şirketidir. Patentli teknolojik ekipmanlarımızla geleneksel biyogaz tesislerinin karşılaştığı zorlukların üstesinden gelerek daha güvenilir ve dayanıklı bir işletme sağlıyoruz.</p>
+<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-md mb-stack-md" data-i18n="home.about.body">Tesisin besleme profili, ekipman seçimi ve işletme ihtiyaçlarını birlikte ele alıyoruz. Çürütücü tasarımından otomasyona kadar süreci bir bütün olarak planlıyoruz.</p>
 <a class="inline-flex items-center gap-2 border-b border-[var(--brand)]/30 pb-1 hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] transition-colors duration-300 font-label-caps text-label-caps" href="/hakkimizda.html">
                     <span data-i18n="home.about.cta">Devamını Oku</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
 </a>
@@ -167,7 +167,7 @@
 <line x1="70" y1="532" x2="70" y2="552" />
 <line x1="370" y1="532" x2="370" y2="552" />
 </svg>
-<p class="font-label-caps text-label-caps text-[var(--text-muted)] leading-loose" data-i18n="home.about.caption">ULUSLARARASI STANDARTLARDA TEKNİK MÜKEMMELLİK, YATIRIMLARI SIFIR KESİNTİ SÜRESİYLE SERTİFİKALI BAŞARI HİKAYELERİNE DÖNÜŞTÜRÜYOR.</p>
+<p class="font-label-caps text-label-caps text-[var(--text-muted)] leading-loose" data-i18n="home.about.caption">Çürütücü, akış hatları ve kontrol birimleri. Tesis tasarımını birbiriyle çalışan sistemler olarak ele alıyoruz.</p>
 </div>
 </div>
 </section>
@@ -175,7 +175,7 @@
 <section class="relative bg-white border-t border-slate-200 fade-in-section" id="services-exhibit">
 <div class="max-w-[1400px] mx-auto px-safe-margin-mobile md:px-safe-margin-desktop pt-20 md:pt-28 pb-12 md:pb-16">
 <div class="flex items-end justify-between gap-6 fade-in-element">
-<h2 class="text-4xl lg:text-6xl font-bold tracking-tighter text-black">Hizmetlerimiz.</h2>
+<h2 class="text-4xl lg:text-6xl font-bold tracking-tighter text-black">Tesisin her adımı, birlikte.</h2>
 <span class="hidden md:block text-[10px] font-mono uppercase tracking-widest text-black/40">04 / KATALOG</span>
 </div>
 </div>
@@ -211,7 +211,7 @@
 </a>
 <a class="services-exhibit-row group service-panel-4 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-b border-slate-200" href="/teknoloji.html#workflow">
 <div class="relative overflow-hidden lg:col-span-7 lg:order-2">
-<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/hero-facility-aerial.jpg" alt="Mühendislik İş Akışı" loading="lazy" decoding="async">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/field/reactor-installation.webp" alt="Sahada reaktör montajı ve tesis yerleşimi" loading="lazy" decoding="async">
 </div>
 <div class="lg:col-span-5 lg:order-1 flex flex-col justify-center p-8 lg:p-16">
 <span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">04</span>
@@ -273,8 +273,8 @@
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
 <div class="md:sticky md:top-32 self-start fade-in-element">
 <div class="flex items-center mb-4"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-orange-600 font-semibold tracking-widest" data-i18n="home.why.eyebrow">Neden Iona</span></div>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-md" data-i18n="home.why.title">Neden Bizi Seçmelisiniz?</h2>
-<p class="font-body-md text-body-md text-slate-600 max-w-md mb-stack-md" data-i18n="home.why.body">Mühendislik uzmanlığımızı ve yenilikçi teknolojiyi bir araya getirerek dünya genelinde yüksek verimli, güvenilir ve sürdürülebilir biyogaz çözümleri sunuyoruz.</p>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-sm max-w-md" data-i18n="home.why.title">İşletmeyi düşünerek tasarlıyoruz.</h2>
+<p class="font-body-md text-body-md text-slate-600 max-w-md mb-stack-md" data-i18n="home.why.body">Ekipman yerleşimi, bakım erişimi ve proses kontrolü; tasarım kararlarını tesisin günlük işletmesiyle birlikte değerlendiriyoruz.</p>
 <a class="inline-block font-label-caps text-label-caps bg-[var(--brand)] text-white px-8 py-4 hover:bg-[var(--brand-hover)] transition-colors duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)]" href="/hakkimizda.html#why-us">
 <span data-i18n="common.more_cta">Daha Fazla</span>
 </a>
@@ -284,11 +284,11 @@
 <button type="button" class="accordion-trigger flex items-center justify-between gap-6" id="why-trigger-1" aria-expanded="true" aria-controls="why-panel-1">
 <span class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">01</span>
-<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion1_title">Akıllı Teknoloji</span></span><span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion1_title">Proses kontrolü</span></span><span class="accordion-plusminus" aria-hidden="true">
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
 </span></button><div class="accordion-row" id="why-panel-1" role="region" aria-labelledby="why-trigger-1" >
-<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion1_desc">Maksimum verimlilik için gelişmiş otomasyon sistemleri entegre ediyoruz.</p></div>
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion1_desc">Sıcaklık, debi ve alarm verilerini ortak bir izleme düzeninde topluyoruz.</p></div>
 </div>
 </div>
 <div class="accordion-item bg-white/90 backdrop-blur-sm px-6 py-4">
@@ -299,18 +299,18 @@
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
 </span></button><div class="accordion-row" id="why-panel-2" role="region" aria-labelledby="why-trigger-2" inert>
-<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion2_desc">Optimize edilmiş tesislerle işletme maliyetlerini düşürüyoruz.</p></div>
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion2_desc">Karıştırma ve pompalama seçimlerini tesisin enerji ihtiyacıyla birlikte değerlendiriyoruz.</p></div>
 </div>
 </div>
 <div class="accordion-item bg-white/90 backdrop-blur-sm px-6 py-4">
 <button type="button" class="accordion-trigger flex items-center justify-between gap-6" id="why-trigger-3" aria-expanded="false" aria-controls="why-panel-3">
 <span class="accordion-heading flex items-center gap-6">
 <span class="accordion-number font-label-caps text-label-caps text-[var(--brand)]">03</span>
-<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion3_title">Kesintisiz Üretim</span></span><span class="accordion-plusminus" aria-hidden="true">
+<span class="accordion-title font-headline-md text-headline-md" data-i18n="home.why.accordion3_title">Bakım ve üretim sürekliliği</span></span><span class="accordion-plusminus" aria-hidden="true">
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
 </span></button><div class="accordion-row" id="why-panel-3" role="region" aria-labelledby="why-trigger-3" inert>
-<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion3_desc">Gelişmiş tasarımlarımız sürekli ve kesintisiz getiriyi garanti eder.</p></div>
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion3_desc">Ekipmana erişim ve bakım senaryolarını tasarım aşamasında ele alıyoruz.</p></div>
 </div>
 </div>
 <div class="accordion-item bg-white/90 backdrop-blur-sm px-6 py-4">
@@ -321,7 +321,7 @@
 <span class="accordion-icon-bar accordion-icon-bar-h"></span>
 <span class="accordion-icon-bar accordion-icon-bar-v"></span>
 </span></button><div class="accordion-row" id="why-panel-4" role="region" aria-labelledby="why-trigger-4" inert>
-<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion4_desc">Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.</p></div>
+<div><p class="accordion-desc text-body-md pt-4 md:pl-[76px]" data-i18n="home.why.accordion4_desc">Saha ekibinin teknik destek ve arıza takibi ihtiyaçlarına odaklanıyoruz.</p></div>
 </div>
 </div>
 </div>
@@ -331,7 +331,7 @@
 <section class="bg-[var(--surface)] px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[var(--border)] fade-in-section" id="explore">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <div class="flex items-center mb-4 fade-in-element"><span class="brand-motif" aria-hidden="true"></span><span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest" data-i18n="home.explore.eyebrow">Keşfedin</span></div>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="home.explore.title">Iona'yı Daha Yakından Tanıyın</h2>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-xl max-w-2xl fade-in-element" data-i18n="home.explore.title">Çalışma alanlarımız</h2>
 <div class="border-t border-[var(--border)] fade-in-element delay-200">
 <a class="group grid grid-cols-1 lg:grid-cols-[120px_1fr_auto] items-center gap-x-8 gap-y-2 py-8 border-b border-[var(--border)] transition-colors duration-300 hover:bg-[var(--section-alt)]" href="/teknoloji.html">
 <span class="font-mono text-sm text-[var(--brand)]">Hizmetler</span>
@@ -499,5 +499,7 @@
 <script type="module" src="/src/pages/main-anasayfa.js"></script>
 <script type="module" src="/src/components/DigitalTwin/mount.jsx"></script>
 </body></html>
+
+
 
 

@@ -1,0 +1,33 @@
+/* IONA bulletin: warm paper, architectural rules and amber accents. */
+#iona-announcements-popup { position: fixed; inset: 0; z-index: 11000; display: grid; place-items: center; padding: clamp(12px, 3vw, 40px); background: #1e221e66; backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); }
+.iona-ap-card { width: min(1040px, 100%); max-height: min(860px, 90dvh); display: flex; flex-direction: column; overflow: hidden; color: #23271f; background: #fffdf9; border: 1px solid #e4dbcc; border-top: 3px solid #e0a02d; box-shadow: 0 30px 100px #171c1930; animation: iona-bulletin-open .4s cubic-bezier(.22,.68,.2,1); }
+.iona-ap-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px; border-bottom: 1px solid #e5ded2; flex-shrink: 0; }
+.iona-ap-edition { display: flex; align-items: center; gap: 24px; }
+.iona-ap-edition .iona-wordmark-text { font-size: 27px; color: #202720; }
+.iona-ap-edition > span:last-child { font: 500 10px/1.5 Inter, Arial, sans-serif; letter-spacing: .17em; color: #796e5b; }
+.iona-ap-close, .iona-ap-arrow { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border: 1px solid #dcd3c4; background: transparent; color: #333b30; cursor: pointer; transition: background .2s, border-color .2s; }
+.iona-ap-close { font-size: 27px; line-height: 1; }
+.iona-ap-close:hover, .iona-ap-arrow:hover { background: #f8e9cd; border-color: #d7a44e; }
+.iona-ap-content { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+.iona-ap-content.has-visual { display: grid; grid-template-columns: .9fr 1.1fr; }
+.iona-ap-visual { min-width: 0; display: grid; place-items: center; padding: clamp(16px, 2vw, 28px); background: #f1ede3; border-right: 1px solid #e1d8c7; }
+.iona-ap-visual img { width: 100%; height: auto; max-height: 420px; object-fit: contain; }
+.iona-ap-body { min-width: 0; padding: clamp(24px, 4vw, 54px); display: flex; flex-direction: column; align-items: flex-start; }
+.iona-ap-meta { display: flex; align-items: center; gap: 10px; font: 500 10px/1.6 Inter, Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #936021; margin: 0 0 25px; }
+.iona-ap-meta::before { content: ''; width: 20px; height: 2px; background: #d79a35; flex-shrink: 0; }
+.iona-ap-title { color: #23271f; font: 500 clamp(26px, 3.4vw, 43px)/1.12 Manrope, Arial, sans-serif; letter-spacing: -.045em; margin: 0 0 22px; overflow-wrap: anywhere; text-wrap: balance; }
+.iona-ap-desc { color: #66695e; font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 30px; }
+.iona-ap-cta { display: flex; justify-content: space-between; align-items: center; gap: 30px; width: 100%; margin-top: auto; border: 1px solid #e0aa52; padding: 16px 20px; color: #3a301e; background: #f5cc7c; font-size: 13px; font-weight: 600; text-decoration: none; transition: background .2s; }
+.iona-ap-cta:hover { background: #efbd5c; }
+.iona-ap-cta > span:last-child { font-size: 22px; transition: transform .2s; }
+.iona-ap-cta:hover > span:last-child { transform: translate(2px, -2px); }
+.iona-ap-footer { display: flex; align-items: center; gap: 12px; padding: 14px 24px; border-top: 1px solid #e5ded2; background: #faf7f0; flex-shrink: 0; }
+.iona-ap-counter { margin-right: auto; color: #81755e; font: 11px/1.5 monospace; letter-spacing: .12em; white-space: nowrap; }
+.iona-ap-dots { display: flex; gap: 3px; max-width: 55%; overflow-x: auto; }
+.iona-ap-dot { min-width: 36px; min-height: 44px; color: #746d5e; border-bottom: 2px solid transparent; font: 11px monospace; }
+.iona-ap-dot[aria-pressed=true] { color: #875719; border-color: #d99c34; background: #f7ebd4; }
+.iona-ap-card :focus-visible { outline: 2px solid #a96b1e; outline-offset: 3px; }
+@keyframes iona-bulletin-open { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 700px) { .iona-ap-content.has-visual { grid-template-columns: 1fr; } .iona-ap-visual { border-right: 0; border-bottom: 1px solid #e1d8c7; } .iona-ap-visual img { max-height: 190px; } .iona-ap-header, .iona-ap-footer { padding: 12px 16px; } .iona-ap-edition { gap: 14px; } .iona-ap-body { padding: 26px 22px; } .iona-ap-desc { font-size: 14px; } .iona-ap-meta { margin-bottom: 16px; } .iona-ap-footer { gap: 6px; } }
+@media (prefers-reduced-motion: reduce) { .iona-ap-card { animation: none; } .iona-ap-card * { transition: none; } }
+

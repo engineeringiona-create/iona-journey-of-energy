@@ -1,5 +1,6 @@
-import { initEditorialMotion } from '../lib/editorialMotion.js';
-import { initHelixScrollBg } from '../three/helix-scroll-bg.js';
+import { initHeroViewport } from '../lib/heroViewport.js';
+
+
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initCardSpotlight, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve } from '../common.js';
@@ -9,7 +10,7 @@ import { initBiogasCalculator } from '../lib/biogasCalculator.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
-initEditorialMotion();
+
 initSmoothScroll();
 initPageCurtain();
 initFooterCurve();
@@ -22,17 +23,18 @@ initSiteSearch();
 initMobileNav();
 
 initParallax();
-initHelixScrollBg(document.getElementById('helix-scroll-bg'));
+
 
 function initHeroTwin() {
   const copy = document.getElementById('hero-copy');
   if (!copy) return;
   document.addEventListener('twinlevelchange', (e) => {
     document.getElementById('hero').classList.toggle('is-inspecting', e.detail.level !== 0);
-    copy.inert = e.detail.level !== 0;
+    copy.inert = false;
   });
 }
 initHeroTwin();
+initHeroViewport();
 
 function initHeroReveal() {
   const lines = gsap.utils.toArray('.js-reveal-line');
@@ -69,7 +71,7 @@ function initMagneticButtons() {
     });
   });
 }
-initMagneticButtons();
+
 
 function initServiceCards() {
   const cards = gsap.utils.toArray('.service-card');
@@ -118,5 +120,7 @@ function initServiceStack() {
   measure();
 }
 initServiceStack();
+
+
 
 

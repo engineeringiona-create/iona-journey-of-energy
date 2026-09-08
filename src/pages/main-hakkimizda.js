@@ -1,4 +1,4 @@
-import { initEditorialMotion } from '../lib/editorialMotion.js';
+
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { initFadeIn, initThemeToggle, initParallax, initSiteSearch, initMobileNav, initSmoothScroll, initPageCurtain, initFooterCurve, initDnaScroll } from '../common.js';
@@ -7,7 +7,7 @@ import { initQuoteModal } from '../lib/quoteModal.js';
 
 gsap.registerPlugin(ScrollTrigger);
 await initI18n();
-initEditorialMotion();
+
 initSmoothScroll();
 initPageCurtain();
 initFooterCurve();

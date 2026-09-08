@@ -1,3 +1,5 @@
+import { ReactorCutaway } from './ReactorCutaway.jsx';
+import { processSteps } from './processSteps.js';
 import { Component, Suspense, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer, Grid, Html, OrbitControls, useGLTF } from '@react-three/drei';
@@ -481,7 +483,7 @@ function FeedPipeGapFill() {
   );
 }
 
-const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected, flowActive }) {
+const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected, flowActive, cutawayOpen }) {
   const { scene: cachedScene } = useGLTF(MODEL_SRC);
   const scene = useMemo(() => new THREE.Group(), []);
   
@@ -557,9 +559,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     plantRoot.children.forEach((structure) => {
 
       const material = new THREE.MeshPhysicalMaterial({
-        color: '#f8fafc',
-        roughness: 1.0,
-        metalness: 0.0,
+        color: '#dcded7',
+        roughness: 0.88,
+        metalness: 0.02,
         clearcoat: 0,
         clearcoatRoughness: 0,
       });
@@ -569,9 +571,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       if (structure.name === 'digester') {
         
         const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#f8fafc',
-          metalness: 0.0,
-          roughness: 1.0,
+          color: '#d3d8ce',
+          metalness: 0.08,
+          roughness: 0.84,
           map: createDigesterWallAlbedoTexture(),
           
           depthWrite: true,
@@ -582,12 +584,12 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         structureNamedMaterials.set(DIGESTER_WALL_MESH_NAME, wallMaterial);
 
         const domeMaterial = new THREE.MeshPhysicalMaterial({
-          color: '#e2e8f0',
-          metalness: 0.7,
-          roughness: 0.4,
-          clearcoat: 0.2,
+          color: '#bfc8b7',
+          metalness: 0.18,
+          roughness: 0.62,
+          clearcoat: 0.08,
           clearcoatRoughness: 0.15,
-          anisotropy: 0.55,
+          anisotropy: 0.15,
           anisotropyRotation: Math.PI / 2,
           depthWrite: true,
           depthTest: true,
@@ -597,27 +599,27 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         DIGESTER_DOME_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, domeMaterial));
 
         const pipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b',
-          metalness: 0.1,
-          roughness: 0.8,
+          color: '#858c83',
+          metalness: 0.72,
+          roughness: 0.36,
         });
         pipeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(pipeMaterial));
         DIGESTER_PIPE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, pipeMaterial));
 
         const railingMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b',
-          metalness: 0.1,
-          roughness: 0.8,
+          color: '#555f53',
+          metalness: 0.65,
+          roughness: 0.45,
         });
         railingMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(railingMaterial));
         DIGESTER_RAILING_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, railingMaterial));
 
         const gratingMaterial = new THREE.MeshStandardMaterial({
-          color: '#f8fafc',
-          metalness: 0,
-          roughness: 1.0,
+          color: '#bfc2b7',
+          metalness: 0.5,
+          roughness: 0.58,
         });
         gratingMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(gratingMaterial));
@@ -627,20 +629,20 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       if (['pump_room', 'engine_room', 'scada_room'].includes(structure.name)) {
         
         const sandwichPanelMaterial = new THREE.MeshStandardMaterial({
-          color: '#94a3b8',
-          metalness: 0.2,
-          roughness: 0.6,
+          color: '#cccbbf',
+          metalness: 0.18,
+          roughness: 0.72,
           bumpMap: sandwichPanelTexture,
-          bumpScale: 0.5,
+          bumpScale: 0.12,
         });
         sandwichPanelMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(sandwichPanelMaterial));
         BUILDING_WALL_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, sandwichPanelMaterial));
 
         const roofMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b',
-          metalness: 0.1,
-          roughness: 0.8,
+          color: '#48624b',
+          metalness: 0.3,
+          roughness: 0.65,
         });
         roofMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(roofMaterial));
@@ -658,9 +660,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         BUILDING_WINDOW_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, windowMaterial));
 
         const doorMaterial = new THREE.MeshStandardMaterial({
-          color: '#8b8f93',
+          color: '#198837',
           metalness: 0.25,
-          roughness: 0.55,
+          roughness: 0.58,
         });
         doorMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(doorMaterial));
@@ -710,18 +712,18 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         BUILDING_MECH_CASING_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, mechCasingMaterial));
 
         const buildingPipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b',
-          metalness: 0.1,
-          roughness: 0.8,
+          color: '#92988c',
+          metalness: 0.72,
+          roughness: 0.38,
         });
         buildingPipeMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(buildingPipeMaterial));
         BUILDING_PIPE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, buildingPipeMaterial));
 
         const structuralSteelMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b',
-          metalness: 0.1,
-          roughness: 0.8,
+          color: '#596353',
+          metalness: 0.6,
+          roughness: 0.5,
         });
         structuralSteelMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(structuralSteelMaterial));
@@ -731,9 +733,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       if (structure.name === 'engine_room') {
         
         const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#94a3b8',
-          metalness: 0.2,
-          roughness: 0.6,
+          color: '#d3d8ce',
+          metalness: 0.08,
+          roughness: 0.84,
         });
         wallMaterial.needsUpdate = true;
         uniformsList.push(attachHoverWormShader(wallMaterial));
@@ -898,29 +900,11 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
   const effectiveSelectedName = selected?.name === 'biogas_mixer' ? 'digester' : selected?.name;
 
   useEffect(() => {
-    materialsRef.current.forEach((material, name) => {
-      const isActive = Boolean(selected) && name === effectiveSelectedName;
-      material.transparent = isActive;
-      material.opacity = isActive ? 0.25 : 1;
-      material.depthWrite = !isActive;
-      material.needsUpdate = true;
-    });
-    
-    namedMeshMaterialsRef.current.forEach((structureNamedMaterials, structureName) => {
-      const isActive = Boolean(selected) && structureName === effectiveSelectedName;
-      structureNamedMaterials.forEach((material) => {
-        material.transparent = isActive;
-        material.opacity = isActive ? 0.25 : 1;
-      material.depthWrite = !isActive;
-        material.needsUpdate = true;
-      });
-    });
-    
-    const digesterActive = effectiveSelectedName === 'digester';
+    // Selection moves the camera only. Interior visibility belongs to cutaway mode.
     tankWallMeshesRef.current.forEach((mesh) => {
-      mesh.raycast = digesterActive ? () => {} : THREE.Mesh.prototype.raycast;
+      mesh.raycast = cutawayOpen ? () => {} : THREE.Mesh.prototype.raycast;
     });
-  }, [selected]);
+  }, [cutawayOpen]);
 
   const animateMixerHover = useCallback((isHovering) => {
     const hub = digesterMixersRef.current.propellerHubs[0];
@@ -971,13 +955,6 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
         });
       });
     }
-    const baseY = baseYRef.current.get(node.name) ?? 0;
-    gsap.to(node.position, {
-      y: isHovering ? baseY + HOVER_LIFT : baseY,
-      duration: HOVER_DURATION,
-      ease: HOVER_EASE,
-      onUpdate: invalidate,
-    });
   }, []);
 
   const handlePointerOver = useCallback(
@@ -1051,9 +1028,9 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
   });
 
   useEffect(() => {
-    flowUniformsRef.current.forEach((uniforms) => {
+    flowUniformsRef.current.forEach((uniforms, index) => {
       gsap.to(uniforms.uFlowActive, {
-        value: flowActive ? 1 : 0,
+        value: ['feed', 'gas', 'power'][index] === flowActive ? 1 : 0,
         duration: reduceMotion ? 0.01 : 0.6,
         ease: 'power2.out',
       });
@@ -1093,21 +1070,24 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
   );
 });
 
-const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, keyLightRef }) {
+const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, keyLightRef, cutawayOpen }) {
   const { camera, gl, size, invalidate } = useThree();
   const controlsRef = useRef(null);
+  const cameraGoal = useRef(null);
   useLayoutEffect(() => {
     const root = plantRootRef.current;
     const controls = controlsRef.current;
     if (!root || !controls || !size.width || !size.height) return;
     root.updateMatrixWorld(true);
 
-    const { position, center } = fitPerspectiveObject(selected ?? root, camera, selected ? FOCUS_DIR : OVERVIEW_DIR, selected ? 1.12 : 1.06);
+    const { position, center } = fitPerspectiveObject(selected ?? root, camera, selected ? FOCUS_DIR : OVERVIEW_DIR, cutawayOpen ? 1.6 : selected ? 1.12 : 1.06);
     camera.far = Math.max(500, position.distanceTo(center) + groundScale * 3);
     camera.updateProjectionMatrix();
-    const timeline = gsap.timeline({ onUpdate: () => { controls.update(); invalidate(); } });
-    timeline.to(camera.position, { x: position.x, y: position.y, z: position.z, duration: CAMERA_DURATION, ease: CAMERA_EASE }, 0);
-    timeline.to(controls.target, { x: center.x, y: center.y, z: center.z, duration: CAMERA_DURATION, ease: CAMERA_EASE }, 0);
+    cameraGoal.current = {position, center};
+    if (reduceMotion) {
+      camera.position.copy(position); controls.target.copy(center); controls.update();
+    }
+    invalidate();
     const light = keyLightRef.current;
     if (light) {
       const siteBox = new THREE.Box3().setFromObject(root);
@@ -1120,16 +1100,23 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, ke
       light.shadow.camera.updateProjectionMatrix();
       gl.shadowMap.needsUpdate = true;
     }
-    return () => timeline.kill();
-  }, [selected, size.width, size.height, groundScale, groundY, camera, gl, plantRootRef, keyLightRef]);
+    return () => { cameraGoal.current = null; };
+  }, [selected, cutawayOpen, size.width, size.height, groundScale, groundY, camera, gl, plantRootRef, keyLightRef]);
   const elapsed = useRef(0);
   useEffect(() => { gl.shadowMap.autoUpdate = false; gl.shadowMap.needsUpdate = true; }, [gl]);
   useFrame((_, delta) => {
+    const goal = cameraGoal.current, controls = controlsRef.current;
+    if (goal && controls && !reduceMotion) {
+      const alpha = 1 - Math.exp(-7 * Math.min(delta, .05));
+      camera.position.lerp(goal.position, alpha);
+      controls.target.lerp(goal.center, alpha);
+      controls.update();
+    }
     elapsed.current += delta;
     if (elapsed.current > SHADOW_BAKE_INTERVAL) { elapsed.current = 0; gl.shadowMap.needsUpdate = true; }
   });
   return <>
-    <OrbitControls ref={controlsRef} enableRotate={false} enableZoom={false} enablePan={false} />
+    <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={false} enableZoom={false} enablePan={false} />
     <mesh position={[0, groundY, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
       <planeGeometry args={[groundScale * 3, groundScale * 3]} />
       <shadowMaterial transparent opacity={.17} depthWrite={false} />
@@ -1226,11 +1213,11 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
 
       {sub ? (
         <div className="flex flex-col gap-6">
-          <EquipmentMedia photo={sub.photo} video={sub.video} />
           <div className="flex flex-col gap-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{sub.name}</h2>
             <p className="text-sm font-bold tracking-wide text-emerald-600">{sub.spec}</p>
           </div>
+          <EquipmentMedia photo={sub.photo} video={sub.video} />
           <p className="text-base leading-relaxed text-gray-600">{sub.description}</p>
           {sub.specs && sub.specs.length > 0 && (
             <TechSpecs items={sub.specs} />
@@ -1238,6 +1225,7 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
         </div>
       ) : (
         <div className="flex flex-col gap-6">
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{structure.title}</h2>
           {structure.photo && (
             <img
               className="h-48 w-full shrink-0 rounded-2xl object-cover"
@@ -1245,7 +1233,7 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
               alt=""
             />
           )}
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{structure.title}</h2>
+          
           <p className="text-base leading-relaxed text-gray-600">{structure.description}</p>
           {structure.specs && structure.specs.length > 0 && (
             <TechSpecs items={structure.specs} />
@@ -1351,6 +1339,19 @@ class TwinErrorBoundary extends Component {
 }
 
 export default function GltfTwinScene() {
+  const [tourStep, setTourStep] = useState(null);
+  const [manualCutaway, setManualCutaway] = useState(false);
+  const cutawayOpen = manualCutaway || tourStep === 1 || tourStep === 2;
+  const tourHeadingRef = useRef(null);
+  const tourStartRef = useRef(null);
+  const hadTourRef = useRef(false);
+  const tourOpen = tourStep !== null;
+  useEffect(() => {
+    if (tourOpen) tourHeadingRef.current?.focus({preventScroll: true});
+    else if (hadTourRef.current) tourStartRef.current?.focus({preventScroll: true});
+    hadTourRef.current = tourOpen;
+  }, [tourOpen]);
+  const [modelReady, setModelReady] = useState(false);
   const [selected, setSelected] = useState(null);
   
   const [currentLevel, setCurrentLevel] = useState(0);
@@ -1363,7 +1364,7 @@ export default function GltfTwinScene() {
   
   const [hasInteracted, setHasInteracted] = useState(false);
   
-  const [flowActive, setFlowActive] = useState(false);
+
   const [isMobileViewport, setIsMobileViewport] = useState(
     () => typeof window !== 'undefined' && window.innerWidth < 768
   );
@@ -1374,11 +1375,10 @@ export default function GltfTwinScene() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  useEffect(() => {
-    if (isMobileViewport) setFlowActive(false);
-  }, [isMobileViewport]);
+
 
   const handleReady = useCallback((plantRoot) => {
+    setModelReady(true);
     const box = new THREE.Box3().setFromObject(plantRoot);
     const size = box.getSize(new THREE.Vector3());
     setGroundY(box.min.y - 0.02);
@@ -1388,12 +1388,16 @@ export default function GltfTwinScene() {
   }, []);
 
   const handleSelect = useCallback((node) => {
+    setManualCutaway(false);
+    setTourStep(null);
     setSelected(node);
     setSelectedSubIndex(null);
     setCurrentLevel(1);
     setHasInteracted(true);
   }, []);
   const handleReset = useCallback(() => {
+    setManualCutaway(false);
+    setTourStep(null);
     setSelected(null);
     setSelectedSubIndex(null);
     setCurrentLevel(0);
@@ -1421,6 +1425,8 @@ export default function GltfTwinScene() {
 
   const [reloadKey, setReloadKey] = useState(0);
   const handleRetry = useCallback(() => {
+    setManualCutaway(false);
+    setTourStep(null); setModelReady(false);
     
     try {
       useGLTF.clear(MODEL_SRC);
@@ -1458,9 +1464,23 @@ export default function GltfTwinScene() {
     return () => { observer.disconnect(); document.removeEventListener('visibilitychange', update); document.removeEventListener('keydown', escape); };
   }, [handleReset]);
 
+  const goToStep = index => {
+    const step = processSteps[index];
+    const node = step && plantRootRef.current?.getObjectByName(step.node);
+    if (!node) return;
+    setManualCutaway(false); setTourStep(index); setSelected(node); setSelectedSubIndex(null);
+    setCurrentLevel(1); setHasInteracted(true);
+  };
   return <div ref={stageRef} className={selected ? 'twin-surface is-inspecting' : 'twin-surface'}>
     <div className="min-w-0">
       <div className="twin-viewport">
+        {tourStep === null && <button type="button" className="twin-cutaway-toggle" disabled={!modelReady} aria-pressed={manualCutaway} onClick={() => {
+          if(manualCutaway) {handleReset();return;}
+          const reactor=plantRootRef.current?.getObjectByName('digester');
+          if(reactor){handleSelect(reactor);setManualCutaway(true);}
+        }}>{manualCutaway ? 'Kesiti kapat' : 'Reaktörün içini aç'}</button>}
+        {cutawayOpen && <div className="twin-cutaway-legend"><span>● Karışım seviyesi</span><span>● Gaz hacmi</span><small>Şematik kesit · Canlı ölçüm değildir</small></div>}
+        {tourStep === null && <button ref={tourStartRef} className="twin-tour-start" type="button" disabled={!modelReady} onClick={() => goToStep(0)}>Tesis nasıl çalışır? <span aria-hidden="true">↗</span></button>}
         <TwinErrorBoundary resetKey={reloadKey} onRetry={handleRetry}>
           <Suspense fallback={<TwinLoading onRetry={handleRetry} />}>
             <Canvas key={reloadKey} shadows frameloop={visible ? (reduceMotion ? 'demand' : 'always') : 'never'}
@@ -1479,9 +1499,10 @@ export default function GltfTwinScene() {
                 shadow-bias={-.00012} shadow-normalBias={.08} />
               <directionalLight position={[40, 25, -40]} color="#dce8ff" intensity={.7} />
               <Model plantRootRef={plantRootRef} onReady={handleReady} onSelect={handleSelect} onReset={handleReset}
-                selected={selected} flowActive={flowActive && !isMobileViewport} />
+                selected={selected} cutawayOpen={cutawayOpen} flowActive={tourStep !== null && !reduceMotion ? processSteps[tourStep].flow : false} />
               <FeedPipeGapFill />
-              <Rig plantRootRef={plantRootRef} selected={selected} groundY={groundY} groundScale={groundScale} shadowFar={shadowFar} keyLightRef={keyLightRef} />
+              <ReactorCutaway plantRootRef={plantRootRef} open={cutawayOpen} />
+              <Rig cutawayOpen={cutawayOpen} plantRootRef={plantRootRef} selected={tourStep !== null ? null : selected} groundY={groundY} groundScale={groundScale} shadowFar={shadowFar} keyLightRef={keyLightRef} />
             </Canvas>
           </Suspense>
         </TwinErrorBoundary>
@@ -1495,7 +1516,19 @@ export default function GltfTwinScene() {
         {selected && <button type="button" onClick={handleReset}>↖ Genel görünüm</button>}
       </nav>
     </div>
-    {selected && <DetailPanel structureKey={selected.name} subIndex={selectedSubIndex} onSelectSub={handleSelectSub}
+    {tourStep !== null && <aside className="twin-tour" aria-label="Tesisin çalışma aşamaları">
+      <div className="twin-tour-top"><span>Tesis nasıl çalışır?</span><button type="button" onClick={handleReset} aria-label="Çalışma turunu kapat">×</button></div>
+      <nav aria-label="Proses aşamaları" className="twin-tour-steps">{processSteps.map((step,index) => <button key={step.title} type="button" aria-current={tourStep === index ? 'step' : undefined} onClick={() => goToStep(index)} aria-label={`${index+1}. ${step.title}`}>{index+1}</button>)}</nav>
+      <div aria-live="polite" aria-atomic="true">
+        <span className="twin-tour-count">0{tourStep+1} / 04</span>
+        <h2 ref={tourHeadingRef} tabIndex={-1}>{processSteps[tourStep].title}</h2>
+        <p>{processSteps[tourStep].body}</p>
+        <dl><dt>Bu aşamanın çıktısı</dt><dd>{processSteps[tourStep].output}</dd></dl>
+      </div>
+      <p className="twin-tour-note">Şematik proses anlatımı. Ekipman ve akış düzeni projeye göre değişir.</p>
+      <div className="twin-tour-actions"><button type="button" disabled={tourStep === 0} onClick={() => goToStep(tourStep-1)}>Geri</button>{tourStep < processSteps.length-1 ? <button type="button" onClick={() => goToStep(tourStep+1)}>Sonraki aşama →</button> : <button type="button" onClick={handleReset}>Genel görünüme dön</button>}</div>
+    </aside>}
+    {selected && tourStep === null && <DetailPanel structureKey={selected.name} subIndex={selectedSubIndex} onSelectSub={handleSelectSub}
       onBack={handleBackToStructure} onClose={handleReset} onReturnToParent={handleReturnToParent} />}
   </div>;
 }
