@@ -4,6 +4,7 @@ import { writeLocalContent } from '../../lib/localContent.js';
 import { writeLocalImages, clearLocalImages } from '../../lib/imageContent.js';
 import { readLocalBucket, writeLocalBucket, clearLocalBucket } from '../../lib/adminStore.js';
 import { PAGES, pageIdForPath } from '../../lib/pages.js';
+import { LANGS } from '../../i18n.js';
 import ImageSettingsModal from './ImageSettingsModal.jsx';
 import TextEditPopover from './TextEditPopover.jsx';
 import Toast from './Toast.jsx';
@@ -785,19 +786,27 @@ export default function LiveEditor({ onLogout }) {
               Gezin
             </span>
           </button>
-          <div className="flex items-center gap-1 rounded-full bg-white/5 border border-white/10 p-1 shrink-0">
-            {['tr', 'en'].map((code) => (
-              <button
-                key={code}
-                type="button"
-                onClick={() => switchLang(code)}
-                title={code === 'tr' ? 'Türkçe metinleri düzenle' : 'İngilizce metinleri düzenle'}
-                className={`px-3 py-1 rounded-full font-label-caps text-[11px] font-bold tracking-[0.06em] transition-colors duration-200 ${lang === code ? 'bg-emerald-500 text-black' : 'text-white/50'}`}
-              >
-                {code.toUpperCase()}
-              </button>
+          {/* Diller LANGS'tan geliyor, elle yazılmıyor. Burada uzun süre
+              ['tr','en'] sabiti duruyordu: site yedi dile çevrildikten sonra
+              bile editör yalnızca ikisini önizleyebiliyor, kalan beş dilin
+              içerik override'ları hiç girilemiyordu.
+
+              Pill yerine açılır liste: yedi pill araç çubuğunu taşırıp
+              sağdaki ikon düğmelerini (medya kitaplığı, istatistik, geçmiş)
+              görünür alanın dışına itiyordu — kapsayıcı `overflow-x-auto`
+              olduğu için kaybolmuyorlar ama kimsenin bulamayacağı bir yere
+              kayıyorlardı. Açılır liste, yanındaki sayfa seçicinin zaten
+              kullandığı biçim. */}
+          <select
+            value={lang}
+            onChange={(e) => switchLang(e.target.value)}
+            title="Düzenlenecek dili seç"
+            className="bg-[#0e1210] border border-white/15 text-white text-[12px] font-bold rounded-full px-3 py-1.5 focus:outline-none focus:border-emerald-400 shrink-0"
+          >
+            {LANGS.map(({ code, label }) => (
+              <option key={code} value={code}>{code.toUpperCase()} · {label}</option>
             ))}
-          </div>
+          </select>
           <div className="flex items-center gap-1 rounded-full bg-white/5 border border-white/10 p-1 shrink-0">
             {VIEWPORTS.map((v) => (
               <button

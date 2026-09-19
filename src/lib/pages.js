@@ -10,6 +10,12 @@ export const PAGES = [
   { id: 'hakkimizda', label: 'Hakkımızda', path: '/hakkimizda.html' },
   { id: 'etki', label: 'Etki', path: '/etki.html' },
   { id: 'iletisim', label: 'İletişim', path: '/iletisim.html' },
+  /* IonaFlux 2026-09-19'a kadar bu listede yoktu: sayfa vardı, navigasyonda
+     duruyordu, ama admin editörünün sayfa seçicisinde hiç görünmüyordu ve
+     pageIdForPath('/ionaflux.html') null döndüğü için o sayfada hiçbir içerik
+     override'ı uygulanmıyordu. site_content.id serbest metin (şemada CHECK
+     yok), yeni id eklemek için tek gereken buraya yazmak. */
+  { id: 'ionaflux', label: 'IonaFlux', path: '/ionaflux.html' },
   { id: 'duyurular', label: 'Duyurular', path: '/duyurular.html' }
 ];
 

@@ -36,14 +36,14 @@ hreflang canlıda çalışıyor.
 - [ ] Confirm in the Railway dashboard (Settings → Source) which branch the service actually deploys from, and confirm Settings → Deploy → Start Command isn't manually overridden to something other than `npm start`.
 - [ ] Set real `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` in Railway's environment variables — and locally in `.env` if the admin editor needs testing against the real DB instead of the `localStorage` fallback.
 - [ ] Verify the live Supabase `site_content` table actually has rows for `teknoloji` / `hakkimizda` / `etki` / `iletisim`, not just a leftover `home` row from before per-page storage existed.
-- [ ] `ionaflux.html` isn't in the admin editor's page selector or `src/lib/pages.js`'s id map — decide whether it needs live-editing support.
+- [x] `ionaflux.html` added to `src/lib/pages.js` on 2026-09-19, so the admin page selector reaches it and its content overrides apply. No `site_content` row exists yet; one is created on first save.
 - [ ] `teknoloji.html` is now the heaviest page (2.55 MB of images) — its `field/*.webp` are already optimised at 1800×1350, but the three stage cards display them in ~400×240 boxes. Proper `srcset`/downscaled variants would cut roughly 0.7 MB. Left undone deliberately: several of those files are shared across pages at different display sizes, so picking one wrong size makes an image blurry somewhere.
 - [ ] Every page ships ~390 kB of JS: ~167 kB is `@supabase/supabase-js` (pulled in by `quoteModal` → `supabaseClient`) and ~221 kB is the shared gsap/lenis/common/i18n chunk. The Supabase cost is currently hidden behind the 1.5 s preloader, so it is not perceptible — only worth attacking if the preloader ever goes away.
 - [ ] Build warns that `dist/assets/scene-utils-*.js` is ~737 kB minified — consider dynamic `import()` / manual chunking for the Three.js scene code per Vite's own suggestion.
 - [ ] Deploys must run from the WSL-native copy `~/.iona-web-deploy`, never `railway up` straight from `/mnt/c` — it uploads NUL-filled files and the build dies on a bogus syntax error (see LESSONS.md, 2026-09-19). Worth scripting as `npm run deploy` so nobody rediscovers it.
 - [ ] `railway.json` (Config as Code) is deprecated; Railway warns on every command and stops honouring it **2026-12-01**. Migrate to `.railway/railway.ts` with `railway config migrate` before then.
 - [ ] Decide whether the admin panel's Supabase content overrides should stay on in production. They are on (`VITE_SUPABASE_URL`/`ANON_KEY` are set) and `site_content` has `home` + `hakkimizda` rows dated 2026-09-09/09-11 from an older working copy — so the live homepage text may not match what's in `index.html` here. `teknoloji` has no row, so the new Hizmetler copy is served straight from the markup.
-- [ ] The admin panel's "3D Bilgi Noktaları" (hotspots) feature pointed at the removed teknoloji.html WebGL scene. Harmless while the list is empty, but any pin added now lands on empty page space — either retarget it or drop the feature (`src/lib/hotspots.js`, `LiveEditor.jsx`).
+- [x] Hotspots retargeted on 2026-09-19 from the removed teknoloji.html showcase to the homepage's Digital Twin hero — the one 3D scene the site still has (`HOTSPOT_PAGE` in `src/i18n.js`).
 
 ## Tasarım sistemi — açık kalan tek kalem
 

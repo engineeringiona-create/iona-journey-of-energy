@@ -27,6 +27,15 @@ export const LANGS = [
   { code: 'hi', label: 'हिन्दी' }
 ];
 
+/* "3D Bilgi Noktaları" pinlerinin hangi sayfada çizileceği.
+   2026-09-19'a kadar 'teknoloji' idi: pinler o sayfadaki 3 makinelik WebGL
+   vitrinini işaret etmek için yazılmıştı. O vitrin kaldırıldı (IONA ekipman
+   değil tesis teslim ediyor), yani özellik boş bir sayfanın üstüne pin
+   koymaya devam ediyordu — admin panelinde duran ama hiçbir şeye
+   yaramayan bir düğme. Sitede hâlâ bir 3D sahne var: ana sayfanın hero
+   Dijital İkiz'i. Hedef oraya alındı. */
+const HOTSPOT_PAGE = 'home';
+
 const dictCache = {};
 
 /* DB-sourced overrides are untrusted (the admin editor's write path has
@@ -219,9 +228,15 @@ async function applyGlobalOverrides() {
   if (!supabase) {
     applyThemeOverrides(readLocalBucket('theme'));
     applyAnnouncementBar(readLocalBucket('announcement'));
-    if (pageId === 'teknoloji') applyHotspots(readLocalBucket('hotspots')?.list);
+    if (pageId === HOTSPOT_PAGE) applyHotspots(readLocalBucket('hotspots')?.list);
     const savedAnnouncements = readLocalBucket('announcements');
-    const localPreview = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+    /* Bu örnek duyuru yalnızca yerelde tarayıcıda gezerken tasarımı görmek
+       için var. Admin editörünün önizleme iframe'inde ÇIKMAMALI: sayfanın
+       ortasına tam ekran bir pop-up koyup düzenlenecek içeriği kapatıyordu.
+       Çerçeve içindeysek (self !== top) örnek gösterilmez. */
+    const framed = window.self !== window.top;
+    const localPreview = !framed
+      && ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
     const announcements = savedAnnouncements?.list ?? (localPreview ? [{
       title: 'Enerjinin geleceğini birlikte tasarlıyoruz.',
       category: 'Tasarım önizlemesi',
@@ -243,7 +258,7 @@ async function applyGlobalOverrides() {
     if (error || !data) return;
     applyThemeOverrides(data.find((r) => r.id === 'theme')?.content);
     applyAnnouncementBar(data.find((r) => r.id === 'announcement')?.content);
-    if (pageId === 'teknoloji') applyHotspots(data.find((r) => r.id === 'hotspots')?.content?.list);
+    if (pageId === HOTSPOT_PAGE) applyHotspots(data.find((r) => r.id === 'hotspots')?.content?.list);
     applyAnnouncementPopup(data.find((r) => r.id === 'announcements')?.content?.list, pageId);
   } catch (e) {
     /* no theme/banner/hotspot/popup override, page still works fine */
