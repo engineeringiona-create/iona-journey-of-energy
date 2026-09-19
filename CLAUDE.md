@@ -8,12 +8,17 @@ This file holds rules that don't change. Long version + reasoning lives in `AGEN
 
 - Lives at a Windows-mounted path (`/mnt/c/...`) under WSL — expect slower file I/O than a native-fs project. `vite.config.js` already sets `watch: { usePolling: true }` to work around drvfs not firing inotify events. If dev server feels laggy, that's expected, not a bug.
 - Dev: `npm run dev` → `http://localhost:5173`
-- Build: `npm run build` → `dist/`, multi-page (`vite.config.js` → `build.rollupOptions.input` lists every page: `index.html`, `teknoloji.html`, `hakkimizda.html`, `etki.html`, `iletisim.html`, `ionaflux.html`, `admin.html`). Any new top-level page HTML file must be added there or it won't build.
+- Build: `npm run build` → `vite build` **then `node scripts/build-i18n-pages.mjs`**, multi-page (`vite.config.js` → `build.rollupOptions.input` lists every page: `index.html`, `teknoloji.html`, `hakkimizda.html`, `etki.html`, `iletisim.html`, `ionaflux.html`, `duyurular.html`, `admin.html`). A new top-level page must be added in **two** places or it won't build/publish: that `input` map **and** `PAGES` in `scripts/seo-inject.mjs`.
 - Deploy: Railway. `railway.json` pins `builder: NIXPACKS` and `startCommand: npm start`. `package.json`'s `start` script runs `serve dist -l $PORT --no-clipboard` — no `-s`/SPA flag, so no route ever silently falls back to `index.html`. `public/serve.json` sets `cleanUrls: false` so `serve` doesn't 301-redirect `/page.html` → `/page`.
 - Git: GitHub's default branch is `master`. As of 2026-08-19 both `main` and `master` point at the same commit (`450eed2`) — keep them in sync when pushing, since Railway's deploy source branch may be either one. Don't assume a push to `main` alone reached production.
 
 ## Content / i18n system
 
+- **Language lives in the URL, not in `localStorage`** (changed 2026-09-19). Turkish stays at the root (`/teknoloji.html`); the other six are real pre-translated static files under `/en/`, `/de/`, `/es/`, `/fr/`, `/ru/`, `/hi/`. `src/lib/langPath.js` is the single source of truth for that scheme (`langFromPath`, `stripLang`, `localizePath`, `samePageInLang`); `currentLang()` reads the path and `setLang()` navigates. Before this, every language shared one URL and Google only ever saw Turkish.
+  - Generator: `scripts/build-i18n-pages.mjs`, run after `vite build`. It fills `[data-i18n]` nodes from the dictionaries, rewrites canonical/og/title/description per language, localises in-page links, and writes `dist/sitemap.xml` + the hreflang block.
+  - **A page is published in a language only if EVERY key it uses exists in that dictionary.** A half-Turkish page served under `hreflang="de"` is worse than no German page at all. The build prints exactly which keys are missing; adding them to `src/i18n/<lang>.json` makes the page (and its hreflang line and sitemap entry) appear on the next build — there is no list to update by hand.
+  - Links to a page that has no copy in the current language stay pointing at the Turkish one, so the nav never produces a 404. `duyurular.html` is deliberately Turkish-only (its body has no `[data-i18n]` nodes at all), and `admin.html` is excluded from everything.
+  - The admin editor switches language **in place** via `window.__ionaSetLang` (`applyLangInPlace` in `src/i18n.js`), not by clicking the nav button — that button now navigates, which would reload the preview iframe and drop its listeners and edit mode.
 - `src/i18n.js` renders every `[data-i18n]` node from a hardcoded JSON dictionary (`src/i18n/<lang>.json`), then layers a DB override on top from Supabase table `site_content`.
 - `site_content` is one row per **page**, not one global row: `id` ∈ `home | teknoloji | hakkimizda | etki | iletisim` (schema: `supabase/schema.sql`). The mapping from URL path → row id lives in `src/lib/pages.js` (`pageIdForPath`) — this is the single source of truth, shared by `i18n.js` and the admin editor. Never hardcode a page id anywhere else.
 - Admin editor: `src/components/Admin/LiveEditor.jsx`, reached via `/admin.html`. Has a page-selector dropdown and an Edit/Navigate mode toggle. Saves write to `site_content` keyed by whichever page is selected.
@@ -47,6 +52,6 @@ This file holds rules that don't change. Long version + reasoning lives in `AGEN
 
 ## Before claiming a deploy/routing fix is done
 
-1. `npm run build`, confirm every expected `dist/*.html` file exists.
-2. Run the **real** start command (`npm start`, or `serve dist -l <port>` directly) — not `npm run dev` — and `curl` every page path plus one bogus path. Every real page should be `200` with the right `<title>`; the bogus path should be `404`, never a silent `200` of `index.html`.
+1. `npm run build`, confirm every expected `dist/*.html` file exists — including the `dist/<lang>/*.html` copies, and read the build's own per-page/per-language summary.
+2. Run the **real** start command (`npm start`, or `serve dist -l <port>` directly) — not `npm run dev` — and `curl` every page path plus one bogus path. Every real page should be `200` with the right `<title>`; the bogus path should be `404`, never a silent `200` of `index.html`. Cover the language prefixes too (42 pages as of 2026-09-19), plus `/robots.txt` and `/sitemap.xml`.
 3. Check which git branch is actually wired to the Railway service before assuming code changes alone explain stale content — see the branch note above.

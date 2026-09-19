@@ -67,3 +67,39 @@ cd ~/.iona-web-deploy && railway link --project distinguished-connection \
 Verify the copy before uploading (`md5sum` every file under `src/` on both sides, and `grep -rlP '\x00' src *.html` must return nothing) — the copy itself is made by the same kernel path that corrupted the upload, so it is not automatically trustworthy either. It came out byte-identical across 103 files here, but check, don't assume.
 
 Same root cause as the `~/.iona-3d-deploy` copy that already existed for the 3D archive — that one was created for a `.gitignore` reason, but the mount is the deeper issue.
+
+## The GitHub repo was three weeks behind what was actually live (2026-09-19)
+
+A task list said "push the local fixes." The fixes were on another machine, but
+the bigger problem was the repo itself: `engineeringiona-create/iona-journey-of-energy`
+still held the pre-WebP tree (45 MB of raw camera JPEGs, no `draco/`, no `hdri/`,
+older HTML), while production had been updated by a `railway up` CLI upload that
+never went through git. The Railway service is still wired to the GitHub repo, so
+**any** push would have rebuilt production from the stale tree and silently
+undone the image optimisation and several pages of copy.
+
+Nothing about this is visible from `git status` — the working copy looked clean
+because it *was* clean; it was simply not the thing that was deployed.
+
+**Rule:** before pushing to a repo whose host auto-deploys, diff the repo against
+whatever is actually serving traffic (`diff -rq` against the deploy copy, or
+`curl` the live HTML for a marker), not just against your own last commit. A CLI
+upload, a dashboard edit or a hotfix applied out-of-band leaves the repo stale in
+a way git cannot warn you about. Here the fix was to sync the repo *to* the live
+tree first, in its own commit, and put the new work on top.
+
+## hreflang must never be written by hand (2026-09-19)
+
+Publishing `/en/`, `/de/` … versions raised an obvious temptation: hardcode the
+7-language hreflang block into each page's `<head>`. That block is a promise that
+every listed URL exists and is in that language. Two things break it silently — a
+page whose translation is incomplete, and a page that was never translated at all
+(`duyurular.html` has no `[data-i18n]` nodes, so its "German version" would have
+been Turkish). Google's documented response to inconsistent hreflang is to ignore
+the whole cluster, so the failure is invisible: no error, just no benefit.
+
+**Rule:** generate hreflang from the same data that decides what gets published
+(`scripts/build-i18n-pages.mjs`), never from a hand-maintained list. The source
+HTML carries only a marker comment. Same for `sitemap.xml` and for in-page links:
+a link to a page that does not exist in the current language stays Turkish rather
+than 404-ing under a language prefix.

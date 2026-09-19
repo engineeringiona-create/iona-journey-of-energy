@@ -1,5 +1,38 @@
 # TODO.md — unfinished work
 
+## Panelden yapılacaklar — kod tarafı bitti, erişim gerekiyor (2026-09-19)
+
+Aşağıdakiler bu depodan yapılamaz: Cloudflare kural yazma ayrı yetki ister ve
+bu makinede Cloudflare token'ı yok, arama motoru araçları ise tarayıcıdan giriş
+ister. Kodun beklediği her şey hazır — `sitemap.xml`, `robots.txt`, canonical ve
+hreflang canlıda çalışıyor.
+
+- [ ] **Google Search Console** — search.google.com/search-console → Add property
+      → **Domain** türü (URL prefix değil; apex, www ve `/en/`, `/de/` … alt
+      yollarını tek mülkte toplar) → `ionaengineering.com`. Verdiği TXT kaydını
+      Cloudflare DNS'e ekle. **Mevcut `_railway-verify` TXT kayıtlarını silme** —
+      Railway sertifika yenilemesi onlara bakıyor. Doğrulama geçince Sitemaps →
+      `sitemap.xml` gönder (43 adres: 7 Türkçe + 36 dil sayfası).
+- [ ] **Bing Webmaster Tools** — bing.com/webmasters → Import from Google Search
+      Console. Ayrı doğrulama istemez. ChatGPT ve Copilot aramaları Bing
+      indeksini kullanıyor, atlanmamalı.
+- [ ] **Google Business Profile** — Türkiye'de harita sonuçlarına girmenin tek
+      yolu. Adres, telefon, kategori (mühendislik / yenilenebilir enerji).
+- [ ] **Cloudflare: www → apex 301** — Rules → Redirect Rules → Create rule.
+      Eşleşme: Hostname equals `www.ionaengineering.com`. Hedef: Dynamic,
+      `concat("https://ionaengineering.com", http.request.uri.path)`, durum
+      **301**, query string Preserve. Şu an www da apex de aynı içeriği doğrudan
+      sunuyor; canonical zaten apex'i gösterdiği için bu acil değil, 301 sadece
+      daha temiz sinyal verir.
+- [ ] **Cloudflare: statik varlık önbelleği** — Caching → Cache Rules. Eşleşmeyi
+      `/assets/*`, `/images/*`, `/videos/*`, `/models/*` yollarıyla SINIRLA,
+      "All incoming requests" yapma. Gerekçe: artık origin doğru `cache-control`
+      gönderiyor (assets 1 yıl immutable, görseller 7 gün, HTML `max-age=0,
+      must-revalidate`). HTML'i kenarda 4 saat tutmak her içerik güncellemesinden
+      sonra Purge Everything gerektirir — admin panelinden metin değiştiren biri
+      için kötü takas. Varlıklar hash'li isim taşıdığı için onlarda purge hiç
+      gerekmez.
+
 - [ ] Confirm in the Railway dashboard (Settings → Source) which branch the service actually deploys from, and confirm Settings → Deploy → Start Command isn't manually overridden to something other than `npm start`.
 - [ ] Set real `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` in Railway's environment variables — and locally in `.env` if the admin editor needs testing against the real DB instead of the `localStorage` fallback.
 - [ ] Verify the live Supabase `site_content` table actually has rows for `teknoloji` / `hakkimizda` / `etki` / `iletisim`, not just a leftover `home` row from before per-page storage existed.
