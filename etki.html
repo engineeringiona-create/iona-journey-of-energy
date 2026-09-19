@@ -3,12 +3,39 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <script>(function(){try{var t=localStorage.getItem('iona-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
 <title>IONA - Sektörler</title>
+<!-- SEO:start -->
+<meta name="description" content="Belediyelerden ağır sanayiye, tarımdan hayvancılığa kadar farklı sektörlere anahtar teslim biyogaz çözümleri sunuyor, küresel tedarik ve mühendislik ağımızla her projeyi…">
+<link rel="canonical" href="https://ionaengineering.com/etki.html">
+<meta property="og:title" content="IONA - Sektörler">
+<meta property="og:description" content="Belediyelerden ağır sanayiye, tarımdan hayvancılığa kadar farklı sektörlere anahtar teslim biyogaz çözümleri sunuyor, küresel tedarik ve mühendislik ağımızla her projeyi…">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ionaengineering.com/etki.html">
+<meta property="og:image" content="https://ionaengineering.com/og-image.jpg">
+<meta property="og:site_name" content="IONA Biogas">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="IONA - Sektörler">
+<meta name="twitter:description" content="Belediyelerden ağır sanayiye, tarımdan hayvancılığa kadar farklı sektörlere anahtar teslim biyogaz çözümleri sunuyor, küresel tedarik ve mühendislik ağımızla her projeyi…">
+<meta name="twitter:image" content="https://ionaengineering.com/og-image.jpg">
+<!-- hreflang: build-i18n-pages.mjs dolduruyor -->
+<!-- SEO:end -->
 <link rel="icon" type="image/svg+xml" href="/images/iona-icon.svg">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Fontlar. 2026-09-19'a kadar burada 4 ayrı render-bloklayan istek vardı ve
+     Material Symbols'ün TAMAMI (binlerce ikon, 6,7 MB) her sayfada indiriliyordu.
+     Şimdi 2 istek: ikon fontu `icon_names` ile sitede gerçekten kullanılan 50
+     ikona indirgendi (6,7 MB -> 17 KB), metin fontları tek çağrıda birleşti.
+     preconnect'ler, font dosyalarının geldiği ikinci origin olan gstatic'in
+     DNS+TLS el sıkışmasını CSS beklemeden başlatıyor.
+
+     DİKKAT: yeni bir Material Symbols ikonu eklersen adını aşağıdaki
+     icon_names listesine DE ekle — listede olmayan ikon, fontta ligatür
+     bulunamadığı için ikon yerine düz yazı olarak görünür ("arrow_forward"
+     kelimesi ekrana basılır). Liste 8 sayfada da aynıdır. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;icon_names=ac_unit,arrow_forward,autorenew,bar_chart,battery_full,bolt,build,call,campaign,check,checklist,close,conveyor_belt,dark_mode,dashboard_customize,description,device_thermostat,filter_alt,format_align_center,format_align_left,format_align_right,groups,history,keyboard_arrow_down,language,layers,light_mode,local_shipping,location_on,mail,menu,newspaper,palette,payments,perm_media,plumbing,precision_manufacturing,propane_tank,qr_code_scanner,report,science,search,sensors,shield,star,summarize,travel_explore,view_in_ar,warning,water_drop&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Montserrat:wght@400;500;600;700;800&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/base.css">
 <link rel="stylesheet" href="/src/styles/editorial.css">
 <link rel="stylesheet" href="/src/styles/brand-system.css">
@@ -120,7 +147,7 @@
 <!-- Hero zone -->
 <section class="hero-zone bg-transparent px-safe-margin-mobile md:px-safe-margin-desktop overflow-hidden fade-in-section" id="etki-hero">
 <div class="absolute inset-0 pointer-events-none z-0">
-<img class="parallax-media" data-img-key="hero_aerial" src="/images/aerial-farmland.jpg" alt="Tarım arazilerinin havadan görünümü">
+<img class="parallax-media" data-img-key="hero_aerial" src="/images/aerial-farmland.webp" alt="Tarım arazilerinin havadan görünümü">
 <div class="hero-photo-scrim"></div>
 </div>
 <div class="max-w-3xl relative z-10 mx-auto text-center">
@@ -144,7 +171,7 @@
 <div class="horizontal-gallery-wrap overflow-hidden">
 <div class="horizontal-gallery-track" id="industries-track">
 <div class="horizontal-gallery-panel relative flex items-end px-safe-margin-mobile md:px-16 py-16">
-<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_digester_dome" src="/images/digester-dome-facility.jpg" alt="Biyogaz çürütücü tesisinin dış görünümü" loading="lazy" decoding="async">
+<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_digester_dome" src="/images/digester-dome-facility.webp" alt="Biyogaz çürütücü tesisinin dış görünümü" loading="lazy" decoding="async">
 <div class="absolute inset-0 bg-black/50"></div>
 <div class="relative z-10 max-w-xl text-white">
 <span class="font-label-caps text-label-caps text-[#ffc700] tracking-widest block mb-2" data-i18n="industries.list.eyebrow">Sektörel Etki</span>
@@ -155,7 +182,7 @@
 </div>
 </div>
 <div class="horizontal-gallery-panel relative flex items-end px-safe-margin-mobile md:px-16 py-16">
-<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_mixer_motor" src="/images/mixer-motor-closeup.jpg" alt="Çürütücü tankına monte edilmiş karıştırma motoru" loading="lazy" decoding="async">
+<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_mixer_motor" src="/images/mixer-motor-closeup.webp" alt="Çürütücü tankına monte edilmiş karıştırma motoru" loading="lazy" decoding="async">
 <div class="absolute inset-0 bg-black/50"></div>
 <div class="relative z-10 max-w-xl text-white">
 <span class="block text-7xl lg:text-8xl font-bold text-[#2d9937] leading-none mb-4">02</span>
@@ -165,7 +192,7 @@
 </div>
 </div>
 <div class="horizontal-gallery-panel relative flex items-end px-safe-margin-mobile md:px-16 py-16">
-<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_auger_conveyor" src="/images/auger-conveyor-equipment.png" alt="Tesiste substrat besleme ekipmanı" loading="lazy" decoding="async">
+<img class="absolute inset-0 w-full h-full object-cover" data-img-key="industry_auger_conveyor" src="/images/auger-conveyor-equipment.webp" alt="Tesiste substrat besleme ekipmanı" loading="lazy" decoding="async">
 <div class="absolute inset-0 bg-black/50"></div>
 <div class="relative z-10 max-w-xl text-white">
 <span class="block text-7xl lg:text-8xl font-bold text-[#2d9937] leading-none mb-4">03</span>

@@ -2,26 +2,95 @@ import { ReactorCutaway } from './ReactorCutaway.jsx';
 import { processSteps } from './processSteps.js';
 import { Component, Suspense, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, Lightformer, Grid, Html, OrbitControls, useGLTF } from '@react-three/drei';
+import { ContactShadows, Environment, Html, OrbitControls, useGLTF, useTexture } from '@react-three/drei'; // eslint-disable-line no-unused-vars -- useTexture: see the texture hooks note below
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { reduceMotion } from '../../three/scene-utils.js';
 import { applyStructureOverrides } from './plantStructureOverrides.js';
 import { fitPerspectiveObject } from './cameraFit.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { localModelUrl, modelUrl } from '../../lib/modelAssets.js';
 
-const MODEL_SRC = '/models/iona-tesis-3d.glb';
-useGLTF.preload(MODEL_SRC);
+/* Phase 104: the plant ships as ONE Draco-compressed GLB with every runtime
+   override already baked in (scripts/model-lab/bake-plant.mjs → gltf-transform
+   draco; `npm run model:build`). 3.45 MB → 0.7 MB. The un-baked source the
+   bake starts from is model-lab/src/iona-tesis-3d.glb — build-time only, and
+   deliberately outside public/ so it isn't copied into the deploy.
+   The decoder is served locally from public/draco/ (copied from three's
+   examples/jsm/libs/draco/gltf): 0.7 MB of wasm+js that the browser caches
+   once, and unlike the GLB it is code — kendi origin'imizde kalıyor.
+
+   2026-09-19: GLB'nin adresi artık sabit değil, modelAssets.js çözüyor —
+   VITE_MODEL_BUCKET tanımlıysa Supabase Storage'ın CDN'inden, değilse
+   eskisi gibi public/models/ altından. Yerel kopya silinmiyor: uzak istek
+   hata verirse (CDN kapalı, bucket private, ağ engeli) fallBackToLocalModel
+   bir kez yerel yola düşüp sahneyi yeniden kuruyor, böylece hero hiçbir
+   koşulda modelsiz kalmıyor. */
+const MODEL_FILE = 'iona-tesis-3d.draco.glb';
+const LOCAL_MODEL_SRC = localModelUrl(MODEL_FILE);
+const DRACO_DECODER_PATH = '/draco/';
+
+/* Modül seviyesinde mutable: fallback olduğunda değeri değişir ve sahne
+   reloadKey ile yeniden kurulduğunda yeni yol okunur. useGLTF'in kendi
+   cache'i yola göre anahtarlandığı için eski girdiyi de temizliyoruz. */
+let modelSrc = modelUrl(MODEL_FILE);
+useGLTF.preload(modelSrc, DRACO_DECODER_PATH);
+
+/* Uzak kopya açılmadıysa yerel kopyaya geç. Zaten yereldeysek false döner —
+   o durumda gerçekten yüklenemiyor demektir, hata ekranı gösterilir. */
+function fallBackToLocalModel() {
+  if (modelSrc === LOCAL_MODEL_SRC) return false;
+  console.warn('[IONA] Uzak 3D model açılamadı, yerel kopyaya dönülüyor:', modelSrc);
+  try {
+    useGLTF.clear(modelSrc);
+  } catch (e) {
+    /* cache'te yoksa sorun değil */
+  }
+  modelSrc = LOCAL_MODEL_SRC;
+  useGLTF.preload(modelSrc, DRACO_DECODER_PATH);
+  return true;
+}
 
 const CAMERA_DURATION = reduceMotion ? 0.01 : 0.8;
 const CAMERA_EASE = 'power2.inOut';
 
-const SHADOW_BAKE_INTERVAL = 1 / 12;
+/* Phase 105 (performance): the plant is a still model, so nothing is
+   rendered unless something changed — the Canvas runs frameloop="demand" and
+   every tween/interaction calls invalidate(). The shadow map is baked once and
+   re-baked only when geometry moves (hover lift, x-ray castShadow flips),
+   never on a timer. */
+const MAX_COPY_OCCLUSION = 0.6;
 
 const CAMERA_FOV = 35;
 
 const OVERVIEW_DIR = new THREE.Vector3(1, 0.8, 1).normalize();
 
 const FOCUS_DIR = new THREE.Vector3(0.65, 0.42, 0.75).normalize();
+/* Phase 100: the digester is framed from higher up than the other structures —
+   its lid sinks into the tank on selection (see DOME_LID_MESH_NAMES) and the
+   interior is what the click is for, so the camera looks down into it at
+   ~45 deg instead of the 23 deg side-on angle the buildings get. */
+const DIGESTER_FOCUS_DIR = new THREE.Vector3(0.6, 0.85, 0.7).normalize();
+/* Phase 101: on selection the dome stays put and is cut in half VERTICALLY —
+   the half facing the camera is clipped away (a world-space clipping plane on
+   the dome glass, swept in from outside the dome so it reads as the lid
+   opening), the far half stays as the silhouette. The plane's normal is the
+   horizontal component of DIGESTER_FOCUS_DIR, so the cut always faces the
+   camera the digester is framed from. Crown fittings sit on the removed half
+   and are simply hidden while the cut is open. */
+const DOME_CUT_NORMAL = new THREE.Vector3(-DIGESTER_FOCUS_DIR.x, 0, -DIGESTER_FOCUS_DIR.z).normalize();
+const DOME_CUT_OPEN = 0;      // plane through the tank axis: exactly half
+const DOME_CUT_CLOSED = 10.5; // past the dome's r 9.2: nothing clipped
+const DOME_CROWN_MESH_NAMES = ['dome_hatch', 'pressure_relief_valve', 'relief_cap'];
+const DOME_CUT_DURATION = reduceMotion ? 0.01 : 0.9;
+
+// Must stay in step with the @media(min-width:880px) block in brand-system.css
+// that switches the card from stacked-below to overlaid-on-the-right.
+const CARD_OVERLAY_QUERY = '(min-width: 880px)';
+/* How much of the viewport the card is allowed to claim before we stop giving
+   ground — past this the model would be squeezed into a sliver on narrow
+   desktop widths, which looks worse than a little overlap. */
+const MAX_CARD_OCCLUSION = 0.5;
 
 const HOVER_LIFT = 0.18;
 const HOVER_DURATION = reduceMotion ? 0.01 : 0.35;
@@ -29,21 +98,302 @@ const HOVER_EASE = 'power2.out';
 const HOVER_WORM_COLOR_A = '#78dc77';
 const HOVER_WORM_COLOR_B = '#c0d8c4';
 
+/* ── Porselen maket + saha renkleri ──────────────────────────────────────────
+   One ceramic-like language, several value/colour tiers: porcelain shells,
+   IONA-green digester body with visible vertical ribs, light steel pipework,
+   and small saturated equipment accents (navy valve bodies, red pumps and
+   handwheels, safety yellow) borrowed from the ANKA reference model. Every
+   recipe is instantiated PER STRUCTURE — never shared across two structures —
+   so the x-ray ghosting keeps working (see the materialOwners pass below). */
+/* ── Glossy architectural ceramic ─────────────────────────────────────────
+   Phase 100 (Murat's brief): the whole plant is a glazed-ceramic display piece
+   — the look of a high-end industrial design render. Every recipe is a
+   MeshPhysicalMaterial (a `clearcoat` key is what selects it in
+   materialFromRecipe): a near-mirror body (roughness .05-.12) under a full
+   clearcoat is what makes porcelain, glazed tile and lacquered metal read as
+   one fired, polished family. Main bodies are the brief's #fdfdfd; the colour
+   accents (IONA green, equipment red, safety yellow, navy) keep their hue but
+   take the same glaze so nothing in the scene reads as a different material
+   system. Concrete parts are the one deliberate contrast — matte, textured
+   (RECIPE_MAPS below) — so the glazed bodies have something to sit on. */
+const WHITE = '#fdfdfd';
+const CERAMIC = { roughness: 0.05, metalness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.1, envMapIntensity: 1.2 };
+const CONCRETE = { roughness: 0.82, metalness: 0, clearcoat: 0.08, clearcoatRoughness: 0.6, envMapIntensity: 0.9 };
+const CLEAR_GLASS = { color: '#ffffff', roughness: 0.04, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 1.3 };
+/* Phase 102 (Murat): the mixers are the one thing that is NOT white — brushed
+   stainless, so they read against the maquette. Anisotropy gives the brushed
+   streak without a texture; a real metal PBR set plugs in through RECIPE_MAPS
+   (`mixerMetal` entry below) the moment one lands in public/textures/. The
+   side/top digester mixers use the same numbers in plantStructureOverrides
+   (mixerSteelMaterial & co — they sit outside the recipe system on purpose). */
+const BRUSHED_STEEL = { color: '#cfd3d6', roughness: 0.38, metalness: 0.8, clearcoat: 0.3, clearcoatRoughness: 0.25, envMapIntensity: 1.7, anisotropy: 0.6 };
+
+/* Phase 101 (Murat): the model is an all-white maquette. Every recipe key is
+   kept — the mesh-name tables below still route through them — but every
+   coloured one now resolves to the same white glazed ceramic; the only
+   texture in the scene is the Concrete034 set on the concrete parts
+   (RECIPE_MAPS), and the two glass recipes are clear white glass. To bring a
+   colour back, change one line here. */
+const SURFACE_RECIPES = {
+  porcelain: { color: WHITE, ...CERAMIC },
+  /* shell* recipes look identical to their solid counterparts but own
+     dedicated material instances per structure: selecting a structure fades
+     ITS shell to reveal the interior (mixers in the tank, CHP in the
+     container, desk behind the SCADA glass) while everything else in the
+     scene stays solid. */
+  shell: { color: WHITE, ...CERAMIC },
+  shellRoof: { color: WHITE, ...CERAMIC },
+  shellGlass: { ...CLEAR_GLASS },
+  shellBrand: { color: WHITE, ...CERAMIC },
+  shellBrandRib: { color: WHITE, ...CERAMIC },
+  shellStone: { color: '#e6e8e3', ...CONCRETE },
+  stone: { color: '#e6e8e3', ...CONCRETE },
+  ochre: { color: WHITE, ...CERAMIC },
+  graphite: { color: WHITE, ...CERAMIC },
+  steel: { color: WHITE, ...CERAMIC },
+  steelPipe: { color: WHITE, ...CERAMIC },
+  galv: { color: WHITE, ...CERAMIC },
+  brand: { color: WHITE, ...CERAMIC },
+  brandRib: { color: WHITE, ...CERAMIC },
+  heatRed: { color: WHITE, ...CERAMIC },
+  sun: { color: WHITE, ...CERAMIC },
+  equipRed: { color: WHITE, ...CERAMIC },
+  navy: { color: WHITE, ...CERAMIC },
+  slurry: { color: WHITE, ...CERAMIC },
+  winGlass: { ...CLEAR_GLASS },
+  screenGlow: { color: WHITE, ...CERAMIC },
+  mixerMetal: { ...BRUSHED_STEEL },
+  propellerRed: { color: '#d0261c', roughness: 0.12, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.1, envMapIntensity: 1.2 },
+};
+
+/* ── Texture hooks (texture readiness) ────────────────────────────────────
+   These materials are built imperatively (materialFromRecipe) because they
+   are assigned during a GLTF traverse, so maps are loaded once through a
+   TextureLoader and attached by recipe key from the table below. Drop a PBR
+   set into public/textures/<name>/ and list its slots here; every slot is
+   optional, and a file that fails to load just leaves the recipe's flat
+   colour (no black flash: a map is attached only once it has loaded).
+
+   For materials declared in JSX the drei form is the same idea:
+   // To add custom textures later, uncomment and update the paths:
+   // const textureProps = useTexture({ normalMap: '/textures/ceramic_normal.jpg', roughnessMap: '/textures/ceramic_roughness.jpg' })
+   // Then spread {...textureProps} inside the meshPhysicalMaterial.
+
+   `repeat` is in texture tiles per world unit, so a 2 m concrete tile is
+   0.5; `normalScale` tames or boosts the relief. Concrete034 is the
+   ambientCG set Murat supplied (downsampled to 1K for the web). */
+const RECIPE_MAPS = {
+  stone: {
+    map: '/textures/concrete034/color.jpg',
+    normalMap: '/textures/concrete034/normal_gl.jpg',
+    roughnessMap: '/textures/concrete034/roughness.jpg',
+    repeat: 0.35, normalScale: 0.55,
+  },
+  shellStone: {
+    map: '/textures/concrete034/color.jpg',
+    normalMap: '/textures/concrete034/normal_gl.jpg',
+    roughnessMap: '/textures/concrete034/roughness.jpg',
+    repeat: 0.35, normalScale: 0.55,
+  },
+  // porcelain: { normalMap: '/textures/ceramic/normal.jpg', roughnessMap: '/textures/ceramic/roughness.jpg', repeat: 0.5, normalScale: 0.3 },
+  // Brushed-metal set for the mixers (ambientCG "MetalXXX" style names):
+  // mixerMetal: { map: '/textures/metal/color.jpg', normalMap: '/textures/metal/normal_gl.jpg', roughnessMap: '/textures/metal/roughness.jpg', metalnessMap: '/textures/metal/metalness.jpg', repeat: 2, normalScale: 0.5 },
+};
+
+const textureLoader = new THREE.TextureLoader();
+const textureCache = new Map();
+function loadSharedTexture(url, slot, repeat) {
+  const cacheKey = `${url}|${repeat}`;
+  if (!textureCache.has(cacheKey)) {
+    textureCache.set(cacheKey, new Promise((resolve, reject) => {
+      textureLoader.load(url, (texture) => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(repeat, repeat);
+        texture.colorSpace = slot === 'map' ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+        texture.anisotropy = 8;
+        resolve(texture);
+      }, undefined, reject);
+    }));
+  }
+  return textureCache.get(cacheKey);
+}
+function attachRecipeMaps(material, key) {
+  const maps = RECIPE_MAPS[key];
+  if (!maps) return;
+  const { repeat = 1, normalScale = 1, ...slots } = maps;
+  Object.entries(slots).forEach(([slot, url]) => {
+    loadSharedTexture(url, slot, repeat).then((texture) => {
+      material[slot] = texture;
+      if (slot === 'normalMap') material.normalScale.set(normalScale, normalScale);
+      material.needsUpdate = true;
+    }).catch(() => { /* missing file: keep the flat recipe colour */ });
+  });
+}
+
+function materialFromRecipe(key) {
+  const recipe = SURFACE_RECIPES[key];
+  const material = 'clearcoat' in recipe
+    ? new THREE.MeshPhysicalMaterial(recipe)
+    : new THREE.MeshStandardMaterial(recipe);
+  attachRecipeMaps(material, key);
+  return material;
+}
+
+const SHELL_RECIPE_KEYS = new Set(['shell', 'shellRoof', 'shellGlass', 'shellBrand', 'shellBrandRib', 'shellStone']);
+
+/* baseName → recipe key. The structure-specific map wins, then this global
+   map, then the structure's default. Names come from the GLB inventory plus
+   the meshes plantStructureOverrides adds at runtime. */
+const GLOBAL_MESH_RECIPES = {
+  foundation_pad: 'stone', wall_plinth: 'stone', pool_pad: 'stone', pool_wall: 'stone',
+  slab: 'stone', heat_pipe_sleeper: 'stone',
+  roof: 'graphite', roof_fascia: 'graphite', roof_vent: 'steel', roof_ac_unit: 'steel',
+  window: 'winGlass', door: 'brand', door_handle: 'steel', radio_mast: 'steel',
+  canopy_post: 'steel',
+  inline_valve_body: 'navy', inline_valve_flange: 'steelPipe',
+  inline_valve_stem: 'steel', inline_valve_wheel: 'equipRed',
+};
+
+const STRUCTURE_MESH_RECIPES = {
+  digester: {
+    tank_wall: 'shellBrand', wall_rib: 'shellBrandRib', wall_band: 'shellBrand',
+    dome_hatch: 'shell', top_ring: 'shell',
+    dome_walkway: 'galv', top_platform: 'galv', stair_tread: 'galv', walkway_inner_kerb: 'galv',
+    stair_stringer: 'steel', stair_handrail_1: 'steel', stair_handrail_2: 'steel',
+    walkway_rail: 'steel', walkway_midrail: 'steel', walkway_post: 'steel',
+    platform_rail: 'steel', platform_post: 'steel', rail_post: 'steel',
+    feed_nozzle: 'steelPipe', feed_nozzle_flange: 'steelPipe',
+    heat_inlet_nozzle: 'heatRed', heat_inlet_nozzle_flange: 'heatRed',
+    heat_return_nozzle: 'heatRed', heat_return_nozzle_flange: 'heatRed',
+    heating_coil_row: 'heatRed', coil_jumper: 'heatRed',
+    pressure_relief_valve: 'sun', relief_cap: 'sun',
+  },
+  engine_room: {
+    container_wall: 'shell', door: 'shellBrand', container_frame: 'graphite', container_stack: 'steel',
+    container_fan: 'graphite', container_hazard_stripe: 'sun',
+    engine_block: 'equipRed', cylinder_head: 'porcelain', valve_cover: 'graphite',
+    generator: 'steel', generator_endcap: 'graphite', generator_fin: 'steel',
+    exhaust_manifold: 'heatRed', exhaust_riser: 'heatRed', exhaust_runner: 'heatRed',
+    exhaust_stack: 'steel', exhaust_cap: 'steel',
+    heat_exchanger: 'steelPipe', oil_sump: 'graphite', engine_skid: 'graphite',
+    coupling_guard: 'sun', flywheel: 'graphite', control_panel: 'graphite', panel_face: 'screenGlow',
+    radiator_fan: 'graphite',
+  },
+  pump_room: {
+    slab: 'ochre', roof: 'shellRoof', roof_fascia: 'shellRoof',
+    pump_volute: 'equipRed', pump_motor: 'navy', motor_fin: 'steel', motor_terminal_box: 'graphite',
+    pump_baseplate: 'graphite', pump_mcc_cabinet: 'graphite',
+    pump_suction: 'steelPipe', pump_discharge: 'steelPipe',
+    discharge_header: 'steelPipe', header_riser: 'steelPipe',
+  },
+  scada_room: {
+    wall_front: 'shell', wall_back: 'shell', wall_left: 'shell', wall_right: 'shell',
+    roof: 'shellRoof', roof_fascia: 'shellRoof', window: 'shellGlass', door: 'shellBrand',
+    operator_desk: 'graphite', desk_panel: 'porcelain', keyboard: 'graphite',
+    monitor: 'graphite', monitor_screen: 'screenGlow', monitor_stand: 'steel',
+    mimic_board: 'graphite', mimic_screen: 'screenGlow',
+    scada_cabinet: 'graphite', cabinet_led: 'screenGlow',
+    chair_back: 'graphite', chair_base: 'graphite', chair_post: 'steel', chair_seat: 'graphite',
+  },
+  feed_pool: {
+    pool_wall: 'shellStone', pool_rim: 'shellStone', pool_cover: 'shellRoof',
+    pool_liner: 'graphite', substrate_surface: 'slurry',
+    pool_bridge: 'steel', pool_feed_chute: 'steel',
+    pool_mixer_shaft: 'mixerMetal', pool_mixer_drive: 'mixerMetal', pool_mixer_blade: 'propellerRed',
+  },
+  site_piping: {
+    gas_pipe_support: 'steel', cable_tray_post: 'galv',
+    heat_main: 'heatRed', heat_inlet: 'heatRed', heat_return: 'heatRed',
+    heat_inlet_tee: 'heatRed', heat_return_tee: 'heatRed', heat_wall_flange_chp: 'heatRed',
+  },
+};
+
+const STRUCTURE_DEFAULT_RECIPE = {
+  digester: 'porcelain', engine_room: 'porcelain', pump_room: 'porcelain',
+  scada_room: 'porcelain', feed_pool: 'porcelain', site_piping: 'steelPipe',
+};
+
+/* Phase 105: plain alpha glass. `transmission` made three render the entire
+   scene a second time into a transmission target on every frame — the single
+   most expensive thing in the scene, for a dome on a white maquette that reads
+   just as well as a 35% glass. */
+const FORCEFIELD_GLASS = {
+  color: '#ffffff',
+  transmission: 0,
+  opacity: 0.36,
+  transparent: true,
+  // Near-clear rather than frosted: at roughness .3 the interior turned to
+  // fog, and seeing in is the whole point of the dome.
+  roughness: 0.08,
+  ior: 1.35,
+  thickness: 0.6,
+  metalness: 0,
+  clearcoat: 1,
+  clearcoatRoughness: 0.05,
+  envMapIntensity: 1.4,
+  // Phase 101: no self-lit tint — the maquette is white, the dome is clear.
+  emissive: '#000000',
+  emissiveIntensity: 0,
+  // Single-sided glass reads as a cut-open crescent from the hero angle.
+  side: THREE.DoubleSide,
+};
+
+/* ── Engineering edges ───────────────────────────────────────────────────────
+   drei's <Edges> is JSX-only and these meshes arrive from a GLTF traverse, so
+   this is the same thing imperatively: an EdgesGeometry outline parented to
+   each mesh, which inherits its transform and stays welded to it. */
+/* Coloured surfaces carry the read now, so the constant outline drops from a
+   green marker pen to a faint ink pencil — hover/selection keep the green. */
+const EDGE_COLOR = '#2a3d31';
+const EDGE_OPACITY = 0.16;
+// Degrees. Low values outline every tessellation seam on a curved tank; this
+// keeps only edges a draughtsman would actually draw.
+const EDGE_THRESHOLD_ANGLE = 22;
+// Bolts, handles and flange rings cost a draw call each and read as fuzz at
+// hero framing, so anything smaller than this is left un-outlined.
+const EDGE_MIN_RADIUS = 0.14;
+
+function edgeGeometryFor(geometry, cache) {
+  if (!cache.has(geometry)) {
+    const edges = new THREE.EdgesGeometry(geometry, EDGE_THRESHOLD_ANGLE);
+    const usable = edges.attributes.position.count > 0;
+    if (!usable) edges.dispose();
+    cache.set(geometry, usable ? edges : null);
+  }
+  return cache.get(geometry);
+}
+
+/* One mesh's outline as a fresh, un-transformed copy the caller can carry into
+   another frame and merge; null when the part is too small to outline. */
+function edgeGeometryPiece(mesh, cache) {
+  if (!mesh.geometry.boundingSphere) mesh.geometry.computeBoundingSphere();
+  if (mesh.geometry.boundingSphere.radius < EDGE_MIN_RADIUS) return null;
+  const geometry = edgeGeometryFor(mesh.geometry, cache);
+  return geometry ? geometry.clone() : null;
+}
+
+// Unselected structures ghost back to this fraction of their own opacity.
+const XRAY_OPACITY = 0.12;
+const XRAY_DURATION = reduceMotion ? 0.01 : 0.55;
+
 const plantData = {
   digester: {
     title: 'Çürütücü',
-    description: 'Organik atıkların metan gazına dönüştüğü mezofilik reaktör merkezi.',
-    photo: '/images/equipment/digester-exterior.jpg',
+    identity: 'Ø24 m · mezofilik 38–42 °C · çift membran kubbe',
+    description: 'Organik atıkların oksijensiz ortamda biyogaza dönüştüğü mezofilik reaktör. Isıtma devresi kojenerasyonun atık ısısıyla beslenir.',
+    photo: '/images/equipment/digester-exterior.webp',
     subComponents: [
       {
-        name: 'Tabliye ve Perde Karıştırıcıları',
-        spec: '15 kW, 320 RPM',
-        description: 'Reaktör içindeki biyokütlenin homojen dağılımını sağlayan, kabuk ve sedimentasyon oluşumunu önleyen çift katmanlı karıştırma sistemi.',
+        name: 'Arma Mix Twin Karıştırıcılar',
+        spec: '15–22 kW · yavaş devirli · tek şaft, çift pervane',
+        description: 'Duvara eğimli monte edilen dalgıç karıştırıcılar; tek uzun şaft üzerindeki iki pervane, yüzey kabuklaşmasını ve taban çökeltisini önleyerek reaktör içeriğini homojen tutar.',
         specs: [
-          'Tabliye (Deck) Karıştırıcıları: Armatech Twin',
-          'Perde (Wall) Karıştırıcıları: Armatech Evoplus'
+          'Referans ürün: Armatec Arma Mix Twin',
+          'Tek şaft (5,5 m’ye kadar), üzerinde iki pervane Ø880–1000 mm',
+          'Kırmızı motor + redüktör, 45° döndürülmüş elmas flanş',
+          'Duvara 45°’ye kadar eğimli montaj — devir sayısı projeye göre belirlenir'
         ],
-        photo: '/images/equipment/digester-mixer.jpg'
+        photo: '/images/equipment/digester-mixer.webp'
       },
       {
         name: 'Isıtma Eşanjörü',
@@ -55,7 +405,7 @@ const plantData = {
           'Kojenerasyon atık ısısıyla beslenir',
           'Duvar içi gömülü spiral boru yerleşimi'
         ],
-        photo: '/images/equipment/digester-heat-exchanger.jpg'
+        photo: '/images/equipment/digester-heat-exchanger.webp'
       },
       {
         name: 'Enstrümantasyon ve Sensörler',
@@ -66,14 +416,16 @@ const plantData = {
           'PT100 Sıcaklık Sensörleri',
           'Biyogaz Basınç Transmitterleri',
           'pH ve Redoks (ORP) Ölçüm Probları'
-        ]
+        ],
+        photo: '/images/equipment/digester-sensors.webp'
       }
     ]
   },
   engine_room: {
     title: 'Kojenerasyon Odası',
+    identity: '1,2 MW elektrik · >%42 elektriksel verim · 85 °C ısı geri kazanımı',
     description: 'Üretilen biyogazın elektrik ve ısı enerjisine dönüştürüldüğü kojenerasyon ünitesi.',
-    photo: '/images/equipment/engine-room.jpg',
+    photo: '/images/equipment/engine-room.webp',
     subComponents: [
       {
         name: 'Gaz Motoru (V12)',
@@ -85,7 +437,7 @@ const plantData = {
           'Otomatik yük takibi (load-following) kontrolü',
           'Gerçek zamanlı emisyon izleme (NOx / CO)'
         ],
-        photo: '/images/equipment/engine-room.jpg'
+        photo: '/images/equipment/engine-room.webp'
       },
       {
         name: 'Egzoz Isı Geri Kazanımı',
@@ -97,14 +449,15 @@ const plantData = {
           'Reaktör ısıtma devresine entegre',
           'Otomatik bypass ve aşırı ısınma koruması'
         ],
-        photo: '/images/equipment/engine-room-heat-recovery.jpg'
+        photo: '/images/equipment/engine-room-heat-recovery.webp'
       }
     ]
   },
   pump_room: {
     title: 'Pompa Odası',
+    identity: '80 m³/h transfer · loblu pompa + maseratör · açık sundurma',
     description: 'Tesis içi substrat ve atık transferinin yönetildiği hidrolik merkez.',
-    photo: '/images/equipment/pump-room.jpg',
+    photo: '/images/equipment/pump-room.webp',
     subComponents: [
       {
         name: 'Loblu Pompa (Rotary Lobe)',
@@ -116,7 +469,7 @@ const plantData = {
           'Değiştirilebilir aşınma plakaları (wear plate)',
           'Kuru çalışmaya karşı mekanik salmastra koruması'
         ],
-        photo: '/images/equipment/pump-room-lobe-pump.jpg'
+        photo: '/images/equipment/pump-room-lobe-pump.webp'
       },
       {
         name: 'Maseratör (Parçalayıcı)',
@@ -128,14 +481,15 @@ const plantData = {
           'Hat üzerine (in-line) flanşlı montaj',
           'Aşırı yük algılama ve otomatik ters yön (reverse) fonksiyonu'
         ],
-        photo: '/images/equipment/pump-room-macerator.jpg'
+        photo: '/images/equipment/pump-room-macerator.webp'
       }
     ]
   },
   scada_room: {
     title: 'SCADA Kontrol Odası',
+    identity: '7/24 izleme · CH₄ / H₂S analizi · PLC otomasyon',
     description: 'Tesisin tüm otomasyon, ölçüm ve güvenlik verilerinin anlık olarak izlendiği beyin.',
-    photo: '/images/equipment/scada-room.jpg',
+    photo: '/images/equipment/scada-room.webp',
     subComponents: [
       {
         name: 'Biyogaz Analizörü',
@@ -147,7 +501,7 @@ const plantData = {
           'Yüksek H₂S alarm eşiği bildirimi',
           '4-20mA / Modbus çıkışlı PLC entegrasyonu'
         ],
-        photo: '/images/equipment/scada-gas-analyzer.jpg'
+        photo: '/images/equipment/scada-gas-analyzer.webp'
       },
       {
         name: 'Ana PLC Panosu',
@@ -159,14 +513,15 @@ const plantData = {
           'Yedekli güç kaynağı (redundant PSU)',
           'Alarm ve olay kayıt (event log) sistemi'
         ],
-        photo: '/images/equipment/scada-plc-panel.jpg'
+        photo: '/images/equipment/scada-plc-panel.webp'
       }
     ]
   },
   feed_pool: {
     title: 'Besleme Havuzu',
+    identity: 'Günlük besleme · homojenizasyon · dalgıç karıştırıcı',
     description: 'Tesise gelen günlük taze atıkların homojenize edilip sisteme hazırlandığı ön kabul ünitesi.',
-    photo: '/images/equipment/feed-pool.jpg',
+    photo: '/images/equipment/feed-pool.webp',
     subComponents: [
       {
         name: 'Dalgıç Karıştırıcı',
@@ -178,21 +533,22 @@ const plantData = {
           'Paslanmaz çelik pervane',
           'Seviye sensörüyle otomatik çalışma senkronizasyonu'
         ],
-        photo: '/images/equipment/feed-pool.jpg',
+        photo: '/images/equipment/feed-pool.webp',
         video: '/videos/digester-mixer.mp4'
       }
     ]
   },
   
   biogas_mixer: {
-    title: 'Ağır Hizmet Dalgıç Karıştırıcı & Homojenizatör',
-    description: 'Yüksek Verimli Hidrodinamik Biyogaz Mikseri',
-    photo: '/images/equipment/digester-mixer.jpg',
+    title: 'Arma Mix Twin Dalgıç Karıştırıcı',
+    identity: '15–22 kW · IE4 · AISI 304/316',
+    description: 'Reaktör duvarına eğimli monte edilen, tek şaft üzerinde iki pervane taşıyan dalgıç karıştırıcı ve homojenizatör.',
+    photo: '/images/equipment/digester-mixer.webp',
     specs: [
-      '⚙️ Motor Gücü: 15 - 22 kW (IE4 Süper Premium Verim)',
-      '🌪️ Pervane Tipi: Özel Açılı Çift/Üç Kanatlı Helisel Bıçak (Kırmızı Koruma Kaplamalı)',
-      '🛡️ Malzeme Dayanımı: AISI 304 / 316 Paslanmaz Çelik, Agresif pH ve H2S Koruması',
-      '🎯 Fonksiyon: Yüzey kabuklaşmasını önleme, taban çökeltisi giderme ve homojen sıcaklık dağılımı.'
+      'Motor gücü: 15–22 kW (IE4 verim sınıfı)',
+      'Tek şaft üzerinde iki pervane, Ø880–1000 mm',
+      'AISI 304/316 paslanmaz gövde; agresif pH ve H₂S koruması',
+      'Fonksiyon: kabuklaşma önleme, taban çökeltisi giderme, homojen sıcaklık dağılımı'
     ],
     subComponents: [],
     returnTo: 'digester'
@@ -308,9 +664,11 @@ function createDigesterWallAlbedoTexture() {
   canvas.height = size;
   const ctx = canvas.getContext('2d');
 
-  ctx.fillStyle = 'rgb(214, 214, 210)';
+  // Ceramic-white panel seams: the stripe stays as engineering detail, but at
+  // this contrast it reads as a shutter line on porcelain, not a grey texture.
+  ctx.fillStyle = 'rgb(249, 250, 251)';
   ctx.fillRect(0, 0, size / 2, size);
-  ctx.fillStyle = 'rgb(196, 196, 192)';
+  ctx.fillStyle = 'rgb(238, 240, 241)';
   ctx.fillRect(size / 2, 0, size / 2, size);
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -325,6 +683,12 @@ function createDigesterWallAlbedoTexture() {
   return texture;
 }
 
+/* The part-name taxonomy below, and the three canvas-texture factories around
+   it, are no longer wired to any material: the clay pass gives every structure
+   one white finish and only the dome and the three flow channels are named
+   out. They are kept because they are the model's only map from mesh name to
+   real-world part — the reference you need the moment a part needs its own
+   treatment again. Unused code, deliberately. */
 const FOUNDATION_MESH_NAMES = new Set(['foundation_pad', 'wall_plinth', 'slab', 'pool_pad']);
 
 const DIGESTER_LATTICE_MESH_NAMES = new Set(['wall_rib', 'wall_band']);
@@ -478,13 +842,14 @@ function FeedPipeGapFill() {
       raycast={() => null}
     >
       <cylinderGeometry args={[FEED_PIPE_GAP_RADIUS, FEED_PIPE_GAP_RADIUS, length, 20]} />
-      <meshStandardMaterial color="#c0c0c0" roughness={1} metalness={0.1} />
+      {/* Matches the feed line's painted steel, or the joint shows up. */}
+      <meshStandardMaterial color="#d3d9da" metalness={0.55} roughness={0.3} />
     </mesh>
   );
 }
 
 const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected, flowActive, cutawayOpen }) {
-  const { scene: cachedScene } = useGLTF(MODEL_SRC);
+  const { scene: cachedScene } = useGLTF(modelSrc, DRACO_DECODER_PATH);
   const scene = useMemo(() => new THREE.Group(), []);
   
   const materialsRef = useRef(new Map());
@@ -496,13 +861,21 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
   
   const namedMeshMaterialsRef = useRef(new Map());
   
-  const digesterMixersRef = useRef({ propellerHubs: [], beacons: [] });
+  const digesterMixersRef = useRef({ propellerHubs: [], beacons: [], fanHubs: [] });
+  const domeMaterialRef = useRef(null);
   
   const tankWallMeshesRef = useRef([]);
-  
+
+  /* Per structure: the shell materials + meshes that go see-through when THAT
+     structure is selected, and the structure's outline material so the green
+     ink fades with the skin it traces. */
+  const shellSetsRef = useRef(new Map());
+  const edgeMaterialsRef = useRef(new Map());
+
   const flowUniformsRef = useRef([]);
 
   const canvasEl = useThree((state) => state.gl.domElement);
+  const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
   useEffect(() => {
     const reset = () => {
@@ -542,295 +915,89 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     scene.add(owned);
     const plantRoot = owned.getObjectByName('biogas_plant') ?? owned;
     plantRootRef.current = plantRoot;
+    // Dev-only handle for inspecting the live scene graph from the console.
+    if (import.meta.env.DEV) window.__IONA_PLANT = plantRoot;
 
-    const { propellerHubs, beacons } = applyStructureOverrides(plantRoot);
-    digesterMixersRef.current = { propellerHubs, beacons };
+    const { propellerHubs, beacons, fanHubs } = applyStructureOverrides(plantRoot);
+    digesterMixersRef.current = { propellerHubs, beacons, fanHubs };
 
     const materials = new Map();
     const baseYs = new Map();
     const hoverUniforms = new Map();
     const namedMeshMaterials = new Map();
-    
+
     const tankWallMeshes = [];
+    const shellSets = new Map();
     
     const flowUniforms = [];
 
-    const sandwichPanelTexture = createSandwichPanelBumpTexture();
+    const edgeMaterials = new Map();
+    const edgeGeometries = new Map();
+    const edgeTargets = [];
+    const structureRecipeGetters = new Map();
     plantRoot.children.forEach((structure) => {
-
-      const material = new THREE.MeshPhysicalMaterial({
-        color: '#dcded7',
-        roughness: 0.88,
-        metalness: 0.02,
-        clearcoat: 0,
-        clearcoatRoughness: 0,
-      });
-      const uniformsList = [attachHoverWormShader(material)];
+      /* One recipe set, but material INSTANCES per structure. A single shared
+         instance would silently break selection: the x-ray pass fades a
+         structure through the materials it owns, and it drops any material
+         owned by two structures (materialOwners.size > 1 below), so a global
+         instance would ghost nothing at all. The hover and flow shaders are
+         per-material too. */
+      const recipeCache = new Map();
+      const uniformsList = [];
+      const getRecipeMaterial = (key) => {
+        if (!recipeCache.has(key)) {
+          const recipeMaterial = materialFromRecipe(key);
+          uniformsList.push(attachHoverWormShader(recipeMaterial));
+          recipeCache.set(key, recipeMaterial);
+        }
+        return recipeCache.get(key);
+      };
+      structureRecipeGetters.set(structure.name, getRecipeMaterial);
+      const material = getRecipeMaterial(STRUCTURE_DEFAULT_RECIPE[structure.name] ?? 'porcelain');
       const structureNamedMaterials = new Map();
 
-      if (structure.name === 'digester') {
-        
-        const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#d3d8ce',
-          metalness: 0.08,
-          roughness: 0.84,
-          map: createDigesterWallAlbedoTexture(),
-          
-          depthWrite: true,
-          depthTest: true,
-        });
-        wallMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(wallMaterial));
-        structureNamedMaterials.set(DIGESTER_WALL_MESH_NAME, wallMaterial);
+      const edgeMaterial = new THREE.LineBasicMaterial({
+        color: EDGE_COLOR,
+        transparent: true,
+        opacity: EDGE_OPACITY,
+        // Outlines sit on the surface they trace; writing depth makes them
+        // z-fight with it.
+        depthWrite: false,
+      });
+      edgeMaterials.set(structure.name, edgeMaterial);
 
+      if (structure.name === 'digester') {
         const domeMaterial = new THREE.MeshPhysicalMaterial({
-          color: '#bfc8b7',
-          metalness: 0.18,
-          roughness: 0.62,
-          clearcoat: 0.08,
-          clearcoatRoughness: 0.15,
-          anisotropy: 0.15,
-          anisotropyRotation: Math.PI / 2,
-          depthWrite: true,
+          ...FORCEFIELD_GLASS,
+          depthWrite: false,
           depthTest: true,
+          /* One world-space plane, constant animated by the lid effect below;
+             gl.localClippingEnabled is switched on in handleCanvasCreated. */
+          clippingPlanes: [new THREE.Plane(DOME_CUT_NORMAL.clone(), DOME_CUT_CLOSED)],
         });
         domeMaterial.needsUpdate = true;
+        domeMaterialRef.current = domeMaterial;
         uniformsList.push(attachHoverWormShader(domeMaterial));
         DIGESTER_DOME_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, domeMaterial));
-
-        const pipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#858c83',
-          metalness: 0.72,
-          roughness: 0.36,
-        });
-        pipeMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(pipeMaterial));
-        DIGESTER_PIPE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, pipeMaterial));
-
-        const railingMaterial = new THREE.MeshStandardMaterial({
-          color: '#555f53',
-          metalness: 0.65,
-          roughness: 0.45,
-        });
-        railingMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(railingMaterial));
-        DIGESTER_RAILING_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, railingMaterial));
-
-        const gratingMaterial = new THREE.MeshStandardMaterial({
-          color: '#bfc2b7',
-          metalness: 0.5,
-          roughness: 0.58,
-        });
-        gratingMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(gratingMaterial));
-        DIGESTER_GRATING_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, gratingMaterial));
-      }
-
-      if (['pump_room', 'engine_room', 'scada_room'].includes(structure.name)) {
-        
-        const sandwichPanelMaterial = new THREE.MeshStandardMaterial({
-          color: '#cccbbf',
-          metalness: 0.18,
-          roughness: 0.72,
-          bumpMap: sandwichPanelTexture,
-          bumpScale: 0.12,
-        });
-        sandwichPanelMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(sandwichPanelMaterial));
-        BUILDING_WALL_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, sandwichPanelMaterial));
-
-        const roofMaterial = new THREE.MeshStandardMaterial({
-          color: '#48624b',
-          metalness: 0.3,
-          roughness: 0.65,
-        });
-        roofMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(roofMaterial));
-        BUILDING_ROOF_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, roofMaterial));
-
-        const windowMaterial = new THREE.MeshPhysicalMaterial({
-          color: '#1e2b33',
-          metalness: 0.2,
-          roughness: 0.08,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.05,
-        });
-        windowMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(windowMaterial));
-        BUILDING_WINDOW_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, windowMaterial));
-
-        const doorMaterial = new THREE.MeshStandardMaterial({
-          color: '#198837',
-          metalness: 0.25,
-          roughness: 0.58,
-        });
-        doorMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(doorMaterial));
-        BUILDING_DOOR_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, doorMaterial));
-
-        const doorHandleMaterial = new THREE.MeshStandardMaterial({
-          color: '#c7c9cc',
-          metalness: 0.85,
-          roughness: 0.25,
-        });
-        doorHandleMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(doorHandleMaterial));
-        BUILDING_DOOR_HANDLE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, doorHandleMaterial));
-
-        const mastMaterial = new THREE.MeshStandardMaterial({
-          color: '#9a9d9f',
-          metalness: 0.75,
-          roughness: 0.3,
-        });
-        mastMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(mastMaterial));
-        BUILDING_MAST_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, mastMaterial));
-
-        const stackMaterial = new THREE.MeshStandardMaterial({
-          color: '#7e8184',
-          metalness: 0.75,
-          roughness: 0.3,
-        });
-        stackMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(stackMaterial));
-        BUILDING_STACK_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, stackMaterial));
-
-        const grilleTexture = createGratingTexture();
-        grilleTexture.repeat.set(3, 3);
-        grilleTexture.needsUpdate = true;
-        const mechCasingMaterial = new THREE.MeshStandardMaterial({
-          
-          color: '#a0a3a5',
-          metalness: 0.7,
-          roughness: 0.3,
-          map: grilleTexture,
-          bumpMap: grilleTexture,
-          bumpScale: 0.2,
-        });
-        mechCasingMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(mechCasingMaterial));
-        BUILDING_MECH_CASING_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, mechCasingMaterial));
-
-        const buildingPipeMaterial = new THREE.MeshStandardMaterial({
-          color: '#92988c',
-          metalness: 0.72,
-          roughness: 0.38,
-        });
-        buildingPipeMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(buildingPipeMaterial));
-        BUILDING_PIPE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, buildingPipeMaterial));
-
-        const structuralSteelMaterial = new THREE.MeshStandardMaterial({
-          color: '#596353',
-          metalness: 0.6,
-          roughness: 0.5,
-        });
-        structuralSteelMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(structuralSteelMaterial));
-        BUILDING_STRUCTURAL_STEEL_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, structuralSteelMaterial));
-      }
-
-      if (structure.name === 'engine_room') {
-        
-        const wallMaterial = new THREE.MeshStandardMaterial({
-          color: '#d3d8ce',
-          metalness: 0.08,
-          roughness: 0.84,
-        });
-        wallMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(wallMaterial));
-        ENGINE_ROOM_WALL_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, wallMaterial));
-
-        const frameMaterial = new THREE.MeshStandardMaterial({
-          color: '#54585c',
-          metalness: 0.35,
-          roughness: 0.45,
-        });
-        frameMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(frameMaterial));
-        ENGINE_ROOM_FRAME_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, frameMaterial));
-
-        const stackMaterial = new THREE.MeshStandardMaterial({
-          color: '#c7cbce',
-          metalness: 0.6,
-          roughness: 0.3,
-        });
-        stackMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(stackMaterial));
-        ENGINE_ROOM_STACK_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, stackMaterial));
-
-        const fanMaterial = new THREE.MeshStandardMaterial({
-          color: '#3a3d40',
-          metalness: 0.5,
-          roughness: 0.4,
-        });
-        fanMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(fanMaterial));
-        ENGINE_ROOM_FAN_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, fanMaterial));
-
-        const hazardMaterial = new THREE.MeshStandardMaterial({
-          color: '#f4c430',
-          metalness: 0.1,
-          roughness: 0.6,
-        });
-        hazardMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(hazardMaterial));
-        ENGINE_ROOM_HAZARD_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, hazardMaterial));
-      }
-
-      if (structure.name === 'feed_pool') {
-        
-        const poolWallMaterial = new THREE.MeshStandardMaterial({
-          color: '#f8fafc',
-          metalness: 0.0,
-          roughness: 1.0,
-        });
-        poolWallMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(poolWallMaterial));
-        structureNamedMaterials.set(POOL_WALL_MESH_NAME, poolWallMaterial);
-
-        const poolHardwareMaterial = new THREE.MeshStandardMaterial({
-          color: '#9a9c9e',
-          metalness: 0.7,
-          roughness: 0.4,
-        });
-        poolHardwareMaterial.needsUpdate = true;
-        uniformsList.push(attachHoverWormShader(poolHardwareMaterial));
-        FEED_POOL_HARDWARE_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, poolHardwareMaterial));
       }
 
       if (structure.name === 'site_piping') {
-        
-        const feedMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b', metalness: 0.1, roughness: 0.8,
+        /* Three flow channels with their own painted identity — steel feed
+           line, safety-yellow gas line, galvanized cable tray — each with the
+           process-tour pulse shader patched onto its own material instance.
+           (A material takes one onBeforeCompile, so channels get the flow
+           shader instead of the hover worm.) */
+        [
+          [SITE_PIPING_FEED_MESH_NAMES, FLOW_FEED_COLOR, 'steelPipe'],
+          [SITE_PIPING_GAS_MESH_NAMES, FLOW_GAS_COLOR, 'sun'],
+          [SITE_PIPING_POWER_MESH_NAMES, FLOW_POWER_COLOR, 'galv'],
+        ].forEach(([meshNames, flowColor, recipeKey]) => {
+          const channelMaterial = materialFromRecipe(recipeKey);
+          channelMaterial.needsUpdate = true;
+          flowUniforms.push(attachFlowPulseShader(channelMaterial, flowColor));
+          meshNames.forEach((name) => structureNamedMaterials.set(name, channelMaterial));
         });
-        feedMaterial.needsUpdate = true;
-        flowUniforms.push(attachFlowPulseShader(feedMaterial, FLOW_FEED_COLOR));
-        SITE_PIPING_FEED_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, feedMaterial));
-
-        const gasMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b', metalness: 0.1, roughness: 0.8,
-        });
-        gasMaterial.needsUpdate = true;
-        flowUniforms.push(attachFlowPulseShader(gasMaterial, FLOW_GAS_COLOR));
-        SITE_PIPING_GAS_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, gasMaterial));
-
-        const powerMaterial = new THREE.MeshStandardMaterial({
-          color: '#64748b', metalness: 0.1, roughness: 0.8,
-        });
-        powerMaterial.needsUpdate = true;
-        flowUniforms.push(attachFlowPulseShader(powerMaterial, FLOW_POWER_COLOR));
-        SITE_PIPING_POWER_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, powerMaterial));
       }
-
-      const concreteMaterial = new THREE.MeshStandardMaterial({
-        color: '#f8fafc',
-        metalness: 0.0,
-        roughness: 1.0,
-      });
-      concreteMaterial.needsUpdate = true;
-      uniformsList.push(attachHoverWormShader(concreteMaterial));
-      FOUNDATION_MESH_NAMES.forEach((name) => structureNamedMaterials.set(name, concreteMaterial));
 
       hoverUniforms.set(structure.name, uniformsList);
       namedMeshMaterials.set(structure.name, structureNamedMaterials);
@@ -850,30 +1017,73 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       if (!material) return;
       
       const baseName = meshBaseName(child.name);
-      
-      if (
-        structure.name === 'digester' &&
-        (DIGESTER_LATTICE_MESH_NAMES.has(baseName) || DIGESTER_WALKWAY_FENCE_MESH_NAMES.has(baseName))
-      ) {
-        child.visible = false;
-        return;
-      }
-      
+
       if (structure.name === 'digester' && DIGESTER_MIXER_MESH_NAMES.has(baseName)) {
         return;
       }
-      
+
+      /* The ribs, bands and railings the clay pass used to hide are visible
+         again: on the green tank body they are the ANKA-style vertical sheet
+         ribs, and the walkway rails read as real galvanized hardware. */
       const override = namedMeshMaterials.get(structure.name)?.get(baseName);
-      child.material = override ?? material;
+      const recipeKey = STRUCTURE_MESH_RECIPES[structure.name]?.[baseName]
+        ?? GLOBAL_MESH_RECIPES[baseName]
+        ?? STRUCTURE_DEFAULT_RECIPE[structure.name]
+        ?? 'porcelain';
+      child.material = override ?? structureRecipeGetters.get(structure.name)(recipeKey);
       child.material.needsUpdate = true;
-      child.castShadow = true;
+      if (!override && SHELL_RECIPE_KEYS.has(recipeKey)) {
+        const entry = shellSets.get(structure.name) ?? { materials: new Set(), meshes: [] };
+        entry.materials.add(child.material);
+        entry.meshes.push(child);
+        shellSets.set(structure.name, entry);
+      }
+      // Glass must not drop a solid shadow — that was what made the old dome
+      // read as a dark metal cap from the hero angle.
+      child.castShadow = !(structure.name === 'digester' && DIGESTER_DOME_MESH_NAMES.has(baseName));
+      child.userData.ionaBaseCastShadow = child.castShadow;
       child.receiveShadow = true;
-      
+      edgeTargets.push([child, structure.name]);
+
       if (structure.name === 'digester' && baseName === DIGESTER_WALL_MESH_NAME) {
         tankWallMeshes.push(child);
       }
     });
     tankWallMeshesRef.current = tankWallMeshes;
+    shellSetsRef.current = shellSets;
+    edgeMaterialsRef.current = edgeMaterials;
+
+    /* Outlines are built after the traverse, not inside it, and merged into ONE
+       LineSegments per structure (Phase 105): ~400 per-mesh line objects were
+       ~400 draw calls a frame for what is a static drawing. Each mesh's
+       EdgesGeometry is carried into the structure's local frame so the merged
+       object rides the structure's hover lift exactly as the per-mesh lines
+       did. Meshes that move on their own (mixers) never had outlines. */
+    plantRoot.updateMatrixWorld(true);
+    const structureInverse = new Map();
+    const edgePieces = new Map();
+    edgeTargets.forEach(([mesh, structureName]) => {
+      const piece = edgeGeometryPiece(mesh, edgeGeometries);
+      if (!piece) return;
+      const structure = plantRoot.getObjectByName(structureName);
+      if (!structure) return;
+      if (!structureInverse.has(structureName)) structureInverse.set(structureName, structure.matrixWorld.clone().invert());
+      const relative = new THREE.Matrix4().multiplyMatrices(structureInverse.get(structureName), mesh.matrixWorld);
+      piece.applyMatrix4(relative);
+      if (!edgePieces.has(structureName)) edgePieces.set(structureName, []);
+      edgePieces.get(structureName).push(piece);
+    });
+    edgePieces.forEach((pieces, structureName) => {
+      const merged = mergeGeometries(pieces, false);
+      pieces.forEach((piece) => piece.dispose());
+      if (!merged) return;
+      const lines = new THREE.LineSegments(merged, edgeMaterials.get(structureName));
+      lines.name = 'engineering_edges';
+      lines.raycast = () => {}; // an outline must never intercept the click meant for the part beneath it
+      lines.frustumCulled = false;
+      resources.add(merged);
+      plantRoot.getObjectByName(structureName)?.add(lines);
+    });
 
     const collectMaterial = material => {
       resources.add(material);
@@ -885,7 +1095,10 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     });
     materials.forEach(collectMaterial);
     namedMeshMaterials.forEach(map => map.forEach(collectMaterial));
-    resources.add(sandwichPanelTexture);
+    edgeMaterials.forEach(collectMaterial);
+    // The outline cache is shared across meshes, so some entries are not
+    // reachable from a single node's geometry — collect it explicitly.
+    edgeGeometries.forEach(geometry => { if (geometry) resources.add(geometry); });
     onReady(plantRoot);
     return () => {
       owned.traverse(node => gsap.killTweensOf(node.position));
@@ -893,6 +1106,8 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       flowUniforms.forEach(u => gsap.killTweensOf(u.uFlowActive));
       resources.forEach(resource => { gsap.killTweensOf(resource); resource.dispose?.(); });
       scene.remove(owned);
+      shellSetsRef.current = new Map();
+      edgeMaterialsRef.current = new Map();
       if (plantRootRef.current === plantRoot) plantRootRef.current = null;
     };
   }, [cachedScene, scene, plantRootRef, onReady]);
@@ -900,11 +1115,64 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
   const effectiveSelectedName = selected?.name === 'biogas_mixer' ? 'digester' : selected?.name;
 
   useEffect(() => {
-    // Selection moves the camera only. Interior visibility belongs to cutaway mode.
+    // Interior visibility belongs to cutaway mode, not to selection.
     tankWallMeshesRef.current.forEach((mesh) => {
       mesh.raycast = cutawayOpen ? () => {} : THREE.Mesh.prototype.raycast;
     });
   }, [cutawayOpen]);
+
+  useEffect(() => {
+    /* Selection is an x-ray INTO the chosen structure: its own shell fades so
+       the interior reads (mixers in the tank, CHP in the container, pumps
+       under the canopy), while the rest of the site stays solid. */
+    const shellSets = shellSetsRef.current;
+    if (!shellSets.size) return;
+    shellSets.forEach((entry, name) => {
+      const faded = name === effectiveSelectedName;
+      // A see-through skin must not keep dropping an opaque shadow onto the
+      // very equipment it just revealed.
+      entry.meshes.forEach((mesh) => {
+        mesh.castShadow = faded ? false : (mesh.userData.ionaBaseCastShadow ?? true);
+      });
+      gl.shadowMap.needsUpdate = true;
+      entry.materials.forEach((material) => {
+        gsap.killTweensOf(material, 'opacity');
+        // `transparent` flips need a program rebuild; the hover shader reuses
+        // its uniform objects across compiles, so this is safe.
+        if (faded) {
+          material.transparent = true;
+          material.depthWrite = false;
+          material.needsUpdate = true;
+        }
+        gsap.to(material, {
+          opacity: faded ? 0.16 : 1,
+          duration: XRAY_DURATION,
+          ease: HOVER_EASE,
+          onUpdate: invalidate,
+          onComplete: () => {
+            if (!faded) {
+              material.transparent = false;
+              material.depthWrite = true;
+              material.needsUpdate = true;
+            }
+            invalidate();
+          },
+        });
+      });
+      // The green ink fades with the skin it traces, or a bright wireframe
+      // ghost would float where the shell used to be.
+      const edgeMaterial = edgeMaterialsRef.current.get(name);
+      if (edgeMaterial) {
+        gsap.killTweensOf(edgeMaterial, 'opacity');
+        gsap.to(edgeMaterial, {
+          opacity: faded ? EDGE_OPACITY * 0.3 : EDGE_OPACITY,
+          duration: XRAY_DURATION,
+          ease: HOVER_EASE,
+          onUpdate: invalidate,
+        });
+      }
+    });
+  }, [effectiveSelectedName, invalidate, gl]);
 
   const animateMixerHover = useCallback((isHovering) => {
     const hub = digesterMixersRef.current.propellerHubs[0];
@@ -1005,27 +1273,39 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     [plantRootRef, animateHover, animateMixerHover, selected, canvasEl]
   );
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const elapsed = reduceMotion ? 0 : state.clock.elapsedTime;
     hoverUniformsRef.current.forEach((uniformsList) => {
       uniformsList.forEach((uniforms) => {
         uniforms.uTime.value = elapsed;
       });
     });
-    if (!reduceMotion) {
-      digesterMixersRef.current.propellerHubs.forEach((hub) => {
-        hub.rotation.z += delta * 1.4;
-      });
-    }
-    digesterMixersRef.current.beacons.forEach((beacon, i) => {
-      beacon.material.emissiveIntensity = 0.6 + Math.sin(elapsed * 1.8 + i * 0.7) * 0.35;
-    });
+    /* Phase 105: propellers, roof fans and beacons are still — a display model.
+       digesterMixersRef is kept for the mixer hint and hover. The hover
+       shimmer is the one thing that runs on its own clock, so while something
+       is hovered the demand loop is kept alive frame by frame. */
+    if (hoveredNameRef.current) invalidate();
     if (!reduceMotion) {
       flowUniformsRef.current.forEach((uniforms) => {
         uniforms.uFlowTime.value = elapsed;
       });
     }
   });
+
+  /* Lid open/close: sweep the dome glass's clipping plane from outside the
+     dome (nothing cut) to the tank axis (near half gone), and back. The crown
+     fittings ride on the removed half, so they hide/show with it. */
+  useEffect(() => {
+    const material = domeMaterialRef.current;
+    const plane = material?.clippingPlanes?.[0];
+    if (!plane) return;
+    const open = selected?.name === 'digester';
+    gsap.to(plane, { constant: open ? DOME_CUT_OPEN : DOME_CUT_CLOSED, duration: DOME_CUT_DURATION, ease: 'power3.inOut', onUpdate: invalidate });
+    const digester = plantRootRef.current?.getObjectByName('digester');
+    digester?.children.forEach((child) => {
+      if (DOME_CROWN_MESH_NAMES.includes(meshBaseName(child.name))) child.visible = !open;
+    });
+  }, [selected, plantRootRef, invalidate]);
 
   useEffect(() => {
     flowUniformsRef.current.forEach((uniforms, index) => {
@@ -1062,7 +1342,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       {mixerHintPos && (
         <Html position={mixerHintPos} center distanceFactor={8}>
           <div className="pointer-events-none select-none whitespace-nowrap rounded-full border border-[#78dc77]/50 bg-black/70 backdrop-blur-md px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_0_16px_rgba(120,220,119,0.5)] animate-pulse">
-            ⚡ Dalgıç Karıştırıcı
+            Arma Mix Twin Karıştırıcı
           </div>
         </Html>
       )}
@@ -1070,17 +1350,90 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
   );
 });
 
-const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, keyLightRef, cutawayOpen }) {
+const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, siteBounds, keyLightRef, cutawayOpen, cardOverlays, cardOcclusion, copyOcclusion }) {
   const { camera, gl, size, invalidate } = useThree();
   const controlsRef = useRef(null);
   const cameraGoal = useRef(null);
+
+  /* The camera is no longer locked: the user can orbit (horizontal free,
+     polar clamped) and zoom. Any manual input drops the current framing goal
+     so the lerp stops fighting the hand; a fresh selection sets a new goal
+     and takes the camera back over. When nothing is selected and the user
+     has been idle for a while, a slow showcase orbit runs — never under
+     prefers-reduced-motion. */
+  /* Phase 98: the plant never spins on its own any more — it is a still
+     display piece (biblo); the user orbits it by hand if they want to. */
+  const idleSpinRef = useRef(false);
+  const resumeTimerRef = useRef(null);
+  const handleControlsStart = useCallback(() => {
+    cameraGoal.current = null;
+    idleSpinRef.current = false;
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+  }, []);
+  const handleControlsEnd = useCallback(() => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = null; // idle spin retired (Phase 98) — nothing to resume
+  }, []);
+  useEffect(() => () => { if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current); }, []);
   useLayoutEffect(() => {
     const root = plantRootRef.current;
     const controls = controlsRef.current;
     if (!root || !controls || !size.width || !size.height) return;
     root.updateMatrixWorld(true);
 
-    const { position, center } = fitPerspectiveObject(selected ?? root, camera, selected ? FOCUS_DIR : OVERVIEW_DIR, cutawayOpen ? 1.6 : selected ? 1.12 : 1.06);
+    /* While a panel is open it sits over the right of the viewport, so the
+       model's stage is not the canvas — it is the strip the panel leaves free.
+       `occlusion` is that panel's measured share of the canvas width, already 0
+       whenever nothing overlays (narrow layouts stack it below instead). Keyed
+       off the measurement rather than off `selected`, because the process tour
+       overlays the same way but deliberately keeps `selected` null here so the
+       framing stays on the whole site. */
+    const occlusion = cardOverlays && !cutawayOpen
+      ? Math.min(MAX_CARD_OCCLUSION, Math.max(0, cardOcclusion)) : 0;
+    /* Phase 105: the canvas now spans the whole hero, so in the overview the
+       introduction copy covers the LEFT of it the same way the card covers the
+       right during inspection. The free strip is [stageLeft, stageRight] of
+       the canvas width; the model is fitted to that width and panned to its
+       centre. Overview → plant sits right of the copy; inspecting → the copy
+       has slid out and the plant moves left, clear of the card. */
+    const stageLeft = selected ? 0 : Math.min(MAX_COPY_OCCLUSION, Math.max(0, copyOcclusion || 0));
+    const stageRight = 1 - occlusion;
+    const free = Math.max(0.3, stageRight - stageLeft);
+    const offsetFrac = (stageLeft + stageRight) / 2 - 0.5;
+    if (import.meta.env.DEV) window.__IONA_STAGE = { stageLeft, stageRight, free, offsetFrac, copyOcclusion, cardOcclusion, selected: selected?.name ?? null };
+    /* Fit against the free strip, not the whole canvas: a stand-in camera with
+       the narrowed aspect makes fitPerspectiveObject pull back until the
+       subject fits the width that is actually visible. Without this the model
+       is framed for a viewport half of which the card is about to cover, which
+       is what left it oversized and cropped. The real camera is never mutated,
+       so no projection matrix churn. */
+    const fitCamera = free < 1
+      ? { up: camera.up, near: camera.near, aspect: camera.aspect * free,
+          getEffectiveFOV: () => camera.getEffectiveFOV() }
+      : camera;
+    const focusDir = selected ? (selected.name === 'digester' ? DIGESTER_FOCUS_DIR : FOCUS_DIR) : OVERVIEW_DIR;
+    const { position, center } = fitPerspectiveObject(selected ?? root, fitCamera, focusDir, cutawayOpen ? 1.6 : selected ? 1.12 : 1.06);
+    /* Then slide that framing left so the subject is centred in the free strip
+       rather than in the canvas. Moving eye and target by the same vector is a
+       pure pan — it clears the card without re-aiming the camera, which would
+       tilt the whole site. The free strip's centre sits `occlusion / 2` of the
+       visible width left of the canvas centre, so the camera travels that far
+       to the right. `right` must be crossVectors(up, backward), the same
+       handedness cameraFit uses — the reverse points at screen-left and pushed
+       the model *under* the card. Nothing is animated here: this only moves the
+       goal, and the useFrame damping below carries the camera there. */
+    if (Math.abs(offsetFrac) > 0.001) {
+      const backward = new THREE.Vector3().subVectors(position, center);
+      const tanY = Math.tan(camera.getEffectiveFOV() * Math.PI / 360);
+      const visibleWidth = 2 * backward.length() * tanY * Math.max(camera.aspect, .01);
+      const right = new THREE.Vector3().crossVectors(camera.up, backward).normalize();
+      // Moving the camera to screen-right puts the subject to screen-left, so
+      // a strip centred right of the canvas centre (offsetFrac > 0) needs a
+      // camera move to the left: the sign is negative.
+      const shift = -visibleWidth * offsetFrac;
+      position.addScaledVector(right, shift);
+      center.addScaledVector(right, shift);
+    }
     camera.far = Math.max(500, position.distanceTo(center) + groundScale * 3);
     camera.updateProjectionMatrix();
     cameraGoal.current = {position, center};
@@ -1101,8 +1454,7 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, ke
       gl.shadowMap.needsUpdate = true;
     }
     return () => { cameraGoal.current = null; };
-  }, [selected, cutawayOpen, size.width, size.height, groundScale, groundY, camera, gl, plantRootRef, keyLightRef]);
-  const elapsed = useRef(0);
+  }, [selected, cutawayOpen, cardOverlays, cardOcclusion, copyOcclusion, size.width, size.height, groundScale, groundY, camera, gl, plantRootRef, keyLightRef]);
   useEffect(() => { gl.shadowMap.autoUpdate = false; gl.shadowMap.needsUpdate = true; }, [gl]);
   useFrame((_, delta) => {
     const goal = cameraGoal.current, controls = controlsRef.current;
@@ -1111,19 +1463,49 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, ke
       camera.position.lerp(goal.position, alpha);
       controls.target.lerp(goal.center, alpha);
       controls.update();
+      // Once the framing has landed, release the goal so the idle orbit and
+      // the user's own orbiting aren't glued back every frame.
+      if (camera.position.distanceTo(goal.position) < 0.08) cameraGoal.current = null;
+    } else if (controls && !reduceMotion) {
+      controls.autoRotate = !selected && !cutawayOpen && idleSpinRef.current;
+      if (controls.autoRotate) controls.update();
     }
-    elapsed.current += delta;
-    if (elapsed.current > SHADOW_BAKE_INTERVAL) { elapsed.current = 0; gl.shadowMap.needsUpdate = true; }
+    // Demand loop: keep frames coming only while the camera is still travelling.
+    if (cameraGoal.current) invalidate();
+    if (import.meta.env.DEV) window.__IONA_CAM = { pos: camera.position.toArray().map((v) => +v.toFixed(1)), target: controls?.target.toArray().map((v) => +v.toFixed(1)), goal: cameraGoal.current ? cameraGoal.current.position.toArray().map((v) => +v.toFixed(1)) : null, aspect: +camera.aspect.toFixed(2), fov: camera.fov };
   });
   return <>
-    <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={false} enableZoom={false} enablePan={false} />
+    <OrbitControls ref={controlsRef} enableDamping={false}
+      enableRotate enableZoom enablePan={false}
+      rotateSpeed={0.55} zoomSpeed={0.6} autoRotateSpeed={0.5}
+      minDistance={25} maxDistance={260}
+      minPolarAngle={0.3} maxPolarAngle={1.32}
+      onStart={handleControlsStart} onEnd={handleControlsEnd} />
+    {/* Two shadow layers, two jobs: this plane catches the key light's long
+        cast (opacity pulled back from .17 so the pair doesn't read as mud)... */}
     <mesh position={[0, groundY, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
       <planeGeometry args={[groundScale * 3, groundScale * 3]} />
-      <shadowMaterial transparent opacity={.17} depthWrite={false} />
+      <shadowMaterial transparent opacity={.12} depthWrite={false} />
     </mesh>
-    <Grid position={[0, groundY - .03, 0]} args={[groundScale * 1.4, groundScale * 1.4]}
-      fadeDistance={groundScale * 1.3} fadeStrength={2} cellSize={5} cellThickness={.35}
-      cellColor="#dddddd" sectionSize={25} sectionThickness={.5} sectionColor="#c8c8c8" />
+    {/* ...and this one is the tight ambient contact darkening right where each
+        foundation meets the ground — the thing that stops the plant floating.
+        `far` stays low on purpose: only geometry near the slab contributes.
+        Baked on one frame and re-keyed when the framing changes, so it costs
+        nothing per frame in the same spirit as the 12fps shadow-map bake. */}
+    {/* scale is the one value not taken literally from the brief: at 50 the
+        shadow plane is smaller than the site (~90 units across) and cuts off
+        mid-yard, so it tracks the measured bounds instead. */}
+    <ContactShadows key={`${groundY}|${groundScale}|${selected?.name ?? ''}|${cutawayOpen}`}
+      position={[0, groundY + .02, 0]} scale={groundScale} resolution={1024}
+      far={10} blur={2.5} opacity={.5} color="#1c1f1e" frames={1} />
+    {/* A real stage under the plant: a light concrete platform slab with a
+        wider plinth below it. This—together with the coloured materials—is
+        what ends the white-model-on-white-page problem: the site never floats
+        on the bare page background again. Both slabs are raycast-inert so a
+        click on them still counts as "missed" and clears the selection. */}
+    {/* Phase 98: the concrete stage slabs and the drafting grid are gone —
+        the plant sits on nothing but its own contact shadow, like a model on
+        a plinth of light. siteBounds is still measured for the camera fit. */}
   </>;
 });
 
@@ -1226,6 +1608,9 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
       ) : (
         <div className="flex flex-col gap-6">
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{structure.title}</h2>
+          {structure.identity && (
+            <p className="-mt-3 text-sm font-bold tracking-wide text-emerald-700">{structure.identity}</p>
+          )}
           {structure.photo && (
             <img
               className="h-48 w-full shrink-0 rounded-2xl object-cover"
@@ -1257,7 +1642,7 @@ function DetailPanel({ structureKey, subIndex, onSelectSub, onBack, onClose, onR
               onClick={() => onReturnToParent(structure.returnTo)}
               className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-emerald-600/30 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-700 font-label-caps text-label-caps py-3 transition-colors duration-200"
             >
-              <span aria-hidden="true">↩️</span> Reaktör Görünümüne Dön
+              <span aria-hidden="true" className="text-lg leading-none">&lsaquo;</span> Reaktör Görünümüne Dön
             </button>
           )}
         </div>
@@ -1306,7 +1691,16 @@ class TwinErrorBoundary extends Component {
     return { failed: true };
   }
 
+  /* onError, "bu hatayı kurtarmayı denedim" derse (uzak kopya açılmadı,
+     yerel kopyaya düşülüyor) hata ekranını hiç göstermiyoruz: state'i
+     hemen geri alıyoruz, ebeveyn de reloadKey'i artırıp sahneyi yeni
+     yolla kuruyor. Yerel kopya da açılmazsa onError false döner ve
+     normal "yüklenemedi + tekrar dene" ekranı görünür. */
   componentDidCatch(error) {
+    if (this.props.onError?.(error)) {
+      this.setState({ failed: false });
+      return;
+    }
     console.error('[IONA] 3D tesis modeli yüklenemedi:', error);
   }
 
@@ -1360,6 +1754,7 @@ export default function GltfTwinScene() {
   const keyLightRef = useRef(null);
   const [groundY, setGroundY] = useState(0);
   const [groundScale, setGroundScale] = useState(120);
+  const [siteBounds, setSiteBounds] = useState(null);
   const [shadowFar, setShadowFar] = useState(40);
   
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -1376,14 +1771,79 @@ export default function GltfTwinScene() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  /* Above 880px the info card is absolutely positioned over the right of the
+     viewport, so the camera has to pan left to clear it; below that the card
+     stacks under the model and a pan would just push the plant off-centre.
+     880px is the same breakpoint the CSS uses — read through matchMedia rather
+     than duplicated as a number here, so the two can never drift apart. */
+  const [cardOverlays, setCardOverlays] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(CARD_OVERLAY_QUERY).matches
+  );
+  useEffect(() => {
+    const query = window.matchMedia(CARD_OVERLAY_QUERY);
+    const update = () => setCardOverlays(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  /* How much of the canvas the card actually covers, measured rather than
+     restated: its width is `min(410px, 38%)` plus a gutter in brand-system.css,
+     so any number hard-coded here would drift silently the moment that CSS
+     changes. offsetLeft/offsetWidth are deliberate — they ignore the card's
+     translateX slide-in, so this measures where the card lands, not where its
+     animation starts. The Rig frames the model inside what is left over. */
+  const stageRef = useRef(null);
+  const [cardOcclusion, setCardOcclusion] = useState(0);
+  useLayoutEffect(() => {
+    if (!selected || !cardOverlays) { setCardOcclusion(0); return; }
+    const viewport = stageRef.current?.querySelector('.twin-viewport');
+    const card = stageRef.current?.querySelector('.twin-detail, .twin-tour');
+    if (!viewport || !card) return;
+    const measure = () => {
+      const width = viewport.offsetWidth;
+      if (width) setCardOcclusion((viewport.offsetLeft + width - card.offsetLeft) / width);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(viewport); observer.observe(card);
+    return () => observer.disconnect();
+    // tourStep is a dependency because swapping the detail card for the tour
+    // panel replaces the measured element without `selected` necessarily changing.
+  }, [selected, cardOverlays, tourStep]);
+
+
+  /* How much of the canvas the hero introduction covers on the left in the
+     overview — measured, like the card, so the CSS columns can change without
+     this drifting. Only counts when the copy really overlaps the viewport
+     (the full-bleed desktop layout); stacked layouts measure 0. */
+  const [copyOcclusion, setCopyOcclusion] = useState(0);
+  useLayoutEffect(() => {
+    const viewport = stageRef.current?.querySelector('.twin-viewport');
+    const copy = document.getElementById('hero-copy');
+    if (!viewport || !copy || !cardOverlays) { setCopyOcclusion(0); return; }
+    const measure = () => {
+      const v = viewport.getBoundingClientRect();
+      const c = copy.getBoundingClientRect();
+      if (!v.width) return;
+      const overlapsVertically = c.bottom > v.top && c.top < v.bottom;
+      const share = overlapsVertically ? (c.right - v.left) / v.width + 0.02 : 0;
+      setCopyOcclusion(Math.min(MAX_COPY_OCCLUSION, Math.max(0, share)));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(viewport); observer.observe(copy);
+    return () => observer.disconnect();
+  }, [cardOverlays]);
 
   const handleReady = useCallback((plantRoot) => {
     setModelReady(true);
     const box = new THREE.Box3().setFromObject(plantRoot);
     const size = box.getSize(new THREE.Vector3());
     setGroundY(box.min.y - 0.02);
-    
+
     setGroundScale(Math.max(size.x, size.z) * 1.3);
+    setSiteBounds({ center: box.getCenter(new THREE.Vector3()), size });
     setShadowFar(Math.max(size.y * 4, 20));
   }, []);
 
@@ -1429,7 +1889,7 @@ export default function GltfTwinScene() {
     setTourStep(null); setModelReady(false);
     
     try {
-      useGLTF.clear(MODEL_SRC);
+      useGLTF.clear(modelSrc);
     } catch (e) {
       
     }
@@ -1439,18 +1899,48 @@ export default function GltfTwinScene() {
     setReloadKey((k) => k + 1);
   }, []);
 
-  const handleCanvasCreated = useCallback(({ gl }) => {
+  /* Uzak (CDN) kopya yüklenemediyse sessizce yerel kopyayla bir kez daha
+     dene; kullanıcı sadece yüklemenin biraz uzadığını görür, hata ekranı
+     görmez. Zaten yereldeysek false dönüp hatayı sınırın kendisine
+     bırakıyoruz. */
+  const handleLoadError = useCallback(() => {
+    if (!fallBackToLocalModel()) return false;
+    setModelReady(false);
+    setReloadKey((k) => k + 1);
+    return true;
+  }, []);
+
+  const handleCanvasCreated = useCallback(({ gl, invalidate }) => {
     gl.setClearColor(0x000000, 0);
+    // Material clipping planes (the dome's vertical half-cut) need this on.
+    gl.localClippingEnabled = true;
+    // The frosted dome makes three re-render the scene into a transmission
+    // target every frame. Half resolution is invisible behind roughness .3 and
+    // keeps that second pass off the frame budget on this 230k-tri site.
+    if ('transmissionResolutionScale' in gl) gl.transmissionResolutionScale = 0.5;
+    /* Phase 105: a lost WebGL context is first given the chance to come back
+       on its own — preventDefault() asks the browser to restore it, three
+       re-initialises on `webglcontextrestored`, and a fresh shadow bake + one
+       frame put the same scene back. Only if nothing comes back in a few
+       seconds is the whole scene rebuilt (reloadKey), which re-parses the GLB
+       and was what made every context hiccup look like a page reload. */
     const canvas = gl.domElement;
     const onLost = (event) => {
       event.preventDefault();
-      console.warn('[IONA] WebGL bağlamı kayboldu — 3D sahne yeniden başlatılıyor.');
-      setReloadKey((k) => k + 1);
+      console.warn('[IONA] WebGL bağlamı kayboldu — geri yüklenmesi bekleniyor.');
+      const fallback = setTimeout(() => {
+        console.warn('[IONA] WebGL bağlamı geri gelmedi — 3D sahne yeniden başlatılıyor.');
+        setReloadKey((k) => k + 1);
+      }, 3000);
+      canvas.addEventListener('webglcontextrestored', () => {
+        clearTimeout(fallback);
+        gl.shadowMap.needsUpdate = true;
+        invalidate();
+      }, { once: true });
     };
     canvas.addEventListener('webglcontextlost', onLost);
   }, []);
 
-  const stageRef = useRef(null);
   const [visible, setVisible] = useState(true);
   useEffect(() => {
     const target = stageRef.current;
@@ -1468,41 +1958,49 @@ export default function GltfTwinScene() {
     const step = processSteps[index];
     const node = step && plantRootRef.current?.getObjectByName(step.node);
     if (!node) return;
+    const opening = tourStep === null;
     setManualCutaway(false); setTourStep(index); setSelected(node); setSelectedSubIndex(null);
     setCurrentLevel(1); setHasInteracted(true);
+    // On a phone the tour takes the whole screen, so bring the stage to it.
+    if (opening && isMobileViewport) {
+      requestAnimationFrame(() => stageRef.current?.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth', block: 'center',
+      }));
+    }
   };
   return <div ref={stageRef} className={selected ? 'twin-surface is-inspecting' : 'twin-surface'}>
     <div className="min-w-0">
       <div className="twin-viewport">
-        {tourStep === null && <button type="button" className="twin-cutaway-toggle" disabled={!modelReady} aria-pressed={manualCutaway} onClick={() => {
-          if(manualCutaway) {handleReset();return;}
-          const reactor=plantRootRef.current?.getObjectByName('digester');
-          if(reactor){handleSelect(reactor);setManualCutaway(true);}
-        }}>{manualCutaway ? 'Kesiti kapat' : 'Reaktörün içini aç'}</button>}
-        {cutawayOpen && <div className="twin-cutaway-legend"><span>● Karışım seviyesi</span><span>● Gaz hacmi</span><small>Şematik kesit · Canlı ölçüm değildir</small></div>}
-        {tourStep === null && <button ref={tourStartRef} className="twin-tour-start" type="button" disabled={!modelReady} onClick={() => goToStep(0)}>Tesis nasıl çalışır? <span aria-hidden="true">↗</span></button>}
-        <TwinErrorBoundary resetKey={reloadKey} onRetry={handleRetry}>
+        {/* Phase 101: the "Reaktörün içini aç" toggle and its legend are retired —
+            clicking the digester itself opens it (x-ray shell + the dome's
+            vertical half-cut). manualCutaway simply stays false. */}
+        {/* Phase 99: the "Tesis nasıl çalışır?" process tour is retired — the
+            button and its aside are gone; tourStep simply stays null. */}
+        <TwinErrorBoundary resetKey={reloadKey} onRetry={handleRetry} onError={handleLoadError}>
           <Suspense fallback={<TwinLoading onRetry={handleRetry} />}>
-            <Canvas key={reloadKey} shadows frameloop={visible ? (reduceMotion ? 'demand' : 'always') : 'never'}
+            <Canvas key={reloadKey} shadows frameloop={visible ? 'demand' : 'never'}
               camera={{ fov: CAMERA_FOV, near: .1, far: 800, position: [100, 80, 100] }}
               dpr={isMobileViewport ? 1 : [1, 1.5]}
               gl={{ antialias: true, powerPreference: 'high-performance', alpha: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }}
               onCreated={handleCanvasCreated} onPointerMissed={handleReset}>
-              <hemisphereLight args={['#e8f0ff', '#c6bcb1', .65]} />
-              <Environment resolution={128} frames={1} environmentIntensity={.65}>
-                <Lightformer intensity={3} position={[0, 8, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[10, 10, 1]} />
-                <Lightformer intensity={2.5} position={[-8, 3, 0]} rotation={[0, Math.PI / 2, 0]} scale={[4, 8, 1]} />
-                <Lightformer intensity={1.5} color="#dce7ff" position={[7, 2, 3]} rotation={[0, -Math.PI / 2, 0]} scale={[3, 6, 1]} />
-              </Environment>
-              <directionalLight ref={keyLightRef} position={[-60, 90, 50]} color="#fff4e4" intensity={2.6} castShadow
+              {/* A real studio HDRI does the lighting now — the hemisphere +
+                  two-directional rig it replaces was what flattened the model,
+                  because every surface got light from everywhere at once.
+                  Served locally from public/hdri/ (same file drei's "studio"
+                  preset would fetch from its CDN) so lighting never depends on
+                  a third-party host being reachable. */}
+              <Environment files="/hdri/studio_small_03_1k.hdr" environmentIntensity={1.05} />
+              {/* One key light survives, and only to shape: a clay render with
+                  no directional term has no form. Kept on keyLightRef because
+                  Rig aims its shadow camera at the site bounds. */}
+              <directionalLight ref={keyLightRef} position={[-60, 90, 50]} intensity={1.1} castShadow
                 shadow-mapSize={isMobileViewport ? [1024, 1024] : [2048, 2048]}
                 shadow-bias={-.00012} shadow-normalBias={.08} />
-              <directionalLight position={[40, 25, -40]} color="#dce8ff" intensity={.7} />
               <Model plantRootRef={plantRootRef} onReady={handleReady} onSelect={handleSelect} onReset={handleReset}
                 selected={selected} cutawayOpen={cutawayOpen} flowActive={tourStep !== null && !reduceMotion ? processSteps[tourStep].flow : false} />
               <FeedPipeGapFill />
               <ReactorCutaway plantRootRef={plantRootRef} open={cutawayOpen} />
-              <Rig cutawayOpen={cutawayOpen} plantRootRef={plantRootRef} selected={tourStep !== null ? null : selected} groundY={groundY} groundScale={groundScale} shadowFar={shadowFar} keyLightRef={keyLightRef} />
+              <Rig cutawayOpen={cutawayOpen} plantRootRef={plantRootRef} selected={tourStep !== null ? null : selected} groundY={groundY} groundScale={groundScale} siteBounds={siteBounds} shadowFar={shadowFar} keyLightRef={keyLightRef} cardOverlays={cardOverlays} cardOcclusion={cardOcclusion} copyOcclusion={copyOcclusion} />
             </Canvas>
           </Suspense>
         </TwinErrorBoundary>
@@ -1516,18 +2014,6 @@ export default function GltfTwinScene() {
         {selected && <button type="button" onClick={handleReset}>↖ Genel görünüm</button>}
       </nav>
     </div>
-    {tourStep !== null && <aside className="twin-tour" aria-label="Tesisin çalışma aşamaları">
-      <div className="twin-tour-top"><span>Tesis nasıl çalışır?</span><button type="button" onClick={handleReset} aria-label="Çalışma turunu kapat">×</button></div>
-      <nav aria-label="Proses aşamaları" className="twin-tour-steps">{processSteps.map((step,index) => <button key={step.title} type="button" aria-current={tourStep === index ? 'step' : undefined} onClick={() => goToStep(index)} aria-label={`${index+1}. ${step.title}`}>{index+1}</button>)}</nav>
-      <div aria-live="polite" aria-atomic="true">
-        <span className="twin-tour-count">0{tourStep+1} / 04</span>
-        <h2 ref={tourHeadingRef} tabIndex={-1}>{processSteps[tourStep].title}</h2>
-        <p>{processSteps[tourStep].body}</p>
-        <dl><dt>Bu aşamanın çıktısı</dt><dd>{processSteps[tourStep].output}</dd></dl>
-      </div>
-      <p className="twin-tour-note">Şematik proses anlatımı. Ekipman ve akış düzeni projeye göre değişir.</p>
-      <div className="twin-tour-actions"><button type="button" disabled={tourStep === 0} onClick={() => goToStep(tourStep-1)}>Geri</button>{tourStep < processSteps.length-1 ? <button type="button" onClick={() => goToStep(tourStep+1)}>Sonraki aşama →</button> : <button type="button" onClick={handleReset}>Genel görünüme dön</button>}</div>
-    </aside>}
     {selected && tourStep === null && <DetailPanel structureKey={selected.name} subIndex={selectedSubIndex} onSelectSub={handleSelectSub}
       onBack={handleBackToStructure} onClose={handleReset} onReturnToParent={handleReturnToParent} />}
   </div>;

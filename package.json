@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-i18n-pages.mjs",
     "preview": "vite preview",
-    "start": "serve dist -l $PORT --no-clipboard"
+    "start": "serve dist -l $PORT --no-clipboard",
+    "model:bake": "node scripts/model-lab/bake-plant.mjs",
+    "model:draco": "npx -y @gltf-transform/cli@4 draco model-lab/out/iona-tesis-baked.glb public/models/iona-tesis-3d.draco.glb --method edgebreaker --quantize-position 14 --quantize-normal 10 --quantize-texcoord 12",
+    "model:build": "npm run model:bake && npm run model:draco",
+    "model:upload": "node scripts/upload-model.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
@@ -25,6 +29,7 @@
     "@tailwindcss/forms": "^0.5.11",
     "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.5.4",
+    "node-html-parser": "^9.0.4",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.19",
     "vite": "^7.1.0"

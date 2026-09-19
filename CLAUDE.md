@@ -19,6 +19,32 @@ This file holds rules that don't change. Long version + reasoning lives in `AGEN
 - Admin editor: `src/components/Admin/LiveEditor.jsx`, reached via `/admin.html`. Has a page-selector dropdown and an Edit/Navigate mode toggle. Saves write to `site_content` keyed by whichever page is selected.
 - `.env` needs `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`. If either is empty, `getSupabase()` returns `null` and the admin editor **silently** falls back to writing `localStorage` instead of the DB (see `src/lib/localContent.js`) — it still shows "Kaydedildi" (Saved). Don't trust that message alone; check `.env` first if edits don't show up cross-browser/cross-device.
 
+## 3D models
+
+- Only **one** page runs WebGL: `index.html`'s hero Digital Twin (`src/components/DigitalTwin/`). `teknoloji.html`'s 3-machine showcase was removed on 2026-09-19 (IONA delivers plants, not equipment) — its sources sit in `.backups/removed-services-3d/`. Don't reintroduce Three.js on other pages without a reason.
+- The hero loads `iona-tesis-3d.draco.glb` (~0.7 MB). Its URL is resolved by `src/lib/modelAssets.js`, not hardcoded: with `VITE_MODEL_BUCKET` set it comes from Supabase Storage's CDN, otherwise from `public/models/`. **The local copy must stay** — it's the fallback when the remote one fails (`fallBackToLocalModel` in `GltfTwinScene.jsx`), so a dead CDN never leaves the hero empty.
+- `npm run model:build` rebuilds the GLB from source; `npm run model:upload` pushes it to Storage. Upload needs `SUPABASE_SERVICE_ROLE_KEY` in `.env` — that key bypasses RLS entirely, so it must never carry a `VITE_` prefix or reach client code.
+
+## Images
+
+- **Every photo on the site is WebP, max 1800 px on the long edge.** Raw camera JPEGs (3–8 MB, up to 5792×4344) were what made pages heavy; they were converted on 2026-09-19 and the originals archived to `.backups/original-images/`. A new photo goes through the same pass before it ships — there is no build-time image pipeline, so an un-converted JPEG dropped into `public/images/` stays un-converted all the way to production.
+- Conversion (no cwebp/ImageMagick/ffmpeg on this box; Pillow lives in the 3D venv):
+  `~/.iona-3d/.venv/bin/python` → `ImageOps.exif_transpose(im)` then `im.save(dst, 'WEBP', quality=82, method=6)`.
+  **`exif_transpose` is not optional** — phone photos carry an EXIF rotation flag that WebP does not preserve, so skipping it publishes sideways images.
+- Photos are referenced from two places, and a rename has to cover both: `<img src>` in the `.html` files, **and** `/images/equipment/*.webp` inside `GltfTwinScene.jsx` (the Digital Twin's detail cards) plus one `bannerImage` in `src/i18n.js`. A grep over `*.html` alone will miss 17 references.
+
+## Icons (Material Symbols)
+
+- The icon font is **subsetted by name**. Every page's `<head>` requests it with `&icon_names=<50 names>`; without that, Google ships the entire icon set — 6.7 MB per page, which was the single heaviest asset on the site.
+- **Adding a new icon means adding its name to that list in all 8 HTML files.** An icon missing from the list has no ligature in the font, so the browser renders the literal word (`arrow_forward`) instead of the glyph. It fails loudly on screen but silently in the console — nothing errors.
+- The `FILL` axis must stay in the request: `HistoryDropdown.jsx` toggles `fontVariationSettings: 'FILL' 1` on the starred-row icon.
+- Icon names live in three kinds of places, so grep all of them before changing the list: `<span class="material-symbols-outlined">name</span>` in HTML, `{t.icon}` fed from `icon:` fields in JSX data arrays (`LiveEditor`, `TextEditPopover`, `PhoneMockup`), and `textContent` assignments in `common.js` (theme toggle's `dark_mode`/`light_mode`).
+
+## Adding a section to a page
+
+- Deleting a section means deleting its anchor. `SEARCH_INDEX` in `src/common.js` deep-links to `#anchor`s across pages, and a browser ignores a missing anchor silently — the visitor just lands at the top of the page with no error anywhere. Removing three machine sections on 2026-09-19 left three dead search entries and three dead homepage panel links behind. Re-validate that list whenever an `id=` disappears.
+- A `.fade-in-element` only becomes visible when an ancestor `.fade-in-section` scrolls into view (`initFadeIn` in `src/common.js`). A new block with fade-in children and no `.fade-in-section` wrapper stays at `opacity: 0` permanently — and it looks like a layout bug, not an animation one. Above-the-fold copy that shouldn't wait gets `is-visible` written straight into the markup instead.
+
 ## Before claiming a deploy/routing fix is done
 
 1. `npm run build`, confirm every expected `dist/*.html` file exists.

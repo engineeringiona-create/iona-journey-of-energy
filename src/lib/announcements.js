@@ -1,3 +1,4 @@
+import { localizePath } from './langPath.js';
 import '../styles/announcements.css';
 
 const OVERLAY_ID = 'iona-announcements-popup';
@@ -90,7 +91,7 @@ export function openAnnouncementModal(cards, startIndex = 0) {
     const title = document.createElement('h2'); title.id = 'iona-ap-title'; title.className = 'iona-ap-title'; title.textContent = a.title;
     body.append(meta, title);
     if (a.description) { const description = document.createElement('p'); description.className = 'iona-ap-desc'; description.textContent = a.description; body.append(description); }
-    const href = safeUrl(a.ctaLink);
+    const href = safeUrl(localizePath(a.ctaLink));
     if (a.ctaEnabled && href) {
       const link = document.createElement('a'); link.className = 'iona-ap-cta'; link.href = href;
       const label = document.createElement('span'); label.textContent = a.ctaText || 'Detayları İncele';

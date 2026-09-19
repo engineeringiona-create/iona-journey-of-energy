@@ -51,6 +51,12 @@ img, video, canvas { max-width: 100%; }
  #hero .hero-copy { padding: 2rem 0; }
  #hero .hero-editorial-title { font-size: clamp(3rem, 8vw, 5.5rem); max-width: 13ch; }
  #hero #iona-digital-twin-root { min-height: 390px; }
+}
+/* The detail card stacks under the model later than the rest of the hero does:
+   at 1023px it still has room beside it, and dropping it below costs a whole
+   screen of scrolling. Both rules move together — the card's border flips from
+   left to top when it stacks, so they have to share one breakpoint. */
+@media (max-width: 879px) {
  .twin-surface.is-inspecting { grid-template-columns: minmax(0, 1fr); gap: 0; }
  .twin-detail { border-left: 0; border-top: 1px solid var(--editorial-rule); padding: 1.5rem 0; max-height: none; }
 }

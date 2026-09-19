@@ -1,4 +1,5 @@
 import { getSupabase } from './supabaseClient.js';
+import { localizePath } from './langPath.js';
 
 const MODAL_ID = 'iona-quote-modal';
 
@@ -226,7 +227,8 @@ function renderSuccess(overlay, close, inserted) {
 
   overlay.querySelector('#iona-qm-done').addEventListener('click', () => {
     close();
-    window.location.href = '/';
+    /* Ana sayfa, ziyaretçinin bulunduğu dilin ana sayfası olmalı. */
+    window.location.href = localizePath('/');
   });
   overlay.querySelector('#iona-qm-success-close').addEventListener('click', close);
   overlay.querySelector('#iona-qm-done').focus();

@@ -2,6 +2,8 @@
    (to pick the right site_content row for the page the browser is on)
    and the admin LiveEditor (page selector + save target), so the two
    can never drift apart on what "teknoloji" or "/etki.html" means. */
+import { stripLang } from './langPath.js';
+
 export const PAGES = [
   { id: 'home', label: 'Anasayfa', path: '/index.html' },
   { id: 'teknoloji', label: 'Teknoloji', path: '/teknoloji.html' },
@@ -12,7 +14,13 @@ export const PAGES = [
 ];
 
 export function pageIdForPath(pathname) {
-  const clean = pathname === '/' ? '/index.html' : pathname;
+  /* Dil önekini burada ayıklıyoruz: '/en/teknoloji.html' de '/teknoloji.html'
+     ile aynı site_content satırını kullanır (içerik dile göre satır içinde
+     bucket'lara ayrılıyor, satırın kendisine göre değil). Ayıklamazsak dil
+     sürümlerinde pageId null kalır ve admin panelinden girilen içerik
+     override'ları o sayfalarda sessizce uygulanmaz. */
+  const withoutLang = stripLang(pathname);
+  const clean = withoutLang === '/' ? '/index.html' : withoutLang;
   const found = PAGES.find((p) => p.path === clean);
   return found ? found.id : null;
 }

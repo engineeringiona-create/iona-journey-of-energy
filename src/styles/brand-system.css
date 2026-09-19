@@ -121,7 +121,10 @@
  .iona-brand #hero .hero-metric strong { font-size:1.6rem; }
  .iona-brand #hero.is-inspecting .twin-viewport { height:70svh; }
 }
-@media(max-width:1023px) { .iona-brand #hero .twin-surface.is-inspecting { grid-template-columns:1fr; } .iona-brand .twin-detail { max-height:none; } .iona-brand .desktop-nav-link { padding-inline:7px; } }
+@media(max-width:1023px) { .iona-brand .desktop-nav-link { padding-inline:7px; } }
+/* Matches editorial.css's 879px card breakpoint — split out of the 1023px
+   block above, which only needed to keep the nav-link padding there. */
+@media(max-width:879px) { .iona-brand #hero .twin-surface.is-inspecting { grid-template-columns:1fr; } .iona-brand .twin-detail { max-height:none; } }
 @media(max-width:760px) {
  .iona-brand #hero .hero-copy { grid-template-columns:1fr; grid-template-areas:'kicker' 'title' 'description' 'action'; gap:1rem; }
  .iona-brand #hero .hero-editorial-title { font-size:clamp(2.3rem,8.5vw,3.5rem); }
@@ -160,13 +163,25 @@
 @media(prefers-reduced-motion:reduce) { .iona-brand [data-announcement-card],.iona-brand .twin-structure-nav button { transition:none; } }
 /* Long sector descriptions flow below photographs instead of fighting an overlay. */
 .iona-brand #industries-track .horizontal-gallery-panel { display:flex; flex-direction:column; align-items:stretch; height:auto; padding:0; background:#f5f7f3; }
-.iona-brand #industries-track .horizontal-gallery-panel > img { position:relative; height:280px; width:100%; object-fit:cover; }
+/* The photo takes the slack: grid rows stretch every panel to the tallest in
+   the row, and with a fixed-height image that surplus used to collect as dead
+   space under the last paragraph. Letting the image grow instead puts the copy
+   flush at the card's foot, so a short card reads as full rather than empty. */
+.iona-brand #industries-track .horizontal-gallery-panel > img { position:relative; flex:1 1 280px; min-height:280px; width:100%; object-fit:cover; }
 .iona-brand #industries-track .horizontal-gallery-panel > .absolute { display:none; }
-.iona-brand #industries-track .horizontal-gallery-panel > .relative { padding:28px; max-width:none; color:#193322; }
-.iona-brand #industries-track .horizontal-gallery-panel .relative > span:first-child { font-size:14px; color:#198837; margin-bottom:16px; }
-.iona-brand #industries-track .horizontal-gallery-panel .relative > span:nth-child(2) { color:#537059; }
-.iona-brand #industries-track .horizontal-gallery-panel h3 { font-size:clamp(1.6rem,2.4vw,2.5rem); line-height:1.2; }
-.iona-brand #industries-track .horizontal-gallery-panel p { color:#5b685f; }
+.iona-brand #industries-track .horizontal-gallery-panel > .relative { padding:clamp(28px,2.4vw,40px); max-width:none; color:#193322; }
+/* These panels are NOT structurally identical — only the first carries the
+   "Sektörel Etki" eyebrow — so positional selectors (`> span:first-child`,
+   `:nth-child(2)`) landed on a different element in every other card and shrank
+   the 02/03/04 numerals to the eyebrow's 14px while 01 stayed huge. Selecting
+   each span by what it *is* fixes all four at once, whatever the panel holds. */
+.iona-brand #industries-track .horizontal-gallery-panel .relative > span.tracking-widest { font-size:14px; color:#198837; margin-bottom:14px; }
+.iona-brand #industries-track .horizontal-gallery-panel .relative > span.font-label-caps:not(.tracking-widest) { font-size:14px; letter-spacing:.14em; color:#537059; }
+.iona-brand #industries-track .horizontal-gallery-panel .relative > span[class*='text-7xl'] { display:block; font-family:Montserrat,Arial,sans-serif; font-size:clamp(3.75rem,6vw,5.75rem); line-height:.85; color:#2d9937; margin-bottom:14px; }
+/* The copy was set for a photo-overlay card (small type on a dark scrim); on
+   these light panels it read undersized against the numeral above it. */
+.iona-brand #industries-track .horizontal-gallery-panel h3 { font-size:clamp(1.9rem,2.8vw,2.9rem); line-height:1.18; margin-top:10px; }
+.iona-brand #industries-track .horizontal-gallery-panel p { max-width:60ch; font-size:clamp(1rem,1.15vw,1.125rem); line-height:1.7; color:#5b685f; }
 .iona-brand .desktop-nav-link[aria-current='page'] { color:#14702e; background:#edf5ed; }
 .iona-brand #data-wall { padding-block:clamp(2rem,4vw,4rem); }
 .iona-brand #data-wall [aria-hidden=true] { background:#198837; }
@@ -224,7 +239,53 @@
 .iona-brand #solutions { background:radial-gradient(ellipse at 50% 45%,#f1e4bf 0, #faf7ee 48%,#f5f7f3 90%); }
 .iona-brand #solutions .solutions-carousel .solution-tile:nth-child(3n+1) > div:first-child { background:#faedcc; }
 .iona-brand #solutions .solutions-carousel .solution-tile:nth-child(3n+1) .material-symbols-outlined { color:#936017; }
-.iona-brand .solutions-controls button:hover { background:#efb33f; color:#193322; border-color:#efb33f; }
+/* ── Çözümlerimiz carousel controls ──────────────────────────────────────────
+   These were the one part of the section still speaking the old language: hard
+   hairline rings on bare background, raw `monospace` numerals, and a flat
+   filled chip for the current step — reading as browser chrome parked under a
+   stack of soft, 28px-rounded, warm-lit cards. Rebuilt from the tiles' own
+   tokens (999px pills, #dce4d5 hairlines, brand green, and this section's amber
+   for hover) so the row belongs to the thing it drives. Sizes stay at/above the
+   44px touch target they had. */
+.iona-brand .solutions-controls {
+ width:fit-content; margin:28px auto 0; gap:14px; padding:8px 12px;
+ background:#fffffff2; border:1px solid #e7e2d4; border-radius:999px;
+ box-shadow:0 10px 28px #3a2f1a0f;
+}
+.iona-brand .solutions-controls button {
+ display:grid; place-items:center; width:44px; height:44px;
+ border:1px solid #e0e6db; border-radius:999px; background:#fff;
+ color:#193322; font-size:1.15rem; line-height:1;
+ transition:background .25s ease, border-color .25s ease, color .25s ease,
+            transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+.iona-brand .solutions-controls button:hover { background:#efb33f; border-color:#efb33f; color:#193322; transform:translateY(-1px); }
+.iona-brand .solutions-controls button:active { transform:scale(.96); }
+.iona-brand .solutions-status {
+ font:600 .8125rem/1 Inter,Arial,sans-serif; letter-spacing:.12em;
+ font-variant-numeric:tabular-nums; color:#52634f;
+}
+.iona-brand .solutions-dots { gap:6px; margin-top:18px; }
+.iona-brand .solutions-dots button {
+ min-width:38px; min-height:38px; padding:0 6px;
+ border:1px solid transparent; border-radius:999px; background:transparent;
+ font:600 .75rem/1 Inter,Arial,sans-serif; letter-spacing:.04em;
+ font-variant-numeric:tabular-nums; color:#7d8a7b;
+ transition:background .22s ease, color .22s ease, border-color .22s ease;
+}
+.iona-brand .solutions-dots button:hover { background:#edf3e8; color:#193322; }
+.iona-brand .solutions-dots button[aria-pressed=true] {
+ background:#198837; border-color:#198837; color:#fff; box-shadow:0 6px 16px #19883740;
+}
+/* The default focus ring was the harshest thing on the row; this is the brand
+   green at a distance instead of a hairline drawn on top of the button. */
+.iona-brand :is(.solutions-controls,.solutions-dots) button:focus-visible {
+ outline:2px solid #198837; outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce) {
+ .iona-brand :is(.solutions-controls,.solutions-dots) button { transition:none; }
+ .iona-brand .solutions-controls button:hover,.iona-brand .solutions-controls button:active { transform:none; }
+}
 .iona-brand #contact-form { background:linear-gradient(120deg,#f6efdf,#f8f8f2 65%); }
 .iona-brand #contact-mail-form { position:relative; z-index:1; }
 .iona-brand #partners { background:#faf7ef; }
@@ -320,6 +381,49 @@
  margin:20px var(--editorial-gutter) 0; width:auto; min-width:0;
  max-height:none; overflow:visible; animation:twin-detail-enter .28s ease-out;
 }
+
+/* ── Inspection choreography ─────────────────────────────────────────────────
+   Selecting a structure: the hero copy leaves to the left, the info card
+   arrives from the right over the model, and the model re-frames itself into
+   the strip the card leaves free — so it ends up left of centre instead of
+   under the card. GltfTwinScene's Rig does that, and it *measures* this card
+   rather than copying the width below, so the two cannot drift apart.
+
+   The one rule everything else obeys: no layout geometry changes. The hero
+   grid keeps both its columns and the model column keeps its width, so the
+   WebGL drawing buffer is never resized mid-transition — that resize is what
+   made this interaction stutter. The copy stays in the layout and only
+   transforms; `inert` is what takes it out of the tab order
+   (main-anasayfa.js). Transform and opacity only: both composite on the GPU
+   and never touch layout, so the 3D scene keeps the whole main thread. */
+.iona-brand #hero .hero-copy {
+ opacity:1; transform:none;
+ /* Apple's standard decelerate curve — fast commit, long settle, no bounce. */
+ transition:opacity .32s ease, transform .55s cubic-bezier(.22, 1, .36, 1);
+}
+.iona-brand #hero.is-inspecting .hero-copy {
+ opacity:0; transform:translateX(-50px); pointer-events:none;
+}
+@media(min-width:880px) {
+ /* Inspection keeps the two-column grid instead of collapsing to one: a column
+    that collapses cannot be slid out of, and collapsing it resizes the canvas.
+    Holding the columns needs no rule here — the collapse is now scoped to
+    max-width:879px further down, so the base grid simply stays in effect.
+
+    The card rides over the right of the viewport rather than taking a column
+    of its own, for the same reason: a column would change the canvas width.
+
+    The process tour is the same kind of panel and gets the same treatment:
+    left in normal flow it stacked *under* a viewport already sized to fill the
+    screen, so opening the tour pushed its own content below the fold. */
+ .iona-brand #hero .twin-surface.is-inspecting { position:relative; }
+ .iona-brand #hero.is-inspecting :is(.twin-detail,.twin-tour) {
+  position:absolute; top:0; right:var(--editorial-gutter); z-index:5;
+  width:min(410px, 38%); margin:0;
+  max-height:calc(100% - 2rem); overflow-y:auto; overscroll-behavior:contain;
+  animation:twin-detail-slide-in .5s cubic-bezier(.22, 1, .36, 1);
+ }
+}
 .iona-brand #hero.is-inspecting .twin-viewport { height:clamp(440px,65svh,800px); }
 @media(min-width:1024px) and (min-height:700px) {
  .iona-brand #hero.is-inspecting .twin-viewport { height:var(--plant-viewport-height,46svh); }
@@ -337,24 +441,184 @@
  .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-viewport { height:clamp(360px,95vw,580px); }
 }
 @keyframes twin-detail-enter { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+/* Stacked (narrow) keeps the upward enter above; overlaid (wide) comes in from
+   the edge it is anchored to, so the motion explains where the card came from. */
+@keyframes twin-detail-slide-in {
+ from { opacity:0; transform:translateX(44px); }
+ to { opacity:1; transform:none; }
+}
 @media(prefers-reduced-motion:reduce) {
  .iona-brand #hero .twin-detail,.iona-brand #hero .twin-tour { animation:none; }
+ .iona-brand #hero .hero-copy { transition:none; }
 }
 
-/* A centered introduction, with the single quote action in the header. */
+/* An oversized introduction on the left, the live plant on the right. */
+.iona-brand #hero .hero-grid {
+ display:grid; grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);
+ align-items:center; column-gap:clamp(1.75rem,3.4vw,4rem);
+}
 .iona-brand #hero .hero-copy {
  grid-template-columns:minmax(0,1fr); grid-template-areas:'kicker' 'title' 'description';
- justify-items:center; text-align:center; gap:12px; padding-top:8px;
+ justify-items:start; text-align:left; gap:14px; padding:0;
 }
-.iona-brand #hero .hero-kicker { justify-content:center; margin:0; }
+.iona-brand #hero .hero-kicker { justify-content:flex-start; margin:0; }
 .iona-brand #hero .hero-editorial-title {
- max-width:24ch; font-size:clamp(2.4rem,5.4vw,5rem); line-height:1.04;
- letter-spacing:-.045em; margin:0 auto;
+ max-width:13ch; font-size:clamp(2.6rem,5.2vw,5.6rem); line-height:1.02;
+ letter-spacing:-.05em; margin:0;
 }
-.iona-brand #hero .hero-editorial-sub { max-width:76ch; margin:0 auto; text-wrap:balance; }
+.iona-brand #hero .hero-editorial-sub { max-width:44ch; margin:0; text-wrap:balance; }
+/* The model keeps its full-bleed edge on the right only. */
+.iona-brand #hero .hero-model-column { margin:0 calc(-1 * var(--editorial-gutter)) 0 0; }
+.iona-brand #hero .hero-model-caption,
+.iona-brand #hero .twin-structure-nav { margin-left:0; margin-right:var(--editorial-gutter); }
+/* Equipment inspection takes the whole width back — but only where the card
+   stacks underneath. At 880px and up the card overlays the model instead, and
+   the grid deliberately holds both columns so the copy has somewhere to slide
+   out to and the canvas is never resized (see the inspection choreography
+   block above). Scoped to max-width here rather than overridden later, because
+   these two rules and that block are the same decision written twice. */
+@media(max-width:879px) {
+ .iona-brand #hero.is-inspecting .hero-grid { grid-template-columns:minmax(0,1fr); }
+ .iona-brand #hero.is-inspecting .hero-model-column { margin-inline:calc(-1 * var(--editorial-gutter)); }
+}
+.iona-brand #hero.is-inspecting .hero-model-caption,
+.iona-brand #hero.is-inspecting .twin-structure-nav { margin-inline:var(--editorial-gutter); }
+@media(max-width:1023px) {
+ .iona-brand #hero .hero-grid { grid-template-columns:minmax(0,1fr); row-gap:1.5rem; }
+ .iona-brand #hero .hero-model-column { margin-inline:calc(-1 * var(--editorial-gutter)); }
+ .iona-brand #hero .hero-model-caption,
+ .iona-brand #hero .twin-structure-nav { margin-inline:var(--editorial-gutter); }
+}
 @media(max-width:760px) {
  .iona-brand #hero .hero-copy { gap:14px; }
- .iona-brand #hero .hero-editorial-title { font-size:clamp(2.15rem,8.8vw,3.5rem); }
+ .iona-brand #hero .hero-editorial-title { font-size:clamp(2.15rem,8.8vw,3.5rem); max-width:16ch; }
  .iona-brand #hero .hero-kicker { font-size:.56rem; letter-spacing:.035em; }
- .iona-brand #hero .hero-editorial-sub { font-size:.875rem; line-height:1.6; }
+ .iona-brand #hero .hero-editorial-sub { font-size:.875rem; line-height:1.6; max-width:none; }
+}
+
+/* The stacked process tour is one screen: plant on top, card scrolling beneath it.
+   Splitting a fixed height beats stacking two intrinsic heights, which overflowed.
+   Runs up to 879px — the exact width where the tour switches to overlaying the
+   viewport instead of stacking under it — so there is no band left in between
+   where it stacks without a height budget and falls off the bottom again. */
+@media(max-width:879px) {
+ .iona-brand #hero:has(.twin-tour) .hero-copy { display:none; }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) {
+  display:flex; flex-direction:column; height:calc(100svh - 7rem);
+ }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) > .min-w-0 {
+  display:flex; flex-direction:column; flex:0 0 42%; min-height:0;
+ }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-viewport {
+  height:auto; flex:1 1 auto; min-height:0;
+ }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-structure-nav { display:none; }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-tour {
+  flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain;
+  margin:10px var(--editorial-gutter) 0; padding:16px; animation:none;
+ }
+ /* Tighter rhythm so a step reads without scrolling in the common case. */
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-tour h2 { font-size:20px; margin:6px 0 10px; }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-tour-steps { margin:14px 0 16px; gap:8px; }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-tour dl { margin:14px 0; padding:12px; }
+ .iona-brand #hero .twin-surface.is-inspecting:has(.twin-tour) .twin-tour .twin-tour-note { margin-bottom:14px; }
+}
+
+/* ── Hero atmosphere: engineering grid + one brand glow behind the plant ─────
+   Two pseudo-element layers, no markup change, both under the content:
+   #hero gets `isolation:isolate`, so a z-index:-1 child can sit behind
+   everything in the section without falling through to the page background.
+   Tree order decides which of the two wins — the grid is written first, so the
+   orb paints over it. #hero is deliberately fixed-white (see the Phase 87 note
+   in base.css), so these are light-only values with no dark-theme pair. */
+.iona-brand #hero { position:relative; isolation:isolate; }
+
+/* Layer 1 — drafting paper: a 24px dot field over a 120px major grid, masked
+   to fade out before it reaches the metrics row and the next section. */
+.iona-brand #hero::before {
+ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+ background-image:
+  radial-gradient(circle at center, rgba(25,51,34,.085) 1px, transparent 1.5px),
+  linear-gradient(to right, rgba(25,51,34,.05) 1px, transparent 1px),
+  linear-gradient(to bottom, rgba(25,51,34,.05) 1px, transparent 1px);
+ background-size:24px 24px, 120px 120px, 120px 120px;
+ background-position:center top;
+ -webkit-mask-image:radial-gradient(120% 90% at 50% 6%, #000 38%, transparent 100%);
+ mask-image:radial-gradient(120% 90% at 50% 6%, #000 38%, transparent 100%);
+}
+
+/* Layer 2 — the air the plant sits in: the brand glow plus aerial depth.
+
+   This spans the whole hero, not the model column. It used to live on
+   .hero-model-column::before, and the vertical depth gradient there had no
+   horizontal falloff — so it stopped dead at the column's left edge and drew a
+   visible rectangle around the model. Atmosphere cannot have a border. On
+   #hero::after it runs edge to edge and fades out on the left through the mask
+   below, so there is no boundary anywhere; the model itself has not moved.
+
+   The glow blobs are positioned in hero coordinates now: the model column is
+   the right ~56%, so its centre is near x=72%. Move all four `at` values
+   together if the plant is ever reframed. */
+.iona-brand #hero::after {
+ /* Phase 101: retired. The glow blobs and aerial gradient made sense on a
+    coloured model; the white maquette instead gets the left-to-right paper->
+    grey backdrop, which lives on #hero's own background (bottom of this file)
+    so the drafting dots on ::before stay on top of it. A blend mode here would
+    have kept the dots too, but it makes Chromium drop the WebGL canvas from
+    the composite. */
+ display:none;
+}
+
+/* Barely-there drift keeps the glow from reading as a printed gradient. */
+@keyframes iona-hero-glow-drift {
+ from { transform:translate3d(-1.2%, .8%, 0) scale(1); }
+ to { transform:translate3d(1.2%, -.8%, 0) scale(1.04); }
+}
+
+@media(prefers-reduced-motion:reduce) {
+ .iona-brand #hero::after { animation:none; }
+}
+
+/* The strip under the model — structure pills + the "IONA / TESİS ANATOMİSİ"
+   meta line — is off. `display:none` rather than deleting the markup, so it is
+   one line to bring back, and so the pills leave the accessibility tree
+   instead of lingering as invisible tab stops. Structures are still selectable
+   by clicking them in the model, and the process tour button is unaffected. */
+.iona-brand #hero .twin-structure-nav,
+.iona-brand #hero .hero-model-caption { display:none; }
+
+/* Phase 98's radial grey pool under the model was replaced in Phase 101 by
+   the left-to-right backdrop on #hero::after above. */
+
+
+/* Phase 101/105 (Murat): the white maquette needs something to stand against.
+   One gradient twice the hero's width — paper → grey → paper — and only its
+   position moves: in the overview the grey half sits behind the plant on the
+   right; while a structure is inspected the plant re-frames to the left (the
+   copy has slid out, the card holds the right) and the grey slides over with
+   it. background-position animates, so the hand-off is one smooth glide. On
+   #hero itself (not a pseudo-element) so #hero::before's dot grid paints over it. */
+.iona-brand #hero {
+ background-image:linear-gradient(to right,
+  #ffffff 0%, #ffffff 15%, #f0f1f0 21%, #dfe1e0 28%, #d1d4d3 36%, #c9ccca 45%,
+  #c9ccca 55%, #d1d4d3 64%, #dfe1e0 72%, #f0f1f0 79%, #ffffff 85%, #ffffff 100%);
+ background-size:200% 100%;
+ background-position:0% 0;
+ transition:background-position .75s cubic-bezier(.22, 1, .36, 1);
+}
+.iona-brand #hero.is-inspecting { background-position:100% 0; }
+@media(prefers-reduced-motion:reduce) { .iona-brand #hero { transition:none; } }
+
+/* Phase 105: the plant's canvas spans the WHOLE hero on desktop — copy and
+   model share grid row 1, the copy in column 1 above (z-index 2), the model
+   column under both. Framing into the strip the copy leaves free is done by
+   GltfTwinScene's Rig (copyOcclusion), so nothing here changes the canvas size
+   between overview and inspection. The copy is pointer-transparent except for
+   its links so orbiting works across the entire hero. */
+@media(min-width:1024px) {
+ .iona-brand #hero .hero-grid { row-gap:0; }
+ .iona-brand #hero .hero-copy { grid-column:1; grid-row:1; position:relative; z-index:2; pointer-events:none; }
+ .iona-brand #hero .hero-copy :is(a,button) { pointer-events:auto; }
+ .iona-brand #hero .hero-model-column,
+ .iona-brand #hero.is-inspecting .hero-model-column { grid-column:1 / -1; grid-row:1; margin:0 calc(-1 * var(--editorial-gutter)); }
 }

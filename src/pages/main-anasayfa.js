@@ -25,12 +25,22 @@ initMobileNav();
 initParallax();
 
 
+/* The hero copy's show/hide is driven from the 3D scene, not from this file:
+   GltfTwinScene owns the `selected` state and broadcasts it as `twinlevelchange`
+   (level 0 = overview, 1 = a structure is selected). This listener is the whole
+   DOM side of that contract — it flips one class, and CSS runs the slide-out.
+
+   `inert` has to track the same flag: once the copy has slid out it is still in
+   the layout (that is what keeps the model column from resizing mid-transition,
+   see brand-system.css), so without this it stays keyboard-focusable while
+   invisible and tabbing lands on a heading nobody can see. */
 function initHeroTwin() {
   const copy = document.getElementById('hero-copy');
   if (!copy) return;
   document.addEventListener('twinlevelchange', (e) => {
-    document.getElementById('hero').classList.toggle('is-inspecting', e.detail.level !== 0);
-    copy.inert = false;
+    const inspecting = e.detail.level !== 0;
+    document.getElementById('hero').classList.toggle('is-inspecting', inspecting);
+    copy.inert = inspecting;
   });
 }
 initHeroTwin();

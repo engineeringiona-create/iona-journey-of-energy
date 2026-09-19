@@ -8,7 +8,7 @@
    out of the critical path for visitors who never reach it.
 
    Points at GltfTwinScene.jsx (loads the real facility GLB at
-   public/models/iona-tesis-3d.glb) rather than the older
+   iona-tesis-3d.draco.glb, see modelAssets.js) rather than the older
    DigitalTwinScene.jsx (hand-built procedural stations, no GLB) — the
    latter is left in the repo unwired, same as before.
 
@@ -17,6 +17,27 @@
    whole hero section, not a grid column — see index.html), not
    `hidden md:block`, so this same IntersectionObserver mounts the twin
    for both mobile and desktop — no separate mobile mount path needed. */
+import { remoteModelOrigin } from '../../lib/modelAssets.js';
+
+/* modelAssets.js dışında bu dosyanın statik importu yok ve olmamalı — o da
+   birkaç satırlık, bağımlılıksız bir env okuyucu.
+
+   GLB Supabase Storage'dan geliyorsa ayrı bir origin demektir: DNS + TLS
+   el sıkışması, model gerçekten istenene kadar (IntersectionObserver
+   tetiklenene kadar) beklerse o maliyet doğrudan modelin görünme süresine
+   eklenir. preconnect'i şimdi kurup el sıkışmayı kullanıcının scroll'uyla
+   paralel hale getiriyoruz. crossorigin şart: GLB'yi fetch eden three
+   CORS modunda istiyor, bağlantı havuzları ayrı — crossorigin'siz
+   preconnect bu isteğe hiç yaramaz. */
+const modelCdnOrigin = remoteModelOrigin();
+if (modelCdnOrigin) {
+  const link = document.createElement('link');
+  link.rel = 'preconnect';
+  link.href = modelCdnOrigin;
+  link.crossOrigin = 'anonymous';
+  document.head.appendChild(link);
+}
+
 const container = document.getElementById('iona-digital-twin-root');
 
 if (container) {

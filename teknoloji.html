@@ -3,12 +3,39 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <script>(function(){try{var t=localStorage.getItem('iona-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
 <title>IONA - Teknoloji</title>
+<!-- SEO:start -->
+<meta name="description" content="Anahtar teslim biyogaz tesisleri kuruyoruz. Çürütücü, karıştırma, pompalama, gaz hattı ve kojenerasyonu aynı prosesin parçaları olarak ele alıyoruz.">
+<link rel="canonical" href="https://ionaengineering.com/teknoloji.html">
+<meta property="og:title" content="IONA - Teknoloji">
+<meta property="og:description" content="Anahtar teslim biyogaz tesisleri kuruyoruz. Çürütücü, karıştırma, pompalama, gaz hattı ve kojenerasyonu aynı prosesin parçaları olarak ele alıyoruz.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ionaengineering.com/teknoloji.html">
+<meta property="og:image" content="https://ionaengineering.com/og-image.jpg">
+<meta property="og:site_name" content="IONA Biogas">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="IONA - Teknoloji">
+<meta name="twitter:description" content="Anahtar teslim biyogaz tesisleri kuruyoruz. Çürütücü, karıştırma, pompalama, gaz hattı ve kojenerasyonu aynı prosesin parçaları olarak ele alıyoruz.">
+<meta name="twitter:image" content="https://ionaengineering.com/og-image.jpg">
+<!-- hreflang: build-i18n-pages.mjs dolduruyor -->
+<!-- SEO:end -->
 <link rel="icon" type="image/svg+xml" href="/images/iona-icon.svg">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Fontlar. 2026-09-19'a kadar burada 4 ayrı render-bloklayan istek vardı ve
+     Material Symbols'ün TAMAMI (binlerce ikon, 6,7 MB) her sayfada indiriliyordu.
+     Şimdi 2 istek: ikon fontu `icon_names` ile sitede gerçekten kullanılan 50
+     ikona indirgendi (6,7 MB -> 17 KB), metin fontları tek çağrıda birleşti.
+     preconnect'ler, font dosyalarının geldiği ikinci origin olan gstatic'in
+     DNS+TLS el sıkışmasını CSS beklemeden başlatıyor.
+
+     DİKKAT: yeni bir Material Symbols ikonu eklersen adını aşağıdaki
+     icon_names listesine DE ekle — listede olmayan ikon, fontta ligatür
+     bulunamadığı için ikon yerine düz yazı olarak görünür ("arrow_forward"
+     kelimesi ekrana basılır). Liste 8 sayfada da aynıdır. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;icon_names=ac_unit,arrow_forward,autorenew,bar_chart,battery_full,bolt,build,call,campaign,check,checklist,close,conveyor_belt,dark_mode,dashboard_customize,description,device_thermostat,filter_alt,format_align_center,format_align_left,format_align_right,groups,history,keyboard_arrow_down,language,layers,light_mode,local_shipping,location_on,mail,menu,newspaper,palette,payments,perm_media,plumbing,precision_manufacturing,propane_tank,qr_code_scanner,report,science,search,sensors,shield,star,summarize,travel_explore,view_in_ar,warning,water_drop&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Montserrat:wght@400;500;600;700;800&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/base.css">
 <link rel="stylesheet" href="/src/styles/editorial.css">
 <link rel="stylesheet" href="/src/styles/brand-system.css">
@@ -111,75 +138,98 @@
 </div>
 </div>
 
-<!-- 3D Services showcase: a self-contained, fixed-height slider (NOT
-     scroll-driven — a scroll-hijacking pinned version of this shipped
-     and got pulled after repeatedly landing broken/overlapping text).
-     Left column = the active machine's copy. Right column is
-     #services-3d-canvas-box: a dedicated, position:relative +
-     overflow:hidden container that owns #webgl-stage outright — the
-     canvas is a real child of it now, absolutely filling this one box
-     (see #webgl-stage in base.css) instead of pinned to the viewport,
-     so it scrolls away with this section like everything else instead
-     of following the screen. See expo-scene.js's resize()/layout() for
-     the matching change on the Three.js side (sized off this box's own
-     rect, not window.innerWidth/innerHeight; machines centered in it
-     rather than offset to dodge a text column they no longer share a
-     frame with). Model/copy switching is entirely click-driven (arrows
-     + pills, see servicesShowcase.js) — the page around it scrolls
-     completely normally, nothing here touches scroll. -->
+<!-- Hizmetler açılışı. 2026-09-19'a kadar burada three.js ile canlandırılan
+     3 makinenin (karıştırıcı / CAT jeneratör / mono pompa) ok+pill ile
+     gezilen bir vitrini vardı. Kaldırıldı: IONA makine satmıyor, anahtar
+     teslim tesis kuruyor — tek tek ekipmanı vitrine koymak şirketi ekipman
+     tedarikçisi gibi gösteriyordu. Yerine gerçek saha fotoğraflarıyla
+     tesis teslim süreci anlatılıyor.
+     Yan etki (istenen): bu sayfa artık hiç WebGL yüklemiyor. expo-scene.js,
+     agitator/pump modelleri, servicesShowcase.js ve 1,1 MB'lık
+     iona-mono-pompa.glb .backups/removed-services-3d/ altına taşındı —
+     three.js bu sayfanın bundle'ından tamamen çıktı. -->
 <section class="relative bg-transparent pt-24 md:pt-28 pb-20 md:pb-28" id="expo">
 <div class="px-safe-margin-mobile md:px-safe-margin-desktop">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
 
-<div class="relative w-full flex flex-col md:flex-row md:items-center gap-8 md:gap-0 md:h-[750px]" id="services-3d-showcase">
+<div class="flex flex-col md:flex-row md:items-center gap-10 md:gap-14">
 
-<div class="relative w-full min-h-[420px] md:w-[45%] md:h-full">
-
-<div class="services-3d-slide" id="expo-agitator" data-machine="agitator">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.agitator_eyebrow">Teknoloji · Karıştırma Sistemi</span>
-<h1 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.agitator_title">İleri Mühendislik, Sürdürülebilir Tesisler İçin</h1>
-<p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.agitator_intro">Sıkı fizibilite analizinden anahtar teslim inşaata kadar, sıfır operasyonel kesinti süresiyle özelleştirilmiş biyoenerji sistemleri sunuyoruz.</p>
-<h2 class="font-headline-md text-headline-md mb-stack-sm fade-in-element delay-300 is-visible" data-i18n="services.expo.agitator_subtitle">Twin Karıştırıcı Teknolojisi</h2>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.agitator_body1">Gelişmiş dikey ve yatay ajitasyon teknolojilerimiz ölü bölgeleri ortadan kaldırır ve köpük oluşumunu önler. Bu, mükemmel substrat homojenliği sağlayarak maksimum metan dönüşümü ve daha yüksek enerji verimliliği sunar.</p>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.expo.agitator_body2">Iona'nın özel karıştırma teknolojisi ve sağlam doğrudan katı besleme sistemleriyle tesislerimiz, anaerobik çürütücü içinde %14'e varan kuru madde içeriğinde bile son derece kararlı operasyonlar sağlar.</p>
+<!-- Sayfanın h1'i burada. Sütun ~%48 genişlikte olduğu için başlık
+     text-display-hero'nun sabit 120px'ini kullanamaz; base.css'teki
+     #services-intro-copy kuralı onu sütuna göre akışkan hale getiriyor
+     (Almanca/Fransızca çeviriler Türkçeden belirgin uzun). -->
+<div class="w-full md:w-[48%]" id="services-intro-copy">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.intro.eyebrow">Ne Yapıyoruz</span>
+<h1 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.intro.title">Anahtar teslim biyogaz tesisleri kuruyoruz.</h1>
+<p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.intro.lead">Iona Biogas; organik atığı elektriğe, ısıya ve organik gübreye çeviren biyogaz tesislerini fizibiliteden devreye almaya kadar tek elden tasarlayan, inşa eden ve çalışır halde teslim eden bir mühendislik şirketidir.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-4 fade-in-element delay-300 is-visible" data-i18n="services.intro.body1">Çürütücü, karıştırma, pompalama, gaz hattı ve kojenerasyonu aynı prosesin parçaları olarak ele alıyoruz. Ekipman seçimi, besleme analizinin ve kütle–enerji dengesinin sonucunda çıkıyor.</p>
+<p class="text-body-md text-[var(--text-muted)] mb-stack-md fade-in-element delay-300 is-visible" data-i18n="services.intro.body2">Her tesis sahanın kendi atığına göre yeniden boyutlandırılır — hayvancılık işletmesi, tarımsal artık, endüstriyel ya da belediye atığı fark etmeksizin.</p>
+<a class="inline-flex items-center gap-2 border-b border-[var(--brand)]/30 pb-1 hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] transition-colors duration-300 font-label-caps text-label-caps fade-in-element delay-400 is-visible" href="/iletisim.html#contact-form">
+<span data-i18n="services.intro.cta">Tesisiniz için fizibilite isteyin</span> <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+</a>
 </div>
 
-<div class="services-3d-slide" id="expo-genset" data-machine="genset">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.genset_eyebrow">Teknoloji · Güç Üretimi</span>
-<h2 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.genset_title">Yüksek Verimli Güç Üretimi</h2>
-<p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.genset_intro">Verimli, sürdürülebilir enerji çözümleri sunan anahtar teslim biyogaz tesisleri inşa ediyoruz.</p>
-<h3 class="font-headline-md text-headline-md mb-stack-sm fade-in-element delay-300 is-visible" data-i18n="services.expo.genset_subtitle">Akıllı Isı ve Enerji Yönetimi</h3>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.genset_body1">Yenilikçi Taşma Sistemimiz (OFT), tamamen "Birleşik Kap" prensibiyle çalışır. Çürüyen madde transferinde yerçekiminden akıllıca yararlanarak mekanik stresi büyük ölçüde azaltır ve pompalama enerji tüketimini %66'ya kadar keser.</p>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.genset_body2">Akıllı ısı dağıtım üniteleri termal enerji kullanımını optimize eder. Tüm Iona tesisleri, akıllı sensörlerle entegre otomatik termal donma önleme koruması içerir.</p>
+<figure class="w-full md:w-[52%] fade-in-element delay-200 is-visible">
+<div class="relative w-full h-[320px] sm:h-[420px] md:h-[560px] overflow-hidden rounded-3xl">
+<img class="w-full h-full object-cover" data-img-key="services_plant_aerial" src="/images/field/facility-aerial.webp" alt="Besleme kaynağının yanına kurulmuş IONA biyogaz tesisinin havadan görünümü" width="1800" height="1350" decoding="async">
 </div>
-
-<div class="services-3d-slide" id="expo-pump" data-machine="pump">
-<span class="font-label-caps text-label-caps text-[#198837] tracking-widest block mb-4 fade-in-element is-visible" data-i18n="services.expo.pump_eyebrow">Teknoloji · Pompa İstasyonu</span>
-<h2 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-display-hero mb-stack-sm tracking-tighter fade-in-element delay-100 is-visible" data-i18n="services.expo.pump_title">Kesintisiz Malzeme Transferi</h2>
-<p class="font-body-lg text-body-lg text-[var(--text-muted)] mb-stack-md fade-in-element delay-200 is-visible" data-i18n="services.expo.pump_intro">Merkezi Pompa İstasyonumuz (CPS), tesisin her noktasına yüksek katı madde oranında bile darbesiz, kararlı akış sağlar.</p>
-<h3 class="font-headline-md text-headline-md mb-stack-sm fade-in-element delay-300 is-visible" data-i18n="services.expo.pump_subtitle">Helisel Rotor-Stator Teknolojisi</h3>
-<p class="text-body-md text-[var(--text-muted)] mb-4" data-i18n="services.expo.pump_body1">Eksantrik rotor, elastomer stator içinde dönerek nabızsız ve sabit debili bir akış üretir. Bu, aşındırıcı ve yüksek viskoziteli substratlarda bile pompa ömrünü uzatır ve bakım sıklığını azaltır.</p>
-<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.expo.pump_body2">Modüler gövde tasarımı sayesinde aşınan tek parça olan stator, tüm hattı sökmeden dakikalar içinde değiştirilebilir — planlı bakımlar dışında sıfır kesinti hedefiyle tasarlandı.</p>
-</div>
+<figcaption class="mt-3 text-sm text-[var(--text-muted)]" data-i18n="services.intro.caption">Sahada kurduğumuz bir tesis: çürütücüler, digestat havuzları, gaz hattı ve kojenerasyon ünitesi — atığın çıktığı işletmenin hemen yanında.</figcaption>
+</figure>
 
 </div>
 
-<div class="relative w-full h-[650px] md:h-full md:w-[55%] overflow-hidden rounded-3xl" id="services-3d-canvas-box">
+<!-- Teslim süreci: üç aşama, üçü de gerçek saha fotoğrafı. Kronolojik
+     sırada ilerliyor (mühendislik → montaj → devreye alma) ki "tesis
+     kuruyoruz" iddiası fotoğrafla da doğrulansın.
 
-<canvas id="webgl-stage"></canvas>
+     fade-in-section ŞART: common.js'teki initFadeIn is-visible'ı yalnızca
+     görünür alana giren bir .fade-in-section'ın İÇİNDEKİ
+     .fade-in-element'lere ekliyor. Sarmalayıcıda bu sınıf olmazsa aşağıdaki
+     üç kart opacity:0'da kalır ve hiç açılmaz. (Yukarıdaki giriş sütunu bunun
+     yerine is-visible'ı doğrudan taşıyor: sayfanın ilk ekranı, gecikmeli
+     belirmesi istenmiyor.) -->
+<div class="mt-16 md:mt-24 fade-in-section">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg max-w-2xl fade-in-element" data-i18n="services.delivery.title">Fizibiliteden ilk kilovatsaate kadar tek sorumlu.</h2>
+<p class="font-body-md text-body-md text-[var(--text-muted)] max-w-xl mt-stack-sm fade-in-element delay-100" data-i18n="services.delivery.lead">Proje boyunca tek sözleşme, tek muhatap. Aşağıdaki üç aşamanın tamamı bize ait — taşeron koordinasyonu yatırımcının işi değil.</p>
+<ol class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 mt-stack-md">
 
-<button type="button" class="services-3d-arrow services-3d-arrow-prev" id="services-3d-prev" data-i18n-aria-label="services.expo.prev_aria" aria-label="Önceki">
-<span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
-</button>
-<button type="button" class="services-3d-arrow services-3d-arrow-next" id="services-3d-next" data-i18n-aria-label="services.expo.next_aria" aria-label="Sonraki">
-<span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
-</button>
-
-<div class="services-3d-tabs" role="tablist" aria-label="3B Teknoloji Vitrini">
-<button type="button" class="services-3d-tab is-active" data-slide-index="0" role="tab" aria-selected="true" data-i18n="services.expo.tab1">1. Karıştırma Sistemi</button>
-<button type="button" class="services-3d-tab" data-slide-index="1" role="tab" aria-selected="false" data-i18n="services.expo.tab2">2. Güç Üretimi</button>
-<button type="button" class="services-3d-tab" data-slide-index="2" role="tab" aria-selected="false" data-i18n="services.expo.tab3">3. Pompa İstasyonu</button>
+<li class="fade-in-element delay-100">
+<div class="relative w-full h-[220px] md:h-[240px] overflow-hidden rounded-2xl mb-5">
+<img class="w-full h-full object-cover" data-img-key="services_stage_engineering" src="/images/field/reactor-installation.webp" alt="İnşa halindeki çürütücü tankı ve karıştırıcı mili" width="1800" height="1350" loading="lazy" decoding="async">
 </div>
+<div class="flex items-center gap-3 mb-2">
+<span class="font-mono text-sm text-[var(--brand)]">01</span>
+<span class="h-px flex-1 bg-[var(--border)]" aria-hidden="true"></span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.delivery.stage1_title">Fizibilite ve Mühendislik</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.delivery.stage1_desc">Besleme profili analizi, kütle ve enerji dengesi, kapasite seçimi, yerleşim planı, izin ve ruhsat süreci. Yatırım kararı tahminle değil hesapla verilir.</p>
+</li>
 
+<li class="fade-in-element delay-200">
+<div class="relative w-full h-[220px] md:h-[240px] overflow-hidden rounded-2xl mb-5">
+<img class="w-full h-full object-cover" data-img-key="services_stage_construction" src="/images/field/reactor-membrane.webp" alt="Reaktörün membran taşıyıcı sisteminin montajı" width="1800" height="1350" loading="lazy" decoding="async">
+</div>
+<div class="flex items-center gap-3 mb-2">
+<span class="font-mono text-sm text-[#ffc700]">02</span>
+<span class="h-px flex-1 bg-[var(--border)]" aria-hidden="true"></span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.delivery.stage2_title">İnşaat ve Montaj</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.delivery.stage2_desc">Saha hazırlığı, betonarme yapılar, ekipman montajı, proses boru hatları, elektrik ve otomasyon. Sahadaki ekip bizim ekibimiz.</p>
+</li>
+
+<li class="fade-in-element delay-300">
+<div class="relative w-full h-[220px] md:h-[240px] overflow-hidden rounded-2xl mb-5">
+<img class="w-full h-full object-cover" data-img-key="services_stage_commissioning" src="/images/field/reactor-exterior.webp" alt="Devreye alınmış biyogaz reaktörlerinin sahadaki görünümü" width="1800" height="1350" loading="lazy" decoding="async">
+</div>
+<div class="flex items-center gap-3 mb-2">
+<span class="font-mono text-sm text-[var(--brand-orange)]">03</span>
+<span class="h-px flex-1 bg-[var(--border)]" aria-hidden="true"></span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2" data-i18n="services.delivery.stage3_title">Devreye Alma ve İşletme</h3>
+<p class="text-body-md text-[var(--text-muted)]" data-i18n="services.delivery.stage3_desc">Aşılama, ilk gaz üretimi, performans testleri ve personel eğitimi. Teslimden sonra da uzaktan izleme ve teknik destek devam eder.</p>
+</li>
+
+</ol>
 </div>
 
 </div>

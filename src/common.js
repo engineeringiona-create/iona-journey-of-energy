@@ -1,6 +1,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import { localizePath } from './lib/langPath.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -137,10 +138,14 @@ const SEARCH_INDEX = [
   { label: 'Misyon, Vizyon ve Değerlerimiz', href: '/hakkimizda.html#statements', keywords: 'mission vision misyon vizyon değer sürdürülebilirlik' },
   { label: 'Neden Iona', href: '/hakkimizda.html#why-us', keywords: 'akıllı teknoloji maliyet tasarrufu kesintisiz destek' },
   { label: 'Hizmetler', href: '/teknoloji.html', keywords: 'services teknoloji çözümler kataloğu' },
-  { label: 'Twin Karıştırıcı Teknolojisi', href: '/teknoloji.html#expo-agitator', keywords: 'agitator karıştırma karıştırıcı ajitasyon' },
-  { label: 'Güç Üretimi', href: '/teknoloji.html#expo-genset', keywords: 'jeneratör enerji güç genset' },
-  { label: 'Mono Pompa Teknolojisi', href: '/teknoloji.html#expo-pump', keywords: 'pompa istasyonu cps' },
-  { label: 'Mühendislik İş Akışı', href: '/teknoloji.html#workflow', keywords: 'adım fizibilite tasarım inşaat destek workflow' },
+  /* 2026-09-19: buradaki üç makine girdisi (Twin Karıştırıcı / Güç Üretimi /
+     Mono Pompa) kaldırıldı — işaret ettikleri #expo-agitator, #expo-genset,
+     #expo-pump çapaları Hizmetler yenilenirken silindi, yani arama sonucuna
+     tıklayan ziyaretçi sayfanın başına düşüyordu. Yerlerine tesis kurulumunu
+     anlatan yeni bölümler geldi. Çapa silerken BU LİSTEYİ de gözden geçir —
+     tarayıcı olmayan bir çapayı sessizce yok sayar, hata vermez. */
+  { label: 'Çözümlerimiz', href: '/teknoloji.html#solutions', keywords: 'çözüm katalog çürütücü karıştırma pompa oft cps ürün teknoloji' },
+  { label: 'Mühendislik İş Akışı', href: '/teknoloji.html#workflow', keywords: 'adım fizibilite tasarım inşaat devreye alma destek workflow anahtar teslim' },
   { label: 'Sektörler', href: '/etki.html', keywords: 'industries endüstri belediye tarım hayvancılık' },
   { label: 'Teknoloji ve Tedarik Ortaklarımız', href: '/etki.html#partners', keywords: 'ortaklar partners tedarikçi' },
   { label: 'IonaFlux', href: '/ionaflux.html', keywords: 'ionaflux uygulama app scada dijital ikiz digital twin arıza qr izleme monitoring' },
@@ -165,7 +170,12 @@ export function initSiteSearch() {
     results.innerHTML = '';
     matches.slice(0, 8).forEach((it) => {
       const a = document.createElement('a');
-      a.href = it.href;
+      /* Bu liste yolları Türkçe kök biçiminde tutuyor (tek bir liste, tek
+         doğruluk kaynağı). Ziyaretçi bir dil sürümündeyse bağlantı o dile
+         çevrilir — yoksa arama sonucuna tıklayan Almanca ziyaretçi sessizce
+         Türkçe sayfaya düşerdi. Sonuç ETİKETLERİ hâlâ Türkçe; index'in
+         çevrilmesi ayrı bir iş. */
+      a.href = localizePath(it.href);
       a.textContent = it.label;
       a.className = 'block px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200';
       results.appendChild(a);

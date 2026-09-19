@@ -623,218 +623,33 @@ html {
 .delay-300 { transition-delay: 300ms; }
 .delay-400 { transition-delay: 400ms; }
 
-/* teknoloji.html's #services-3d-showcase: a fixed-height, click-driven
-   slider between the 3 machines (arrows + pills, see
-   servicesShowcase.js) — NOT scroll-driven. An earlier version pinned
-   this section with ScrollTrigger and stepped it via wheel/touch
-   hijacking; that shipped broken (overlapping text) twice in a row and
-   was pulled entirely in favor of this plain, always-normal-scrolling
-   version. Applies at every viewport width now, not just md: — there's
-   no scroll-position logic left for a breakpoint to gate.
+/* teknoloji.html'in Hizmetler açılışı (#expo). 2026-09-19'da buradaki
+   3 makinelik WebGL vitrini kaldırıldı; onunla birlikte .services-3d-*
+   (slide crossfade, cam oklar, pill sekmeler) ve #webgl-stage kuralları
+   da silindi — sayfada artık ne canvas var ne slider.
 
-   Every animated property below (opacity, visibility, pointer-events) is
-   set here ONLY as a resting/initial state — no `transition` on any of
-   it. servicesShowcase.js's GSAP tweens own the actual crossfade
-   in-between; a CSS transition running alongside a GSAP tween on the
-   same property is what produced the earlier "text bleeds into other
-   text" bug (two animation systems both writing inline opacity on the
-   same element, out of sync with each other) — not repeating that here. */
-#services-3d-showcase {
-    isolation: isolate;
-    /* No `size` (that's what `strict`/`content` add over this) — the
-       showcase has no single explicit height of its own on mobile
-       (its two children stack and size themselves; only md:h-[750px]
-       fixes it), so size containment would collapse it to 0 height
-       there. layout+paint+style containment is still real, safe
-       perf isolation: a re-render inside here can't trigger layout/
-       paint work outside it, or vice versa. */
-    contain: layout paint style;
+   Geriye kalan tek şey akışkan başlık tipografisi: h1 hâlâ ~%48
+   genişliğinde bir sütunun içinde ve text-display-hero'nun 120px'i tam
+   sayfa genişliği için çizilmiş bir ölçü. Sütunu kendi sizing context'i
+   yapıp başlığı ona göre ölçeklemezsek tek bir kelime sütundan taşıyor
+   (Almanca ve Fransızca çeviriler Türkçeden belirgin uzun). */
+#services-intro-copy {
+    container-type: inline-size;
 }
 
-/* Left column: the active service's typography, ~45% wide on desktop
-   (md:w-[45%] in teknoloji.html). Right column is
-   #services-3d-canvas-box, a dedicated position:relative +
-   overflow:hidden box that #webgl-stage fills — see that id's own
-   comment in this file for why it's confined there instead of a
-   fixed/full-viewport backdrop. */
-#services-3d-showcase .services-3d-slide {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    /* Every step crossfades this via GSAP opacity tweens (see
-       servicesShowcase.js) — promoting it ahead of time means that
-       tween never has to wait on a first-frame layer-promotion cost. */
-    will-change: opacity;
+#services-intro-copy > h1[class*="display-hero"] {
+    font-size: clamp(2.25rem, 12cqi, 4.25rem);
+    line-height: 1.07;
 }
 
-#services-3d-showcase .services-3d-slide.is-active-slide {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
-/* Liquid-glass prev/next arrows, floating at the showcase's own
-   vertical center — same blur/saturate recipe as the announcement
-   popup's glass buttons (see lib/announcements.js's --ap-glass-btn-*)
-   for a consistent "glass" look across the site, values inlined here
-   rather than sharing those page-scoped custom properties since this
-   is a different page. */
-.services-3d-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
-    border: 1px solid rgba(20, 24, 20, 0.14);
-    color: var(--text);
-    cursor: pointer;
-    transition: background-color 300ms ease, border-color 300ms ease, transform 300ms ease;
-}
-
-.services-3d-arrow:hover {
-    background: rgba(255, 255, 255, 0.75);
-    border-color: rgba(20, 24, 20, 0.22);
-}
-
-.services-3d-arrow-prev { left: 0; }
-.services-3d-arrow-next { right: 0; }
-
-:root.dark .services-3d-arrow {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.16);
-    color: #fff;
-}
-
-:root.dark .services-3d-arrow:hover {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.26);
-}
-
-/* Pill tab switcher, centered along the showcase's own bottom edge. */
-.services-3d-tabs {
-    position: absolute;
-    left: 50%;
-    bottom: 16px;
-    transform: translateX(-50%);
-    z-index: 20;
-    display: flex;
-    gap: 6px;
-    padding: 6px;
-    border-radius: 999px;
-    max-width: calc(100% - 32px);
-    overflow-x: auto;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
-    border: 1px solid rgba(20, 24, 20, 0.14);
-}
-
-:root.dark .services-3d-tabs {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.16);
-}
-
-.services-3d-tab {
-    padding: 8px 16px;
-    border-radius: 999px;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background-color 300ms ease, color 300ms ease;
-}
-
-.services-3d-tab.is-active {
-    background: var(--brand-orange);
-    color: #fff;
-}
-
-@media (max-width: 767px) {
-    .services-3d-arrow {
-        width: 40px;
-        height: 40px;
-    }
-    .services-3d-tabs {
-        bottom: 8px;
-    }
-    .services-3d-tab {
-        padding: 7px 12px;
-        font-size: 11px;
-    }
-}
-
-/* Backdrop-blur forces the compositor to re-sample everything behind
-   the blurred element every frame it's on screen — real cost on
-   weaker mobile/tablet GPUs, for buttons this small. Dropped
-   entirely below desktop; background opacity bumped up in its place
-   (0.55 -> 0.82, dark 0.08 -> 0.5) so the glass still reads as opaque
-   enough to stay legible over the 3D model without the blur itself. */
-@media (max-width: 1023px) {
-    .services-3d-arrow,
-    .services-3d-tabs {
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        background: rgba(255, 255, 255, 0.82);
-    }
-    :root.dark .services-3d-arrow,
-    :root.dark .services-3d-tabs {
-        background: rgba(20, 24, 20, 0.72);
-    }
-}
-
-/* Çözümlerimiz's 8-card grid: no `size` here either (natural content
-   height, not a fixed box), same reasoning as #services-3d-showcase
-   above — layout+paint+style containment only, so a card's own hover
+/* Çözümlerimiz's 8-card grid: no `size` here (natural content height,
+   not a fixed box) — layout+paint+style containment only, so a card's own hover
    transform/spotlight repaint can't force the browser to re-check
    layout/paint outside this section. */
 #solutions {
     contain: layout paint style;
 }
 
-/* teknoloji.html's expo-scene.js canvas — the only page that currently
-   instantiates a <canvas id="webgl-stage">. (etki.html's genset-scene.js
-   renders to this same id too, but nothing currently mounts it — no
-   <canvas> in etki.html to select, predating this fix, not something
-   this change touches. If that page ever comes back, it'll want its own
-   scoped rule rather than reusing the one below.)
-
-   Confined to #services-3d-canvas-box (a normal, position:relative +
-   overflow:hidden box inside the showcase section) instead of a fixed/
-   full-viewport backdrop — an earlier version had this canvas pinned to
-   the viewport, which meant it visually "followed the screen" past its
-   own section into Çözümlerimiz/the footer, reading as broken/stuck
-   scrolling even though the document itself was scrolling fine
-   underneath. expo-scene.js's resize()/layout() size the renderer and
-   camera off this box's own rect, not window.innerWidth/innerHeight —
-   see that file's own comments. */
-#webgl-stage {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-}
 
 /* The dramatic top zone on 3D-hosting pages where the model is the focal
    point. Below it, content flows naturally (not viewport-locked) so long
@@ -2047,10 +1862,9 @@ html {
     z-index: 0;
 }
 
-/* Biogaz getiri hesaplayıcı waste-type pills — same shape/interaction
-   as .services-3d-tab, brand green instead of brand-orange since this
-   is a data-entry control, not a CTA (the CTA below it keeps the
-   orange). */
+/* Biogaz getiri hesaplayıcı waste-type pills — brand green instead of
+   brand-orange since this is a data-entry control, not a CTA (the CTA
+   below it keeps the orange). */
 .biogaz-atik-pill {
     padding: 10px 18px;
     border-radius: 999px;

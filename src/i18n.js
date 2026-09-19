@@ -15,6 +15,7 @@ import { pageIdForPath } from './lib/pages.js';
 import { applyThemeVars } from './lib/themeVars.js';
 import { reorderSections } from './lib/sectionLayout.js';
 import { pickFrameTarget } from './lib/imageFrameTarget.js';
+import { langFromPath, samePageInLang } from './lib/langPath.js';
 
 export const LANGS = [
   { code: 'tr', label: 'Türkçe' },
@@ -225,7 +226,7 @@ async function applyGlobalOverrides() {
       title: 'Enerjinin geleceğini birlikte tasarlıyoruz.',
       category: 'Tasarım önizlemesi',
       description: 'Yeni IONA duyuru tasarımı: mühendislik haberleri, etkinlikler ve güncellemeler için daha sade bir okuma deneyimi.\n\nBu örnek yalnızca yerel önizlemede gösterilir. Yönetim panelinden duyuru kaydettiğinizde yerini kendi içeriğiniz alır.',
-      bannerImage: '/images/digester-dome-facility.jpg',
+      bannerImage: '/images/digester-dome-facility.webp',
       showInPopup: true,
       ctaEnabled: true,
       ctaText: 'Duyuruları İncele',
@@ -285,12 +286,20 @@ function loadDict(lang) {
   return p;
 }
 
+/* Dilin tek kaynağı ADRESTİR. Türkçe kökte (`/teknoloji.html`), diğer altı dil
+   önekli adreste (`/de/teknoloji.html`) — her biri build sırasında üretilmiş
+   gerçek, önceden çevrilmiş bir HTML dosyası.
+
+   Eskiden dil localStorage'dan okunuyordu. Bunun iki sonucu vardı: her dilin
+   tek bir adresi olduğu için Google yalnızca Türkçe sürümü görüyordu, ve
+   localStorage'ı olmayan Googlebot'un indekslediği içerikle ziyaretçinin
+   gördüğü içerik ayrışabiliyordu. localStorage hâlâ YAZILIYOR (dil menüsünün
+   etiketi ve olası ileride kullanım için) ama render kararını artık vermiyor:
+   verseydi `/teknoloji.html` adresi, tarayıcısında eski bir kayıt taşıyan
+   ziyaretçiye Almanca açılır, canonical ise Türkçe'yi gösterirdi. */
 export function currentLang() {
-  try {
-    const saved = localStorage.getItem('iona-lang');
-    if (saved && LANGS.some((l) => l.code === saved)) return saved;
-  } catch (e) { /* private mode etc. */ }
-  return 'tr';
+  if (typeof location === 'undefined') return 'tr';
+  return langFromPath(location.pathname);
 }
 
 function applyDict(dict) {
@@ -318,6 +327,7 @@ export async function initI18n() {
   const dict = await loadDict(lang);
   window.__ionaLang = lang;
   window.__ionaDict = dict;
+  window.__ionaSetLang = applyLangInPlace;
   applyDict(dict);
   applyGlobalOverrides();
   trackPageView();
@@ -325,9 +335,31 @@ export async function initI18n() {
   return dict;
 }
 
+/* Dil değiştirmek artık bir GEZİNMEDİR, yerinde yeniden render değil: her dilin
+   kendi adresi ve kendi statik HTML'i var, seçim adrese yazılmazsa paylaşılan
+   bağlantı yanlış dili açar ve arama motoru o dili hiç göremez. Ziyaretçi
+   bulunduğu sayfanın hedef dildeki karşılığına gider (`#capa` ve `?sorgu`
+   korunur), ana sayfaya atılmaz.
+
+   Zaten o dildeysek gezinme yapılmaz — aksi halde menüden mevcut dile tıklamak
+   sayfayı boşuna baştan yükletirdi. */
 async function setLang(lang) {
   if (!LANGS.some((l) => l.code === lang)) return;
   try { localStorage.setItem('iona-lang', lang); } catch (e) { /* private mode etc. */ }
+  if (lang === currentLang()) return;
+  location.href = samePageInLang(lang, location);
+}
+
+/* Gezinmeden, sayfayı yerinde çeviren eski davranış. Genel ziyaretçi akışında
+   KULLANILMAZ (setLang artık adres değiştirir); tek tüketicisi admin editörünün
+   iframe önizlemesi: orada dil değiştirmek sayfayı yeniden yükletirse iframe'e
+   bağlı tıklama dinleyicileri ve düzenleme modu kaybolur, editör de hangi dilin
+   açık olduğunu bildiren "i18nchange" olayını hiç alamaz.
+   initI18n() bunu window.__ionaSetLang olarak dışarı açar — LiveEditor iframe
+   sınırının ötesinden modülü import edemez, ancak contentWindow üzerinden
+   çağırabilir. */
+export async function applyLangInPlace(lang) {
+  if (!LANGS.some((l) => l.code === lang)) return;
   document.documentElement.lang = lang;
   const dict = await loadDict(lang);
   window.__ionaLang = lang;

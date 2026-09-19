@@ -468,15 +468,21 @@ export default function LiveEditor({ onLogout }) {
     langRef.current = lang;
   }, [lang]);
 
-  /* Reuses the live site's own language switcher (src/i18n.js's
-     initLangSwitcher()) instead of reimplementing lang-switching here —
-     clicking the nav's hidden data-lang button re-renders the page's
-     text in place, same page/scroll position, no iframe reload. The
-     resulting "i18nchange" event (also dispatched by that same code)
-     is what actually updates the `lang` state below. */
+  /* Reuses the live site's own i18n code instead of reimplementing
+     lang-switching here — it re-renders the page's text in place, same
+     page/scroll position, no iframe reload. The resulting "i18nchange"
+     event (dispatched by that same code) is what actually updates the
+     `lang` state below.
+
+     Nav'daki gizli data-lang düğmesine tıklamak ARTIK OLMAZ: o düğme
+     2026-09-19'dan beri dilin adresine gidiyor (`/de/teknoloji.html`),
+     bu da iframe'i yeniden yükletir — düzenleme modu, bu effect'in bir
+     kez bağladığı tıklama dinleyicileri ve i18nchange olayı topluca
+     kaybolurdu. Bunun yerine sayfanın kendi içindeki yerinde-çeviri
+     fonksiyonu çağrılıyor; iframe sınırını modül import'u geçemediği
+     için erişim contentWindow üzerinden. */
   function switchLang(code) {
-    const doc = iframeRef.current?.contentDocument;
-    doc?.querySelector(`[data-lang="${code}"]`)?.click();
+    iframeRef.current?.contentWindow?.__ionaSetLang?.(code);
   }
 
   /* The three global (non-page-scoped) modals converted to "Uygula" in

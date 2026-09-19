@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin
+
+# Yönetim aracı dışında kapalı bir yol yok. Dil sürümleri (/en/, /de/, /es/,
+# /fr/, /ru/, /hi/) taranmaya açıktır; hangi sürümün hangi dile ait olduğunu
+# her sayfanın <head> bölümündeki hreflang etiketleri söyler.
+
+Sitemap: https://ionaengineering.com/sitemap.xml

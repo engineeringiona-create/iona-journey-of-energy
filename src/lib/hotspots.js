@@ -1,11 +1,14 @@
 const LAYER_ID = 'iona-hotspot-layer';
 
-/* #webgl-stage (the 3D machine scene) is a full-viewport position:fixed
-   canvas (see base.css) — pins are placed as plain percentage x/y over
-   that same fixed viewport rather than projected from real Three.js
-   world coordinates. Simpler and good enough for "point at roughly this
-   part of the model"; it doesn't track the model through its
-   scroll-driven fly-in/assemble animation (see expo-scene.js). */
+/* Pins are plain percentage x/y over a fixed, full-viewport layer — never
+   projected from real Three.js world coordinates.
+
+   DİKKAT (2026-09-19): bunlar teknoloji.html'deki 3 makinelik WebGL
+   vitrinini işaret etmek için yazılmıştı; o vitrin kaldırıldı. Kod
+   olduğu gibi duruyor ve liste boşken (varsayılan) hiçbir şey çizmiyor,
+   ama admin panelindeki "3D Bilgi Noktaları" ile pin eklenirse artık
+   bir model yerine sayfanın üstünde boşluğa yerleşir. Özellik yeniden
+   kullanılacaksa hedefini de yeniden tanımlamak gerekir. */
 export function applyHotspots(list) {
   const existing = document.getElementById(LAYER_ID);
   if (!list || list.length === 0) {

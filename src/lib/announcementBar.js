@@ -1,3 +1,4 @@
+import { localizePath } from './langPath.js';
 const BAR_ID = 'iona-announcement-bar';
 
 /* Every page's nav is position:fixed;top:0 and rendered as a translucent
@@ -31,7 +32,9 @@ export function applyAnnouncementBar(cfg) {
   bar.innerHTML = '';
   if (cfg.link) {
     const a = document.createElement('a');
-    a.href = cfg.link;
+    /* Kök-göreli bağlantı, ziyaretçinin bulunduğu dile çevrilir; tam URL
+       ve mailto:/tel: olduğu gibi geçer (bkz. localizePath). */
+    a.href = localizePath(cfg.link);
     a.textContent = cfg.text;
     a.style.color = 'inherit';
     a.style.textDecoration = 'underline';

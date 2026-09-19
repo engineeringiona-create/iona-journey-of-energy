@@ -3,17 +3,39 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <script>(function(){try{var t=localStorage.getItem('iona-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
 <title>IONA | Biyogaz Çözümleri &amp; Temiz Enerji Teknolojileri</title>
+<!-- SEO:start -->
+<link rel="canonical" href="https://ionaengineering.com/">
+<meta property="og:url" content="https://ionaengineering.com/">
+<meta property="og:image" content="https://ionaengineering.com/og-image.jpg">
+<meta property="og:site_name" content="IONA Biogas">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="IONA | Biyogaz Çözümleri &amp; Temiz Enerji Teknolojileri">
+<meta name="twitter:description" content="Organik atığı sürdürülebilir yeşil enerjiye dönüştüren yüksek verimli biyogaz tesisleri ve mühendislik çözümleri.">
+<meta name="twitter:image" content="https://ionaengineering.com/og-image.jpg">
+<!-- hreflang: build-i18n-pages.mjs dolduruyor -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"IONA Biogas","alternateName":"Iona Engineering","url":"https://ionaengineering.com/","logo":"https://ionaengineering.com/images/iona-logo.png","image":"https://ionaengineering.com/og-image.jpg","description":"Organik atığı sürdürülebilir yeşil enerjiye dönüştüren yüksek verimli biyogaz tesisleri ve mühendislik çözümleri.","address":{"@type":"PostalAddress","streetAddress":"Kırkkonaklar Mah. 358. Sok. 13/5","addressLocality":"Çankaya","addressRegion":"Ankara","addressCountry":"TR"},"contactPoint":{"@type":"ContactPoint","telephone":"+90-540-246-4662","email":"info@ionaengineering.com","contactType":"sales","availableLanguage":["Turkish","English","German","Spanish","French","Russian","Hindi"]}}</script>
+<!-- SEO:end -->
 <meta name="description" content="Organik atığı sürdürülebilir yeşil enerjiye dönüştüren yüksek verimli biyogaz tesisleri ve mühendislik çözümleri.">
 <meta property="og:title" content="IONA — Biyogaz Çözümleri">
 <meta property="og:description" content="Organik atığı sürdürülebilir yeşil enerjiye dönüştüren yüksek verimli biyogaz tesisleri ve yalın mühendislik çözümleri.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://iona-journey-of-energy-production.up.railway.app/">
-<meta property="og:image" content="https://iona-journey-of-energy-production.up.railway.app/og-image.jpg">
 <link rel="icon" type="image/svg+xml" href="/images/iona-icon.svg">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Fontlar. 2026-09-19'a kadar burada 4 ayrı render-bloklayan istek vardı ve
+     Material Symbols'ün TAMAMI (binlerce ikon, 6,7 MB) her sayfada indiriliyordu.
+     Şimdi 2 istek: ikon fontu `icon_names` ile sitede gerçekten kullanılan 50
+     ikona indirgendi (6,7 MB -> 17 KB), metin fontları tek çağrıda birleşti.
+     preconnect'ler, font dosyalarının geldiği ikinci origin olan gstatic'in
+     DNS+TLS el sıkışmasını CSS beklemeden başlatıyor.
+
+     DİKKAT: yeni bir Material Symbols ikonu eklersen adını aşağıdaki
+     icon_names listesine DE ekle — listede olmayan ikon, fontta ligatür
+     bulunamadığı için ikon yerine düz yazı olarak görünür ("arrow_forward"
+     kelimesi ekrana basılır). Liste 8 sayfada da aynıdır. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;icon_names=ac_unit,arrow_forward,autorenew,bar_chart,battery_full,bolt,build,call,campaign,check,checklist,close,conveyor_belt,dark_mode,dashboard_customize,description,device_thermostat,filter_alt,format_align_center,format_align_left,format_align_right,groups,history,keyboard_arrow_down,language,layers,light_mode,local_shipping,location_on,mail,menu,newspaper,palette,payments,perm_media,plumbing,precision_manufacturing,propane_tank,qr_code_scanner,report,science,search,sensors,shield,star,summarize,travel_explore,view_in_ar,warning,water_drop&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Montserrat:wght@400;500;600;700;800&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
 <link rel="stylesheet" href="/src/styles/base.css">
 <link rel="stylesheet" href="/src/styles/editorial.css">
@@ -179,42 +201,12 @@
 <span class="hidden md:block text-[10px] font-mono uppercase tracking-widest text-black/40">04 / KATALOG</span>
 </div>
 </div>
-<a class="services-exhibit-row group service-panel-1 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-agitator">
+<a class="services-exhibit-row group service-panel-1 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-b border-slate-200" href="/teknoloji.html#workflow">
 <div class="relative overflow-hidden lg:col-span-7">
-<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/digester-mixer.jpg" alt="Twin Karıştırıcı Teknolojisi" loading="lazy" decoding="async">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/field/reactor-installation.webp" alt="Sahada reaktör montajı ve tesis yerleşimi" loading="lazy" decoding="async">
 </div>
 <div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
 <span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">01</span>
-<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Twin Karıştırıcı Teknolojisi</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüzey kabuklaşmasını önleyen, düşük enerjili çift karıştırıcı sistemleri.</p><dl class="service-specs"><div><dt>Sistem</dt><dd>Çift karıştırıcı</dd></div><div><dt>Proses</dt><dd>Anaerobik çürütme</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
-</div>
-</a>
-<a class="services-exhibit-row group service-panel-2 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-genset">
-<div class="relative overflow-hidden lg:col-span-7 lg:order-2">
-<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/power-cat-gensets.jpg" alt="Güç Üretimi" loading="lazy" decoding="async">
-</div>
-<div class="lg:col-span-5 lg:order-1 flex flex-col justify-center p-8 lg:p-16">
-<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">02</span>
-<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Güç Üretimi</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Yüksek verimli jeneratör setleriyle biyogazdan elektrik ve ısı.</p><dl class="service-specs"><div><dt>Sistem</dt><dd>Kojenerasyon</dd></div><div><dt>Çıktı</dt><dd>Elektrik + ısı</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
-</div>
-</a>
-<a class="services-exhibit-row group service-panel-3 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-slate-200" href="/teknoloji.html#expo-pump">
-<div class="relative overflow-hidden lg:col-span-7">
-<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/pump-room.jpg" alt="Mono Pompa Teknolojisi" loading="lazy" decoding="async">
-</div>
-<div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
-<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">03</span>
-<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Mono Pompa Teknolojisi</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Aşındırıcı substratlarda kesintisiz çalışan sabit debili pompa istasyonları.</p><dl class="service-specs"><div><dt>Sistem</dt><dd>Mono pompa</dd></div><div><dt>Görev</dt><dd>Substrat transferi</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
-</div>
-</a>
-<a class="services-exhibit-row group service-panel-4 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-b border-slate-200" href="/teknoloji.html#workflow">
-<div class="relative overflow-hidden lg:col-span-7 lg:order-2">
-<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/field/reactor-installation.webp" alt="Sahada reaktör montajı ve tesis yerleşimi" loading="lazy" decoding="async">
-</div>
-<div class="lg:col-span-5 lg:order-1 flex flex-col justify-center p-8 lg:p-16">
-<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">04</span>
 <h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Mühendislik İş Akışı</h3>
 <p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Fizibiliteden devreye almaya, uçtan uca proje yönetimi.</p><dl class="service-specs"><div><dt>Kapsam</dt><dd>Fizibilite → devreye alma</dd></div><div><dt>Disiplin</dt><dd>Proses mühendisliği</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
 </div>

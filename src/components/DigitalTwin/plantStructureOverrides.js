@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 /* Runtime geometry overrides layered onto specific structures loaded
-   from the scanned/authored facility GLB (public/models/iona-tesis-3d.glb)
+   from the scanned/authored facility GLB (model-lab/src/iona-tesis-3d.glb)
    — that file is a static binary asset with no 3D editor available in
    this environment, so "replace the generic building" happens as an
    additive/subtractive pass over the already-loaded scene graph instead
@@ -151,8 +151,10 @@ function rebuildEngineRoomContainer(engineRoom) {
     });
   });
 
-  /* Blank steel door panel (no window, no glass) on the front wall. */
-  container.add(makeMesh(box(1.1, 2.05, 0.05), 'container_wall', [-4.6, 1.35, CONTAINER_HALF_D + 0.03]));
+  /* Blank steel door panel (no window, no glass) on the front wall — named
+     'door' so the shared recipe map paints it IONA green like the other
+     building doors. */
+  container.add(makeMesh(box(1.1, 2.05, 0.05), 'door', [-4.6, 1.35, CONTAINER_HALF_D + 0.03]));
 
   /* Roof deck. */
   container.add(makeMesh(
@@ -161,20 +163,23 @@ function rebuildEngineRoomContainer(engineRoom) {
   ));
 
   /* Dual rooftop cooling fans/radiators — two identical housing+blade
-     assemblies, symmetric across the roof's centerline (spec: "dual
-     industrial cooling fans/radiators", not the single unit Phase 47
-     left in place — that whole original roof_radiator/radiator_fan
-     fixture went with the deleted shell). Own name/material
-     (container_fan, dark metallic mesh-grille look). */
+     assemblies, symmetric across the roof's centerline. The blades sit
+     in their own 'container_fan_hub' group so GltfTwinScene's useFrame
+     can spin them in place (same pattern as the mixer propeller hubs);
+     the housing stays static. */
   [-3.2, 3.2].forEach((x) => {
     const fanY = CONTAINER_ROOF_Y + 0.35;
     const housingGeo = new THREE.CylinderGeometry(0.78, 0.78, 0.5, 16);
     container.add(makeMesh(housingGeo, 'container_fan', [x, fanY, 0]));
+    const hub = new THREE.Group();
+    hub.name = 'container_fan_hub';
+    hub.position.set(x, fanY + 0.28, 0);
     for (let b = 0; b < 3; b++) {
-      const blade = makeMesh(box(0.09, 0.05, 1.35), 'container_fan', [x, fanY + 0.28, 0]);
+      const blade = makeMesh(box(0.09, 0.05, 1.35), 'container_fan', [0, 0, 0], null, undefined, false);
       blade.rotation.y = (b / 3) * Math.PI * 2;
-      container.add(blade);
+      hub.add(blade);
     }
+    container.add(hub);
   });
 
   /* Vertical exhaust silencer chimney stack + cap, off to one corner —
@@ -233,7 +238,7 @@ function replacePumpRoomShell(pumpRoom) {
      'canopy_post' — see BUILDING_STRUCTURAL_STEEL_MESH_NAMES in
      GltfTwinScene.jsx for its bare-steel material. */
   const POST_RADIUS = 0.12;
-  const POST_HEIGHT = 3.9;
+  const POST_HEIGHT = 4.9;
   [-4.4, 0, 4.4].forEach((x) => {
     [-3.1, 3.1].forEach((z) => {
       canopy.add(makeMesh(
@@ -251,7 +256,7 @@ function replacePumpRoomShell(pumpRoom) {
      standing-seam material the other two buildings' roofs use), so
      this needs zero new material wiring even though the shell it
      replaces is gone. */
-  canopy.add(makeMesh(box(9.6, 0.22, 6.6), 'roof', [0, 4.21, 0], [0.07, 0, 0]));
+  canopy.add(makeMesh(box(9.6, 0.22, 6.6), 'roof', [0, 5.21, 0], [0.07, 0, 0]));
 }
 
 /* ---------------- Digester -> seal the wall/tabliye seam ----------------
@@ -333,8 +338,18 @@ function sealDigesterWallSeam(digester) {
    quaternion.setFromUnitVectors(+Z, thatVector) maps local +Z onto it
    directly — no eye/target convention to get backwards a second time. */
 const DIGESTER_RADIUS = 12;
-const DIGESTER_MID_Y = 3.45;
-const MIXER_AZIMUTHS = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
+/* Phase 99: was 3.45 (mid-wall). The heating coil now fills the inner wall
+   from y 1.25 to 3.55 (COIL_LAST_Y), and the side mixers mount just above
+   its top ring, per the brief: "karıştırıcılar en üstteki ısı boru sırasının
+   biraz üstünde". 4.15 leaves the shaft's slight downward run clear of the
+   top ring as it passes the ring's radius. */
+const DIGESTER_MID_Y = 4.15;
+/* Phase 98: was [0, 90, 180, 270]. Azimuth 0 is exactly where the pump
+   room's feed line lands on the wall (feed_nozzle, measured at x=12.3, z=0),
+   so mixer #1 and that pipe occupied the same nozzle — the reported clash.
+   Rotated 30 deg: 30/120/210/300 clears the feed nozzle (0), the stair
+   (180) and the two heat nozzles (~263/277) with margin at r=12. */
+const MIXER_AZIMUTHS = [Math.PI / 6, (2 * Math.PI) / 3, (7 * Math.PI) / 6, (5 * Math.PI) / 3];
 
 /* Computes a real inward-pointing unit vector for a mixer mounted at
    `mountPos`: base direction is straight from mountPos to a point
@@ -391,8 +406,16 @@ const MIXER_RENDER_ORDER = 10;
    this) so that's true by inspection here, not by coincidence. Built
    once, shared across every mixer instance — none of these ever differ
    per-mixer. */
-const mixerSteelMaterial = new THREE.MeshStandardMaterial({
-  color: '#c7c9cc', metalness: 0.85, roughness: 0.25, transparent: false, opacity: 1, depthWrite: true
+/* Phase 102: brushed stainless — the mixers are the one non-white thing in
+   the white maquette so they stay legible. Same numbers as GltfTwinScene's
+   BRUSHED_STEEL recipe (the pool mixer uses that one); still built here,
+   still opaque, still outside the x-ray system. To put a real metal PBR set
+   on them, fill MIXER_TEXTURE_SET below. */
+const MIXER_TEXTURE_SET = null; // e.g. { map: '/textures/metal/color.jpg', normalMap: '/textures/metal/normal_gl.jpg', roughnessMap: '/textures/metal/roughness.jpg', metalnessMap: '/textures/metal/metalness.jpg', repeat: 2 }
+const BRUSHED = { metalness: 0.8, roughness: 0.38, clearcoat: 0.3, clearcoatRoughness: 0.25, envMapIntensity: 1.7, anisotropy: 0.6 };
+const mixerSteelMaterial = new THREE.MeshPhysicalMaterial({
+  color: '#cfd3d6', ...BRUSHED,
+  transparent: false, opacity: 1, depthWrite: true
 });
 /* Emissive baked in at creation (not toggled) — "pop through the
    frosted tank" per spec needs the glow present at rest, not only while
@@ -401,20 +424,43 @@ const mixerSteelMaterial = new THREE.MeshStandardMaterial({
    roughness pushed up from the steel parts' 0.25 — spec calls for
    "high roughness/contrast" on the propellers specifically, a matte
    painted-metal read rather than the shaft/housing's polished one. */
-const mixerPropellerMaterial = new THREE.MeshStandardMaterial({
-  color: '#EF4444', metalness: 0.25, roughness: 0.75, emissive: '#ff3b3b', emissiveIntensity: 0.5,
+/* Phase 103 (Murat): the propeller blades are the one colour in the maquette —
+   glazed signal red on the brushed-steel hub/shaft, so the mixers read at a
+   glance even through the white tank wall. */
+const mixerPropellerMaterial = new THREE.MeshPhysicalMaterial({
+  color: '#d0261c', metalness: 0.05, roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.1, envMapIntensity: 1.2,
   transparent: false, opacity: 1, depthWrite: true
 });
-const mixerBeaconMaterial = new THREE.MeshStandardMaterial({
-  color: '#eafcff', metalness: 0.1, roughness: 0.4, emissive: '#66d9ff', emissiveIntensity: 0.6,
+const mixerBeaconMaterial = new THREE.MeshPhysicalMaterial({
+  color: '#ffffff', metalness: 0.05, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.08,
+  emissive: '#ffffff', emissiveIntensity: 0.5,
   transparent: false, opacity: 1, depthWrite: true
 });
 /* Propeller hub cone — dark metallic, distinct from both the shaft's
    light polished steel and the blades' bright red, so the hub still
    reads as its own part instead of blending into either. */
-const mixerHubMaterial = new THREE.MeshStandardMaterial({
-  color: '#3a3d40', metalness: 0.8, roughness: 0.35, transparent: false, opacity: 1, depthWrite: true
+const mixerHubMaterial = new THREE.MeshPhysicalMaterial({
+  color: '#a9aeb2', ...BRUSHED, roughness: 0.34,
+  transparent: false, opacity: 1, depthWrite: true
 });
+
+/* Optional metal PBR set on every mixer material, attached once loaded (no
+   black flash while the images are in flight). */
+if (MIXER_TEXTURE_SET) {
+  const { repeat = 1, ...slots } = MIXER_TEXTURE_SET;
+  const loader = new THREE.TextureLoader();
+  Object.entries(slots).forEach(([slot, url]) => {
+    loader.load(url, (texture) => {
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(repeat, repeat);
+      texture.colorSpace = slot === 'map' ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+      [mixerSteelMaterial, mixerPropellerMaterial, mixerHubMaterial].forEach((material) => {
+        material[slot] = texture;
+        material.needsUpdate = true;
+      });
+    });
+  });
+}
 
 /* CONFIRMED BUG, now fixed: every blade used to be built as a plain
    centered box (BoxGeometry defaults to centered on its own origin)
@@ -672,7 +718,347 @@ function addDigesterMixers(digester) {
   return { propellerHubs, beacons };
 }
 
+/* ---------------- Inline gate valves on the process lines ----------------
+   ANKA reference vocabulary: a gate valve is body + bonnet + stem +
+   handwheel + a flange pair. Placement is measured, not guessed: the
+   target pipe's world bounding box gives the run axis (longest of x/z),
+   the pipe radius (smallest extent / 2) and the point `t` along the run.
+   Meshes are parented under the pipe's own structure so clicks resolve
+   to it, and the names below are routed to their materials by
+   GltfTwinScene's recipe map (inline_valve_*). */
+const VALVE_TARGETS = [
+  ['site_piping', 'gas_main', 0.3],
+  ['site_piping', 'feed_from_pool', 0.45],
+  ['pump_room', 'discharge_header', 0.5],
+];
+
+function buildGateValve(pipeRadius) {
+  const group = new THREE.Group();
+  const bodyR = Math.max(pipeRadius * 1.7, 0.22);
+  const bodyL = bodyR * 1.7;
+
+  const bodyGeo = new THREE.CylinderGeometry(bodyR, bodyR, bodyL, 14);
+  bodyGeo.rotateZ(Math.PI / 2);
+  group.add(makeMesh(bodyGeo, 'inline_valve_body', [0, 0, 0], null, undefined, false));
+
+  [-1, 1].forEach((side) => {
+    const flangeGeo = new THREE.CylinderGeometry(pipeRadius * 1.45, pipeRadius * 1.45, 0.07, 14);
+    flangeGeo.rotateZ(Math.PI / 2);
+    group.add(makeMesh(flangeGeo, 'inline_valve_flange', [side * (bodyL / 2 + 0.04), 0, 0], null, undefined, false));
+  });
+
+  const bonnetH = bodyR * 1.35;
+  group.add(makeMesh(
+    new THREE.CylinderGeometry(bodyR * 0.5, bodyR * 0.62, bonnetH, 12),
+    'inline_valve_body', [0, bodyR * 0.4 + bonnetH / 2, 0], null, undefined, false
+  ));
+
+  const stemH = bodyR * 1.1;
+  const stemTopY = bodyR * 0.4 + bonnetH + stemH / 2;
+  group.add(makeMesh(
+    new THREE.CylinderGeometry(0.035, 0.035, stemH, 8),
+    'inline_valve_stem', [0, stemTopY, 0], null, undefined, false
+  ));
+
+  const wheelY = stemTopY + stemH / 2;
+  const wheelR = bodyR * 0.8;
+  const wheelGeo = new THREE.TorusGeometry(wheelR, 0.045, 8, 20);
+  wheelGeo.rotateX(Math.PI / 2);
+  group.add(makeMesh(wheelGeo, 'inline_valve_wheel', [0, wheelY, 0], null, undefined, false));
+  for (let s = 0; s < 3; s++) {
+    const spoke = makeMesh(box(wheelR * 2 - 0.06, 0.03, 0.03), 'inline_valve_wheel', [0, wheelY, 0], null, undefined, false);
+    spoke.rotation.y = (s / 3) * Math.PI;
+    group.add(spoke);
+  }
+  return group;
+}
+
+function addInlineValves(plantRoot) {
+  plantRoot.updateMatrixWorld(true);
+  VALVE_TARGETS.forEach(([structureName, meshName, t]) => {
+    const structure = plantRoot.getObjectByName(structureName);
+    if (!structure) return;
+    const guardName = `inline_valve_${meshName}`;
+    if (structure.getObjectByName(guardName)) return;
+
+    let pipe = null;
+    const pattern = new RegExp(`^${meshName}(?:_\\d+)?$`);
+    structure.traverse((node) => { if (!pipe && node.isMesh && pattern.test(node.name)) pipe = node; });
+    if (!pipe) return;
+
+    const bbox = new THREE.Box3().setFromObject(pipe);
+    const size = bbox.getSize(new THREE.Vector3());
+    const center = bbox.getCenter(new THREE.Vector3());
+    const alongX = size.x >= size.z;
+    const pipeRadius = Math.max(Math.min(size.y, alongX ? size.z : size.x) / 2, 0.12);
+
+    const pos = center.clone();
+    if (alongX) pos.x = bbox.min.x + size.x * t;
+    else pos.z = bbox.min.z + size.z * t;
+
+    const valve = buildGateValve(pipeRadius);
+    valve.name = guardName;
+    if (!alongX) valve.rotation.y = Math.PI / 2;
+    structure.add(valve);
+    // World → the structure's local frame, in case the structure carries
+    // its own transform.
+    structure.worldToLocal(pos);
+    valve.position.copy(pos);
+  });
+}
+
+function collectFanHubs(plantRoot) {
+  const hubs = [];
+  plantRoot.traverse((node) => { if (node.name === 'container_fan_hub') hubs.push(node); });
+  return hubs;
+}
+
+
+/* ---------------- Digester -> trapez sac duvar ----------------------------
+   Phase 98 (Murat, biblo/vitrin dili): the tank wall is no longer a smooth
+   cylinder with 72 separate applique ribs stuck on it — it IS a trapezoidal
+   profiled sheet (trapez sac), the way a real tank's cladding is. The rib
+   meshes the old look needed are removed with it, so the wall costs 1 mesh
+   instead of 73 and reads as one folded sheet instead of a drum with slats.
+
+   Profile: one pitch = flat crest -> slope -> flat valley -> slope, all four
+   an equal quarter of the pitch. That puts every fold exactly on a vertex ring
+   (8 radial segments per rib, breakpoints at .25/.5/.75), so the folds stay
+   crisp instead of being averaged away by the tessellation. Geometry is
+   de-indexed before computeVertexNormals so each facet gets a flat normal —
+   a smooth-shaded trapezoid sheet looks like a wobbly cylinder, not sheet
+   metal. */
+const TRAPEZ_RIBS = 72;
+const TRAPEZ_DEPTH = 0.17;
+const TRAPEZ_SEGMENTS_PER_RIB = 8;
+
+function trapezProfile(t) {
+  /* t in [0,1) inside one pitch. 0 = valley plane, 1 = crest plane. */
+  if (t < 0.25) return 1;              // flat crest
+  if (t < 0.5) return 1 - (t - 0.25) * 4;  // falling flank
+  if (t < 0.75) return 0;              // flat valley
+  return (t - 0.75) * 4;               // rising flank
+}
+
+function trapezoidalCylinderGeometry(radius, height, depth = TRAPEZ_DEPTH) {
+  const radialSegments = TRAPEZ_RIBS * TRAPEZ_SEGMENTS_PER_RIB;
+  const geo = new THREE.CylinderGeometry(radius, radius, height, radialSegments, 1, true);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+    const len = Math.hypot(x, z);
+    if (len < 1e-6) continue;
+    const theta = Math.atan2(z, x);
+    // +1000 keeps the modulo positive for negative theta without a branch.
+    const phase = ((theta * TRAPEZ_RIBS) / (Math.PI * 2) + 1000) % 1;
+    const r = radius + depth * trapezProfile(phase);
+    pos.setX(i, (x / len) * r);
+    pos.setZ(i, (z / len) * r);
+  }
+  pos.needsUpdate = true;
+  const flat = geo.toNonIndexed();
+  geo.dispose();
+  flat.computeVertexNormals();
+  return flat;
+}
+
+/* Every mesh named 'tank_wall' — the GLB's own wall AND the seam seal
+   sealDigesterWallSeam() adds — is re-profiled in place from its own measured
+   geometry, so the seal keeps matching the wall it plugs instead of turning
+   into a smooth band sitting proud of a folded one. */
+function applyTrapezWall(digester) {
+  digester.traverse((node) => {
+    if (!node.isMesh || node.name !== 'tank_wall' || node.userData.ionaTrapez) return;
+    node.geometry.computeBoundingBox();
+    const bb = node.geometry.boundingBox;
+    const radius = (bb.max.x - bb.min.x) / 2;
+    const height = bb.max.y - bb.min.y;
+    const midY = (bb.max.y + bb.min.y) / 2;
+    const next = trapezoidalCylinderGeometry(radius, height);
+    if (midY !== 0) next.translate(0, midY, 0);
+    node.geometry.dispose();
+    node.geometry = next;
+    node.userData.ionaTrapez = true;
+  });
+
+  /* The applique ribs and the three horizontal bands existed to give a flat
+     cylinder some relief. The profile does that now; leaving them on top reads
+     as clutter on a wall that already has a texture of its own. */
+  ['wall_rib', 'wall_band'].forEach((name) => {
+    digester.children
+      .filter((child) => child.name === name || child.name.startsWith(name + '_'))
+      .forEach((child) => digester.remove(child));
+  });
+}
+
+/* ---------------- Digester -> kubbe korkuluğunu kaldır --------------------
+   The tabliye carries TWO concentric rails: an outer one on the deck edge
+   (torus Ø27.7, the real fall protection) and an inner one hugging the gas
+   dome's own base (Ø18.5 — the dome is Ø18.4). The inner ring reads as a cage
+   around the balloon from every hero angle and is what gets removed here; the
+   deck-edge ring stays. Posts are one flat list of 62 shared by both rings, so
+   they're separated by measured radius, not by name. */
+const DOME_RAIL_MAX_RADIUS = 10.5; // dome base ~9.2, deck edge ~11.9-13.8
+
+function removeDomeRailing(digester) {
+  const doomed = [];
+  digester.traverse((node) => {
+    if (!node.isMesh) return;
+    const base = node.name.replace(/_\d+$/, '');
+    if (base !== 'walkway_rail' && base !== 'walkway_midrail' && base !== 'walkway_post') return;
+    node.geometry.computeBoundingBox();
+    const bb = node.geometry.boundingBox;
+    // A ring's own bbox gives its radius; a post's doesn't, so use its position.
+    const ringRadius = Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z) / 2;
+    const world = node.getWorldPosition(new THREE.Vector3());
+    const radius = ringRadius > 1 ? ringRadius : Math.hypot(world.x, world.z);
+    if (radius <= DOME_RAIL_MAX_RADIUS) doomed.push(node);
+  });
+  doomed.forEach((node) => node.parent?.remove(node));
+}
+
+/* ---------------- Digester -> ısı boruları: içeride, 12 sıra ---------------
+   Murat, Phase 99: the heating coil is INSIDE the tank, the way a real
+   wall-mounted heating loop is — the GLB's exterior hoops (and the exterior
+   rebuild before this) were wrong. 12 full rings on the inner wall face, a
+   little off the floor, evenly spaced, the top ring at about half the wall's
+   height, so the loop only shows when the shell goes see-through (selection /
+   "Reaktörün içini aç"). The side mixers are mounted just above the top ring
+   (DIGESTER_MID_Y below) so nothing on the wall crosses the coil band.
+   Measured: wall face y 0.9-6.0, inner radius 12. */
+const COIL_ROWS = 12;
+const COIL_TUBE_RADIUS = 0.06;
+const COIL_WALL_CLEARANCE = 0.45; // ring centreline this far inside the wall face
+const COIL_FIRST_Y = 1.25;        // ~0.35 above the tank floor (0.9)
+const COIL_LAST_Y = 3.55;         // ~half the wall height (0.9 + 5.1/2 = 3.45)
+const COIL_JUMPER_AZIMUTH = 1.5 * Math.PI; // the heating nozzles' side (~263/277 deg)
+
+function rebuildHeatingCoils(digester) {
+  const group = digester.getObjectByName('heating_coils');
+  if (!group || group.userData.ionaCoilsRebuilt) return;
+  [...group.children].forEach((child) => group.remove(child));
+
+  const radius = DIGESTER_RADIUS - COIL_WALL_CLEARANCE;
+  const step = (COIL_LAST_Y - COIL_FIRST_Y) / (COIL_ROWS - 1);
+
+  for (let row = 0; row < COIL_ROWS; row++) {
+    const geo = new THREE.TorusGeometry(radius, COIL_TUBE_RADIUS, 8, 120);
+    geo.rotateX(Math.PI / 2); // torus plane XY -> XZ (horizontal ring)
+    group.add(makeMesh(geo, 'heating_coil_row', [0, COIL_FIRST_Y + row * step, 0], null, null, false));
+  }
+
+  /* Row-to-row jumpers stacked on the heating nozzles' side, so the 12 rings
+     read as one serpentine circuit fed from heat_inlet/heat_return rather
+     than as 12 loose hoops. */
+  for (let row = 0; row < COIL_ROWS - 1; row++) {
+    const y = COIL_FIRST_Y + row * step + step / 2;
+    const geo = new THREE.CylinderGeometry(COIL_TUBE_RADIUS, COIL_TUBE_RADIUS, step, 8);
+    group.add(makeMesh(
+      geo, 'coil_jumper',
+      [Math.cos(COIL_JUMPER_AZIMUTH) * radius, y, Math.sin(COIL_JUMPER_AZIMUTH) * radius],
+      null, null, false
+    ));
+  }
+  group.userData.ionaCoilsRebuilt = true;
+}
+
+/* ---------------- Feed pool -> yarısı kapalı, yarısı açık ve derin --------
+   Measured: pool_wall Ø11 spanning y 0.3-3.5 at world (18,18), pool_rim at
+   y 3.5, substrate_surface a Ø10.4 disc sitting high at y 2.28 — which made
+   the pool read as a full, shallow saucer. Two changes: the substrate drops so
+   the open side has real depth to look down into, and a half-deck covers the
+   other half (the -X semicircle, i.e. the side away from the hero camera), so
+   the pool reads as a covered tank that has been opened, not as a paddling
+   pool. Named 'pool_rim' on purpose — that name already routes to the pool's
+   own stone finish in GltfTwinScene's recipe map. */
+const POOL_CENTER = new THREE.Vector3(18, 0, 18);
+const POOL_COVER_RADIUS = 5.62;
+const POOL_COVER_Y = 3.66; // sits on the rim (rim top ~3.6), like a lid
+const POOL_SUBSTRATE_Y = 1.35;
+
+function openHalfOfFeedPool(feedPool) {
+  if (feedPool.userData.ionaPoolOpened) return;
+
+  const substrate = feedPool.getObjectByName('substrate_surface');
+  if (substrate) {
+    const world = substrate.getWorldPosition(new THREE.Vector3());
+    world.y = POOL_SUBSTRATE_Y;
+    substrate.position.copy(feedPool.worldToLocal(world));
+  }
+
+  /* Named 'pool_cover' — routed to the dark standing-seam roof finish in
+     GltfTwinScene's feed_pool recipe map, the same as the buildings' roofs, so
+     it reads as a lid and not as more of the pale rim it sits on. */
+  const coverGeo = new THREE.CylinderGeometry(
+    POOL_COVER_RADIUS, POOL_COVER_RADIUS, 0.18, 56, 1, false, Math.PI, Math.PI
+  );
+  const centre = feedPool.worldToLocal(new THREE.Vector3(POOL_CENTER.x, POOL_COVER_Y, POOL_CENTER.z));
+  feedPool.add(makeMesh(coverGeo, 'pool_cover', [centre.x, centre.y, centre.z]));
+
+  /* The straight edge of the opening wants a lip, or the cover reads as a
+     sheet of paper laid on top. */
+  const lipGeo = box(0.24, 0.42, POOL_COVER_RADIUS * 2);
+  feedPool.add(makeMesh(lipGeo, 'pool_cover', [centre.x - 0.12, centre.y + 0.12, centre.z]));
+
+  feedPool.userData.ionaPoolOpened = true;
+}
+
+/* ---------------- Digester -> deck opened for the sinking lid --------------
+   Phase 100: the tabliye (dome_walkway) shipped as a SOLID Ø24 disc under the
+   dome. Now that the dome slides into the tank when the digester is selected
+   (GltfTwinScene DOME_SINK), the deck has to be what it would be on a real
+   tank: an annulus from the dome's base (r 9.2, where walkway_inner_kerb
+   sits) out to the wall (r 12). Rebuilt in place from a Shape with a hole so
+   the slab keeps its 0.16 thickness and reads as a real plate edge at the
+   opening, not a zero-thickness ring. */
+const DECK_INNER_RADIUS = 9.2;
+const DECK_OUTER_RADIUS = 12;
+const DECK_THICKNESS = 0.16;
+
+function openDeckForDome(digester) {
+  const deck = digester.getObjectByName('dome_walkway');
+  if (!deck || deck.userData.ionaDeckOpened) return;
+  const shape = new THREE.Shape();
+  shape.absarc(0, 0, DECK_OUTER_RADIUS, 0, Math.PI * 2, false);
+  const hole = new THREE.Path();
+  hole.absarc(0, 0, DECK_INNER_RADIUS, 0, Math.PI * 2, true);
+  shape.holes.push(hole);
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: DECK_THICKNESS, bevelEnabled: false, curveSegments: 96 });
+  geo.rotateX(-Math.PI / 2);            // extrude along +Z -> +Y
+  geo.translate(0, -DECK_THICKNESS / 2, 0); // centre on the old slab's own mid-plane
+  deck.geometry.dispose();
+  deck.geometry = geo;
+  deck.userData.ionaDeckOpened = true;
+}
+
+/* GLTFLoader makes node names unique on import (biogas_mixer, biogas_mixer_1,
+   biogas_mixer_2 ...). Most of the runtime already compares base names
+   (meshBaseName in GltfTwinScene), but the mixer/fan handles and the mixer
+   click target are looked up by exact name, so the baked file's suffixes are
+   stripped again here for exactly those names — three itself is fine with
+   duplicate names. */
+const BAKED_NAME_RESTORE = new Set([
+  'biogas_mixer', 'top_slab_mixer', 'side_mixer_prop_hub', 'side_mixer_beacon',
+  'side_mixer_blade', 'side_mixer_hub', 'side_mixer_shaft', 'side_mixer_collar',
+  'side_mixer_housing', 'container_fan_hub',
+]);
+function restoreBakedNames(plantRoot) {
+  plantRoot.traverse((node) => {
+    const base = node.name.replace(/_\d+$/, '');
+    if (BAKED_NAME_RESTORE.has(base)) node.name = base;
+  });
+}
+
 export function applyStructureOverrides(plantRoot) {
+  /* Phase 104: a baked GLB (scripts/model-lab/bake-plant.mjs) already carries
+     every change below; only the animation handles still need collecting. */
+  if (plantRoot.userData?.ionaBaked) {
+    restoreBakedNames(plantRoot);
+    const digester = plantRoot.getObjectByName('digester');
+    const mixers = digester ? addDigesterMixers(digester) : { propellerHubs: [], beacons: [] };
+    return { ...mixers, fanHubs: collectFanHubs(plantRoot) };
+  }
   const engineRoom = plantRoot.getObjectByName('engine_room');
   if (engineRoom) rebuildEngineRoomContainer(engineRoom);
 
@@ -680,8 +1066,21 @@ export function applyStructureOverrides(plantRoot) {
   if (pumpRoom) replacePumpRoomShell(pumpRoom);
 
   const digester = plantRoot.getObjectByName('digester');
-  if (digester) sealDigesterWallSeam(digester);
+  if (digester) {
+    sealDigesterWallSeam(digester);
+    /* Order matters: the seal is another 'tank_wall' mesh, so it has to exist
+       before the trapez pass re-profiles every wall mesh it finds. */
+    applyTrapezWall(digester);
+    removeDomeRailing(digester);
+    rebuildHeatingCoils(digester);
+    openDeckForDome(digester);
+  }
   const mixers = digester ? addDigesterMixers(digester) : { propellerHubs: [], beacons: [] };
 
-  return mixers;
+  const feedPool = plantRoot.getObjectByName('feed_pool');
+  if (feedPool) openHalfOfFeedPool(feedPool);
+
+  addInlineValves(plantRoot);
+
+  return { ...mixers, fanHubs: collectFanHubs(plantRoot) };
 }

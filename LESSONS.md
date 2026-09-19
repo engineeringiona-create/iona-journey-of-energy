@@ -47,3 +47,23 @@ Before `cleanUrls: false` was added, `serve` 301-redirected `/teknoloji.html` �
 `getSupabase()` (`src/lib/supabaseClient.js`) called `createClient(url, anonKey)` unguarded. Verified directly with `@supabase/supabase-js`: `createClient()` throws **synchronously** — not a rejected promise — when the URL isn't syntactically valid HTTP/HTTPS (confirmed via a standalone Node repro before touching any code). That throw happened *outside* the try/catch in `src/i18n.js`'s `fetchContentOverrides` (the try/catch only wraps the query call, not the `getSupabase()` call above it), so it propagated all the way up through `loadDict()` → `initI18n()` → the top-level `await initI18n()` at the very top of every `main-*.js` page entry script. A top-level `await` that throws with nothing catching it stops the rest of that module's synchronous code from ever running — including `runPreloader()`, which is defined and called *after* that await. Since the preloader's only dismiss mechanism is a `gsap.delayedCall(1.5, ...)` timer *inside* `runPreloader()`, a page that never reaches that call shows the pulsing star loading screen forever, with no console-visible crash the way a normal in-page error would look. Symptom: every real page stuck on the preloader after a bad `VITE_SUPABASE_URL` was set (e.g. on Railway), even though the DB integration is meant to be optional/best-effort.
 
 **Rule:** a feature documented as "fails soft, page works without it" (see `supabaseClient.js`'s own comment predating this fix) needs every one of its entry points guarded, not just the ones that obviously do network I/O — a synchronous constructor call is just as capable of taking the whole page down as an unguarded `await`. Before trusting a try/catch, check exactly which lines are inside it versus which run before it. Fixed by wrapping `createClient()` itself in try/catch, falling back to `client = null` (the same "no DB configured" path every caller already handles) instead of letting the throw escape.
+
+## `railway up` deploying from `/mnt/c` silently uploads NUL-filled files (2026-09-19)
+
+A deploy failed on Railway with `src/pages/main-ionaflux.js (1:0): Unexpected character '\0'` while `npm run build` passed locally on the exact same tree. The local file was clean — 470 bytes, ASCII, zero NUL bytes (`tr -d -c '\000' < file | wc -c` → 0). The corruption was introduced by the Railway CLI's own upload reading the file off the WSL drvfs mount (`/mnt/c/...`): the tar entry kept the right size but the bytes arrived as NULs.
+
+Nothing in the error points at the filesystem — it reads exactly like a syntax error in your code, so the instinct is to go edit a file that is already fine. Check the local bytes first; if they're clean, the build input isn't what you think it is.
+
+Fix: deploy from a WSL-native copy, never from `/mnt/c` directly.
+
+```
+tar --exclude=./node_modules --exclude=./dist --exclude=./.git --exclude=./.backups \
+    --exclude=./model-lab --exclude=./.env --exclude=./.claude -cf - . \
+  | tar -xf - -C ~/.iona-web-deploy
+cd ~/.iona-web-deploy && railway link --project distinguished-connection \
+    --service iona-journey-of-energy --environment production && railway up
+```
+
+Verify the copy before uploading (`md5sum` every file under `src/` on both sides, and `grep -rlP '\x00' src *.html` must return nothing) — the copy itself is made by the same kernel path that corrupted the upload, so it is not automatically trustworthy either. It came out byte-identical across 103 files here, but check, don't assume.
+
+Same root cause as the `~/.iona-3d-deploy` copy that already existed for the 3D archive — that one was created for a `.gitignore` reason, but the mount is the deeper issue.
