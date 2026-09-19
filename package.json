@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build && node scripts/build-i18n-pages.mjs",
     "preview": "vite preview",
+    "test": "node --test tests/*.test.mjs",
     "start": "serve dist -l $PORT --no-clipboard",
     "model:bake": "node scripts/model-lab/bake-plant.mjs",
     "model:draco": "npx -y @gltf-transform/cli@4 draco model-lab/out/iona-tesis-baked.glb public/models/iona-tesis-3d.draco.glb --method edgebreaker --quantize-position 14 --quantize-normal 10 --quantize-texcoord 12",

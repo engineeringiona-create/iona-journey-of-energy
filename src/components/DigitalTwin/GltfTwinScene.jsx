@@ -534,7 +534,12 @@ const plantData = {
           'Seviye sensörüyle otomatik çalışma senkronizasyonu'
         ],
         photo: '/images/equipment/feed-pool.webp',
-        video: '/videos/digester-mixer.mp4'
+        /* Dosya adındaki 1280, yeniden kodlanmış sürümü ayırt etmek için:
+           video 7 gün `cache-control` ile yayınlanıyor, yani aynı adla içerik
+           değiştirmek Cloudflare kenarında elle "Purge Everything" gerektirir.
+           Ad değişince eski adres kullanılmaz hâle gelir, purge'e gerek kalmaz.
+           Yeni bir kodlama yaparsan dosya adını da değiştir. */
+        video: '/videos/digester-mixer-1280.mp4'
       }
     ]
   },
