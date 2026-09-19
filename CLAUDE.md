@@ -55,3 +55,7 @@ This file holds rules that don't change. Long version + reasoning lives in `AGEN
 1. `npm run build`, confirm every expected `dist/*.html` file exists — including the `dist/<lang>/*.html` copies, and read the build's own per-page/per-language summary.
 2. Run the **real** start command (`npm start`, or `serve dist -l <port>` directly) — not `npm run dev` — and `curl` every page path plus one bogus path. Every real page should be `200` with the right `<title>`; the bogus path should be `404`, never a silent `200` of `index.html`. Cover the language prefixes too (42 pages as of 2026-09-19), plus `/robots.txt` and `/sitemap.xml`.
 3. Check which git branch is actually wired to the Railway service before assuming code changes alone explain stale content — see the branch note above.
+
+## Verifying the SEO skeleton
+
+`npm run verify:seo` (or `node scripts/verify-seo.mjs http://localhost:4599` against a local `serve dist`) reads `sitemap.xml`, fetches every URL in it, and checks three things: each URL is a real `200` (not a redirect), each `canonical` points at itself, and every `hreflang` pair references back. That last one is the silent killer — Google ignores a whole hreflang cluster when the references don't reciprocate, with no error anywhere. Run it after any change to pages, languages or URLs, and after a deploy.
