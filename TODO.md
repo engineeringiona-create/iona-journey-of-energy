@@ -47,6 +47,12 @@ hreflang canlıda çalışıyor.
 
 ## Tasarım sistemi — açık kalan tek kalem
 
+- [ ] **Ana sayfada 28 metin parçası hâlâ çeviri etiketi taşımıyor** — hesaplayıcının
+      atık türü seçenekleri, "IONA / TESİS ANATOMİSİ" gibi bölüm etiketleri,
+      veri duvarındaki metrik adları. Bunlar `[data-i18n]` taşımadığı için dil
+      sayfalarında Türkçe kalıyor ve build'in eksiksiz-çeviri kapısı da onları
+      göremiyor (kapı yalnızca KULLANILAN anahtarları denetliyor). 2026-09-19'da
+      katalog bölümü (20 anahtar) etiketlendi; kalanlar aynı yöntemle yapılmalı.
 - [ ] **`src/lib/quoteModal.js` kendi paletini ve ölçeğini çalıştırıyor.** Teklif
       modalı inline stille kurulmuş ve DESIGN.md'de geçmeyen ikinci bir renk
       kümesi taşıyor (`#193322`, `#52634f`, `#198837`, `#fffdf7`, `#f5f7ef`,
@@ -57,4 +63,6 @@ hreflang canlıda çalışıyor.
       senin: (a) bu değerleri DESIGN.md'ye resmî olarak ekleyip modalı
       sistemin parçası yapmak, (b) modalı mevcut rampaya ve palete taşımak.
       Bu yüzden susturulmadı — uyarılar görünür kalsın, karar verildiğinde
-      kapansın.
+      kapansın. Aynı değerler 2026-09-19'da `src/lib/successCard.js`'e de taşındı
+      (onay kartı iki akış için ortaklandı); karar verildiğinde değiştirilecek
+      yer artık iki dosya: modalın formu ve ortak onay kartı.

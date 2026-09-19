@@ -13,21 +13,17 @@
   "nav.tagline": "SIMPLY, ENGINEERED",
   "nav.cta": "Teklif Alın",
   "nav.theme_toggle": "Karanlık modu değiştir",
-
   "footer.copyright": "© 2026 IONA BİYOGAZ MÜHENDİSLİK. KIRKKONAKLAR MAH. 358. SOK. 13/5, ÇANKAYA - ANKARA/TÜRKİYE · +90 540 246 4662",
   "footer.privacy": "Gizlilik Politikası",
   "footer.terms": "Kullanım Şartları",
   "footer.impact_report": "Çevresel Etki Raporu",
-
   "common.explore_cta": "İncele",
   "common.details_cta": "Detaylı Bilgi",
   "common.more_cta": "Daha Fazla",
-
   "stats.experience_label": "Yıllık Deneyim",
   "stats.projects_label": "Tamamlanan Proje",
   "stats.offices_label": "Dünya Genelinde Ofis",
   "stats.engineers_label": "Mühendis",
-
   "home.hero.badge": "20+ Yıllık Deneyim · Yalın Mühendislik",
   "home.hero.meta_index": "01 / GİRİŞ — GELECEĞİN BİYOGAZ MÜHENDİSLİĞİ",
   "home.hero.slide1_title": "Biyogaz tesisleri için mühendislik.",
@@ -44,13 +40,11 @@
   "home.hero.next": "Sonraki",
   "home.hero.view3d_cta": "3D Modeli Görüntüle",
   "home.hero.landscape_hint": "Daha iyi bir deneyim için cihazınızı yatay çevirin",
-
   "home.about.eyebrow": "Hakkımızda",
   "home.about.title": "Yalın Mühendislik.",
   "home.about.body": "Tesisin besleme profili, ekipman seçimi ve işletme ihtiyaçlarını birlikte ele alıyoruz. Çürütücü tasarımından otomasyona kadar süreci bir bütün olarak planlıyoruz.",
   "home.about.cta": "Devamını Oku",
   "home.about.caption": "Çürütücü, akış hatları ve kontrol birimleri. Tesis tasarımını birbiriyle çalışan sistemler olarak ele alıyoruz.",
-
   "home.why.eyebrow": "Neden Iona",
   "home.why.title": "İşletmeyi düşünerek tasarlıyoruz.",
   "home.why.body": "Ekipman yerleşimi, bakım erişimi ve proses kontrolü; tasarım kararlarını tesisin günlük işletmesiyle birlikte değerlendiriyoruz.",
@@ -62,15 +56,12 @@
   "home.why.accordion3_desc": "Ekipmana erişim ve bakım senaryolarını tasarım aşamasında ele alıyoruz.",
   "home.why.accordion4_title": "7/24 Destek",
   "home.why.accordion4_desc": "Saha ekibinin teknik destek ve arıza takibi ihtiyaçlarına odaklanıyoruz.",
-
   "home.digitaltwin.eyebrow": "Dijital İkiz",
   "home.digitaltwin.title": "Tesisimizi Üç Boyutlu Keşfedin.",
   "home.digitaltwin.body": "Bir Iona biyogaz tesisinin bileşenlerini interaktif 3D modelde inceleyin; her bileşene tıklayarak teknik detaylarını görün.",
-
   "home.ionaflux.title": "Tesisinizin Dijital İkizi: IonaFlux.",
   "home.ionaflux.body": "IonaFlux, Iona mühendisliği tarafından geliştirilen ve müşterilerimize teslim edilen dijital işletme platformudur. Canlı SCADA verisi, arıza yönetimi ve saha raporlaması tek panelde birleşir.",
   "home.ionaflux.cta": "IonaFlux'u Keşfedin",
-
   "home.explore.eyebrow": "Keşfedin",
   "home.explore.title": "Çalışma alanlarımız",
   "home.explore.card1_title": "İleri Mühendislik, Sürdürülebilir Tesisler İçin",
@@ -81,16 +72,13 @@
   "home.explore.card3_desc": "Mühendislik ekibimizle iletişime geçin, projenize özel bir teklif alın.",
   "home.explore.card4_title": "Tesisiniz İçin Dijital İkiz",
   "home.explore.card4_desc": "Müşterilerimize teslim ettiğimiz kendi yazılımımızı, canlı SCADA ve arıza yönetimini keşfedin.",
-
   "about.hero.eyebrow": "Hakkımızda",
   "about.hero.title": "Yenilikçi Mühendislik, Daha Yeşil Bir Gelecek İçin",
   "about.hero.body": "Iona Biogas, güçlü çevresel sorumlulukla yenilikçi mühendislik çözümleri geliştirmeye adanmış bir enerji şirketidir.",
-
   "about.smart.eyebrow": "Şirket Hakkında",
   "about.smart.title": "Yüksek Verimli Biyogaz Tesisleri İçin Akıllı Teknolojiler",
   "about.smart.tags": "PATENTLİ YÜKSEK PERFORMANSLI EKİPMAN<br>MAKSİMUM PROSES KONTROLÜ VE KARARLILIK<br>GELİŞMİŞ 7/24 UZAKTAN İZLEME SİSTEMLERİ",
   "about.smart.body": "Enerji verimliliğine öncelik vererek modern biyogaz tesisleri tasarlıyor ve inşa ediyoruz. Patentli teknolojik ekipmanlarımızla, Iona Biogas geleneksel biyogaz tesislerinin karşılaştığı yaygın zorlukların üstesinden gelerek daha güvenilir ve dayanıklı operasyonlar sağlar. Proses kontrolüne verilen özel önem, her tesisin maksimum verimlilikte çalışmasını garanti eder. Ayrıca gelişmiş teknolojiler, tesislerin uzaktan izlenmesini ve yönetilmesini mümkün kılar.",
-
   "about.statements.eyebrow": "Değere ve Size Bağlılığımız",
   "about.statements.title": "Misyonumuz, Vizyonumuz ve Değerlerimiz",
   "about.statements.mission_eyebrow": "Misyon Beyanı",
@@ -105,7 +93,6 @@
   "about.statements.sustainability_eyebrow": "Sürdürülebilirlik",
   "about.statements.sustainability_title": "Gelecek Nesiller İçin Sıfır Atık ve Düşük Karbon",
   "about.statements.sustainability_body": "Sürdürülebilirlik, tasarımlarımızın özüdür. Metan geri kazanımını en üst düzeye çıkararak, birinci sınıf biyo-gübrelerle toprak sağlığını koruyarak ve küresel karbon ayak izlerini azaltarak yarını güvence altına alıyoruz.",
-
   "about.why.eyebrow": "Neden Iona",
   "about.why.title": "Yüksek Performanslı Biyogaz Mühendisliği",
   "about.why.item1_title": "Akıllı Teknoloji",
@@ -116,7 +103,6 @@
   "about.why.item3_desc": "Gelişmiş tasarımlarımız sürekli ve kesintisiz getiriyi garanti eder.",
   "about.why.item4_title": "7/24 Destek",
   "about.why.item4_desc": "Sıfır kesinti süresi için kesintisiz teknik destek sağlıyoruz.",
-
   "services.intro.eyebrow": "Ne Yapıyoruz",
   "services.intro.title": "Anahtar teslim biyogaz tesisleri kuruyoruz.",
   "services.intro.lead": "Iona Biogas; organik atığı elektriğe, ısıya ve organik gübreye çeviren biyogaz tesislerini fizibiliteden devreye almaya kadar tek elden tasarlayan, inşa eden ve çalışır halde teslim eden bir mühendislik şirketidir.",
@@ -132,80 +118,68 @@
   "services.delivery.stage2_desc": "Saha hazırlığı, betonarme yapılar, ekipman montajı, proses boru hatları, elektrik ve otomasyon. Sahadaki ekip bizim ekibimiz.",
   "services.delivery.stage3_title": "Devreye Alma ve İşletme",
   "services.delivery.stage3_desc": "Aşılama, ilk gaz üretimi, performans testleri ve personel eğitimi. Teslimden sonra da uzaktan izleme ve teknik destek devam eder.",
-
   "services.solutions.eyebrow": "Ürün & Teknoloji Kataloğu",
   "services.solutions.title": "Çözümlerimiz",
-
   "services.solutions.item1_title": "Çürütücü Tasarımı",
   "services.solutions.item1_desc": "Her tesisin besleme profiline özel olarak mühendislik edilen anaerobik çürütücü sistemleri tasarlıyoruz. %14'e varan kuru madde oranında dahi kararlı çalışan, sahaya özel geometri ve hassas ısıtma sistemleriyle organik ayrışmayı hızlandıran çözümler sunuyoruz.",
   "services.solutions.item1_feat1": "Optimum Doluluk Seviyesi: %70–80 kapasite aralığı",
   "services.solutions.item1_feat2": "Hidrolik Bekletme Süresi (HRT): 20–30 gün",
   "services.solutions.item1_feat3": "Organik Yükleme Oranı: 2–4 kg UKM/m³/gün",
   "services.solutions.item1_feat4": "%14'e varan kuru madde oranında kararlı çalışma",
-
   "services.solutions.item2_title": "Karıştırma Teknolojisi",
   "services.solutions.item2_desc": "20 yılı aşkın saha tecrübesiyle geliştirdiğimiz karıştırma sistemleri, her besleme tipine göre özelleştirilir. Biyogaz verimini, tesis güvenliğini ve enerji tasarrufunu aynı anda optimize eden mühendislik çözümleri sunuyoruz.",
   "services.solutions.item2_feat1": "Tam substrat homojenliği, sıfır ölü bölge",
   "services.solutions.item2_feat2": "Yüzey kabuğu (scum) oluşumunun önlenmesi",
   "services.solutions.item2_feat3": "Optimize karıştırıcı konumlandırma ile düşük enerji tüketimi",
   "services.solutions.item2_feat4": "Maksimum günlük metan verimi",
-
   "services.solutions.item3_title": "Merkezi Pompa İstasyonu (CPS)",
   "services.solutions.item3_desc": "Tesisin tüm pompa ve kontrol birimlerini tek bir merkezde topluyoruz. Bu yapı, boru hattı mesafelerini ve olası kaçak noktalarını azaltırken, üretimi durdurmadan bakım yapılabilen yedekli bir işletme modeli sağlıyor.",
   "services.solutions.item3_feat1": "Tüm pompa ve kontrol üniteleri tek lokasyonda",
   "services.solutions.item3_feat2": "Yedekli (redundant) çalışma — kesintisiz üretim",
   "services.solutions.item3_feat3": "Kısaltılmış boru hatları, azaltılmış kaçak riski",
   "services.solutions.item3_feat4": "Hızlı müdahale, düşük servis maliyeti",
-
   "services.solutions.item4_title": "Enerji Tasarruflu Taşma Sistemi (OFT)",
   "services.solutions.item4_desc": "Çürütücüler ile digestat çukurları arasında yerçekimi prensibiyle çalışan, dışarıdan enerji gerektirmeyen yenilikçi bir taşma sistemi geliştirdik. \"Birleşik Kap\" prensibiyle çalışan sistem, geleneksel pompalama yöntemlerine sürdürülebilir bir alternatif sunar.",
   "services.solutions.item4_feat1": "Pompalama enerjisinde %66'ya varan tasarruf",
   "services.solutions.item4_feat2": "Az hareketli parça, düşük mekanik stres",
   "services.solutions.item4_feat3": "Kesintisiz ve akıcı malzeme transferi",
   "services.solutions.item4_feat4": "Minimum bakım ihtiyacı, uzun sistem ömrü",
-
   "services.solutions.item5_title": "Sedimantasyon Tuzağı",
   "services.solutions.item5_desc": "Çürütücü içindeki inorganik madde ve tortu birikimini sürekli olarak yöneterek tesisin uzun vadeli performansını koruyoruz. Sistem, aktif hacim kaybını önler ve iç temizlik müdahalesi gerektirmeden optimum çalışmayı sürdürür.",
   "services.solutions.item5_feat1": "İnorganik madde birikiminin önlenmesi, tam kapasite koruma",
   "services.solutions.item5_feat2": "İç temizlik nedeniyle duruşların ortadan kaldırılması",
   "services.solutions.item5_feat3": "Otomatik tortu izolasyonu ile ekipman hasarının önlenmesi",
   "services.solutions.item5_feat4": "Tesis ömrü boyunca maksimum süreklilik",
-
   "services.solutions.item6_title": "Donmaya ve Tıkanmaya Karşı Koruma",
   "services.solutions.item6_desc": "Boru hatlarında olası tıkanmaları anlık olarak tespit edip otomatik temizleyen, aynı zamanda düşük sıcaklıklarda donmaya karşı ısıl koruma sağlayan entegre bir sistem sunuyoruz. Zorlu iklim koşullarında bile kesintisiz işletme garantisi veriyoruz.",
   "services.solutions.item6_feat1": "Anlık sensörle tıkanma tespiti, otomatik hava/su temizleme",
   "services.solutions.item6_feat2": "Sedimantasyon Tuzağı ve Taşma (OFT) hatlarında özel koruma",
   "services.solutions.item6_feat3": "Dış sıcaklığa duyarlı otomatik donma önleme",
   "services.solutions.item6_feat4": "Sıfır altı iklimlerde kesintisiz işletme",
-
   "services.solutions.item7_title": "Doğrudan Katı Besleme",
   "services.solutions.item7_desc": "Biyokütle malzemelerin ön işlem gerektirmeden doğrudan çürütücüye beslenmesini sağlıyoruz. Bu sistem, ön karıştırma ve ek pompalama ihtiyacını ortadan kaldırarak hem enerji tasarrufu hem de operasyonel kolaylık sunar.",
   "services.solutions.item7_feat1": "%14'e varan kuru madde toleransı",
   "services.solutions.item7_feat2": "Taş, ahşap ve ağır yabancı madde ayrıştırma",
   "services.solutions.item7_feat3": "Akıllı otomasyonla dozaj ve besleme zamanlaması",
   "services.solutions.item7_feat4": "Aşınmaya dayanıklı ağır hizmet tipi besleme ekipmanı",
-
   "services.solutions.item8_title": "Isı Dağıtım Ünitesi (HDU)",
   "services.solutions.item8_desc": "Tesisteki tüm ısı kaynaklarını tek bir merkezde toplayıp, gereken ısıyı gereken yere hassas şekilde dağıtan akıllı termal yönetim sistemi. SCADA ile tam entegre çalışarak yıl boyu kararlı çürütücü sıcaklığı sağlar.",
   "services.solutions.item8_feat1": "Hassas termal hesaplama, ihtiyaç kadar ısı dağıtımı",
   "services.solutions.item8_feat2": "Tam SCADA entegrasyonu, uzaktan izleme",
   "services.solutions.item8_feat3": "Kompakt tasarım, otomatik ısı dengeleme",
   "services.solutions.item8_feat4": "İç ve dış ısı kaynaklarının tek merkezde birleşimi",
-
   "services.solutions.item9_title": "Gaz Vanası Odası (GVC)",
   "services.solutions.item9_desc": "Çürütücüden çıkan biyogazı soğutarak proses güvenliğini artıran, yeraltına yerleştirilmiş bir sistemdir. Genleşme odasında mekanik nem giderme ve filtrasyon uygulayarak, dışarıdan enerji harcamadan gaz kalitesini yükseltir.",
   "services.solutions.item9_feat1": "Enerji harcamadan çalışan nem giderme ve filtrasyon",
   "services.solutions.item9_feat2": "Çift membranlı gaz tutucular ve gelişmiş emniyet vanaları",
   "services.solutions.item9_feat3": "Aşırı basınç ve vakuma karşı yapısal koruma",
   "services.solutions.item9_feat4": "Rüzgar ve kar yüküne dayanıklı, uzun ömürlü malzeme",
-
   "services.solutions.item10_title": "Biyogaz Ön Arıtma",
   "services.solutions.item10_desc": "Ham biyogazı çok aşamalı arıtma süreciyle yüksek kaliteli biyometana dönüştürüyoruz. Nem giderme, H₂S ve CO₂ arıtımı içeren süreç, her tesisin besleme ve çıktı ihtiyacına göre özelleştiriliyor.",
   "services.solutions.item10_feat1": "Gelişmiş nem giderme (soğutma / genleşme sistemi)",
   "services.solutions.item10_feat2": "H₂S ve CO₂ arıtımı ile ekipman korozyonunun önlenmesi",
   "services.solutions.item10_feat3": "Gaz Vanası Odası (GVC) entegrasyonu",
   "services.solutions.item10_feat4": "Sahaya özel arıtma ünitesi tasarımı",
-
   "services.metrics.eyebrow": "Küresel Performans Metrikleri",
   "services.metrics.title": "Küresel Biyoenerji Projesi Büyümesi",
   "services.metrics.body": "Yüksek verimli tesis tasarımları ve patentli teknolojilerle Iona Biogas, yenilenebilir enerji üretimini sürekli olarak ölçeklendiriyor.",
@@ -214,7 +188,6 @@
   "services.metrics.item3_label": "Operasyonel Tesis Güvenilirliği",
   "services.field.eyebrow": "Sahadan Görüntüler",
   "services.field.title": "Teknolojimiz Gerçek Tesislerde",
-
   "services.workflow.eyebrow": "Mühendislik İş Akışı",
   "services.workflow.title": "Proje Geliştirme Aşamaları",
   "services.workflow.step1_label": "Adım 01",
@@ -229,7 +202,6 @@
   "services.workflow.step4_label": "Adım 04",
   "services.workflow.step4_title": "Sürekli Biyolojik Destek",
   "services.workflow.step4_desc": "Tesisinizin tepe performansında sıfır kesinti süresiyle çalışmasını sağlamak için 7/24 uzaktan izleme, düzenli biyolojik analiz ve teknik bakım sunuyoruz.",
-
   "services.faq.eyebrow": "Sık Sorulan Sorular",
   "services.faq.title": "Sıkça Sorulan Teknik Sorular",
   "services.faq.q1": "Iona karıştırma sistemleri biyogaz verimini nasıl en üst düzeye çıkarır?",
@@ -240,12 +212,10 @@
   "services.faq.a3": "Yenilikçi Taşma Sistemimiz (OFT), tamamen \"Birleşik Kap\" prensibiyle çalışır. Çürüyen madde transferinde yerçekiminden akıllıca yararlanarak mekanik stresi büyük ölçüde azaltır ve pompalama enerji tüketimini %66'ya kadar keser.",
   "services.faq.q4": "Boru hatlarını kışın donmaya karşı hangi önlemler korur?",
   "services.faq.a4": "Tüm Iona tesisleri, akıllı sensörlerle entegre otomatik termal Donma Önleme koruması içerir. Sistem, sıfırın altındaki dış ortam sıcaklıklarını otomatik olarak algılar ve donmayı önlemek ve maliyetli kesinti sürelerinden kaçınmak için hat ısıtmasını devreye sokar.",
-
   "industries.hero.eyebrow": "Sektörler",
   "industries.hero.title": "Hizmet Verdiğimiz Sektörler ve Küresel Ağımız",
   "industries.hero.body": "Belediyelerden ağır sanayiye, tarımdan hayvancılığa kadar farklı sektörlere anahtar teslim biyogaz çözümleri sunuyor, küresel tedarik ve mühendislik ağımızla her projeyi hayata geçiriyoruz.",
   "industries.hero.cta": "Teklif İsteyin",
-
   "industries.list.eyebrow": "Sektörel Etki",
   "industries.list.title": "Hizmet Verdiğimiz Sektörler",
   "industries.list.item1_title": "Belediye Biyokütle Enerjisi",
@@ -260,7 +230,6 @@
   "industries.list.item4_title": "Hayvancılık Gübre Yönetimi",
   "industries.list.item4_subtitle": "Çevre Dostu Gübre Stabilizasyonu · Koku Emisyonunun Giderilmesi",
   "industries.list.item4_desc": "Büyük ölçekli çiftliklerin gelişmiş anaerobik çürütme yoluyla hayvan gübresini verimli bir şekilde yönetmesine yardımcı oluyoruz. Biyogaz tesislerimiz zararlı sera gazlarını ortadan kaldırır, kokuyu giderir ve kârlı yeşil enerji yaratır.",
-
   "industries.partners.eyebrow": "Küresel İş Birlikleri",
   "industries.partners.title": "Teknoloji ve Tedarik Ortaklarımız",
   "industries.partners.body": "Her tesis, alanında uzman küresel tedarikçi ve mühendislik ağımızın üzerine inşa edilir. Anahtar teslim bir biyogaz projesini mümkün kılan altı temel iş birliği alanı:",
@@ -276,17 +245,14 @@
   "industries.partners.item5_desc": "Fizibilite ve çevresel etki değerlendirmelerinde uluslararası mühendislik ve danışmanlık firmalarıyla proje ortaklıkları kuruyoruz.",
   "industries.partners.item6_title": "Finansman & Yatırım Ortaklıkları",
   "industries.partners.item6_desc": "Projelerin hayata geçmesi için küresel yatırım ve proje finansmanı kuruluşlarıyla birlikte çalışıyoruz.",
-
   "contact.hero.eyebrow": "İletişim",
   "contact.hero.title": "Bize Ulaşın",
   "contact.hero.body": "Projenizi konuşmaya hazırız. Fizibilite çalışmasından anahtar teslim inşaata kadar, mühendislik ekibimiz sorularınızı yanıtlamak için burada.",
   "contact.hero.scroll_cue": "Aşağı kaydırın",
-
   "contact.info.address_title": "Adres",
   "contact.info.address_body": "Kırkkonaklar Mah. 358. Sok. 13/5<br>Çankaya, Ankara / Türkiye",
   "contact.info.phone_title": "Telefon",
   "contact.info.email_title": "E-posta",
-
   "contact.form.eyebrow": "Teklif Alın",
   "contact.form.title": "Projenizi Anlatın",
   "contact.form.body": "Formu doldurun; mesajınız doğrudan mühendislik ekibimize iletilecektir.",
@@ -296,17 +262,13 @@
   "contact.form.phone_placeholder": "Telefon Numaranız",
   "contact.form.message_placeholder": "Projeniz hakkında kısaca bilgi verin",
   "contact.form.submit": "Mesajı Gönder",
-
   "flux.cta.demo": "Canlı Demo Talep Edin",
   "flux.cta.watch": "Tanıtım Videosunu İzleyin",
-
   "flux.hero.title": "Bir Tesis, Bir Ekran, Tam Kontrol.",
   "flux.hero.body": "IonaFlux, Iona mühendisliği tarafından geliştirilen ve müşterilerimize teslim edilen dijital işletme platformudur. Canlı tesis verilerini, arıza yönetimini ve saha operasyonlarını tek panelde birleştirir.",
-
   "flux.live.eyebrow": "Canlı İzleme",
   "flux.live.title": "Tesisinizdeki Her Veri, Gerçek Zamanlı Ekranınızda.",
   "flux.live.body": "PLC verileri beş saniyede bir güncellenir; hiçbir değer simülasyon değildir. Her çürütücünün sıcaklığı, debisi ve alarm durumu anlık olarak izlenir. Gece oluşan bir alarm, nöbetçi mühendise otomatik olarak bildirilir.",
-
   "flux.catalog.title": "Sahadan Ofise, Uçtan Uca Yönetim.",
   "flux.catalog.item1_title": "Markalı Raporlama",
   "flux.catalog.item1_desc": "Günlük saha, akış ve analiz raporları tek tıkla markalı PDF olarak oluşturulur ve doğrudan müşteriyle paylaşılır.",
@@ -314,21 +276,16 @@
   "flux.catalog.item2_desc": "Saha ekibi arızayı anında bildirir; talep otomatik olarak ilgili mühendise atanır ve süreç açık, atandı, devam ediyor, çözüldü adımlarıyla izlenir.",
   "flux.catalog.item3_title": "Saha Operasyon Modülleri",
   "flux.catalog.item3_desc": "Vardiya planlama, görev atama, kontrol listeleri, kantar ve lojistik, besleme reçeteleri; sahadaki tüm günlük operasyon tek uygulamada yönetilir.",
-
   "flux.qr.eyebrow": "QR ile Tanı",
   "flux.qr.title": "Ekipmanı Tanıyın, Arıza Süresini Kısaltın.",
   "flux.qr.body": "Her ekipmanın üzerinde bir QR kod bulunur. Telefonla okutulduğunda ilgili makinenin canlı durumu, seri numarası ve kablolama şeması anında görüntülenir.",
-
   "flux.lab.title": "Verim Değişimlerinin Nedenini Anında Görün.",
   "flux.lab.body": "Laboratuvar sonuçları nominal aralıklarla karşılaştırılır; verim skoru haftalık değişimi gösterir ve gerekli aksiyonu önerir.",
-
   "flux.fleet.eyebrow": "Çoklu Tesis",
   "flux.fleet.title": "Tek Panelden, Birbirinden İzole Yönetilen Tesisler.",
   "flux.fleet.body": "Portföyünüzdeki her tesis kendi erişim anahtarıyla çalışır; veriler birbirine karışmaz. Büyüdükçe tüm tesislerinizi tek panelden yönetmeye devam edersiniz.",
-
   "flux.video.title": "IonaFlux'u İki Dakikada İzleyin.",
   "flux.video.body": "Uygulamanın müşterilerimize teslim edildiği haliyle, gerçek ekran görüntüleriyle hazırlanan kısa tanıtım videomuz.",
-
   "digitalTwin.ui.learnMore": "Detaylı Bilgi",
   "digitalTwin.ui.back": "← Geri",
   "digitalTwin.ui.close": "Kapat",
@@ -356,7 +313,26 @@
   "digitalTwin.stations.control-cabin.stats.loadFactor": "Yük Oranı",
   "digitalTwin.stations.control-cabin.stats.engineTemperature": "Motor Sıcaklığı",
   "digitalTwin.stations.control-cabin.stats.operatingHours": "Çalışma Saati",
-
   "digitalTwin.ui.fallbackAlt": "Iona biyogaz tesisinin fotoğrafı",
-  "digitalTwin.ui.fallbackDescription": "3D model bu cihazda görüntülenemiyor. Tesisimizin gerçek bir fotoğrafını görüntülüyorsunuz."
+  "digitalTwin.ui.fallbackDescription": "3D model bu cihazda görüntülenemiyor. Tesisimizin gerçek bir fotoğrafını görüntülüyorsunuz.",
+  "home.catalog.index": "04 / KATALOG",
+  "home.catalog.title": "Tesisin her adımı, birlikte.",
+  "home.catalog.scope_label": "Kapsam",
+  "home.catalog.discipline_label": "Disiplin",
+  "home.catalog.item1_title": "Mühendislik İş Akışı",
+  "home.catalog.item1_desc": "Fizibiliteden devreye almaya, uçtan uca proje yönetimi.",
+  "home.catalog.item1_scope": "Fizibilite → devreye alma",
+  "home.catalog.item1_discipline": "Proses mühendisliği",
+  "home.catalog.item2_title": "Çürütme ve Karıştırma",
+  "home.catalog.item2_desc": "Besleme profiline göre boyutlandırılan çürütücü ve substratı homojen tutan karıştırma düzeni.",
+  "home.catalog.item2_scope": "Çürütücü + karıştırma",
+  "home.catalog.item2_discipline": "Anaerobik proses",
+  "home.catalog.item3_title": "Pompalama ve Transfer",
+  "home.catalog.item3_desc": "Tüm pompa ve kontrol birimlerini tek merkezde toplayan istasyon, yerçekimiyle çalışan taşma hatlarıyla birlikte.",
+  "home.catalog.item3_scope": "Pompa istasyonu + taşma hatları",
+  "home.catalog.item3_discipline": "Akışkan mekaniği",
+  "home.catalog.item4_title": "Gaz Hattı ve Enerji",
+  "home.catalog.item4_desc": "Gazın tutulması, nemden ve H₂S'ten arındırılması, kojenerasyonda elektrik ve ısıya çevrilmesi.",
+  "home.catalog.item4_scope": "Gaz tutucu → kojenerasyon",
+  "home.catalog.item4_discipline": "Enerji sistemleri"
 }

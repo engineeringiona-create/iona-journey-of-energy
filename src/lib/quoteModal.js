@@ -1,5 +1,6 @@
 import { getSupabase } from './supabaseClient.js';
 import { localizePath } from './langPath.js';
+import { renderSuccessCard } from './successCard.js';
 
 const MODAL_ID = 'iona-quote-modal';
 
@@ -199,37 +200,26 @@ async function handleSubmit(e, card, overlay, close) {
    just a swap inside the small 440px card) — the card is removed
    entirely and this renders straight into the fixed inset-0 overlay,
    so it reads as an immersive confirmation screen instead of "a form
-   that changed its mind". */
+   that changed its mind".
+
+   2026-09-19: kartın kendisi src/lib/successCard.js'e taşındı. İletişim
+   sayfasının formu da aynı onayı gösteriyordu ama tamamen farklı bir
+   tasarımla; tek kaynağa indirildi. Buradaki fark yalnızca metinler ve ana
+   düğmenin ne yaptığı. */
 function renderSuccess(overlay, close, inserted) {
   const ref = inserted?.id ? inserted.id.slice(0, 8).toUpperCase() : '';
   const timestamp = new Date(inserted?.created_at || Date.now()).toLocaleString('tr-TR');
 
-  overlay.style.background = 'rgba(5,7,6,0.7)';
-  overlay.style.padding = '24px';
-  overlay.innerHTML = `
-    <div style="position:relative;max-width:540px;width:100%;text-align:center;background:#fffdf7;border-radius:28px;padding:40px 28px;">
-      <button type="button" id="iona-qm-success-close" aria-label="Kapat" style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);color:#193322;font-size:16px;line-height:1;cursor:pointer;">×</button>
-      <div style="width:88px;height:88px;border-radius:50%;background:rgba(63,174,102,0.15);border:1px solid rgba(63,174,102,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;animation:iona-qm-pop 450ms ease;">
-        <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
-          <path d="M4 12.5L9.5 18L20 6" stroke="#3fae66" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="30" stroke-dashoffset="30" style="animation:iona-qm-draw 550ms ease 200ms forwards;"/>
-        </svg>
-      </div>
-      <h3 style="color:#193322;font-weight:800;font-size:28px;line-height:1.25;margin:0 0 16px;">Teklif Talebiniz Başarıyla Alındı!</h3>
-      <p style="color:#52634f;font-size:15px;line-height:1.65;margin:0 0 24px;">Uzman mühendislik ekibimiz bilgilerinizi inceleyip en kısa sürede sizinle iletişime geçecektir.</p>
-      ${ref ? `<p style="color:#52634f;font-size:12px;letter-spacing:0.04em;margin:0 0 32px;">Referans No: #${ref} · ${timestamp}</p>` : ''}
-      <button type="button" id="iona-qm-done" style="background:#198837;color:#fff;font-weight:700;font-size:14px;padding:14px 32px;border-radius:999px;border:0;cursor:pointer;">Kapat / Anasayfaya Dön</button>
-    </div>
-    <style>
-      @keyframes iona-qm-pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-      @keyframes iona-qm-draw { to { stroke-dashoffset: 0; } }
-    </style>
-  `;
-
-  overlay.querySelector('#iona-qm-done').addEventListener('click', () => {
-    close();
-    /* Ana sayfa, ziyaretçinin bulunduğu dilin ana sayfası olmalı. */
-    window.location.href = localizePath('/');
+  renderSuccessCard(overlay, {
+    title: 'Teklif Talebiniz Başarıyla Alındı!',
+    body: 'Uzman mühendislik ekibimiz bilgilerinizi inceleyip en kısa sürede sizinle iletişime geçecektir.',
+    meta: ref ? `Referans No: #${ref} · ${timestamp}` : '',
+    primaryLabel: 'Kapat / Anasayfaya Dön',
+    onPrimary: () => {
+      close();
+      /* Ana sayfa, ziyaretçinin bulunduğu dilin ana sayfası olmalı. */
+      window.location.href = localizePath('/');
+    },
+    onClose: close
   });
-  overlay.querySelector('#iona-qm-success-close').addEventListener('click', close);
-  overlay.querySelector('#iona-qm-done').focus();
 }

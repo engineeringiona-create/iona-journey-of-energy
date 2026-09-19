@@ -2,6 +2,7 @@ import { initFadeIn, initThemeToggle, initSiteSearch, initCardSpotlight, initMob
 import { initI18n, initLangSwitcher } from '../i18n.js';
 import { initQuoteModal } from '../lib/quoteModal.js';
 import { getSupabase } from '../lib/supabaseClient.js';
+import { renderSuccessCard } from '../lib/successCard.js';
 
 await initI18n();
 initSmoothScroll();
@@ -21,8 +22,8 @@ initCardSpotlight();
    which read as broken more often than it read as "your message is on
    its way"). stopPropagation alongside preventDefault since this form
    sits inside a fade-in-section whose own click/scroll wiring shouldn't
-   see the submit bubble past it. Success is a full-screen liquid-glass
-   card the visitor dismisses themselves (Tamam / Kapat), which is also
+   see the submit bubble past it. Success is the shared confirmation card
+   (src/lib/successCard.js) the visitor dismisses themselves, which is also
    what resets the form — not the insert succeeding — so a visitor who
    wants to screenshot their submitted values before closing still can. */
 const form = document.getElementById('contact-mail-form');
@@ -61,27 +62,14 @@ form?.addEventListener('submit', async (e) => {
   showConfirmationOverlay(form);
 });
 
+/* Onay kartı artık teklif akışıyla AYNI: src/lib/successCard.js.
+   Önceden burada koyu cam bir panel, radial parlamalar ve turuncu bir düğme
+   vardı; teklif modalı ise krem zeminli editoryal bir kart gösteriyordu. Aynı
+   işi yapan iki ekranın iki ayrı dünyada olmasının bir sebebi yoktu.
+   Buradaki fark yalnızca metinler ve kapanışta formun sıfırlanması. */
 function showConfirmationOverlay(form) {
   const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 z-[99999] flex items-center justify-center p-6 backdrop-blur-xl bg-slate-950/85';
-  overlay.innerHTML = `
-    <div class="pointer-events-none absolute -top-32 -left-24 w-[420px] h-[420px] rounded-full opacity-60" style="background:radial-gradient(circle,rgba(63,174,102,0.35),transparent 70%)" aria-hidden="true"></div>
-    <div class="pointer-events-none absolute -bottom-32 -right-24 w-[420px] h-[420px] rounded-full opacity-50" style="background:radial-gradient(circle,rgba(255,183,61,0.3),transparent 70%)" aria-hidden="true"></div>
-    <div class="relative max-w-md w-full rounded-3xl border border-emerald-400/30 bg-slate-900/80 p-10 text-center shadow-[0_0_60px_-10px_rgba(63,174,102,0.35)]">
-      <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/10" style="animation:iona-cf-pop 450ms ease;">
-        <svg width="38" height="38" viewBox="0 0 24 24" fill="none">
-          <path d="M4 12.5L9.5 18L20 6" stroke="#3fae66" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="30" stroke-dashoffset="30" style="animation:iona-cf-draw 550ms ease 150ms forwards;"/>
-        </svg>
-      </div>
-      <h3 class="mb-3 text-2xl font-extrabold text-white">Mesajınız Başarıyla İletildi!</h3>
-      <p class="mb-8 text-[15px] leading-relaxed text-white/65">Uzman mühendislik ekibimiz bilgilerinizi inceleyip en kısa sürede sizinle iletişime geçecektir.</p>
-      <button type="button" id="iona-cf-close" class="rounded-full bg-[var(--brand-orange,#ff751f)] px-8 py-3 text-[13px] font-bold text-white transition hover:brightness-110">Tamam / Kapat</button>
-    </div>
-    <style>
-      @keyframes iona-cf-pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-      @keyframes iona-cf-draw { to { stroke-dashoffset: 0; } }
-    </style>
-  `;
+  overlay.className = 'fixed inset-0 z-[99999] flex items-center justify-center';
   document.body.appendChild(overlay);
 
   function close() {
@@ -91,6 +79,11 @@ function showConfirmationOverlay(form) {
   }
   function onKeydown(e) { if (e.key === 'Escape') close(); }
   document.addEventListener('keydown', onKeydown);
-  overlay.querySelector('#iona-cf-close').addEventListener('click', close);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  renderSuccessCard(overlay, {
+    title: 'Mesajınız Başarıyla İletildi!',
+    body: 'Uzman mühendislik ekibimiz bilgilerinizi inceleyip en kısa sürede sizinle iletişime geçecektir.',
+    primaryLabel: 'Tamam / Kapat',
+    onClose: close
+  });
 }

@@ -1486,10 +1486,22 @@ const Rig = memo(function Rig({ plantRootRef, selected, groundY, groundScale, si
     if (import.meta.env.DEV) window.__IONA_CAM = { pos: camera.position.toArray().map((v) => +v.toFixed(1)), target: controls?.target.toArray().map((v) => +v.toFixed(1)), goal: cameraGoal.current ? cameraGoal.current.position.toArray().map((v) => +v.toFixed(1)) : null, aspect: +camera.aspect.toFixed(2), fov: camera.fov };
   });
   return <>
+    {/* Kullanıcı girdisinin tamamı kapalı (2026-09-19 isteği): tekerlekle
+        yakınlaştırma ve basılı tutup döndürme kaldırıldı, kaydırma zaten
+        kapalıydı. Kamera artık yalnızca sahnenin kendi mantığıyla hareket
+        ediyor — bir yapı seçildiğinde cameraGoal'e doğru yol alan animasyon ve
+        yeniden çerçeveleme (useLayoutEffect).
+
+        Tekerlek olayının serbest kalması bir yan fayda: hero tam ekran
+        olduğundan, tuval üzerinde tekerlek çevirince sayfa kaydırmak yerine
+        model yakınlaşıyordu ve ziyaretçi sayfada aşağı inemiyordu.
+
+        OrbitControls yerinde kalıyor çünkü `controls.target` sahnenin bakış
+        merkezi olarak her yerde okunuyor (kamera-fit hesapları buna bakıyor);
+        bileşeni kaldırmak o mantığı da sökmek olurdu. autoRotate zaten ölüydü:
+        idleSpinRef Phase 98'den beri hiç true olmuyor. */}
     <OrbitControls ref={controlsRef} enableDamping={false}
-      enableRotate enableZoom enablePan={false}
-      rotateSpeed={0.55} zoomSpeed={0.6} autoRotateSpeed={0.5}
-      minDistance={25} maxDistance={260}
+      enableRotate={false} enableZoom={false} enablePan={false}
       minPolarAngle={0.3} maxPolarAngle={1.32}
       onStart={handleControlsStart} onEnd={handleControlsEnd} />
     {/* Two shadow layers, two jobs: this plane catches the key light's long

@@ -197,18 +197,55 @@
 <section class="relative bg-white border-t border-slate-200 fade-in-section" id="services-exhibit">
 <div class="max-w-[1400px] mx-auto px-safe-margin-mobile md:px-safe-margin-desktop pt-20 md:pt-28 pb-12 md:pb-16">
 <div class="flex items-end justify-between gap-6 fade-in-element">
-<h2 class="text-4xl lg:text-6xl font-bold tracking-tighter text-black">Tesisin her adımı, birlikte.</h2>
-<span class="hidden md:block text-[10px] font-mono uppercase tracking-widest text-black/40">04 / KATALOG</span>
+<h2 class="text-4xl lg:text-6xl font-bold tracking-tighter text-black" data-i18n="home.catalog.title">Tesisin her adımı, birlikte.</h2>
+<span class="hidden md:block text-[10px] font-mono uppercase tracking-widest text-black/40" data-i18n="home.catalog.index">04 / KATALOG</span>
 </div>
 </div>
+<!-- Dört panel: editorial-sections.css bu bölümü `service-panel-1..4` için
+     yazılmış yapışkan (sticky) bir kart destesi olarak kurguluyor — her kart
+     bir öncekinin üstüne biniyor, ikincisi koyu inversiyon. Kart sayısı
+     değişirse o CSS'teki --stack-index listesi de gözden geçirilmeli.
+     Kartlar tesisin dört ana aşamasını özetliyor ve hepsi Hizmetler
+     sayfasındaki gerçek bölümlere gidiyor; metinler oradaki çözüm
+     kataloğundan türetildi, yeni iddia yazılmadı. -->
 <a class="services-exhibit-row group service-panel-1 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-t border-b border-slate-200" href="/teknoloji.html#workflow">
 <div class="relative overflow-hidden lg:col-span-7">
 <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/field/reactor-installation.webp" alt="Sahada reaktör montajı ve tesis yerleşimi" loading="lazy" decoding="async">
 </div>
 <div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
 <span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">01</span>
-<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">Mühendislik İş Akışı</h3>
-<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md">Fizibiliteden devreye almaya, uçtan uca proje yönetimi.</p><dl class="service-specs"><div><dt>Kapsam</dt><dd>Fizibilite → devreye alma</dd></div><div><dt>Disiplin</dt><dd>Proses mühendisliği</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black" data-i18n="home.catalog.item1_title">Mühendislik İş Akışı</h3>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md" data-i18n="home.catalog.item1_desc">Fizibiliteden devreye almaya, uçtan uca proje yönetimi.</p><dl class="service-specs"><div><dt data-i18n="home.catalog.scope_label">Kapsam</dt><dd data-i18n="home.catalog.item1_scope">Fizibilite → devreye alma</dd></div><div><dt data-i18n="home.catalog.discipline_label">Disiplin</dt><dd data-i18n="home.catalog.item1_discipline">Proses mühendisliği</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
+</div>
+</a>
+<a class="services-exhibit-row group service-panel-2 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-b border-slate-200" href="/teknoloji.html#solutions">
+<div class="relative overflow-hidden lg:col-span-7">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/field/digester-interior.webp" alt="Çürütücünün iç yüzeyi ve karıştırma düzeni" loading="lazy" decoding="async">
+</div>
+<div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
+<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#ffc700] mb-4">02</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6" data-i18n="home.catalog.item2_title">Çürütme ve Karıştırma</h3>
+<p class="text-base lg:text-lg leading-relaxed max-w-md" data-i18n="home.catalog.item2_desc">Besleme profiline göre boyutlandırılan çürütücü ve substratı homojen tutan karıştırma düzeni.</p><dl class="service-specs"><div><dt data-i18n="home.catalog.scope_label">Kapsam</dt><dd data-i18n="home.catalog.item2_scope">Çürütücü + karıştırma</dd></div><div><dt data-i18n="home.catalog.discipline_label">Disiplin</dt><dd data-i18n="home.catalog.item2_discipline">Anaerobik proses</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
+</div>
+</a>
+<a class="services-exhibit-row group service-panel-3 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-b border-slate-200" href="/teknoloji.html#solutions">
+<div class="relative overflow-hidden lg:col-span-7">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/pump-room.webp" alt="Merkezi pompa istasyonunda pompa ve kontrol birimleri" loading="lazy" decoding="async">
+</div>
+<div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
+<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">03</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black" data-i18n="home.catalog.item3_title">Pompalama ve Transfer</h3>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md" data-i18n="home.catalog.item3_desc">Tüm pompa ve kontrol birimlerini tek merkezde toplayan istasyon, yerçekimiyle çalışan taşma hatlarıyla birlikte.</p><dl class="service-specs"><div><dt data-i18n="home.catalog.scope_label">Kapsam</dt><dd data-i18n="home.catalog.item3_scope">Pompa istasyonu + taşma hatları</dd></div><div><dt data-i18n="home.catalog.discipline_label">Disiplin</dt><dd data-i18n="home.catalog.item3_discipline">Akışkan mekaniği</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
+</div>
+</a>
+<a class="services-exhibit-row group service-panel-4 grid grid-cols-1 lg:grid-cols-12 min-h-[50vh] border-b border-slate-200" href="/teknoloji.html#solutions">
+<div class="relative overflow-hidden lg:col-span-7">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" src="/images/equipment/engine-room.webp" alt="Kojenerasyon motor odası ve enerji üretim hattı" loading="lazy" decoding="async">
+</div>
+<div class="lg:col-span-5 flex flex-col justify-center p-8 lg:p-16">
+<span class="block text-5xl lg:text-6xl font-bold tracking-tight text-[#2d9937] mb-4">04</span>
+<h3 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black" data-i18n="home.catalog.item4_title">Gaz Hattı ve Enerji</h3>
+<p class="text-base lg:text-lg text-black/60 leading-relaxed max-w-md" data-i18n="home.catalog.item4_desc">Gazın tutulması, nemden ve H₂S'ten arındırılması, kojenerasyonda elektrik ve ısıya çevrilmesi.</p><dl class="service-specs"><div><dt data-i18n="home.catalog.scope_label">Kapsam</dt><dd data-i18n="home.catalog.item4_scope">Gaz tutucu → kojenerasyon</dd></div><div><dt data-i18n="home.catalog.discipline_label">Disiplin</dt><dd data-i18n="home.catalog.item4_discipline">Enerji sistemleri</dd></div></dl><span class="service-arrow" aria-hidden="true">↗</span>
 </div>
 </a>
 </section>
@@ -475,7 +512,24 @@
 </svg>
 <div class="relative max-w-[theme(spacing.container-max)] mx-auto flex flex-col items-center gap-10 text-center">
 <span class="text-[10px] font-mono uppercase tracking-widest text-black/40">İletişime Geçin</span>
-<a class="text-[11vw] md:text-[7vw] leading-[0.95] font-bold tracking-tighter text-black break-all hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">HELLO@IONA.COM</a>
+<!-- Boyut vw ile ölçeklenirken kapsayıcı 1440px'de duruyordu: geniş ekranda
+     7vw yazıyı kabın dışına taşırıyor, `break-all` da onu harf ortasından
+     bölüp sonu alt satıra atıyordu ("...IONA." / "COM"). İki ayrı önlem var:
+
+     1. min() büyümeyi kabın sığdırabileceği yerde durduruyor (masaüstünde
+        artık tek satır, ölçü 1440/1920/2400'de doğrulandı).
+     2. `break-keep` + tek bir <wbr>: adres yalnızca @ işaretinden sonra
+        bölünebiliyor, başka hiçbir yerden bölünemiyor. Yazı tipi yüklenene
+        kadar yedek font kullanılıyor ve o font biraz daha geniş (ölçülen:
+        8,48em / 8,37em) — 320px'in altındaki bir ekranda tek satıra
+        sığmayabilir. O durumda artık rastgele harf düşmüyor, "HELLO@" /
+        "IONA.COM" diye kasıtlı bir yerden bölünüyor.
+
+     `max-w-full` şart: bağlantı `items-center` olan bir flex kabında yer
+     alıyor, yani genişliği varsayılan olarak max-content oluyor ve kabı
+     aşsa bile ASLA satır kırmıyor. Sınır konmazsa <wbr> hiç devreye
+     girmez, yazı sessizce taşar. -->
+<a class="max-w-full text-[10vw] md:text-[min(6.6vw,6.1rem)] leading-[0.95] font-bold tracking-tighter text-black break-keep hover:text-[#2d9937] transition-colors" href="mailto:hello@iona.com">HELLO@<wbr>IONA.COM</a>
 <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 mt-6 fade-in-element">
 <a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/hakkimizda.html" data-i18n="nav.about">Hakkımızda</a>
 <a class="text-sm font-semibold text-black hover:text-[#2d9937] transition-colors" href="/teknoloji.html" data-i18n="nav.services">Hizmetler</a>
