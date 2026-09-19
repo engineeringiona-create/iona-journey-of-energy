@@ -1,0 +1,53 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "src/components/DigitalTwin/GltfTwinScene.jsx"
+        ],
+        "createdAt": "2026-09-19T15:08:44.299Z",
+        "reason": "WebGL overlay text, not page typography: the 11px label renders inside <Html distanceFactor={8}> so its on-screen size is driven by camera distance, and the 10px loader labels are a font-mono telemetry register the DESIGN.md Inter ramp does not cover. User confirmed intentional 2026-09-19."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "*",
+        "files": [
+          "src/components/DigitalTwin/GltfTwinScene.jsx"
+        ],
+        "createdAt": "2026-09-19T15:09:31.474Z",
+        "reason": "PBR material albedo for the 3D plant, not interface color: #cfd3d6 is brushed stainless (metalness 0.8, anisotropy 0.6), #e6e8e3 is concrete (roughness 0.82), #d0261c is the propeller's safety-red paint. A UI palette cannot govern what colour steel is. User confirmed intentional 2026-09-19."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "*",
+        "files": [
+          "src/components/Admin/LiveEditor.jsx"
+        ],
+        "createdAt": "2026-09-19T15:10:20.106Z",
+        "reason": "Admin editörü ayrı bir yüzey: DESIGN.md kamuya açık editoryal siteyi tarif ediyor, bu ise tek kullanıcılık bir iç araç. 65-82. satırlardaki renkler/2px radius, müşterinin sayfasının ÜZERİNE çizilen düzenleme işaretleri (kesikli yeşil çerçeve, vurgulu zemin) — marka paletinin dışında olmaları kasıtlı, içerik değil araç gibi okunsunlar diye. 11px etiketler yoğun araç çubuğu register'ı, 18px ise bir Material Symbols ikonunun boyutu, metin değil. Kullanıcı 2026-09-19'da kasıtlı olduğunu onayladı."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "*",
+        "files": [
+          "src/components/Admin/LiveEditor.jsx"
+        ],
+        "createdAt": "2026-09-19T15:10:20.147Z",
+        "reason": "Admin editörü ayrı bir yüzey: DESIGN.md kamuya açık editoryal siteyi tarif ediyor, bu ise tek kullanıcılık bir iç araç. 65-82. satırlardaki renkler/2px radius, müşterinin sayfasının ÜZERİNE çizilen düzenleme işaretleri (kesikli yeşil çerçeve, vurgulu zemin) — marka paletinin dışında olmaları kasıtlı, içerik değil araç gibi okunsunlar diye. 11px etiketler yoğun araç çubuğu register'ı, 18px ise bir Material Symbols ikonunun boyutu, metin değil. Kullanıcı 2026-09-19'da kasıtlı olduğunu onayladı."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "src/components/Admin/LiveEditor.jsx"
+        ],
+        "createdAt": "2026-09-19T15:10:20.187Z",
+        "reason": "Admin editörü ayrı bir yüzey: DESIGN.md kamuya açık editoryal siteyi tarif ediyor, bu ise tek kullanıcılık bir iç araç. 65-82. satırlardaki renkler/2px radius, müşterinin sayfasının ÜZERİNE çizilen düzenleme işaretleri (kesikli yeşil çerçeve, vurgulu zemin) — marka paletinin dışında olmaları kasıtlı, içerik değil araç gibi okunsunlar diye. 11px etiketler yoğun araç çubuğu register'ı, 18px ise bir Material Symbols ikonunun boyutu, metin değil. Kullanıcı 2026-09-19'da kasıtlı olduğunu onayladı."
+      }
+    ]
+  }
+}

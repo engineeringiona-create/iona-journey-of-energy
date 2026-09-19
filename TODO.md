@@ -44,3 +44,17 @@ hreflang canlıda çalışıyor.
 - [ ] `railway.json` (Config as Code) is deprecated; Railway warns on every command and stops honouring it **2026-12-01**. Migrate to `.railway/railway.ts` with `railway config migrate` before then.
 - [ ] Decide whether the admin panel's Supabase content overrides should stay on in production. They are on (`VITE_SUPABASE_URL`/`ANON_KEY` are set) and `site_content` has `home` + `hakkimizda` rows dated 2026-09-09/09-11 from an older working copy — so the live homepage text may not match what's in `index.html` here. `teknoloji` has no row, so the new Hizmetler copy is served straight from the markup.
 - [ ] The admin panel's "3D Bilgi Noktaları" (hotspots) feature pointed at the removed teknoloji.html WebGL scene. Harmless while the list is empty, but any pin added now lands on empty page space — either retarget it or drop the feature (`src/lib/hotspots.js`, `LiveEditor.jsx`).
+
+## Tasarım sistemi — açık kalan tek kalem
+
+- [ ] **`src/lib/quoteModal.js` kendi paletini ve ölçeğini çalıştırıyor.** Teklif
+      modalı inline stille kurulmuş ve DESIGN.md'de geçmeyen ikinci bir renk
+      kümesi taşıyor (`#193322`, `#52634f`, `#198837`, `#fffdf7`, `#f5f7ef`,
+      `#cddbc6`, `rgba(63,174,102,…)`), kendi yarıçapları (28px, 12px) ve
+      rampa dışı punto boyutları (28px, 15px, 13px) var — 33 uyarı.
+      Yanlış pozitif DEĞİL: kamuya açık, gerçek bir arayüz ve sitenin ana
+      dönüşüm noktası. İki yol var, ikisi de görsel sonuç doğuruyor ve karar
+      senin: (a) bu değerleri DESIGN.md'ye resmî olarak ekleyip modalı
+      sistemin parçası yapmak, (b) modalı mevcut rampaya ve palete taşımak.
+      Bu yüzden susturulmadı — uyarılar görünür kalsın, karar verildiğinde
+      kapansın.

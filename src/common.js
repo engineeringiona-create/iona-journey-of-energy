@@ -177,13 +177,13 @@ export function initSiteSearch() {
          çevrilmesi ayrı bir iş. */
       a.href = localizePath(it.href);
       a.textContent = it.label;
-      a.className = 'block px-3 py-2 rounded-lg text-[14px] text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200';
+      a.className = 'block px-3 py-2 rounded-lg font-body-sm text-body-sm text-[var(--text)] hover:bg-[var(--surface-2)] hover:text-[var(--brand)] transition-colors duration-200';
       results.appendChild(a);
     });
     if (!matches.length) {
       const p = document.createElement('p');
       p.textContent = 'Sonuç bulunamadı.';
-      p.className = 'px-3 py-2 text-[13px] text-[var(--text-muted)]';
+      p.className = 'px-3 py-2 font-body-sm text-body-sm text-[var(--text-muted)]';
       results.appendChild(p);
     }
   }

@@ -108,6 +108,7 @@ export default {
         'headline-lg-mobile': ['Manrope', 'Arial', 'sans-serif'],
         'headline-lg': ['Manrope', 'Arial', 'sans-serif'],
         'body-md': ['Inter', 'Arial', 'sans-serif'],
+        'body-sm': ['Inter', 'Arial', 'sans-serif'],
         'display-hero': ['Manrope', 'Arial', 'sans-serif'],
         'body-lg': ['Inter', 'Arial', 'sans-serif'],
         'display-hero-mobile': ['Manrope', 'Arial', 'sans-serif'],
@@ -118,6 +119,12 @@ export default {
         'headline-lg-mobile': ['40px', { lineHeight: '120%', letterSpacing: '-0.02em', fontWeight: '600' }],
         'headline-lg': ['64px', { lineHeight: '120%', letterSpacing: '-0.02em', fontWeight: '600' }],
         'body-md': ['16px', { lineHeight: '160%', fontWeight: '400' }],
+        /* Arayüz ölçeği: açılır liste satırları, boş durum metinleri, alt
+           yazılar. body-md (16px) ile label-caps (12px) arasında bir basamak
+           yoktu, o yüzden bu tür yerlerde rampa dışı text-[13px]/[14px]
+           değerleri türemişti. Satır yüksekliği body-md'nin %160'ı yerine
+           %150: bu boy metin genelde sıkı bir listede duruyor. */
+        'body-sm': ['14px', { lineHeight: '150%', fontWeight: '400' }],
         'display-hero': ['120px', { lineHeight: '110%', letterSpacing: '-0.04em', fontWeight: '700' }],
         'body-lg': ['20px', { lineHeight: '160%', fontWeight: '400' }],
         'display-hero-mobile': ['56px', { lineHeight: '110%', letterSpacing: '-0.02em', fontWeight: '800' }],

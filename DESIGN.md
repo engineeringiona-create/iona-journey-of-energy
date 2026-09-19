@@ -53,6 +53,11 @@ typography:
     fontSize: 16px
     fontWeight: '400'
     lineHeight: 160%
+  body-sm:
+    fontFamily: Inter
+    fontSize: 14px
+    fontWeight: '400'
+    lineHeight: 150%
   label-caps:
     fontFamily: Inter
     fontSize: 12px
@@ -92,6 +97,8 @@ spacing:
 ## Typography
 
 Inter throughout (display/headline/body/label-caps scale unchanged from the original spec — see the frontmatter). Large, confident headline sizes carry the editorial pages; `label-caps` (12px, 700 weight, wide tracking) marks eyebrows, index numerals, and technical specs.
+
+`body-sm` (14px, 400 weight, 150% leading) was added on 2026-09-19 for **interface** text — dropdown rows, empty states, captions — not for prose. It closes a gap that was producing drift: the ramp jumped straight from `body-md` (16px) to `label-caps` (12px), and `label-caps` is a heavy, wide-tracked *label* register, wrong for a sentence. So UI chrome had been reaching for one-off `text-[13px]`/`text-[14px]` values instead. Reach for `body-sm` there; if a new spot wants 13px or 15px, the answer is `body-sm`, not another one-off.
 
 ## Layout & Spacing
 

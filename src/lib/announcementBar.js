@@ -25,8 +25,14 @@ export function applyAnnouncementBar(cfg) {
   bar.style.background = cfg.bgColor || '#22703c';
   bar.style.color = '#ffffff';
   bar.style.textAlign = 'center';
-  bar.style.fontSize = '13px';
+  /* DESIGN.md'nin `label-caps` basamağı (12px / 700 / 0.1em). Burada Tailwind
+     yardımcı sınıfı kullanılamıyor — çubuk JS'ten inline stille kuruluyor — o
+     yüzden değerler elle yazılı; rampa değişirse burası da değişmeli.
+     Öncesinde rampa dışı 13px'ti: kısa, kalın, ortalanmış bir bildirim şeridi
+     tam da bu etiket register'ı, prose değil. */
+  bar.style.fontSize = '12px';
   bar.style.fontWeight = '700';
+  bar.style.letterSpacing = '0.1em';
   bar.style.padding = '8px 16px';
 
   bar.innerHTML = '';

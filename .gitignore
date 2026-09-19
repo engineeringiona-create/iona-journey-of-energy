@@ -1,6 +1,7 @@
 node_modules/
 dist/
-.impeccable/
+.impeccable/*
+!.impeccable/config.json
 .claude/
 .backups/
 _font-backup-arial-test/
