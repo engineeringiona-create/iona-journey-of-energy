@@ -56,6 +56,12 @@ This file holds rules that don't change. Long version + reasoning lives in `AGEN
 2. Run the **real** start command (`npm start`, or `serve dist -l <port>` directly) — not `npm run dev` — and `curl` every page path plus one bogus path. Every real page should be `200` with the right `<title>`; the bogus path should be `404`, never a silent `200` of `index.html`. Cover the language prefixes too (42 pages as of 2026-09-19), plus `/robots.txt` and `/sitemap.xml`.
 3. Check which git branch is actually wired to the Railway service before assuming code changes alone explain stale content — see the branch note above.
 
+## Caching
+
+- `public/serve.json` sets `cache-control`: `assets/**` a year + `immutable` (Vite content-hashes those names), unhashed media one day, HTML `max-age=0, must-revalidate` so a content edit shows up immediately, xml/txt/json an hour.
+- **`serve` applies those header rules to `404` responses too**, because they match on the request path. Requesting an asset URL before it is deployed therefore teaches Cloudflare to cache a 404 for the full TTL, and it keeps serving that 404 after the file lands. Probe with a query string (`?x=1`) — a different cache key — or just wait. See `LESSONS.md`.
+- **Changing an unhashed asset's content means changing its filename.** Same URL always means same bytes; that is what keeps a purge from ever being necessary.
+
 ## Verifying the SEO skeleton
 
 `npm run verify:seo` (or `node scripts/verify-seo.mjs http://localhost:4599` against a local `serve dist`) reads `sitemap.xml`, fetches every URL in it, and checks three things: each URL is a real `200` (not a redirect), each `canonical` points at itself, and every `hreflang` pair references back. That last one is the silent killer — Google ignores a whole hreflang cluster when the references don't reciprocate, with no error anywhere. Run it after any change to pages, languages or URLs, and after a deploy.

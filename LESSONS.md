@@ -103,3 +103,32 @@ the whole cluster, so the failure is invisible: no error, just no benefit.
 HTML carries only a marker comment. Same for `sitemap.xml` and for in-page links:
 a link to a page that does not exist in the current language stays Turkish rather
 than 404-ing under a language prefix.
+
+## `serve` puts the asset cache-control on 404s too — and Cloudflare cached one (2026-09-19)
+
+`public/serve.json` gained a `headers` block giving images/videos/fonts a long
+`cache-control`. `serve` matches those rules on the **request path**, not on the
+response, so a request for a file that does not exist comes back as
+`404 Not Found` **with the long `cache-control` attached**. Cloudflare honours
+it and caches the 404.
+
+How it bit: a re-encoded video was renamed and the new URL was polled to watch
+the deploy land. The polls ran before the deploy finished, so the edge cached a
+404 for a URL that existed minutes later. `curl` then returned `404` with
+`cf-cache-status: HIT` while the same URL with `?x=1` returned `200` — the file
+was fine, the edge was not, and without a Cloudflare token there was no way to
+purge it. The fix was to rename the file again to a URL nobody had requested.
+
+**Rules:**
+- Never request a not-yet-deployed asset URL in its plain form. Add a query
+  string (`?x=1`) — Cloudflare's default cache key includes it, so the probe
+  cannot poison the real URL.
+- Origin TTL for unhashed assets is deliberately **one day**, not a week: it
+  bounds how long a mistakenly cached 404 can survive. Longer edge caching
+  belongs in a Cloudflare Cache Rule, which *can* be purged selectively.
+  `assets/**` keeps `immutable` for a year — those names are content-hashed by
+  Vite and ship in the same container as the HTML that references them, so a
+  404 there cannot happen in normal operation.
+- Changing the content of an unhashed asset means changing its filename
+  (`digester-mixer.mp4` → `digester-mixer-1280w.mp4`). Same content, same URL
+  forever; new content, new URL. That removes the purge step entirely.

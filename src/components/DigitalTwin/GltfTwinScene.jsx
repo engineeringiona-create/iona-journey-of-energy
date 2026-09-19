@@ -534,12 +534,18 @@ const plantData = {
           'Seviye sensörüyle otomatik çalışma senkronizasyonu'
         ],
         photo: '/images/equipment/feed-pool.webp',
-        /* Dosya adındaki 1280, yeniden kodlanmış sürümü ayırt etmek için:
-           video 7 gün `cache-control` ile yayınlanıyor, yani aynı adla içerik
-           değiştirmek Cloudflare kenarında elle "Purge Everything" gerektirir.
-           Ad değişince eski adres kullanılmaz hâle gelir, purge'e gerek kalmaz.
-           Yeni bir kodlama yaparsan dosya adını da değiştir. */
-        video: '/videos/digester-mixer-1280.mp4'
+        /* Dosya adındaki 1280w, yeniden kodlanmış sürümün genişliği. Video
+           uzun `cache-control` ile yayınlandığı için aynı adla içerik
+           değiştirmek Cloudflare kenarında elle purge gerektirir; ad değişince
+           gerekmez. Yeni bir kodlama yaparsan dosya adını DA değiştir.
+
+           DİKKAT: yeni adresi, dosya yayına çıkmadan ÖNCE düz hâliyle
+           istemeyin — `serve` eksik dosyaya da aynı uzun cache-control'ü
+           basıyor, yani Cloudflare 404'ü önbelleğe alıyor ve dosya sonradan
+           gelse bile kenar 404 dönmeye devam ediyor. Kontrol edecekseniz
+           sorgu dizesiyle isteyin (`?x=1`): farklı önbellek anahtarı olur,
+           temiz adresi zehirlemez. */
+        video: '/videos/digester-mixer-1280w.mp4'
       }
     ]
   },
