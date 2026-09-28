@@ -128,7 +128,7 @@ export const ORG_JSON_LD = {
   contactPoint: {
     '@type': 'ContactPoint',
     telephone: '+90-540-246-4662',
-    email: 'info@ionaengineering.com',
+    email: 'hello@iona-tr.com',
     contactType: 'sales',
     availableLanguage: ['Turkish', 'English', 'German', 'Spanish', 'French', 'Russian', 'Hindi']
   }
