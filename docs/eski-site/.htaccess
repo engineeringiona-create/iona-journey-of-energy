@@ -1,0 +1,20 @@
+# iona-tr.com -> ionaengineering.com kalıcı (301) yönlendirme.
+# Güzel Hosting cPanel > Dosya Yöneticisi > public_html/.htaccess dosyasının
+# YERİNE konur. E-posta (hello@ / info@iona-tr.com) etkilenmez: posta MX/DNS
+# kayıtlarından çalışır, bu dosya yalnızca web isteklerini yönlendirir.
+# Eski site İngilizceydi; sayfalar yeni sitenin /en/ karşılıklarına gider ki
+# Google sıralamayı doğru sayfaya devretsin.
+
+RewriteEngine On
+
+# Hizmet sayfaları -> Teknoloji/Hizmetler
+RewriteRule ^(iona-)?(biogas-plant-design|biogas-plant-optimization-re-engineering-services|epc-services)/?$ https://ionaengineering.com/en/teknoloji.html [R=301,L,NC]
+RewriteRule ^(technical-consulting|drying-units|gas-purification-units|odor-removal-units|digestate-removement-enrichment|micro-orc-systems|substrate-preparation-for-hemicellulose-lignin-rich-feedstocks)/?$ https://ionaengineering.com/en/teknoloji.html [R=301,L,NC]
+
+# Kurumsal
+RewriteRule ^about-iona/?$ https://ionaengineering.com/en/hakkimizda.html [R=301,L,NC]
+RewriteRule ^(contact|get-quote)/?$ https://ionaengineering.com/en/iletisim.html [R=301,L,NC]
+RewriteRule ^galeri/?$ https://ionaengineering.com/duyurular.html [R=301,L,NC]
+
+# Geri kalan her şey (ana sayfa dahil) -> yeni ana sayfa
+RewriteRule ^ https://ionaengineering.com/ [R=301,L]

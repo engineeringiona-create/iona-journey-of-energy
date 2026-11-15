@@ -58,13 +58,14 @@ export const PAGES = [
     path: '/',
     i18n: true,
     jsonLd: true,
-    title: { prefix: 'IONA | ', key: 'home.hero.slide1_title' },
+    title: { prefix: 'IONA Engineering | ', key: 'home.hero.slide1_title' },
     desc: { keys: ['home.hero.slide1_sub'], trKeep: true }
   },
   {
     file: 'teknoloji.html',
     path: '/teknoloji.html',
     i18n: true,
+    faq: 'services.faq',
     title: { prefix: 'IONA - ', key: 'nav.services' },
     desc: { keys: ['services.intro.title', 'services.intro.body1'] }
   },
@@ -110,20 +111,54 @@ export const PAGES = [
 
 export const ORG_JSON_LD = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'IONA Biogas',
-  alternateName: 'Iona Engineering',
+  '@type': ['Organization', 'ProfessionalService'],
+  '@id': SITE + '/#organization',
+  name: 'İONA Mühendislik',
+  legalName: 'İONA Mühendislik Danışmanlık Ticaret Limited Şirketi',
+  /* Google'da ve eski sitede (iona-tr.com) geçen bütün adlar: marka araması
+     hangisiyle yapılırsa yapılsın bu kayıtla eşleşsin. */
+  alternateName: ['IONA', 'IONA Biogas', 'Iona Engineering', 'IONA TR', 'İONA Mühendislik Danışmanlık', 'Iona Biyogaz'],
   url: SITE + '/',
   logo: SITE + '/images/iona-logo.png',
   image: SITE + '/og-image.jpg',
   description:
-    'Organik atığı sürdürülebilir yeşil enerjiye dönüştüren yüksek verimli biyogaz tesisleri ve mühendislik çözümleri.',
+    'İONA Mühendislik; biyogaz tesisi tasarımı, anahtar teslim (EPC) biyogaz tesisi kurulumu, anaerobik çürütme, gaz arıtma, kurutma ve digestat çözümleri, mevcut tesis optimizasyonu ve teknik danışmanlık sunan Ankara merkezli bir biyogaz mühendislik şirketidir.',
+  slogan: 'Organik atığı sürdürülebilir yeşil enerjiye dönüştürüyoruz.',
+  telephone: '+90-540-246-4662',
+  email: 'hello@iona-tr.com',
+  priceRange: '$$$',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'Kırkkonaklar Mah. 358. Sok. 13/5',
+    streetAddress: 'Ehlibeyt Mah. Ceyhun Atuf Kansu Cd. Başkent Plaza No:106/32-33',
     addressLocality: 'Çankaya',
     addressRegion: 'Ankara',
+    postalCode: '06520',
     addressCountry: 'TR'
+  },
+  areaServed: [
+    { '@type': 'Country', name: 'Türkiye' },
+    { '@type': 'Country', name: 'India' },
+    { '@type': 'Place', name: 'Europe' }
+  ],
+  knowsAbout: [
+    'Biyogaz tesisi', 'Biogas plant', 'Anaerobik çürütme', 'Anaerobic digestion',
+    'Biyogaz tesisi tasarımı', 'Anahtar teslim biyogaz tesisi', 'EPC',
+    'Kojenerasyon', 'Biyometan', 'Gaz arıtma', 'Digestat', 'Atıktan enerji',
+    'Hayvansal gübre biyogaz', 'Tarımsal atık', 'Gıda atığı', 'Yenilenebilir enerji'
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Biyogaz mühendislik hizmetleri',
+    itemListElement: [
+      'Biyogaz tesisi tasarımı ve proses mühendisliği',
+      'Anahtar teslim (EPC) biyogaz tesisi kurulumu',
+      'Mevcut biyogaz tesisi optimizasyonu ve yeniden mühendislik',
+      'Gaz arıtma ve biyometan üniteleri',
+      'Kurutma üniteleri ve digestat değerlendirme',
+      'Koku giderme üniteleri',
+      'Fizibilite ve teknik danışmanlık',
+      'İşletme ve bakım hizmetleri'
+    ].map((name) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name } }))
   },
   contactPoint: {
     '@type': 'ContactPoint',
@@ -203,6 +238,23 @@ export function hreflangBlock(page, langs) {
   return rows.join('\n');
 }
 
+/**
+ * Sayfada görünen SSS'den FAQPage şeması. Yalnızca sayfada gerçekten yazan
+ * soru/cevaplar kullanılır (prefix.q1/a1, q2/a2 ...); Google görünmeyen SSS
+ * işaretlemesini kural ihlali sayar. Arama motorları ve yapay zekâ asistanları
+ * bu blokları doğrudan cevap kaynağı olarak okur.
+ */
+function faqJsonLd(prefix, dict) {
+  const items = [];
+  for (let i = 1; dict[`${prefix}.q${i}`]; i++) {
+    const q = stripTags(dict[`${prefix}.q${i}`]);
+    const a = stripTags(dict[`${prefix}.a${i}`] || '');
+    if (q && a) items.push({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } });
+  }
+  if (!items.length) return null;
+  return { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: items };
+}
+
 /** Aynı scriptin ikinci kez çalışmasında etiketlerin ikizlenmemesi için. */
 function stripManaged(html) {
   return html.replace(/[ \t]*<!-- SEO:start -->[\s\S]*?<!-- SEO:end -->\n?/g, '');
@@ -230,7 +282,7 @@ function build(page, html, trDict) {
   if (!/property="og:type"/.test(html)) out.push('<meta property="og:type" content="website">');
   out.push(`<meta property="og:url" content="${url}">`);
   out.push(`<meta property="og:image" content="${img}">`);
-  out.push('<meta property="og:site_name" content="IONA Biogas">');
+  out.push('<meta property="og:site_name" content="İONA Mühendislik">');
   out.push(`<meta property="og:locale" content="${OG_LOCALE.tr}">`);
   out.push('<meta name="twitter:card" content="summary_large_image">');
   out.push(`<meta name="twitter:title" content="${attr(title)}">`);
@@ -239,11 +291,13 @@ function build(page, html, trDict) {
   if (page.i18n) out.push(HREFLANG_MARKER);
   if (page.jsonLd)
     out.push(`<script type="application/ld+json">${JSON.stringify(ORG_JSON_LD)}</script>`);
+  const faq = page.faq && faqJsonLd(page.faq, trDict);
+  if (faq) out.push(`<script type="application/ld+json">${JSON.stringify(faq)}</script>`);
   out.push('<!-- SEO:end -->');
   return out.join('\n');
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   const trDict = JSON.parse(readFileSync(join(root, 'src/i18n/tr.json'), 'utf8'));
   for (const page of PAGES) {
     const file = resolve(root, page.file);

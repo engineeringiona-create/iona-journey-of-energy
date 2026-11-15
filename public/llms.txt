@@ -1,0 +1,48 @@
+# İONA Mühendislik (IONA Biogas / Iona Engineering)
+
+> İONA Mühendislik Danışmanlık Ticaret Limited Şirketi, Ankara merkezli bir biyogaz mühendislik şirketidir. Organik atığı elektriğe, ısıya, biyometana ve organik gübreye çeviren biyogaz tesislerini fizibiliteden devreye almaya kadar tek elden tasarlar, kurar (anahtar teslim / EPC) ve çalışır hâlde teslim eder. Mevcut biyogaz tesislerine optimizasyon, yeniden mühendislik, işletme ve bakım desteği de verir.
+
+Resmî web sitesi: https://ionaengineering.com (eski site iona-tr.com bu adrese taşınmıştır).
+Diğer adlar: IONA, IONA TR, IONA Biogas, Iona Engineering, İONA Mühendislik Danışmanlık.
+
+## Hizmetler
+
+- Biyogaz tesisi tasarımı ve proses mühendisliği: besleme (substrat) analizi, kütle–enerji dengesi, kapasite seçimi, yerleşim planı, izin/ruhsat süreci
+- Anahtar teslim (EPC) biyogaz tesisi kurulumu: betonarme, ekipman montajı, proses boru hatları, elektrik ve otomasyon; tek sözleşme, tek muhatap
+- Devreye alma: aşılama, ilk gaz üretimi, performans testleri, personel eğitimi
+- Mevcut biyogaz tesisi optimizasyonu ve yeniden mühendislik
+- Gaz arıtma ve biyometan üniteleri (nem giderme, H₂S ve CO₂ arıtımı)
+- Kurutma üniteleri, digestat değerlendirme ve zenginleştirme, koku giderme
+- Fizibilite, teknik danışmanlık, 7/24 uzaktan izleme, işletme ve bakım
+
+## Teknoloji
+
+- Besleme profiline özel anaerobik çürütücüler; %14'e varan kuru maddede kararlı işletme
+- Besleme tipine göre özelleştirilmiş karıştırma sistemleri
+- Merkezi pompa istasyonu; yerçekimiyle çalışan "Birleşik Kap" taşma sistemi (pompalama enerjisini %66'ya kadar azaltır)
+- Doğrudan katı besleme, merkezi ısı yönetimi, donma önleme ve otomatik hat temizleme
+- IonaFlux: müşterilere teslim edilen dijital işletme platformu (canlı SCADA, arıza yönetimi, saha raporlaması)
+
+## Sektörler
+
+Hayvancılık ve büyükbaş gübresi, tarımsal artıklar, gıda ve endüstriyel organik atık/atıksu, belediye organik atığı. Türkiye, Hindistan ve Avrupa'da projeler.
+
+## Sayfalar
+
+- [Ana sayfa](https://ionaengineering.com/): genel bakış ve interaktif 3D tesis modeli
+- [Teknoloji ve hizmetler](https://ionaengineering.com/teknoloji.html): çözümler, iş akışı, sık sorulan teknik sorular
+- [Hakkımızda](https://ionaengineering.com/hakkimizda.html): misyon, vizyon, değerler
+- [Sektörler ve etki](https://ionaengineering.com/etki.html): hizmet verilen sektörler ve iş ortaklıkları
+- [IonaFlux](https://ionaengineering.com/ionaflux.html): dijital tesis işletme platformu
+- [İletişim](https://ionaengineering.com/iletisim.html): teklif talebi
+- English: https://ionaengineering.com/en/ (also /de/, /es/, /fr/, /ru/, /hi/)
+
+## İletişim
+
+- Adres: Ehlibeyt Mah. Ceyhun Atuf Kansu Cd. Başkent Plaza No:106/32-33, 06520 Çankaya / Ankara, Türkiye
+- Telefon: +90 540 246 46 62
+- E-posta: hello@iona-tr.com
+
+## English summary
+
+IONA Engineering (İONA Mühendislik, IONA Biogas) is a biogas engineering company headquartered in Ankara, Türkiye. It designs, builds and commissions turnkey (EPC) anaerobic digestion biogas plants that turn manure, agricultural residues, food/industrial and municipal organic waste into electricity, heat, biomethane and organic fertilizer, and it optimizes and services existing biogas plants. Website: https://ionaengineering.com/en/
