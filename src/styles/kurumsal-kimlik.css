@@ -134,6 +134,18 @@
   background: var(--k-green-dark) var(--k-rings) no-repeat right -220px center / auto 140% !important;
   border-top: 0 !important; color: #fff;
 }
+/* Alt bilgi, kenarlardan boşluk bırakan, dört köşesi yuvarlak bir kart.
+   Eskiden yalnız üst köşeler yuvarlaktı (brand-system.css 40px 40px 0 0).
+   Üstteki bölüm koyu yeşil olunca köşelerden o yeşil görünüyordu. Kart
+   artık hep sayfa zemininin üstünde durduğu için köşeleri her sayfada ve
+   iki temada da aynı görünüyor. */
+.iona-brand #site-footer {
+  --footer-gap: clamp(8px, 1.1vw, 18px);
+  border-radius: clamp(20px, 2.2vw, 32px) !important;
+  margin: var(--footer-gap);
+  margin-top: calc(var(--footer-gap) * 2);
+  overflow: clip;
+}
 .iona-brand #site-footer .footer-curve { display: none; }
 .iona-brand #site-footer :is(span, p) { color: #ffffffa6 !important; }
 .iona-brand #site-footer a { color: #fff !important; }

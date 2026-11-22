@@ -2,6 +2,10 @@
 
 > No panel/dashboard tool is wired into this repo yet, so nothing here auto-flows anywhere — this file is maintained by hand until such a tool exists.
 
+## 2026-11-22 · Alt bilgi artık dört köşesi yuvarlak bir kart
+
+- Sayfa sonundaki koyu yeşil iletişim alanının yalnız üst köşeleri yuvarlaktı. Üstteki bölüm de yeşil olunca köşelerde o yeşil görünüyordu. Alan artık kenarlardan biraz içeride duran, dört köşesi yuvarlak bir kart. Böylece köşeleri her sayfada ve iki temada da aynı görünüyor.
+
 ## 2026-11-22 · Admin editörü: düzenlenemeyen yerler açıldı
 
 - **10 hizmet sayfası artık editörde.** Sayfa seçicide "Hizmet · …" adıyla görünüyorlar. Önceden admin'den bu sayfalara girilen hiçbir şey sitede uygulanmıyordu.
