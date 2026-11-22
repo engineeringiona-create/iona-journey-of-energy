@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------
-   Theme tokens. One brand green (#22703c) and one brand orange
-   (#ff751f) run through the whole site; only --brand itself swaps
+   Theme tokens. One brand green (#247335) and one brand orange
+   (#247335) run through the whole site; only --brand itself swaps
    to a brighter tint in dark mode; text/orange/surfaces adapt via
    the rest of the variables below. Toggled by .dark on <html>
    (see common.js initThemeToggle) — the class is applied by an
@@ -8,28 +8,28 @@
    light-mode flash.
 ---------------------------------------------------------------- */
 :root {
-    /* Phase 91: was #f7f6f1 (a warm off-white) — brief calls for a
+    /* Phase 91: was #f1f4ee (a warm off-white) — brief calls for a
        strictly pure-white canvas sitewide, no off-white tint anywhere.
        Dark mode's own --bg (below) is untouched. */
     --bg: #ffffff;
     --surface: #ffffff;
     --surface-2: #f2f0ea;
-    --text: #14181a;
+    --text: #202e25;
     --text-muted: #565f58;
     --border: rgba(0, 0, 0, 0.06);
     --border-strong: rgba(0, 0, 0, 0.1);
     --nav-bg: rgba(255, 255, 255, 0.62);
     /* Phase 82: brand identity manual's official primary green
-       (#2D9937) replaces the old #22703c/#3fae66 "generic emerald"
+       (#247335) replaces the old #247335/#247335 "generic emerald"
        pair — every consumer of var(--brand)/var(--brand-hover) picks
        this up automatically (buttons, links, borders, icons sitewide).
        --brand-yellow is new: the manual's accent, for telemetry rings/
        highlights/callout badges specifically, not a general-purpose
        replacement for --brand-orange (the CTA color elsewhere). */
-    --brand: #2D9937;
-    --brand-hover: #3AB347;
-    --brand-yellow: #FFC700;
-    --brand-orange: #ff751f;
+    --brand: #247335;
+    --brand-hover: #1d5f2b;
+    --brand-yellow: #b9dac5;
+    --brand-orange: #247335;
     --shadow-ambient: rgba(20, 24, 20, 0.25);
     /* The sitewide section-background alternation token: every content
        section is either var(--surface) ("pure white") or this ("soft
@@ -64,10 +64,10 @@
     --border: rgba(255, 255, 255, 0.08);
     --border-strong: rgba(255, 255, 255, 0.14);
     --nav-bg: rgba(14, 18, 16, 0.68);
-    --brand: #3FBF4C;
-    --brand-hover: #56D164;
-    --brand-yellow: #FFC700;
-    --brand-orange: #ff8a3d;
+    --brand: #5fae7a;
+    --brand-hover: #7cc296;
+    --brand-yellow: #b9dac5;
+    --brand-orange: #5fae7a;
     --shadow-ambient: rgba(0, 0, 0, 0.55);
     --section-alt: var(--surface-2);
     --border-green: color-mix(in srgb, var(--brand) 34%, transparent);
@@ -152,8 +152,8 @@ body {
    path/line only ever read the stroke half, circle only ever reads the
    fill half, so one @keyframes block covers all three element types. */
 @keyframes dna-color-shift {
-    0% { stroke: #2d9937; fill: #2d9937; }
-    100% { stroke: #ffc700; fill: #ffc700; }
+    0% { stroke: #247335; fill: #247335; }
+    100% { stroke: #b9dac5; fill: #b9dac5; }
 }
 
 .iona-dna-bg path,
@@ -408,11 +408,11 @@ html {
 }
 
 .mobile-nav-link:hover {
-    color: #2d9937;
+    color: #247335;
 }
 
 .mobile-nav-link.is-current {
-    color: #2d9937;
+    color: #247335;
 }
 
 /* Phase 94: desktop inline nav — is-current mirrors .mobile-nav-link's
@@ -422,7 +422,7 @@ html {
    class. Equal-specificity override relies on base.css loading after
    tailwind.css, same pattern as this file's other utility overrides. */
 .desktop-nav-link.is-current {
-    color: #2d9937;
+    color: #247335;
 }
 .desktop-nav-link.is-current::after {
     width: 100%;
@@ -469,7 +469,7 @@ html {
 }
 
 .mobile-nav-utility-btn:hover {
-    color: #2d9937;
+    color: #247335;
 }
 
 .mobile-nav-search-panel {
@@ -494,7 +494,7 @@ html {
 
 .mobile-nav-search-input:focus {
     outline: none;
-    border-color: #2d9937;
+    border-color: #247335;
 }
 
 .mobile-nav-search-results {
@@ -514,7 +514,7 @@ html {
 }
 
 .mobile-nav-search-results a:hover {
-    color: #2d9937;
+    color: #247335;
 }
 
 .mobile-nav-lang-panel {
@@ -539,7 +539,7 @@ html {
 }
 
 .mobile-nav-lang-panel button:hover {
-    color: #2d9937;
+    color: #247335;
 }
 
 .mobile-nav-cta {
@@ -557,7 +557,7 @@ html {
 }
 
 .mobile-nav-cta:hover {
-    background: #2d9937;
+    background: #247335;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -763,7 +763,7 @@ html {
 }
 
 .hero-editorial-cta:hover {
-    /* var(--brand) is Phase 82's official primary green, #2D9937 — the
+    /* var(--brand) is Phase 82's official primary green, #247335 — the
        one accent color this brutalist section still borrows from the
        site's theme tokens rather than hardcoding, since it's already
        the exact brand-manual value regardless of light/dark. */
@@ -824,7 +824,7 @@ html {
 
 .accordion-item:hover,
 .accordion-item.is-active {
-    background-color: #14181a;
+    background-color: #202e25;
 }
 
 .accordion-item .accordion-title,
@@ -1129,7 +1129,7 @@ html {
    (soft terminals, single-story a) — plain styled text stays crisp at every
    size and never needs re-drawing again. */
 .iona-wordmark-text {
-    font-family: 'Quicksand', 'Inter', sans-serif;
+    font-family: 'Fustat', 'DM Sans', sans-serif;
     font-weight: 700;
     color: var(--brand);
     letter-spacing: -0.01em;
@@ -1186,7 +1186,7 @@ html {
     position: fixed;
     inset: 0;
     z-index: 90;
-    background: #2d9937;
+    background: #247335;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1494,7 +1494,7 @@ html {
 }
 
 .bento-card:hover {
-    border-color: #78dc77;
+    border-color: #b9dac5;
 }
 
 .bento-pill {
@@ -1528,7 +1528,7 @@ html {
     width: 6px;
     height: 6px;
     border-radius: 999px;
-    background: #78dc77;
+    background: #b9dac5;
     flex-shrink: 0;
 }
 
@@ -1546,7 +1546,7 @@ html {
 }
 
 .bento-card-stat:hover {
-    border-color: #78dc77;
+    border-color: #b9dac5;
 }
 
 .bento-spark {
@@ -1556,8 +1556,8 @@ html {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 999px;
-    background: color-mix(in srgb, #78dc77 18%, transparent);
-    color: #78dc77;
+    background: color-mix(in srgb, #b9dac5 18%, transparent);
+    color: #b9dac5;
     font-size: 18px;
     margin: 0 auto 1rem;
 }
@@ -1569,7 +1569,7 @@ html {
     font-size: clamp(2.5rem, 5vw, 3.25rem);
     line-height: 1;
     letter-spacing: -0.02em;
-    color: #78dc77;
+    color: #b9dac5;
     margin-bottom: 0.5rem;
 }
 
@@ -1636,7 +1636,7 @@ html {
 }
 
 .bento-card-dark:hover {
-    border-color: #78dc77;
+    border-color: #b9dac5;
 }
 
 .bento-card-dark .bento-pill {
@@ -1755,7 +1755,7 @@ html {
    and inherited var(--text), untouched in the HTML this whole time) —
    only the accordion card treatment actually needs new rules here, since
    .accordion-item's shared base styling (elsewhere in this file) still
-   assumes a dark hover/active state (#14181a bg, white text) that would
+   assumes a dark hover/active state (#202e25 bg, white text) that would
    be invisible on a white card. ID-scoped so this doesn't touch that
    shared accordion styling anywhere else it's reused (e.g. teknoloji.html
    expo tabs). */
@@ -1775,7 +1775,7 @@ html {
 #why-choose-us .accordion-item:hover,
 #why-choose-us .accordion-item.is-active {
     /* Overrides the shared .accordion-item:hover/.is-active dark-fill
-       (#14181a) elsewhere in this file — that's the old card-hover
+       (#202e25) elsewhere in this file — that's the old card-hover
        treatment; this section stays flat white/transparent always. */
     background-color: transparent;
     border-color: rgba(226, 232, 240, 0.8);
@@ -1788,7 +1788,7 @@ html {
 }
 
 #why-choose-us .accordion-number {
-    color: #2d9937;
+    color: #247335;
 }
 
 #why-choose-us .accordion-desc {
@@ -1830,7 +1830,7 @@ html {
 
 #why-choose-us .accordion-item:hover .accordion-icon-bar,
 #why-choose-us .accordion-item.is-active .accordion-icon-bar {
-    background: #2d9937;
+    background: #247335;
 }
 
 #why-choose-us .accordion-item.is-active .accordion-icon-bar-v {
@@ -2196,7 +2196,7 @@ html {
    #2eae73 / --iona-green-strong #20834f / nav-pill accent #22a76b) —
    explicitly documented there as "yumuşak sage/mint yeşil (sert
    kelly-green DEĞİL)" (soft sage/mint green, NOT hard kelly-green).
-   #78dc77 (this WEBSITE's own brand green, DESIGN.md) is a brighter
+   #b9dac5 (this WEBSITE's own brand green, DESIGN.md) is a brighter
    kelly-green and stays exactly where it already was everywhere outside
    this phone's screen content (the demo badge, ground shadow, and every
    other site section) — only the simulated APP UI inside the screen

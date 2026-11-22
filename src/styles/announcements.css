@@ -4,7 +4,7 @@
 .iona-ap-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px; border-bottom: 1px solid #e5ded2; flex-shrink: 0; }
 .iona-ap-edition { display: flex; align-items: center; gap: 24px; }
 .iona-ap-edition .iona-wordmark-text { font-size: 27px; color: #202720; }
-.iona-ap-edition > span:last-child { font: 500 10px/1.5 Inter, Arial, sans-serif; letter-spacing: .17em; color: #796e5b; }
+.iona-ap-edition > span:last-child { font: 500 10px/1.5 'DM Sans', Arial, sans-serif; letter-spacing: .17em; color: #796e5b; }
 .iona-ap-close, .iona-ap-arrow { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border: 1px solid #dcd3c4; background: transparent; color: #333b30; cursor: pointer; transition: background .2s, border-color .2s; }
 .iona-ap-close { font-size: 27px; line-height: 1; }
 .iona-ap-close:hover, .iona-ap-arrow:hover { background: #f8e9cd; border-color: #d7a44e; }
@@ -13,9 +13,9 @@
 .iona-ap-visual { min-width: 0; display: grid; place-items: center; padding: clamp(16px, 2vw, 28px); background: #f1ede3; border-right: 1px solid #e1d8c7; }
 .iona-ap-visual img { width: 100%; height: auto; max-height: 420px; object-fit: contain; }
 .iona-ap-body { min-width: 0; padding: clamp(24px, 4vw, 54px); display: flex; flex-direction: column; align-items: flex-start; }
-.iona-ap-meta { display: flex; align-items: center; gap: 10px; font: 500 10px/1.6 Inter, Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #936021; margin: 0 0 25px; }
+.iona-ap-meta { display: flex; align-items: center; gap: 10px; font: 500 10px/1.6 'DM Sans', Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #936021; margin: 0 0 25px; }
 .iona-ap-meta::before { content: ''; width: 20px; height: 2px; background: #d79a35; flex-shrink: 0; }
-.iona-ap-title { color: #23271f; font: 500 clamp(26px, 3.4vw, 43px)/1.12 Manrope, Arial, sans-serif; letter-spacing: -.045em; margin: 0 0 22px; overflow-wrap: anywhere; text-wrap: balance; }
+.iona-ap-title { color: #23271f; font: 500 clamp(26px, 3.4vw, 43px)/1.12 Fustat, Arial, sans-serif; letter-spacing: -.045em; margin: 0 0 22px; overflow-wrap: anywhere; text-wrap: balance; }
 .iona-ap-desc { color: #66695e; font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 30px; }
 .iona-ap-cta { display: flex; justify-content: space-between; align-items: center; gap: 30px; width: 100%; margin-top: auto; border: 1px solid #e0aa52; padding: 16px 20px; color: #3a301e; background: #f5cc7c; font-size: 13px; font-weight: 600; text-decoration: none; transition: background .2s; }
 .iona-ap-cta:hover { background: #efbd5c; }

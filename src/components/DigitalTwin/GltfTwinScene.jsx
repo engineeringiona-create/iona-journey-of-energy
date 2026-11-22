@@ -35,6 +35,12 @@ const DRACO_DECODER_PATH = '/draco/';
    cache'i yola göre anahtarlandığı için eski girdiyi de temizliyoruz. */
 let modelSrc = modelUrl(MODEL_FILE);
 useGLTF.preload(modelSrc, DRACO_DECODER_PATH);
+/* Karıştırıcılar Murat'ın ionaPlant modellerinden (Plant kütüphanesi,
+   design-r01/assets/models): duvar (perde) ve tabliye tipi. */
+const MIXER_WALL_SRC = '/models/mixer-wall.glb';
+const MIXER_DECK_SRC = '/models/mixer-deck.glb';
+useGLTF.preload(MIXER_WALL_SRC);
+useGLTF.preload(MIXER_DECK_SRC);
 
 /* Uzak kopya açılmadıysa yerel kopyaya geç. Zaten yereldeysek false döner —
    o durumda gerçekten yüklenemiyor demektir, hata ekranı gösterilir. */
@@ -861,6 +867,8 @@ function FeedPipeGapFill() {
 
 const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, selected, flowActive, cutawayOpen }) {
   const { scene: cachedScene } = useGLTF(modelSrc, DRACO_DECODER_PATH);
+  const { scene: mixerWallScene } = useGLTF(MIXER_WALL_SRC);
+  const { scene: mixerDeckScene } = useGLTF(MIXER_DECK_SRC);
   const scene = useMemo(() => new THREE.Group(), []);
   
   const materialsRef = useRef(new Map());
@@ -929,7 +937,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
     // Dev-only handle for inspecting the live scene graph from the console.
     if (import.meta.env.DEV) window.__IONA_PLANT = plantRoot;
 
-    const { propellerHubs, beacons, fanHubs } = applyStructureOverrides(plantRoot);
+    const { propellerHubs, beacons, fanHubs } = applyStructureOverrides(plantRoot, { wall: mixerWallScene, deck: mixerDeckScene });
     digesterMixersRef.current = { propellerHubs, beacons, fanHubs };
 
     const materials = new Map();
@@ -1121,7 +1129,7 @@ const Model = memo(function Model({ plantRootRef, onReady, onSelect, onReset, se
       edgeMaterialsRef.current = new Map();
       if (plantRootRef.current === plantRoot) plantRootRef.current = null;
     };
-  }, [cachedScene, scene, plantRootRef, onReady]);
+  }, [cachedScene, mixerWallScene, mixerDeckScene, scene, plantRootRef, onReady]);
 
   const effectiveSelectedName = selected?.name === 'biogas_mixer' ? 'digester' : selected?.name;
 

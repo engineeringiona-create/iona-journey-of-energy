@@ -10,7 +10,7 @@
 .engineering-edit .hero-metric > span { display: none; }
 .engineering-edit .hero-metric { display: block; }
 .engineering-edit .hero-metric strong, .engineering-edit .hero-metric:nth-child(2) strong { color: #2a3127; font-size: clamp(1.5rem, 2.3vw, 2.4rem); }
-.engineering-edit #about-teaser .engineering-panel { background: #f7f6f1; box-shadow: none; border-color: #dad8ce; }
+.engineering-edit #about-teaser .engineering-panel { background: #f1f4ee; box-shadow: none; border-color: #dad8ce; }
 .engineering-edit .engineering-drawing { color: #697663; }
 .engineering-edit #about-teaser .engineering-panel p { text-transform: none; letter-spacing: 0; font-size: .85rem; font-weight: 400; line-height: 1.7; }
 .engineering-edit .services-exhibit-row { position: relative; top: auto; min-height: 0; }
@@ -39,11 +39,11 @@
 .engineering-edit .partner-tile:nth-child(1) { background: #f6f4ec; }
 .engineering-edit #biogaz-hesaplayici { background: #f6f5ef; }
 .engineering-edit #biogaz-hesaplayici .bg-white\/70 { background: #fff; box-shadow: none; backdrop-filter: none; border-color: #d7d9cf; }
-.engineering-edit #solutions { background: #f7f6f1; }
+.engineering-edit #solutions { background: #f1f4ee; }
 .engineering-edit #solutions .solutions-carousel .solution-tile { border-radius: 4px; }
 .engineering-edit #solutions .solutions-carousel .solution-tile > div:first-child { border-radius: 0; }
 .engineering-edit #solutions .solutions-carousel .solution-tile.is-current { box-shadow: 0 12px 26px #262b2114; }
-.engineering-edit #contact-form { background: #f7f6f1; }
+.engineering-edit #contact-form { background: #f1f4ee; }
 @media (min-width: 1024px) { .engineering-edit .service-panel-2 > div:first-child, .engineering-edit .service-panel-4 > div:first-child { order: 2; } }
 @media (max-width: 600px) { .engineering-edit #hero .hero-editorial-title { font-size: clamp(2.6rem, 9.5vw, 3.5rem); } .engineering-edit .services-exhibit-row > div:first-child { min-height: 230px; } }
 /* Local design trial: restrained process routing along the page margin. */

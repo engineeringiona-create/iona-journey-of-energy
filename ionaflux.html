@@ -6,7 +6,7 @@
 <!-- SEO:start -->
 <link rel="canonical" href="https://ionaengineering.com/ionaflux.html">
 <meta property="og:title" content="IONA - IonaFlux">
-<meta property="og:description" content="IonaFlux: Iona müşterilerine teslim edilen biyogaz tesisi dijital ikizi. Canlı SCADA verisi, arıza yönetimi, QR ile makine tanısı ve saha operasyonları tek panelde.">
+<meta property="og:description" content="IonaFlux: IONA'nın tesisle birlikte müşterisine teslim ettiği işletme uygulaması. Canlı SCADA verisi, arıza yönetimi, QR ile makine tanısı ve saha operasyonları tek panelde.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ionaengineering.com/ionaflux.html">
 <meta property="og:image" content="https://ionaengineering.com/og-image.jpg">
@@ -14,11 +14,11 @@
 <meta property="og:locale" content="tr_TR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="IONA - IonaFlux">
-<meta name="twitter:description" content="IonaFlux: Iona müşterilerine teslim edilen biyogaz tesisi dijital ikizi. Canlı SCADA verisi, arıza yönetimi, QR ile makine tanısı ve saha operasyonları tek panelde.">
+<meta name="twitter:description" content="IonaFlux: IONA'nın tesisle birlikte müşterisine teslim ettiği işletme uygulaması. Canlı SCADA verisi, arıza yönetimi, QR ile makine tanısı ve saha operasyonları tek panelde.">
 <meta name="twitter:image" content="https://ionaengineering.com/og-image.jpg">
 <!-- hreflang: build-i18n-pages.mjs dolduruyor -->
 <!-- SEO:end -->
-<meta name="description" content="IonaFlux: Iona müşterilerine teslim edilen biyogaz tesisi dijital ikizi. Canlı SCADA verisi, arıza yönetimi, QR ile makine tanısı ve saha operasyonları tek panelde.">
+<meta name="description" content="IonaFlux: IONA'nın tesisle birlikte müşterisine teslim ettiği işletme uygulaması. Canlı SCADA verisi, arıza yönetimi, QR ile makine tanısı ve saha operasyonları tek panelde.">
 <link rel="icon" type="image/svg+xml" href="/images/iona-icon.svg">
 <link rel="stylesheet" href="/src/styles/tailwind.css">
 <!-- Fontlar. 2026-09-19'a kadar burada 4 ayrı render-bloklayan istek vardı ve
@@ -35,10 +35,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;icon_names=ac_unit,arrow_forward,autorenew,bar_chart,battery_full,bolt,build,call,campaign,check,checklist,close,conveyor_belt,dark_mode,dashboard_customize,description,device_thermostat,filter_alt,format_align_center,format_align_left,format_align_right,groups,history,keyboard_arrow_down,language,layers,light_mode,local_shipping,location_on,mail,menu,newspaper,palette,payments,perm_media,plumbing,precision_manufacturing,propane_tank,qr_code_scanner,report,science,search,sensors,shield,star,summarize,travel_explore,view_in_ar,warning,water_drop&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Montserrat:wght@400;500;600;700;800&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/fustat-var.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="/fonts/dmsans-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="/src/styles/base.css">
 <link rel="stylesheet" href="/src/styles/editorial.css">
 <link rel="stylesheet" href="/src/styles/brand-system.css">
+<link rel="stylesheet" href="/src/styles/kurumsal-kimlik.css">
 </head>
 <body class="iona-brand flux-editorial bg-[var(--bg)] text-[var(--text)] font-body-md antialiased selection:bg-[var(--brand)] selection:text-white">
 <!-- Phase 91: MPA curtain page transition. Base CSS state already
@@ -46,7 +48,7 @@
      reveals it on load and re-covers before any internal link navigates.
      See initPageCurtain in common.js and #iona-curtain in base.css. -->
 <div id="iona-curtain" aria-hidden="true">
-<img class="iona-brand-logo" src="/images/iona-connected.svg" alt="iona" width="124" height="45">
+<img class="iona-brand-logo" src="/images/iona-logo-kimlik.svg" alt="IONA — Simply, Engineered!" width="118" height="50">
 </div>
 <!-- Phase 112: thematic subpage background — SCADA Dot Matrix, replaces
      the old sitewide .iona-dna-bg watermark on this page (see
@@ -65,7 +67,7 @@
      is-current highlighting, alongside the existing .mobile-nav-link. -->
 <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-safe-margin-mobile md:px-safe-margin-desktop py-5" id="mobile-nav">
 <a class="flex items-center flex-1" href="/">
-<img class="iona-brand-logo" src="/images/iona-connected.svg" alt="iona" width="124" height="45">
+<img class="iona-brand-logo" src="/images/iona-logo-kimlik.svg" alt="IONA — Simply, Engineered!" width="118" height="50">
 </a>
 <div class="hidden md:flex flex-1 items-center justify-center gap-8">
 <a class="desktop-nav-link relative py-2 text-sm font-semibold tracking-wide text-slate-900 transition-colors duration-300 hover:text-[#2d9937] after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[#2d9937] after:transition-all after:duration-300 after:ease-[cubic-bezier(0.76,0,0.24,1)] hover:after:w-full" href="/" data-i18n="nav.home">Anasayfa</a>
@@ -134,7 +136,7 @@
 </div>
 
 <!-- IonaFlux uses the shared editorial system with a focused dark monitoring showcase. -->
-<section class="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-24 px-safe-margin-mobile md:px-safe-margin-desktop ionaflux-titanium-bg fade-in-section" id="flux-hero">
+<section class="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-24 px-safe-margin-mobile md:px-safe-margin-desktop fade-in-section" id="flux-hero">
 <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-50" style="background:radial-gradient(circle,rgba(34,112,60,0.22),transparent 70%)" aria-hidden="true"></div>
 <div class="relative max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-12 lg:gap-10 items-center">
 <div class="max-w-xl fade-in-element">
@@ -142,8 +144,8 @@
 <img src="/images/iona-star-mark.png" alt="" width="22" height="22" class="shrink-0" aria-hidden="true">
 <span class="text-[19px] font-extrabold tracking-tight" style="font-family:Arial,sans-serif"><span class="text-white">iona</span><span class="text-[#3fae66]">flux</span></span>
 </span>
-<h1 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-[60px] leading-[1.08] tracking-tighter text-white mb-stack-sm" data-i18n="flux.hero.title">Bir Tesis, Bir Ekran, Tam Kontrol.</h1>
-<p class="font-body-lg text-body-lg text-neutral-400 mb-stack-md max-w-md" data-i18n="flux.hero.body">IonaFlux, Iona mühendisliği tarafından geliştirilen ve müşterilerimize teslim edilen dijital işletme platformudur. Canlı tesis verilerini, arıza yönetimini ve saha operasyonlarını tek panelde birleştirir.</p>
+<h1 class="font-headline-lg-mobile md:font-display-hero text-headline-lg-mobile md:text-[60px] leading-[1.08] tracking-tighter text-white mb-stack-sm" data-i18n="flux.hero.title">Tesisinizde ne olduğunu, olduğu anda bilin.</h1>
+<p class="font-body-lg text-body-lg text-neutral-400 mb-stack-md max-w-md" data-i18n="flux.hero.body">IonaFlux, IONA'nın kurduğu tesisle birlikte işletmeciye teslim ettiği uygulamadır. Üretim, besleme, laboratuvar, arıza ve saha kayıtları telefonunuzda ve bilgisayarınızda tek yerde durur; IONA mühendisleri de aynı veriye bakar.</p>
 <div class="flex flex-wrap items-center gap-4">
 <a class="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)]" href="/iletisim.html" data-i18n="flux.cta.demo">Canlı Demo Talep Edin</a>
 <a class="inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] border border-white/20 text-white hover:border-[#3fae66] hover:text-[#3fae66] transition-colors duration-300" href="#flux-video" data-i18n="flux.cta.watch">Tanıtım Videosunu İzleyin</a>
@@ -153,17 +155,96 @@
 </div>
 </section>
 
-<!-- Live monitoring: full-width image reveal, not a split — the first
-     of several deliberately different section families on this page. -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#2d9937]/35 fade-in-section" id="flux-live">
+<!-- Müşteri tesisi hakkında neyi görür: altı başlık, ekran görüntüsü yok. -->
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop fade-in-section" id="flux-see">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
 <div class="max-w-2xl fade-in-element">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="flux.live.eyebrow">Canlı İzleme</span>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.live.title">Tesisinizdeki Her Veri, Gerçek Zamanlı Ekranınızda.</h2>
-<p class="text-body-md text-neutral-400 max-w-xl" data-i18n="flux.live.body">PLC verileri beş saniyede bir güncellenir; hiçbir değer simülasyon değildir. Her çürütücünün sıcaklığı, debisi ve alarm durumu anlık olarak izlenir. Gece oluşan bir alarm, nöbetçi mühendise otomatik olarak bildirilir.</p>
+<span class="font-label-caps text-label-caps tracking-widest block mb-4" data-i18n="flux.see.eyebrow">Neleri görürsünüz</span>
+<h2 data-i18n="flux.see.title">Tesisin bütün günü, tek ekranda.</h2>
+<p data-i18n="flux.see.body">Sahada olmasanız da tesisin nasıl çalıştığını görürsünüz. Her bilgi tarihiyle ve kimin girdiğiyle birlikte kayıtlıdır.</p>
+</div>
+<div class="flux-see-grid fade-in-element delay-100">
+<div class="flux-see-card">
+<span class="material-symbols-outlined" aria-hidden="true">bolt</span>
+<h3 data-i18n="flux.see.production_title">Üretim ve proses</h3>
+<p data-i18n="flux.see.production_desc">Günlük biyogaz ve elektrik üretimi; reaktör ve lagün seviyeleri, sıcaklıklar ve proses değerleri.</p>
+</div>
+<div class="flux-see-card">
+<span class="material-symbols-outlined" aria-hidden="true">local_shipping</span>
+<h3 data-i18n="flux.see.feed_title">Besleme ve kantar</h3>
+<p data-i18n="flux.see.feed_desc">Gelen her hammadde: tartım, tedarikçi, araç ve sefer bilgisi; hangi reaktöre ne beslendiği.</p>
+</div>
+<div class="flux-see-card">
+<span class="material-symbols-outlined" aria-hidden="true">science</span>
+<h3 data-i18n="flux.see.lab_title">Laboratuvar</h3>
+<p data-i18n="flux.see.lab_desc">KM, OKM, pH ve FOS/TAC gibi analiz sonuçları ve bunlardan hesaplanan digester sağlık skoru.</p>
+</div>
+<div class="flux-see-card">
+<span class="material-symbols-outlined" aria-hidden="true">report</span>
+<h3 data-i18n="flux.see.faults_title">Arızalar</h3>
+<p data-i18n="flux.see.faults_desc">Açık ve çözülen arızalar, kimin ilgilendiği, ne zaman kapandığı ve benzer arızalar için bilgi bankası.</p>
+</div>
+<div class="flux-see-card">
+<span class="material-symbols-outlined" aria-hidden="true">groups</span>
+<h3 data-i18n="flux.see.field_title">Saha ve vardiya</h3>
+<p data-i18n="flux.see.field_desc">Vardiya kayıtları, yapılan işler, kontrol turları ve sahadan yüklenen fotoğraflar.</p>
+</div>
+<div class="flux-see-card">
+<span class="material-symbols-outlined" aria-hidden="true">sensors</span>
+<h3 data-i18n="flux.see.alerts_title">Bildirimler</h3>
+<p data-i18n="flux.see.alerts_desc">Alarm, arıza ve olağan dışı durumlar telefonunuza bildirim olarak gelir.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Live monitoring: full-width image reveal, not a split — the first
+     of several deliberately different section families on this page. -->
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#2d9937]/35 fade-in-section" id="flux-live">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<div class="max-w-2xl fade-in-element">
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="flux.live.eyebrow">Canlı izleme</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.live.title">Otomasyona bağlı tesislerde değerler canlı gelir.</h2>
+<p class="text-body-md text-neutral-400 max-w-xl" data-i18n="flux.live.body">PLC'si panele bağlanan tesislerde sıcaklık, debi, seviye ve ekipman durumu canlı görünür. Bir değer sınır dışına çıktığında ilgili kişiye bildirim gider; gece oluşan bir sorun sabahki rapora kalmaz.</p>
 </div>
 <div class="mt-12 fade-in-element delay-200 rounded-xl overflow-hidden border border-white/10">
-<img data-img-key="flux_live_scada" class="w-full h-auto" src="/images/ionaflux/scada.jpg" alt="IonaFlux canlı SCADA görünümü: çürütücü sıcaklığı, debi ve jeneratör durumları" loading="lazy" decoding="async">
+<img data-img-key="flux_live_scada" class="w-full h-auto" src="/images/ionaflux/portal-genel.webp" alt="IonaFlux müşteri portalı, genel ekran: günlük net üretim, son iki haftanın grafiği, havuz–reaktör–motor zinciri ve açık arızalar" width="1440" height="687" loading="lazy" decoding="async">
+</div>
+</div>
+</section>
+
+<!-- Normal işleyişten farkı: iki sütunlu karşılaştırma. -->
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop fade-in-section" id="flux-diff">
+<div class="max-w-[theme(spacing.container-max)] mx-auto">
+<div class="max-w-2xl fade-in-element">
+<span class="font-label-caps text-label-caps tracking-widest block mb-4" data-i18n="flux.diff.eyebrow">Normal işleyişten farkı</span>
+<h2 data-i18n="flux.diff.title">Bilgiyi sormak yerine görürsünüz.</h2>
+</div>
+<div class="flux-diff-table fade-in-element delay-100">
+<div class="flux-diff-row flux-diff-head">
+<p data-i18n="flux.diff.head_before">Çoğu tesiste</p>
+<p data-i18n="flux.diff.head_after">IonaFlux ile</p>
+</div>
+<div class="flux-diff-row">
+<p class="flux-diff-before" data-i18n="flux.diff.row1_before">Tesisin durumu telefonla ya da mesajla soruluyor.</p>
+<p class="flux-diff-after" data-i18n="flux.diff.row1_after">Durum ekranda; kimseyi aramadan bakarsınız.</p>
+</div>
+<div class="flux-diff-row">
+<p class="flux-diff-before" data-i18n="flux.diff.row2_before">Kantar fişleri ve besleme kayıtları kâğıtta ya da dağınık Excel dosyalarında.</p>
+<p class="flux-diff-after" data-i18n="flux.diff.row2_after">Her tartım ve besleme kaydı tarihiyle, tek listede.</p>
+</div>
+<div class="flux-diff-row">
+<p class="flux-diff-before" data-i18n="flux.diff.row3_before">Laboratuvar sonucu ayrı bir dosyada kalıyor, üretimle birlikte okunmuyor.</p>
+<p class="flux-diff-after" data-i18n="flux.diff.row3_after">Analiz sonucu üretim ve besleme verisinin yanında; düşüşün nedeni görünür.</p>
+</div>
+<div class="flux-diff-row">
+<p class="flux-diff-before" data-i18n="flux.diff.row4_before">Arızanın kimde olduğu ve ne zaman çözüldüğü belirsiz.</p>
+<p class="flux-diff-after" data-i18n="flux.diff.row4_after">Her arızanın sorumlusu, adımları ve kapanış zamanı kayıtlı.</p>
+</div>
+<div class="flux-diff-row">
+<p class="flux-diff-before" data-i18n="flux.diff.row5_before">Rapor ay sonunda elle hazırlanıyor.</p>
+<p class="flux-diff-after" data-i18n="flux.diff.row5_after">Günlük ve dönemsel rapor istediğiniz an PDF olarak hazır.</p>
+</div>
 </div>
 </div>
 </section>
@@ -171,31 +252,31 @@
 <!-- Text-only catalog: mirrors teknoloji.html's Çözümlerimiz pattern
      (icon + title + description, no screenshots) so not every topic on
      this page is presented as an image card. -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-catalog">
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-catalog">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-xl max-w-2xl fade-in-element" data-i18n="flux.catalog.title">Sahadan Ofise, Uçtan Uca Yönetim.</h2>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-xl max-w-2xl fade-in-element" data-i18n="flux.catalog.title">Neler yapabilirsiniz</h2>
 <!-- Cards stack within their natural content height. -->
 <div class="relative fade-in-element delay-200" id="flux-catalog-stack">
 <div class="sticky top-24 z-10 bg-zinc-900 border border-zinc-800 rounded-2xl p-8 md:p-10 shadow-2xl mb-8">
 <span class="material-symbols-outlined text-[28px] text-[#3fae66] mb-4 block" aria-hidden="true">description</span>
-<h3 class="font-headline-md text-headline-md text-white mb-2" data-i18n="flux.catalog.item1_title">Markalı Raporlama</h3>
-<p class="text-body-md text-neutral-400 max-w-2xl" data-i18n="flux.catalog.item1_desc">Günlük saha, akış ve analiz raporları tek tıkla markalı PDF olarak oluşturulur ve doğrudan müşteriyle paylaşılır.</p>
+<h3 class="font-headline-md text-headline-md text-white mb-2" data-i18n="flux.catalog.item1_title">Rapor alın, paylaşın</h3>
+<p class="text-body-md text-neutral-400 max-w-2xl" data-i18n="flux.catalog.item1_desc">Günlük saha, üretim ve analiz raporlarını PDF olarak indirin; ortaklarınızla ve finans kuruluşlarıyla doğrudan paylaşın.</p>
 </div>
 <div class="sticky top-32 z-20 bg-zinc-900 border border-zinc-800 rounded-2xl p-8 md:p-10 shadow-2xl mb-8">
 <span class="material-symbols-outlined text-[28px] text-[#ffc700] mb-4 block" aria-hidden="true">report</span>
-<h3 class="font-headline-md text-headline-md text-white mb-2" data-i18n="flux.catalog.item2_title">Arıza Yönetimi</h3>
-<p class="text-body-md text-neutral-400 max-w-2xl" data-i18n="flux.catalog.item2_desc">Saha ekibi arızayı anında bildirir; talep otomatik olarak ilgili mühendise atanır ve süreç açık, atandı, devam ediyor, çözüldü adımlarıyla izlenir.</p>
+<h3 class="font-headline-md text-headline-md text-white mb-2" data-i18n="flux.catalog.item2_title">Arıza bildirin, takip edin</h3>
+<p class="text-body-md text-neutral-400 max-w-2xl" data-i18n="flux.catalog.item2_desc">Sahadan fotoğrafla arıza açın; talep ilgili kişiye atanır ve açık, atandı, devam ediyor, çözüldü adımlarıyla izlenir. Çözülen arızalar bilgi bankasında birikir.</p>
 </div>
 <div class="sticky top-40 z-30 bg-zinc-900 border border-zinc-800 rounded-2xl p-8 md:p-10 shadow-2xl">
 <span class="material-symbols-outlined text-[28px] text-[#3fae66] mb-4 block" aria-hidden="true">checklist</span>
-<h3 class="font-headline-md text-headline-md text-white mb-2" data-i18n="flux.catalog.item3_title">Saha Operasyon Modülleri</h3>
-<p class="text-body-md text-neutral-400 max-w-2xl" data-i18n="flux.catalog.item3_desc">Vardiya planlama, görev atama, kontrol listeleri, kantar ve lojistik, besleme reçeteleri; sahadaki tüm günlük operasyon tek uygulamada yönetilir.</p>
+<h3 class="font-headline-md text-headline-md text-white mb-2" data-i18n="flux.catalog.item3_title">Sahayı yönetin</h3>
+<p class="text-body-md text-neutral-400 max-w-2xl" data-i18n="flux.catalog.item3_desc">Vardiya planı, görev atama, kontrol listeleri, kantar, lojistik seferleri ve besleme reçeteleri aynı uygulamada.</p>
 </div>
 </div>
 <!-- Slim full-width strip grounding the module list above in a real
      screenshot, without repeating the card treatment used elsewhere. -->
 <div class="mt-12 rounded-xl overflow-hidden border border-white/10 fade-in-element delay-300">
-<img data-img-key="flux_ops" class="w-full h-auto" src="/images/ionaflux/ops.jpg" alt="IonaFlux operasyon modülleri: vardiya planlama, görev atama, kontrol listeleri, kantar ve lojistik, besleme reçeteleri" loading="lazy" decoding="async">
+<img data-img-key="flux_ops" class="w-full h-auto" src="/images/ionaflux/portal-kantar.webp" alt="IonaFlux kantar ekranı: aylık giriş/çıkış tonajı, sefer ve araç sayısı, günün seferleri" width="1440" height="687" loading="lazy" decoding="async">
 </div>
 </div>
 </section>
@@ -203,28 +284,28 @@
 <!-- QR diagnostics: split again, but the image is a narrow phone
      screenshot rather than a wide dashboard, so it reads differently
      from the hero split even though the layout family repeats. -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-qr">
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-qr">
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_0.7fr] gap-12 lg:gap-16 items-center">
 <div class="max-w-lg fade-in-element">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="flux.qr.eyebrow">QR ile Tanı</span>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.qr.title">Ekipmanı Tanıyın, Arıza Süresini Kısaltın.</h2>
-<p class="text-body-md text-neutral-400" data-i18n="flux.qr.body">Her ekipmanın üzerinde bir QR kod bulunur. Telefonla okutulduğunda ilgili makinenin canlı durumu, seri numarası ve kablolama şeması anında görüntülenir.</p>
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4" data-i18n="flux.qr.eyebrow">Ekipman kartı</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.qr.title">Ekipmanın geçmişi, üzerindeki QR kodda.</h2>
+<p class="text-body-md text-neutral-400" data-i18n="flux.qr.body">Ekipmanın üzerindeki QR kodu telefonla okutun; seri numarası, teknik belgeleri, bakım ve arıza geçmişi açılır. Saha ekibi doğru parçayı tarif etmekle uğraşmaz.</p>
 </div>
 <div class="fade-in-element delay-100 rounded-xl overflow-hidden border border-white/10 shadow-[0_0_40px_-10px_rgba(34,112,60,0.25)] max-w-xs mx-auto lg:mx-0">
-<img data-img-key="flux_qr" class="w-full h-auto" src="/images/ionaflux/qr.jpg" alt="IonaFlux QR tarama ekranı: makine kimliği ve canlı durum" loading="lazy" decoding="async">
+<img data-img-key="flux_qr" class="w-full h-auto" src="/images/ionaflux/portal-ariza-analiz.webp" alt="IonaFlux arıza analizi: açık ve toplam kayıt, sayaçtan ölçülen üretim kaybı, arızaların aylara ve alanlara dağılımı" width="1440" height="687" loading="lazy" decoding="async">
 </div>
 </div>
 </section>
 
 <!-- Lab to production: split, image on the left this time. -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-lab">
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-white/[0.08] fade-in-section" id="flux-lab">
 <div class="max-w-[theme(spacing.container-max)] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 <div class="fade-in-element order-2 lg:order-1 rounded-xl overflow-hidden border border-white/10">
-<img data-img-key="flux_lab" class="w-full h-auto" src="/images/ionaflux/lab.jpg" alt="IonaFlux laboratuvar sonuçları ve verim skoru: FOS/TAC, pH, amonyum azotu, kuru madde" loading="lazy" decoding="async">
+<img data-img-key="flux_lab" class="w-full h-auto" src="/images/ionaflux/portal-reaktor-lab.webp" alt="IonaFlux reaktör laboratuvarı: her reaktörün hacmi, bekleme süresi, pH, KM ve FOS/TAC ölçümleri, eksik ölçüm uyarıları" width="1440" height="687" loading="lazy" decoding="async">
 </div>
 <div class="max-w-lg fade-in-element delay-100 order-1 lg:order-2">
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.lab.title">Verim Değişimlerinin Nedenini Anında Görün.</h2>
-<p class="text-body-md text-neutral-400" data-i18n="flux.lab.body">Laboratuvar sonuçları nominal aralıklarla karşılaştırılır; verim skoru haftalık değişimi gösterir ve gerekli aksiyonu önerir.</p>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.lab.title">Verim düştüğünde nedenini görün.</h2>
+<p class="text-body-md text-neutral-400" data-i18n="flux.lab.body">Laboratuvar sonuçları besleme ve üretim verisiyle yan yana durur. Digester sağlık skoru hangi değerin aralık dışına çıktığını gösterir; besleme reçetesindeki bir değişikliğin üretime etkisini önceden hesaplayabilirsiniz.</p>
 </div>
 </div>
 </section>
@@ -232,37 +313,41 @@
 <!-- Fleet: data-only stats band, mirroring teknoloji.html's Performance
      Metrics section exactly — no screenshot at all, the strongest visual
      contrast to the image-heavy sections above. -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#2d9937]/35 fade-in-section" id="flux-fleet">
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-24 border-t border-[#2d9937]/35 fade-in-section" id="flux-fleet">
 <div class="max-w-[theme(spacing.container-max)] mx-auto">
-<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="flux.fleet.eyebrow">Çoklu Tesis</span>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm max-w-2xl fade-in-element" data-i18n="flux.fleet.title">Tek Panelden, Birbirinden İzole Yönetilen Tesisler.</h2>
-<p class="font-body-md text-body-md text-neutral-400 max-w-2xl mb-stack-xl fade-in-element delay-100" data-i18n="flux.fleet.body">Portföyünüzdeki her tesis kendi erişim anahtarıyla çalışır; veriler birbirine karışmaz. Büyüdükçe tüm tesislerinizi tek panelden yönetmeye devam edersiniz.</p>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 fade-in-element delay-200">
-<div>
-<div class="flex justify-between font-label-caps text-label-caps text-white mb-2"><span>Plant A</span><span class="text-[#3fae66]">500 kW</span></div>
-<div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#3fae66] rounded-full" style="width:42%"></div></div>
+<span class="font-label-caps text-label-caps text-[var(--brand-orange)] tracking-widest block mb-4 fade-in-element" data-i18n="flux.fleet.eyebrow">Ne kazanırsınız</span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm max-w-2xl fade-in-element" data-i18n="flux.fleet.title">Daha az telefon, daha erken karar.</h2>
+<p class="font-body-md text-body-md text-neutral-400 max-w-2xl mb-stack-xl fade-in-element delay-100" data-i18n="flux.fleet.body">IonaFlux tesisi sizin yerinize işletmez; doğru kararı daha erken vermeniz için gereken bilgiyi önünüze koyar.</p>
+<div class="flux-gain-grid fade-in-element delay-200">
+<div class="flux-gain">
+<h3 data-i18n="flux.gain.item1_title">Sorunu büyümeden görürsünüz</h3>
+<p data-i18n="flux.gain.item1_desc">Sınır dışı bir değer ya da açık kalmış bir arıza, ay sonu raporunu beklemeden önünüze gelir.</p>
 </div>
-<div>
-<div class="flex justify-between font-label-caps text-label-caps text-white mb-2"><span>Plant B</span><span class="text-[#3fae66]">1.2 MW</span></div>
-<div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#3fae66] rounded-full" style="width:100%"></div></div>
+<div class="flux-gain">
+<h3 data-i18n="flux.gain.item2_title">Kayıtlı bir geçmişiniz olur</h3>
+<p data-i18n="flux.gain.item2_desc">Her besleme, analiz ve arıza tarihiyle saklanır; denetimde, sigortada ve teşvik başvurularında belge olarak kullanılır.</p>
 </div>
-<div>
-<div class="flex justify-between font-label-caps text-label-caps text-white mb-2"><span>Plant C</span><span class="text-[#3fae66]">850 kW</span></div>
-<div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#3fae66] rounded-full" style="width:71%"></div></div>
+<div class="flux-gain">
+<h3 data-i18n="flux.gain.item3_title">Herkes kendi işini görür</h3>
+<p data-i18n="flux.gain.item3_desc">Sahip, müdür, operatör ve izleyici rolleri ayrı yetkilerle çalışır; birden fazla tesisiniz varsa verileri birbirine karışmaz.</p>
+</div>
+<div class="flux-gain">
+<h3 data-i18n="flux.gain.item4_title">Destek aynı ekrandan gelir</h3>
+<p data-i18n="flux.gain.item4_desc">IONA mühendisleri sizinle aynı veriye bakar; sorun telefonda tarif edilmeden çözülmeye başlar.</p>
 </div>
 </div>
 </div>
 </section>
 
 <!-- Demo video + closing CTA -->
-<section class="ionaflux-titanium-bg px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-28 border-t border-white/[0.08] fade-in-section" id="flux-video">
+<section class="px-safe-margin-mobile md:px-safe-margin-desktop py-20 md:py-28 border-t border-white/[0.08] fade-in-section" id="flux-video">
 <div class="pointer-events-none absolute left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full opacity-40" style="background:radial-gradient(circle,rgba(34,112,60,0.18),transparent 70%)" aria-hidden="true"></div>
 <div class="relative max-w-4xl mx-auto text-center fade-in-element">
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white mb-stack-sm" data-i18n="flux.video.title">IonaFlux'u İki Dakikada İzleyin.</h2>
 <p class="text-body-md text-neutral-400 max-w-xl mx-auto mb-stack-md" data-i18n="flux.video.body">Uygulamanın müşterilerimize teslim edildiği haliyle, gerçek ekran görüntüleriyle hazırlanan kısa tanıtım videomuz.</p>
 </div>
 <div class="relative max-w-4xl mx-auto mt-4 fade-in-element delay-100 rounded-xl overflow-hidden border border-white/10 shadow-[0_0_60px_-15px_rgba(34,112,60,0.3)]">
-<video class="w-full h-auto block" src="/videos/ionaflux-demo.mp4" poster="/images/ionaflux/outro.jpg" controls preload="none" playsinline></video>
+<video class="w-full h-auto block" src="/videos/ionaflux-tanitim-2026-tr.mp4" data-src-en="/videos/ionaflux-tanitim-2026-en.mp4" poster="/images/ionaflux/video-kapak-tr.webp" data-poster-en="/images/ionaflux/video-kapak-en.webp" width="1920" height="1080" controls preload="none" playsinline></video>
 </div>
 <div class="relative max-w-4xl mx-auto mt-10 text-center fade-in-element delay-200">
 <a class="inline-flex items-center gap-2 rounded-full px-7 py-3.5 font-label-caps text-[13px] font-bold tracking-[0.08em] bg-[var(--brand-orange)] text-white hover:brightness-110 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,117,31,0.45)]" href="/iletisim.html" data-i18n="flux.cta.demo">Canlı Demo Talep Edin</a>
@@ -273,14 +358,14 @@
      so there's no seam at the bottom when the site itself is in light
      mode (footer is normally bg-transparent, inheriting var(--bg)). -->
 <!-- Phase 107: compact architectural footer, dark variant (matches this
-     page's own ionaflux-titanium-bg sections) — see hakkimizda.html's
+     page's own sections) — see hakkimizda.html's
      copy of this comment for the full split-footer rationale. -->
 <footer class="relative bg-black border-t border-white/10 px-safe-margin-mobile md:px-safe-margin-desktop py-16 fade-in-section" id="site-footer">
 <div class="relative max-w-[theme(spacing.container-max)] mx-auto pl-8 md:pl-10">
 <div class="absolute left-0 top-0 h-full w-[2px]" style="background:linear-gradient(180deg,#2d9937,#ffc700)" aria-hidden="true"></div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 fade-in-element">
 <div>
-<img class="iona-brand-logo" src="/images/iona-connected.svg" alt="iona" width="124" height="45">
+<img class="iona-brand-logo" src="/images/iona-logo-kimlik.svg" alt="IONA — Simply, Engineered!" width="118" height="50">
 <p class="text-sm text-white/60 mt-4 max-w-xs">Organik atığı sürdürülebilir yeşil enerjiye dönüştüren mühendislik çözümleri.</p>
 </div>
 <div class="flex flex-col gap-2 text-sm">
@@ -305,6 +390,7 @@
 
 <script type="module" src="/src/pages/main-ionaflux.js"></script>
 <script type="module" src="/src/components/IonaFlux/mount.jsx"></script>
+<script>(function(){if((document.documentElement.lang||"tr").slice(0,2)==="tr")return;document.querySelectorAll("[data-src-en]").forEach(function(e){e.setAttribute("src",e.getAttribute("data-src-en"));if(e.getAttribute("data-poster-en"))e.setAttribute("poster",e.getAttribute("data-poster-en"));});})();</script>
 </body></html>
 
 

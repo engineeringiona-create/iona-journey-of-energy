@@ -677,6 +677,126 @@ function buildTwinTopMixer(azimuth) {
   return { group, hubs, beacon };
 }
 
+/* ---------------- Karıştırıcılar: Murat'ın ionaPlant modelleri ----------------
+   Eski karıştırıcılar kutu (küp) gövdeli ilkel şekillerdi. Yerlerine Plant
+   kütüphanesindeki iki gerçek model geliyor (public/models/mixer-*.glb, metre):
+     wall: perdeden giren — ankraj plakası duvar düzleminde (x≈0.285), içerisi -X,
+           motor+redüktör dışarıda +X, mil aşağı eğimli.
+     deck: tabliyeden giren — ankraj plakası tabliye üstünde (y≈0.02), mil -X ve
+           aşağı, iki pervane.
+   Her ikisinde de "içeri" = şablonun -X ekseni, yukarı = +Y. Şablon bir kez bu
+   yerel çerçeveye taşınır (plaka merkezi orijin, +Z içeri), sonra her montaj
+   noktasına radyal yönle yerleştirilir. Parça adları sitenin karıştırıcı
+   adlarına eşlenir; böylece seçim/ışınlama ve malzeme ayrımı aynen çalışır. */
+const MIXER_PART_MAP = [
+  [/IC_PERVANE/, 'side_mixer_blade', () => mixerPropellerMaterial],
+  [/MOTOR_RED/, 'side_mixer_housing', () => mixerPropellerMaterial],
+  [/MOTOR_FAN/, 'side_mixer_hub', () => mixerHubMaterial],
+  [/IC_UZUN_SAFT|GERGI_MILI/, 'side_mixer_shaft', () => mixerSteelMaterial],
+  [/./, 'side_mixer_collar', () => mixerSteelMaterial],
+];
+const mixerTemplateCache = new WeakMap();
+
+function mixerTemplate(scene, plateAxis) {
+  if (!scene) return null;
+  if (mixerTemplateCache.has(scene)) return mixerTemplateCache.get(scene);
+  scene.updateMatrixWorld(true);
+  let plate = null;
+  scene.traverse((n) => { if (n.isMesh && /ANKRAJ_PLAKASI/.test(n.name)) plate = n; });
+  if (!plate) return null;
+  const pc = new THREE.Box3().setFromObject(plate).getCenter(new THREE.Vector3());
+  /* Şablon → yerel: orijin plaka merkezi; yerel +Z = şablon -X (içeri);
+     yerel +Y = şablon +Y; yerel +X = şablon +Z (sağ el kuralı). */
+  const toLocal = new THREE.Matrix4().set(
+    0, 0, 1, -pc.z,
+    0, 1, 0, -pc.y,
+    -1, 0, 0, pc.x,
+    0, 0, 0, 1,
+  );
+  const parts = [];
+  let minY = Infinity;
+  scene.traverse((n) => {
+    if (!n.isMesh) return;
+    const geo = n.geometry.clone().applyMatrix4(n.matrixWorld).applyMatrix4(toLocal);
+    geo.computeBoundingBox();
+    minY = Math.min(minY, geo.boundingBox.min.y);
+    const [, name, mat] = MIXER_PART_MAP.find(([re]) => re.test(n.name));
+    parts.push({ geo, name, mat, propeller: /IC_PERVANE/.test(n.name) });
+  });
+  const tpl = { parts, minY, plateAxis };
+  mixerTemplateCache.set(scene, tpl);
+  return tpl;
+}
+
+/* Radyal içeri yön + dünya yukarısı ile yatay çerçeve: plaka duvara/tabliyeye
+   oturur, motor her zaman yukarıda kalır (setFromUnitVectors yuvarlanmayı
+   rastgele bırakıyordu). */
+function radialFrame(azimuth) {
+  const z = new THREE.Vector3(-Math.cos(azimuth), 0, -Math.sin(azimuth));
+  const y = new THREE.Vector3(0, 1, 0);
+  const x = new THREE.Vector3().crossVectors(y, z).normalize();
+  return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+}
+
+function buildTemplateMixer(tpl, groupName, mountPos, azimuth, scale = 1) {
+  const group = new THREE.Group();
+  group.name = groupName;
+  group.position.copy(mountPos);
+  group.quaternion.copy(radialFrame(azimuth));
+  group.scale.setScalar(scale);
+  const hubs = [];
+  tpl.parts.forEach(({ geo, name, mat, propeller }) => {
+    const mesh = makeMesh(geo, name, [0, 0, 0], null, mat());
+    mesh.renderOrder = MIXER_RENDER_ORDER;
+    if (propeller) {
+      /* İpucu konumu ve eski animasyon kancası için pervane merkezinde boş
+         bir düğüm (side_mixer_prop_hub). */
+      const hub = new THREE.Group();
+      hub.name = 'side_mixer_prop_hub';
+      geo.boundingBox.getCenter(hub.position);
+      group.add(hub);
+      hubs.push(hub);
+    }
+    group.add(mesh);
+  });
+  /* Görünmez işaret: ipucu balonu bunun konumunu okur. */
+  const beacon = makeMesh(new THREE.TorusGeometry(0.5, 0.03, 6, 16), 'side_mixer_beacon', [0, 0, -0.1], null, mixerBeaconMaterial);
+  beacon.visible = false;
+  group.add(beacon);
+  return { group, hubs, beacon };
+}
+
+/* Plaka duvarın dış yüzüne (trapez sac sırtı dahil) oturur. */
+const WALL_MIXER_MOUNT_RADIUS = DIGESTER_RADIUS + 0.06;
+/* Tabliye üst kotu (top_ring ~5.85). */
+const DECK_MIXER_MOUNT_Y = 5.88;
+/* Tank tabanının üstünde bırakılacak pay: tabliye karıştırıcısının alt
+   pervanesi tabana değmesin diye şablon gerekirse orantılı küçültülür. */
+const DECK_MIXER_FLOOR_CLEARANCE = 0.6;
+
+function addTemplateMixers(digester, templates) {
+  const wall = mixerTemplate(templates?.wall);
+  const deck = mixerTemplate(templates?.deck);
+  if (!wall || !deck) return null;
+  digester.children
+    .filter((c) => c.name === 'biogas_mixer' || c.name === 'top_slab_mixer' || c.name === 'mixers' || c.name === 'top_mixers')
+    .forEach((c) => digester.remove(c));
+  const propellerHubs = [];
+  const beacons = [];
+  MIXER_AZIMUTHS.forEach((a) => {
+    const pos = new THREE.Vector3(WALL_MIXER_MOUNT_RADIUS * Math.cos(a), DIGESTER_MID_Y, WALL_MIXER_MOUNT_RADIUS * Math.sin(a));
+    const { group, hubs, beacon } = buildTemplateMixer(wall, 'biogas_mixer', pos, a);
+    digester.add(group); propellerHubs.push(...hubs); beacons.push(beacon);
+  });
+  const deckScale = Math.min(1, (DECK_MIXER_MOUNT_Y - DECK_MIXER_FLOOR_CLEARANCE) / -deck.minY);
+  TOP_MIXER_AZIMUTHS.forEach((a) => {
+    const pos = new THREE.Vector3(TOP_MIXER_MOUNT_RADIUS * Math.cos(a), DECK_MIXER_MOUNT_Y, TOP_MIXER_MOUNT_RADIUS * Math.sin(a));
+    const { group, hubs, beacon } = buildTemplateMixer(deck, 'top_slab_mixer', pos, a, deckScale);
+    digester.add(group); propellerHubs.push(...hubs); beacons.push(beacon);
+  });
+  return { propellerHubs, beacons };
+}
+
 /* Re-discovers the hub/beacon refs of already-built mixers instead of
    just bailing empty-handed — React.StrictMode double-invokes this
    component's useLayoutEffect once in dev (see this file's own header
@@ -1050,13 +1170,56 @@ function restoreBakedNames(plantRoot) {
   });
 }
 
-export function applyStructureOverrides(plantRoot) {
+/* ---------------- Digester -> gerçek ölçekte trapez sac ---------------------
+   Pişmiş GLB'deki duvar 72 nervür × 17 cm: Ø~25 m tankta ~1,1 m adım, gerçek
+   trapez sacın (≈30 cm adım, ≈4–5 cm derinlik) dört katı kaba; maketten
+   "kalın çıta" gibi okunuyordu. Murat'ın seçimi (15 Kas): ince trapez sac.
+   Adım ve derinlik gerçek ölçüde; normaller yumuşatılır ki uzaktan moiré
+   yerine ince doku okunsun. */
+const FINE_TRAPEZ_PITCH = 0.32;
+const FINE_TRAPEZ_DEPTH = 0.045;
+
+function fineTrapezGeometry(radius, height) {
+  const ribs = Math.round((Math.PI * 2 * radius) / FINE_TRAPEZ_PITCH);
+  const geo = new THREE.CylinderGeometry(radius, radius, height, ribs * 4, 1, true);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i);
+    const len = Math.hypot(x, z);
+    if (len < 1e-6) continue;
+    const phase = ((Math.atan2(z, x) * ribs) / (Math.PI * 2) + 1000) % 1;
+    const r = radius + FINE_TRAPEZ_DEPTH * trapezProfile(phase);
+    pos.setX(i, (x / len) * r);
+    pos.setZ(i, (z / len) * r);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function refineDigesterWall(digester) {
+  digester.traverse((node) => {
+    if (!node.isMesh || node.name !== 'tank_wall' || node.userData.ionaFineTrapez) return;
+    node.geometry.computeBoundingBox();
+    const bb = node.geometry.boundingBox;
+    const radius = (bb.max.x - bb.min.x) / 2 - TRAPEZ_DEPTH;
+    const next = fineTrapezGeometry(radius, bb.max.y - bb.min.y);
+    next.translate(0, (bb.max.y + bb.min.y) / 2, 0);
+    node.geometry.dispose();
+    node.geometry = next;
+    node.userData.ionaFineTrapez = true;
+  });
+}
+
+export function applyStructureOverrides(plantRoot, mixerTemplates = null) {
   /* Phase 104: a baked GLB (scripts/model-lab/bake-plant.mjs) already carries
      every change below; only the animation handles still need collecting. */
   if (plantRoot.userData?.ionaBaked) {
     restoreBakedNames(plantRoot);
     const digester = plantRoot.getObjectByName('digester');
-    const mixers = digester ? addDigesterMixers(digester) : { propellerHubs: [], beacons: [] };
+    if (digester) refineDigesterWall(digester);
+    const mixers = digester
+      ? (addTemplateMixers(digester, mixerTemplates) ?? addDigesterMixers(digester))
+      : { propellerHubs: [], beacons: [] };
     return { ...mixers, fanHubs: collectFanHubs(plantRoot) };
   }
   const engineRoom = plantRoot.getObjectByName('engine_room');
@@ -1075,7 +1238,9 @@ export function applyStructureOverrides(plantRoot) {
     rebuildHeatingCoils(digester);
     openDeckForDome(digester);
   }
-  const mixers = digester ? addDigesterMixers(digester) : { propellerHubs: [], beacons: [] };
+  const mixers = digester
+    ? (addTemplateMixers(digester, mixerTemplates) ?? addDigesterMixers(digester))
+    : { propellerHubs: [], beacons: [] };
 
   const feedPool = plantRoot.getObjectByName('feed_pool');
   if (feedPool) openHalfOfFeedPool(feedPool);

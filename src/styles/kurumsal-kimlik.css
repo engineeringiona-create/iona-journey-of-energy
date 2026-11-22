@@ -1,0 +1,168 @@
+/* IONA Kurumsal Kimlik Kılavuzu v4 — site katmanı.
+   Kaynak: IONA_Kurumsal_Set_ (Marka sistemi s.006–015).
+   - Renk: IONA Yeşili #247335 · Koyu Yeşil #173D29 · Açık Nötr #F1F4EE ·
+     Yumuşak Yeşil #B9DAC5 · Metin #202E25. Kılavuz dışı sarı/turuncu yok.
+   - Yazı: başlık Fustat (Bold), metin/veri DM Sans. Satır aralığı %125–145.
+   - Grafik: logodaki "o" halkalarından türeyen tonal halka motifi, koyu
+     yüzeylerde. Noktalı ızgara, parlama, degrade yok.
+   - Dil: net, somut, kanıta dayalı — doğrulanmamış metrik gösterilmez.
+   Bu dosya brand-system.css'ten SONRA yüklenir; yalnız üstüne yazar. */
+
+@font-face {
+  font-family: 'Fustat';
+  src: url('/fonts/fustat-var.woff') format('woff');
+  font-weight: 200 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dmsans-var.woff') format('woff');
+  font-weight: 100 1000;
+  font-display: swap;
+}
+
+:root {
+  --k-green: #247335;
+  --k-green-dark: #173d29;
+  --k-neutral: #f1f4ee;
+  --k-soft: #b9dac5;
+  --k-ink: #202e25;
+  --k-muted: #56645b;
+  --k-rule: #d9e2d8;
+  --brand: #247335;
+  --brand-hover: #1d5f2b;
+  --text: #202e25;
+  --text-muted: #56645b;
+  --iona-font-display: 'Fustat', Arial, sans-serif;
+  --iona-font-body: 'DM Sans', Arial, sans-serif;
+  /* Halka motifi: logodaki iki "o" — tonal, ince değil kalın çizgi. */
+  --k-rings: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 400'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.06' stroke-width='44'%3E%3Ccircle cx='200' cy='200' r='150'/%3E%3Ccircle cx='420' cy='200' r='150'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ── Yazı ─────────────────────────────────────────────────────────────── */
+.iona-brand, .iona-brand :is(p, li, input, textarea, button, select, a, span, label, td, th) {
+  font-family: 'DM Sans', Arial, sans-serif;
+}
+.iona-brand :is(h1, h2, h3, h4),
+.iona-brand #hero .hero-editorial-title,
+.iona-brand .hero-metric strong {
+  font-family: 'Fustat', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: inherit;
+}
+.iona-brand :is(h1, h2) { line-height: 1.12; }
+.iona-brand p { line-height: 1.6; }
+.iona-brand .material-symbols-outlined { font-family: 'Material Symbols Outlined'; }
+
+/* Üst etiketler: yanıp sönen/renkli nokta yerine kısa çizgi + yeşil büyük harf */
+.iona-brand :is(.hero-kicker, .font-label-caps) { letter-spacing: .12em; font-weight: 600; }
+.iona-brand .hero-kicker::before,
+.iona-brand span[aria-hidden='true'].rounded-full:is(.w-2, .w-1\.5, .w-2\.5) { display: none !important; }
+.iona-brand #hero .hero-kicker {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--k-green); font-size: .72rem;
+}
+.iona-brand #hero .hero-kicker::after {
+  content: ''; order: -1; width: 28px; height: 2px; background: var(--k-green);
+}
+
+/* ── Gezinme ──────────────────────────────────────────────────────────── */
+.iona-brand #mobile-nav { background: #fffffff7; border-color: var(--k-rule); }
+.iona-brand .desktop-nav-link { border-radius: 0; padding: 10px 2px; margin-inline: 10px; font-size: 14px; color: var(--k-ink); }
+.iona-brand .desktop-nav-link:hover { background: transparent; color: var(--k-green); box-shadow: inset 0 -2px 0 var(--k-soft); }
+.iona-brand .desktop-nav-link[aria-current='page'],
+.iona-brand .desktop-nav-link.is-active { background: transparent !important; color: var(--k-green) !important; box-shadow: inset 0 -2px 0 var(--k-green); }
+.iona-brand [data-i18n="nav.cta"] { border-radius: 6px; background: var(--k-green) !important; padding: 12px 22px; font-weight: 600; letter-spacing: 0; }
+.iona-brand [data-i18n='nav.cta']:hover { background: var(--k-green-dark) !important; }
+
+/* Düğmeler: hap değil, kılavuzdaki kart köşesi (6 px) */
+.iona-brand :is(.hero-editorial-cta, a.rounded-full, button.rounded-full):not(.twin-structure-nav button):not([class*='w-2']):not([aria-label]) { border-radius: 6px; }
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.iona-brand #hero { background: var(--k-neutral); }
+.iona-brand #hero::before, .iona-brand #hero::after { display: none !important; }
+.iona-brand #hero .hero-editorial-title { color: var(--k-ink); font-weight: 700; letter-spacing: -0.035em; }
+.iona-brand #hero .hero-editorial-sub { color: var(--k-muted); }
+.iona-brand #hero .hero-model-caption { color: var(--k-muted); }
+.iona-brand .hero-metrics {
+  background: #fff; border: 0; border-top: 2px solid var(--k-green);
+  box-shadow: none; border-radius: 0;
+}
+.iona-brand .hero-metric { background: transparent !important; box-shadow: none !important; }
+.iona-brand .hero-metric > span { color: var(--k-green); font-family: 'DM Sans', sans-serif; font-weight: 600; }
+.iona-brand #hero .hero-metric strong { color: var(--k-ink); font-size: clamp(1.1rem, 1.55vw, 1.4rem); letter-spacing: -0.015em; word-spacing: -0.05em; font-variant-numeric: normal; text-align: left; }
+.iona-brand .hero-metric p { color: var(--k-muted); }
+.iona-brand .twin-structure-nav { background: #fff; border-color: var(--k-rule); border-radius: 8px; }
+.iona-brand .twin-structure-nav button { border-radius: 6px; }
+.iona-brand .twin-structure-nav button[aria-pressed=true] { background: var(--k-green); border-color: var(--k-green); }
+
+/* ── Koyu yüzeyler: Koyu Yeşil + halka motifi ─────────────────────────── */
+.iona-brand :is(.ionaflux-titanium-bg, .bg-zinc-950, .bg-\[\#0e1210\], .bg-black) {
+  background-color: var(--k-green-dark) !important;
+  background-image: var(--k-rings) !important;
+  background-repeat: no-repeat !important;
+  background-position: right -180px center !important;
+  background-size: auto 130% !important;
+}
+.iona-brand .ionaflux-titanium-bg > .pointer-events-none[aria-hidden='true'] { display: none; }
+
+/* ── Kartlar ve yüzeyler ──────────────────────────────────────────────── */
+.iona-brand :is(.bg-decorated, .bg-\[var\(--section-alt\)\]) { background: var(--k-neutral) !important; }
+.iona-brand :is(.rounded-2xl, .rounded-3xl, .rounded-\[28px\], .rounded-\[24px\]) { border-radius: 10px; }
+
+/* ── Doğrulanmamış metrikler (önizleme) ───────────────────────────────────
+   Kılavuz: "Performans iddialarını doğrulanmış ölçüm ve koşullarla verin."
+   Kaynağı olmayan rakam bölümleri, gerçek değerler onaylanana kadar gizli. */
+.iona-brand #data-wall, .iona-brand #stats { display: none; }
+
+/* Logo: kılavuzdaki kilitli logo + "Simply, Engineered!" sloganı */
+.iona-brand .iona-brand-logo { width: 116px; height: auto; }
+@media (max-width: 767px) { .iona-brand .iona-brand-logo { width: 96px; } }
+
+/* Bölüm etiketi motifi: iki renkli nokta yerine kısa yeşil çizgi */
+.iona-brand .brand-motif { width: 28px !important; height: 2px !important; background: var(--k-green) !important; border-radius: 0 !important; box-shadow: none !important; margin-right: 12px; }
+.iona-brand .brand-motif::before, .iona-brand .brand-motif::after { display: none !important; }
+.iona-brand .blueprint-watermark { display: none; }
+
+/* Hakkımızda: çizim yerine gerçek saha fotoğrafı */
+.iona-brand .engineering-panel { background: transparent !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; }
+.iona-brand .engineering-photo { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
+
+/* ── Alt bilgi: Koyu Yeşil + halka motifi, sade iletişim ───────────────── */
+.iona-brand #site-footer {
+  background: var(--k-green-dark) var(--k-rings) no-repeat right -220px center / auto 140% !important;
+  border-top: 0 !important; color: #fff;
+}
+.iona-brand #site-footer .footer-curve { display: none; }
+.iona-brand #site-footer :is(span, p) { color: #ffffffa6 !important; }
+.iona-brand #site-footer a { color: #fff !important; }
+.iona-brand #site-footer a:hover { color: var(--k-soft) !important; }
+.iona-brand.editorial-home #site-footer a[href^='mailto'] {
+  text-transform: lowercase; font-family: 'Fustat', Arial, sans-serif;
+  font-size: clamp(2rem, 5vw, 4.25rem) !important; letter-spacing: -0.03em; font-weight: 700;
+}
+/* Henüz sayfası olmayan bağlantılar (gizlilik, koşullar, etki raporu) boş "#"e gidiyordu */
+.iona-brand #site-footer a[href='#'] { display: none; }
+
+/* Canlı veritabanındaki eski tema kaydı (theme: cta/accent #ff751f, brand
+   #22703c) themeVars.js ile <style> enjekte edip bu renkleri eziyordu.
+   Kurumsal kimlik renkleri sabit: yüksek özgüllük + !important. */
+html:root:root {
+  --brand: #247335 !important;
+  --brand-hover: #1d5f2b !important;
+  --brand-orange: #247335 !important;
+  --color-accent: #247335 !important;
+  --border-green: color-mix(in srgb, #247335 24%, transparent) !important;
+}
+
+/* Alt sayfaların alt bilgisi küçük sütunlu düzen: e-posta normal boyutta,
+   koyu zeminde beyaz logo. */
+.iona-brand:not(.editorial-home) #site-footer a[href^='mailto'] { font-size: inherit !important; text-transform: none; }
+.iona-brand #site-footer .iona-brand-logo { content: url('/images/iona-logo-kimlik-beyaz.svg'); }
+
+/* Ana sayfa IonaFlux: tanıtım videosu kareleri 16:9, kırpılmadan */
+.iona-brand #ionaflux-teaser .flux-editorial-media img { aspect-ratio: 16 / 9; object-fit: contain; background: #eef3ec; margin-bottom: 0; }
+.iona-brand #ionaflux-teaser .flux-editorial-media > img { border-radius: 12px; margin-bottom: 12px; }
+.iona-brand #ionaflux-teaser .flux-video-thumbs { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px !important; margin-bottom: 20px; }
+.iona-brand #ionaflux-teaser .flux-video-thumbs img { border-radius: 8px; }

@@ -10,10 +10,10 @@ img, video, canvas { max-width: 100%; }
 .editorial-home #hero { display: block; position: relative; background: #fff; color: #111; min-height: auto; padding: 8.5rem var(--editorial-gutter) 0; overflow: visible; }
 .hero-grid { display: grid; grid-template-columns: minmax(0, .83fr) minmax(0, 1.17fr); align-items: center; max-width: 1600px; margin: auto; min-height: min(660px, calc(100svh - 15rem)); }
 #hero .hero-copy { position: relative; width: auto; height: auto; padding: 3rem 0 4rem; pointer-events: auto; z-index: 2; }
-.hero-kicker, .editorial-meta { font: 500 .75rem/1.5 Inter, Arial, sans-serif; text-transform: uppercase; letter-spacing: .15em; }
+.hero-kicker, .editorial-meta { font: 500 .75rem/1.5 'DM Sans', Arial, sans-serif; text-transform: uppercase; letter-spacing: .15em; }
 .hero-kicker { display: flex; gap: .9rem; align-items: center; color: #575757; margin-bottom: 2rem; }
-.hero-kicker::before { content: ''; width: 7px; height: 7px; background: #2d9937; border-radius: 50%; flex-shrink: 0; }
-#hero .hero-editorial-title { font-family: Inter, Arial, sans-serif; font-size: clamp(3rem, 5.4vw, 6.3rem); line-height: .98; font-weight: 500; letter-spacing: -.065em; max-width: 10ch; text-wrap: balance; margin: 0 0 2rem; }
+.hero-kicker::before { content: ''; width: 7px; height: 7px; background: #247335; border-radius: 50%; flex-shrink: 0; }
+#hero .hero-editorial-title { font-family: 'DM Sans', Arial, sans-serif; font-size: clamp(3rem, 5.4vw, 6.3rem); line-height: .98; font-weight: 500; letter-spacing: -.065em; max-width: 10ch; text-wrap: balance; margin: 0 0 2rem; }
 #hero .hero-editorial-sub { font-size: clamp(1rem, 1.2vw, 1.15rem); line-height: 1.75; max-width: 35ch; color: #606060; margin-bottom: 2.5rem; }
 #hero .hero-editorial-cta { display: inline-flex; align-items: center; gap: 2.5rem; padding: 1rem 0; background: transparent; color: #111; border: 0; border-bottom: 1px solid #111; border-radius: 0; font-size: .875rem; font-weight: 600; box-shadow: none; }
 #hero .hero-editorial-cta::after { content: '↗'; font-size: 1.3rem; transition: transform .25s; }
@@ -25,7 +25,7 @@ img, video, canvas { max-width: 100%; }
 .hero-metric { padding: 1.65rem 2rem; display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; min-width: 0; }
 .hero-metric:first-child { padding-left: 0; }
 .hero-metric + .hero-metric { border-left: 1px solid var(--editorial-rule); }
-.hero-metric > span { color: #757575; font: .75rem/2 Inter, sans-serif; }
+.hero-metric > span { color: #757575; font: .75rem/2 'DM Sans', sans-serif; }
 .hero-metric strong { display: block; font-size: clamp(1.3rem, 2.7vw, 2.75rem); font-weight: 500; letter-spacing: -.045em; line-height: 1.15; }
 .hero-metric p { font-size: .75rem; line-height: 1.5; color: #606060; margin-top: .5rem; }
 #hero.is-inspecting .hero-grid { grid-template-columns: minmax(0, 1fr); }
@@ -231,10 +231,10 @@ img, video, canvas { max-width: 100%; }
 .aperture-right::after { content: ''; position: absolute; left: 28px; top: 0; bottom: 0; width: 1px; background: #ddd5c8; }
 .aperture-signature { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 18px; width: min(80%, 480px); text-align: center; opacity: 0; }
 #iona-curtain .iona-wordmark-text { color: #222a22; font-size: 52px; line-height: 1; background: #f6f3ec; padding: 10px 22px; }
-.aperture-label { color: #795b32; font: 500 10px/1.5 Inter, Arial, sans-serif; text-transform: uppercase; letter-spacing: .2em; background: #f6f3ec; padding: 5px 12px; }
+.aperture-label { color: #795b32; font: 500 10px/1.5 'DM Sans', Arial, sans-serif; text-transform: uppercase; letter-spacing: .2em; background: #f6f3ec; padding: 5px 12px; }
 @media (prefers-reduced-motion: reduce) { #iona-curtain.is-transitioning { visibility: hidden; } }
 /* Unified typography: architectural headings, readable copy, stable technical digits. */
-:root { --iona-font-display: 'Manrope', Arial, sans-serif; --iona-font-body: 'Inter', Arial, sans-serif; --iona-font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace; }
+:root { --iona-font-display: 'Fustat', Arial, sans-serif; --iona-font-body: 'DM Sans', Arial, sans-serif; --iona-font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace; }
 :root:not([data-font-override]) body { font-family: var(--iona-font-body); }
 :root:not([data-font-override]) :is(h1, h2, h3, h4), :root:not([data-font-override]) #hero .hero-editorial-title { font-family: var(--iona-font-display); }
 :root:not([data-font-override]) :is(button, input, textarea, select) { font-family: var(--iona-font-body); }
