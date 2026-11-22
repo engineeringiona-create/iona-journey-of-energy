@@ -31,6 +31,16 @@ Hayvancılık ve büyükbaş gübresi, tarımsal artıklar, gıda ve endüstriye
 
 - [Ana sayfa](https://ionaengineering.com/): genel bakış ve interaktif 3D tesis modeli
 - [Teknoloji ve hizmetler](https://ionaengineering.com/teknoloji.html): çözümler, iş akışı, sık sorulan teknik sorular
+- [Biyogaz Tesisi Tasarımı ve Proses Mühendisliği](https://ionaengineering.com/hizmetler/biyogaz-tesisi-tasarimi.html): Hammaddenize, sahanıza ve üretmek istediğiniz enerjiye göre tasarlanmış biyogaz tesisi: biyoloji, mekanik, elektrik ve inşaat tek bir proses olarak ele alınır.
+- [Anahtar Teslim (EPC) Biyogaz Tesisi Kurulumu](https://ionaengineering.com/hizmetler/anahtar-teslim-epc.html): Mühendislik, tedarik ve inşaatı tek sözleşmede topluyoruz: fizibiliteden devreye almaya kadar tesisin tamamından tek muhatap sorumlu.
+- [Mevcut Biyogaz Tesisi Optimizasyonu ve Yeniden Mühendislik](https://ionaengineering.com/hizmetler/tesis-optimizasyonu.html): Çalışan ama beklenen verimi vermeyen tesisleri inceliyor, sorunun kaynağını buluyor ve gerekli değişiklikleri yapıyoruz.
+- [Gaz Arıtma ve Biyometan Üniteleri](https://ionaengineering.com/hizmetler/gaz-aritma-biyometan.html): Ham biyogazı motora ya da şebekeye uygun hale getiren arıtma hatları: nem giderme, H₂S giderme ve gerektiğinde CO₂ ayırma ile biyometan.
+- [Digestat Ayırma ve Zenginleştirme](https://ionaengineering.com/hizmetler/digestat-ayirma.html): Çürütücüden çıkan digestatı katı ve sıvı fazlarına ayırıp taşınabilir, depolanabilir ve gübre olarak değerlendirilebilir hale getiriyoruz.
+- [Kurutma Üniteleri](https://ionaengineering.com/hizmetler/kurutma-uniteleri.html): Digestat, gübre ve arıtma çamurunu kurutarak hacmini azaltan, depolamayı ve satışı kolaylaştıran üniteler; mümkün olduğunca tesisin kendi atık ısısıyla.
+- [Koku Giderme Üniteleri](https://ionaengineering.com/hizmetler/koku-giderme.html): Biyogaz ve biyoenerji tesislerinde kabul, ön işlem ve kurutma alanlarından çıkan kokulu havayı arıtan, debiye ve kirletici yüküne göre boyutlandırılmış sistemler.
+- [Lignoselülozik Hammadde (Saman, Silaj) Hazırlama](https://ionaengineering.com/hizmetler/substrat-hazirlama.html): Saman, silaj ve benzeri lifli hammaddelerin çürütücüde daha iyi ayrışması için ön işlem: doğru boyut, doğru nem, homojen besleme.
+- [Mikro-ORC ile Atık Isıdan Elektrik](https://ionaengineering.com/hizmetler/mikro-orc.html): Kojenerasyon motorlarının ve proseslerin kullanılmayan düşük sıcaklıklı atık ısısını Organik Rankine Çevrimi (ORC) ile elektriğe çeviren küçük ölçekli sistemler.
+- [Fizibilite ve Teknik Danışmanlık](https://ionaengineering.com/hizmetler/teknik-danismanlik.html): Biyogaz yatırımının her aşamasında bağımsız mühendislik desteği: yatırım kararından önce fizibilite, kurulum sırasında teknoloji seçimi, işletmede denetim ve iyileştirme.
 - [Hakkımızda](https://ionaengineering.com/hakkimizda.html): misyon, vizyon, değerler
 - [Sektörler ve etki](https://ionaengineering.com/etki.html): hizmet verilen sektörler ve iş ortaklıkları
 - [IonaFlux](https://ionaengineering.com/ionaflux.html): dijital tesis işletme platformu
@@ -46,3 +56,16 @@ Hayvancılık ve büyükbaş gübresi, tarımsal artıklar, gıda ve endüstriye
 ## English summary
 
 IONA Engineering (İONA Mühendislik, IONA Biogas) is a biogas engineering company headquartered in Ankara, Türkiye. It designs, builds and commissions turnkey (EPC) anaerobic digestion biogas plants that turn manure, agricultural residues, food/industrial and municipal organic waste into electricity, heat, biomethane and organic fertilizer, and it optimizes and services existing biogas plants. Website: https://ionaengineering.com/en/
+
+Service pages (English):
+
+- [Biogas Plant Design and Process Engineering](https://ionaengineering.com/en/hizmetler/biyogaz-tesisi-tasarimi.html)
+- [Turnkey (EPC) Biogas Plant Construction](https://ionaengineering.com/en/hizmetler/anahtar-teslim-epc.html)
+- [Optimisation and Re-engineering of Existing Biogas Plants](https://ionaengineering.com/en/hizmetler/tesis-optimizasyonu.html)
+- [Gas Purification and Biomethane Units](https://ionaengineering.com/en/hizmetler/gaz-aritma-biyometan.html)
+- [Digestate Separation and Enrichment](https://ionaengineering.com/en/hizmetler/digestat-ayirma.html)
+- [Drying Units](https://ionaengineering.com/en/hizmetler/kurutma-uniteleri.html)
+- [Odour Removal Units](https://ionaengineering.com/en/hizmetler/koku-giderme.html)
+- [Lignocellulosic Feedstock (Straw, Silage) Preparation](https://ionaengineering.com/en/hizmetler/substrat-hazirlama.html)
+- [Micro-ORC: Electricity from Waste Heat](https://ionaengineering.com/en/hizmetler/mikro-orc.html)
+- [Feasibility and Technical Consulting](https://ionaengineering.com/en/hizmetler/teknik-danismanlik.html)

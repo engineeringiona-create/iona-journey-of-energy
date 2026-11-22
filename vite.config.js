@@ -27,6 +27,16 @@ export default defineConfig({
         iletisim: resolve(__dirname, 'iletisim.html'),
         ionaflux: resolve(__dirname, 'ionaflux.html'),
         duyurular: resolve(__dirname, 'duyurular.html'),
+        'hizmet_biyogaz_tesisi_tasarimi': resolve(__dirname, 'hizmetler/biyogaz-tesisi-tasarimi.html'),
+        'hizmet_anahtar_teslim_epc': resolve(__dirname, 'hizmetler/anahtar-teslim-epc.html'),
+        'hizmet_tesis_optimizasyonu': resolve(__dirname, 'hizmetler/tesis-optimizasyonu.html'),
+        'hizmet_gaz_aritma_biyometan': resolve(__dirname, 'hizmetler/gaz-aritma-biyometan.html'),
+        'hizmet_digestat_ayirma': resolve(__dirname, 'hizmetler/digestat-ayirma.html'),
+        'hizmet_kurutma_uniteleri': resolve(__dirname, 'hizmetler/kurutma-uniteleri.html'),
+        'hizmet_koku_giderme': resolve(__dirname, 'hizmetler/koku-giderme.html'),
+        'hizmet_substrat_hazirlama': resolve(__dirname, 'hizmetler/substrat-hazirlama.html'),
+        'hizmet_mikro_orc': resolve(__dirname, 'hizmetler/mikro-orc.html'),
+        'hizmet_teknik_danismanlik': resolve(__dirname, 'hizmetler/teknik-danismanlik.html'),
         admin: resolve(__dirname, 'admin.html')
       }
     }

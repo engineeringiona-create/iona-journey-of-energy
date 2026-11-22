@@ -18,7 +18,7 @@ export default {
      left on the CDN script it already has rather than pulled into this
      glob. public/models/*.html are separate, self-styled standalone
      demo pages with their own <style> block, not Tailwind consumers. */
-  content: ['./*.html', './src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./*.html', './hizmetler/*.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       colors: {

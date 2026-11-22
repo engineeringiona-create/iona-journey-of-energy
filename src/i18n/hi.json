@@ -386,5 +386,17 @@
   "home.ionaflux.feat1": "उत्पादन और प्रक्रिया",
   "home.ionaflux.feat2": "फ़ीडिंग और वेब्रिज",
   "home.ionaflux.feat3": "प्रयोगशाला और स्वास्थ्य स्कोर",
-  "home.ionaflux.feat4": "खराबी ट्रैकिंग और सूचनाएँ"
+  "home.ionaflux.feat4": "खराबी ट्रैकिंग और सूचनाएँ",
+  "svc.common.all_title": "हमारी सेवाएँ",
+  "svc.common.all_lead": "हर सेवा का विवरण उसके अपने पृष्ठ पर है।",
+  "svc.biyogaz_tesisi_tasarimi.nav": "बायोगैस संयंत्र डिज़ाइन",
+  "svc.anahtar_teslim_epc.nav": "टर्नकी (EPC)",
+  "svc.tesis_optimizasyonu.nav": "संयंत्र अनुकूलन",
+  "svc.gaz_aritma_biyometan.nav": "गैस शुद्धिकरण और बायोमीथेन",
+  "svc.digestat_ayirma.nav": "डाइजेस्टेट पृथक्करण",
+  "svc.kurutma_uniteleri.nav": "सुखाने की इकाइयाँ",
+  "svc.koku_giderme.nav": "गंध निवारण",
+  "svc.substrat_hazirlama.nav": "सब्सट्रेट तैयारी",
+  "svc.mikro_orc.nav": "माइक्रो-ORC",
+  "svc.teknik_danismanlik.nav": "व्यवहार्यता और परामर्श"
 }

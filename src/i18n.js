@@ -330,6 +330,10 @@ function applyDict(dict) {
     const val = dict[el.getAttribute('data-i18n-aria-label')];
     if (val !== undefined) el.setAttribute('aria-label', val);
   });
+  document.querySelectorAll('[data-i18n-alt]').forEach((el) => {
+    const val = dict[el.getAttribute('data-i18n-alt')];
+    if (val !== undefined) el.setAttribute('alt', val);
+  });
 }
 
 /* Runs once per page load: applies the saved (or default 'tr')

@@ -386,5 +386,17 @@
   "home.ionaflux.feat1": "Производство и процесс",
   "home.ionaflux.feat2": "Загрузка и весы",
   "home.ionaflux.feat3": "Лаборатория и индекс состояния",
-  "home.ionaflux.feat4": "Учёт неисправностей и уведомления"
+  "home.ionaflux.feat4": "Учёт неисправностей и уведомления",
+  "svc.common.all_title": "Наши направления услуг",
+  "svc.common.all_lead": "Подробности по каждой услуге — на отдельной странице.",
+  "svc.biyogaz_tesisi_tasarimi.nav": "Проектирование биогазовых установок",
+  "svc.anahtar_teslim_epc.nav": "Под ключ (EPC)",
+  "svc.tesis_optimizasyonu.nav": "Оптимизация установок",
+  "svc.gaz_aritma_biyometan.nav": "Очистка газа и биометан",
+  "svc.digestat_ayirma.nav": "Сепарация дигестата",
+  "svc.kurutma_uniteleri.nav": "Сушильные установки",
+  "svc.koku_giderme.nav": "Удаление запахов",
+  "svc.substrat_hazirlama.nav": "Подготовка субстрата",
+  "svc.mikro_orc.nav": "Микро-ORC",
+  "svc.teknik_danismanlik.nav": "ТЭО и консалтинг"
 }

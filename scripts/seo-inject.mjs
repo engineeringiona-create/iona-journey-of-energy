@@ -98,6 +98,96 @@ export const PAGES = [
     desc: { keys: ['flux.hero.body'], trKeep: true }
   },
   {
+    file: 'hizmetler/biyogaz-tesisi-tasarimi.html',
+    path: '/hizmetler/biyogaz-tesisi-tasarimi.html',
+    i18n: true,
+    faq: 'svc.biyogaz_tesisi_tasarimi.faq',
+    service: { key: 'svc.biyogaz_tesisi_tasarimi', type: 'Biogas plant design' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.biyogaz_tesisi_tasarimi.title' },
+    desc: { keys: ['svc.biyogaz_tesisi_tasarimi.lead'] }
+  },
+  {
+    file: 'hizmetler/anahtar-teslim-epc.html',
+    path: '/hizmetler/anahtar-teslim-epc.html',
+    i18n: true,
+    faq: 'svc.anahtar_teslim_epc.faq',
+    service: { key: 'svc.anahtar_teslim_epc', type: 'EPC biogas plant construction' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.anahtar_teslim_epc.title' },
+    desc: { keys: ['svc.anahtar_teslim_epc.lead'] }
+  },
+  {
+    file: 'hizmetler/tesis-optimizasyonu.html',
+    path: '/hizmetler/tesis-optimizasyonu.html',
+    i18n: true,
+    faq: 'svc.tesis_optimizasyonu.faq',
+    service: { key: 'svc.tesis_optimizasyonu', type: 'Biogas plant optimisation and re-engineering' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.tesis_optimizasyonu.title' },
+    desc: { keys: ['svc.tesis_optimizasyonu.lead'] }
+  },
+  {
+    file: 'hizmetler/gaz-aritma-biyometan.html',
+    path: '/hizmetler/gaz-aritma-biyometan.html',
+    i18n: true,
+    faq: 'svc.gaz_aritma_biyometan.faq',
+    service: { key: 'svc.gaz_aritma_biyometan', type: 'Biogas purification and biomethane upgrading' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.gaz_aritma_biyometan.title' },
+    desc: { keys: ['svc.gaz_aritma_biyometan.lead'] }
+  },
+  {
+    file: 'hizmetler/digestat-ayirma.html',
+    path: '/hizmetler/digestat-ayirma.html',
+    i18n: true,
+    faq: 'svc.digestat_ayirma.faq',
+    service: { key: 'svc.digestat_ayirma', type: 'Digestate separation and enrichment' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.digestat_ayirma.title' },
+    desc: { keys: ['svc.digestat_ayirma.lead'] }
+  },
+  {
+    file: 'hizmetler/kurutma-uniteleri.html',
+    path: '/hizmetler/kurutma-uniteleri.html',
+    i18n: true,
+    faq: 'svc.kurutma_uniteleri.faq',
+    service: { key: 'svc.kurutma_uniteleri', type: 'Digestate and sludge drying' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.kurutma_uniteleri.title' },
+    desc: { keys: ['svc.kurutma_uniteleri.lead'] }
+  },
+  {
+    file: 'hizmetler/koku-giderme.html',
+    path: '/hizmetler/koku-giderme.html',
+    i18n: true,
+    faq: 'svc.koku_giderme.faq',
+    service: { key: 'svc.koku_giderme', type: 'Odour removal' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.koku_giderme.title' },
+    desc: { keys: ['svc.koku_giderme.lead'] }
+  },
+  {
+    file: 'hizmetler/substrat-hazirlama.html',
+    path: '/hizmetler/substrat-hazirlama.html',
+    i18n: true,
+    faq: 'svc.substrat_hazirlama.faq',
+    service: { key: 'svc.substrat_hazirlama', type: 'Lignocellulosic feedstock pre-treatment' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.substrat_hazirlama.title' },
+    desc: { keys: ['svc.substrat_hazirlama.lead'] }
+  },
+  {
+    file: 'hizmetler/mikro-orc.html',
+    path: '/hizmetler/mikro-orc.html',
+    i18n: true,
+    faq: 'svc.mikro_orc.faq',
+    service: { key: 'svc.mikro_orc', type: 'Micro-ORC waste heat to power' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.mikro_orc.title' },
+    desc: { keys: ['svc.mikro_orc.lead'] }
+  },
+  {
+    file: 'hizmetler/teknik-danismanlik.html',
+    path: '/hizmetler/teknik-danismanlik.html',
+    i18n: true,
+    faq: 'svc.teknik_danismanlik.faq',
+    service: { key: 'svc.teknik_danismanlik', type: 'Biogas feasibility and technical consulting' },
+    title: { prefix: 'IONA Engineering | ', key: 'svc.teknik_danismanlik.title' },
+    desc: { keys: ['svc.teknik_danismanlik.lead'] }
+  },
+  {
     file: 'duyurular.html',
     path: '/duyurular.html',
     i18n: false,
@@ -157,7 +247,9 @@ export const ORG_JSON_LD = {
       'Kurutma üniteleri ve digestat değerlendirme',
       'Koku giderme üniteleri',
       'Fizibilite ve teknik danışmanlık',
-      'İşletme ve bakım hizmetleri'
+      'İşletme ve bakım hizmetleri',
+      'Lignoselülozik hammadde hazırlama',
+      'Mikro-ORC ile atık ısıdan elektrik'
     ].map((name) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name } }))
   },
   contactPoint: {
@@ -244,7 +336,7 @@ export function hreflangBlock(page, langs) {
  * işaretlemesini kural ihlali sayar. Arama motorları ve yapay zekâ asistanları
  * bu blokları doğrudan cevap kaynağı olarak okur.
  */
-function faqJsonLd(prefix, dict) {
+export function faqJsonLd(prefix, dict) {
   const items = [];
   for (let i = 1; dict[`${prefix}.q${i}`]; i++) {
     const q = stripTags(dict[`${prefix}.q${i}`]);
@@ -253,6 +345,39 @@ function faqJsonLd(prefix, dict) {
   }
   if (!items.length) return null;
   return { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: items };
+}
+
+/**
+ * Hizmet sayfaları için Service + BreadcrumbList şeması. Metin sayfada görünen
+ * başlık ve giriş cümlesinden gelir; sağlayıcı ana Organization kaydıdır.
+ */
+export function serviceJsonLd(page, dict, lang = 'tr') {
+  const name = stripTags(dict[`${page.service.key}.title`] || '');
+  const description = stripTags(dict[`${page.service.key}.lead`] || '');
+  const url = pageUrl(lang, page.path);
+  const home = pageUrl(lang, '/');
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      '@id': url + '#service',
+      name,
+      description,
+      serviceType: page.service.type,
+      url,
+      provider: { '@id': SITE + '/#organization' },
+      areaServed: ORG_JSON_LD.areaServed
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: stripTags(dict['svc.common.home'] || 'Ana sayfa'), item: home },
+        { '@type': 'ListItem', position: 2, name: stripTags(dict['svc.common.services'] || 'Hizmetler'), item: pageUrl(lang, '/teknoloji.html') },
+        { '@type': 'ListItem', position: 3, name: stripTags(dict[`${page.service.key}.nav`] || name), item: url }
+      ]
+    }
+  ];
 }
 
 /** Aynı scriptin ikinci kez çalışmasında etiketlerin ikizlenmemesi için. */
@@ -291,6 +416,9 @@ function build(page, html, trDict) {
   if (page.i18n) out.push(HREFLANG_MARKER);
   if (page.jsonLd)
     out.push(`<script type="application/ld+json">${JSON.stringify(ORG_JSON_LD)}</script>`);
+  if (page.service)
+    for (const block of serviceJsonLd(page, trDict))
+      out.push(`<script type="application/ld+json">${JSON.stringify(block)}</script>`);
   const faq = page.faq && faqJsonLd(page.faq, trDict);
   if (faq) out.push(`<script type="application/ld+json">${JSON.stringify(faq)}</script>`);
   out.push('<!-- SEO:end -->');

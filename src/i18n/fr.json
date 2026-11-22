@@ -386,5 +386,17 @@
   "home.ionaflux.feat1": "Production et procédé",
   "home.ionaflux.feat2": "Alimentation et pont-bascule",
   "home.ionaflux.feat3": "Laboratoire et indice de santé",
-  "home.ionaflux.feat4": "Suivi des pannes et alertes"
+  "home.ionaflux.feat4": "Suivi des pannes et alertes",
+  "svc.common.all_title": "Nos domaines de services",
+  "svc.common.all_lead": "Chaque service dispose de sa propre page détaillée.",
+  "svc.biyogaz_tesisi_tasarimi.nav": "Conception d'unités de biogaz",
+  "svc.anahtar_teslim_epc.nav": "Clé en main (EPC)",
+  "svc.tesis_optimizasyonu.nav": "Optimisation d'unités",
+  "svc.gaz_aritma_biyometan.nav": "Épuration du gaz et biométhane",
+  "svc.digestat_ayirma.nav": "Séparation du digestat",
+  "svc.kurutma_uniteleri.nav": "Unités de séchage",
+  "svc.koku_giderme.nav": "Traitement des odeurs",
+  "svc.substrat_hazirlama.nav": "Préparation des substrats",
+  "svc.mikro_orc.nav": "Micro-ORC",
+  "svc.teknik_danismanlik.nav": "Faisabilité et conseil"
 }

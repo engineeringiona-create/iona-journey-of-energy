@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
 import {
   PAGES, LANGS, OG_LOCALE, HREFLANG_MARKER,
-  pageUrl, hreflangBlock, descriptionFor, titleFor, attr
+  pageUrl, hreflangBlock, descriptionFor, titleFor, attr, faqJsonLd, serviceJsonLd
 } from './seo-inject.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -51,7 +51,7 @@ const dicts = Object.fromEntries(
 /** Sayfanın kullandığı tüm çeviri anahtarları. */
 function keysUsedBy(doc) {
   const keys = new Set();
-  for (const attrName of ['data-i18n', 'data-i18n-placeholder', 'data-i18n-aria-label']) {
+  for (const attrName of ['data-i18n', 'data-i18n-placeholder', 'data-i18n-aria-label', 'data-i18n-alt']) {
     doc.querySelectorAll(`[${attrName}]`).forEach((el) => keys.add(el.getAttribute(attrName)));
   }
   return keys;
@@ -107,6 +107,10 @@ function translate(html, lang, page, hreflang, existsInLang) {
     const val = dict[el.getAttribute('data-i18n-aria-label')];
     if (val !== undefined) el.setAttribute('aria-label', String(val));
   });
+  doc.querySelectorAll('[data-i18n-alt]').forEach((el) => {
+    const val = dict[el.getAttribute('data-i18n-alt')];
+    if (val !== undefined) el.setAttribute('alt', String(val));
+  });
 
   const htmlEl = doc.querySelector('html');
   if (htmlEl) htmlEl.setAttribute('lang', lang);
@@ -139,18 +143,25 @@ function translate(html, lang, page, hreflang, existsInLang) {
     setMeta(doc, 'meta[name="twitter:description"]', desc);
   }
 
-  /* JSON-LD Organization: kuruluş aynı kuruluş, yalnızca hangi dil sürümünü
-     tarif ettiği değişir. */
-  const ld = doc.querySelector('script[type="application/ld+json"]');
-  if (ld) {
+  /* JSON-LD: Organization aynı kuruluş, yalnızca hangi dil sürümünü tarif
+     ettiği değişir. FAQPage / Service / BreadcrumbList ise sayfada GÖRÜNEN
+     metinden türer; dil sürümünde Türkçe kalırsa Google görünmeyen içerik
+     işaretlemesi sayar. Bu yüzden o dilin sözlüğünden yeniden üretilir. */
+  const service = page.service ? serviceJsonLd(page, dict, lang) : null;
+  doc.querySelectorAll('script[type="application/ld+json"]').forEach((ld) => {
     try {
       const data = JSON.parse(ld.textContent);
-      data.url = pageUrl(lang, '/');
-      ld.set_content(JSON.stringify(data));
+      const type = [].concat(data['@type']);
+      let next = null;
+      if (type.includes('Organization')) next = { ...data, url: pageUrl(lang, '/') };
+      else if (type.includes('FAQPage') && page.faq) next = faqJsonLd(page.faq, dict);
+      else if (type.includes('Service') && service) next = service[0];
+      else if (type.includes('BreadcrumbList') && service) next = service[1];
+      if (next) ld.set_content(JSON.stringify(next));
     } catch (e) {
       /* elle bozulmuş JSON-LD build'i düşürmesin */
     }
-  }
+  });
 
   /* Site içi bağlantılar dil önekini korumalı: yapılmazsa ziyaretçi ilk
      tıklamada Türkçe'ye düşer, Googlebot da dil sürümlerini birbirine bağlı
@@ -250,6 +261,7 @@ for (const page of PAGES) {
   for (const lang of ready) {
     const dir = join(dist, lang);
     mkdirSync(dir, { recursive: true });
+    mkdirSync(dirname(join(dir, page.file)), { recursive: true });
     writeFileSync(join(dir, page.file), translate(html, lang, page, hreflang, existsByLang[lang]));
     written++;
   }

@@ -386,5 +386,17 @@
   "home.ionaflux.feat1": "Produktion und Prozess",
   "home.ionaflux.feat2": "Fütterung und Waage",
   "home.ionaflux.feat3": "Labor und Gesundheitswert",
-  "home.ionaflux.feat4": "Störungsverfolgung und Meldungen"
+  "home.ionaflux.feat4": "Störungsverfolgung und Meldungen",
+  "svc.common.all_title": "Unsere Leistungsbereiche",
+  "svc.common.all_lead": "Zu jeder Leistung gibt es eine eigene Seite mit Details.",
+  "svc.biyogaz_tesisi_tasarimi.nav": "Biogasanlagenplanung",
+  "svc.anahtar_teslim_epc.nav": "Schlüsselfertig (EPC)",
+  "svc.tesis_optimizasyonu.nav": "Anlagenoptimierung",
+  "svc.gaz_aritma_biyometan.nav": "Gasreinigung & Biomethan",
+  "svc.digestat_ayirma.nav": "Gärrestseparation",
+  "svc.kurutma_uniteleri.nav": "Trocknungsanlagen",
+  "svc.koku_giderme.nav": "Geruchsbeseitigung",
+  "svc.substrat_hazirlama.nav": "Substrataufbereitung",
+  "svc.mikro_orc.nav": "Mikro-ORC",
+  "svc.teknik_danismanlik.nav": "Machbarkeit & Beratung"
 }

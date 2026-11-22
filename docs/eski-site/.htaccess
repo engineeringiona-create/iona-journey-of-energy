@@ -7,9 +7,18 @@
 
 RewriteEngine On
 
-# Hizmet sayfaları -> Teknoloji/Hizmetler
-RewriteRule ^(iona-)?(biogas-plant-design|biogas-plant-optimization-re-engineering-services|epc-services)/?$ https://ionaengineering.com/en/teknoloji.html [R=301,L,NC]
-RewriteRule ^(technical-consulting|drying-units|gas-purification-units|odor-removal-units|digestate-removement-enrichment|micro-orc-systems|substrate-preparation-for-hemicellulose-lignin-rich-feedstocks)/?$ https://ionaengineering.com/en/teknoloji.html [R=301,L,NC]
+# Hizmet sayfaları -> her biri kendi yeni sayfasına (İngilizce sürüm)
+RewriteRule ^(iona-)?biogas-plant-design/?$ https://ionaengineering.com/en/hizmetler/biyogaz-tesisi-tasarimi.html [R=301,L,NC]
+RewriteRule ^(iona-)?epc-services/?$ https://ionaengineering.com/en/hizmetler/anahtar-teslim-epc.html [R=301,L,NC]
+RewriteRule ^(iona-)?biogas-plant-optimization-re-engineering-services/?$ https://ionaengineering.com/en/hizmetler/tesis-optimizasyonu.html [R=301,L,NC]
+RewriteRule ^(iona-)?gas-purification-units/?$ https://ionaengineering.com/en/hizmetler/gaz-aritma-biyometan.html [R=301,L,NC]
+RewriteRule ^(iona-)?digestate-removement-enrichment/?$ https://ionaengineering.com/en/hizmetler/digestat-ayirma.html [R=301,L,NC]
+RewriteRule ^(iona-)?drying-units/?$ https://ionaengineering.com/en/hizmetler/kurutma-uniteleri.html [R=301,L,NC]
+RewriteRule ^(iona-)?odor-removal-units/?$ https://ionaengineering.com/en/hizmetler/koku-giderme.html [R=301,L,NC]
+RewriteRule ^(iona-)?substrate-preparation-for-hemicellulose-lignin-rich-feedstocks/?$ https://ionaengineering.com/en/hizmetler/substrat-hazirlama.html [R=301,L,NC]
+RewriteRule ^(iona-)?micro-orc-systems/?$ https://ionaengineering.com/en/hizmetler/mikro-orc.html [R=301,L,NC]
+RewriteRule ^(iona-)?technical-consulting/?$ https://ionaengineering.com/en/hizmetler/teknik-danismanlik.html [R=301,L,NC]
+
 
 # Kurumsal
 RewriteRule ^about-iona/?$ https://ionaengineering.com/en/hakkimizda.html [R=301,L,NC]
