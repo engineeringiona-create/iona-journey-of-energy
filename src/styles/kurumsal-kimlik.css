@@ -166,3 +166,18 @@ html:root:root {
 .iona-brand #ionaflux-teaser .flux-editorial-media > img { border-radius: 12px; margin-bottom: 12px; }
 .iona-brand #ionaflux-teaser .flux-video-thumbs { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px !important; margin-bottom: 20px; }
 .iona-brand #ionaflux-teaser .flux-video-thumbs img { border-radius: 8px; }
+
+/* ── Koyu yeşil bölümlerin başlıkları ─────────────────────────────────────
+   Bu üç bölüm (bg-zinc-950) yukarıda Koyu Yeşil #173D29 zemine çevrildi;
+   ama eski stiller (#contact-form h2, #contact-form p …) başlık, üst etiket
+   ve giriş cümlesini açık zemine göre koyu renge sabitliyordu: koyu zeminde
+   koyu yazı, okunmuyordu. Kart/form İÇİ metne dokunulmaz (beyaz kart). */
+.iona-brand :is(#contact-form, #metrics, #partners) :is(h1, h2):not(form *, .bg-white *) {
+  color: #fff !important;
+}
+.iona-brand :is(#contact-form, #metrics, #partners) span.font-label-caps:not(form *, .bg-white *, .rounded-2xl *, .rounded-3xl *) {
+  color: var(--k-soft) !important;
+}
+.iona-brand :is(#contact-form, #metrics, #partners) p.font-body-md:not(form *, .bg-white *) {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
