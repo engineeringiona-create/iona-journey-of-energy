@@ -32,8 +32,14 @@ if (counters.length) {
     once: true,
     onEnter: () => {
       counters.forEach((el) => {
-        const target = Number(el.dataset.countTarget || '0');
-        const suffix = el.dataset.countSuffix || '';
+        /* Hedef sayı artık yazının KENDİSİNDEN okunuyor ("20+" → 20 ve "+"):
+           rakam admin editöründen değiştirilebilsin diye (anahtar
+           site.stats.*_value, ana sayfadaki rakamlarla ortak). Sayıyla
+           başlamayan bir metin girilirse sayaç oynamaz, yazı olduğu gibi kalır. */
+        const m = /^(\d+)(.*)$/.exec((el.textContent || '').trim());
+        if (!m) return;
+        const target = Number(m[1]);
+        const suffix = m[2];
         const counter = { value: 0 };
         gsap.to(counter, {
           value: target,

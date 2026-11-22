@@ -11,7 +11,7 @@ import { readLocalBucket } from './lib/adminStore.js';
 import { applyAnnouncementBar } from './lib/announcementBar.js';
 import { applyHotspots } from './lib/hotspots.js';
 import { applyAnnouncementPopup } from './lib/announcements.js';
-import { pageIdForPath } from './lib/pages.js';
+import { pageIdForPath, SHARED_ROW_ID } from './lib/pages.js';
 import { applyThemeVars } from './lib/themeVars.js';
 import { reorderSections } from './lib/sectionLayout.js';
 import { pickFrameTarget } from './lib/imageFrameTarget.js';
@@ -199,15 +199,25 @@ async function fetchContentOverrides(lang) {
   }
   if (!pageId) return null;
   try {
-    const { data, error } = await supabase.from('site_content').select('*').eq('id', pageId).maybeSingle();
-    if (error || !data || !data.content) return null;
-    applyImageOverrides(data.content.images);
-    applyTextStyleOverrides(data.content.textStyles);
-    applySectionLayout(data.content.sections);
-    applySeoOverrides(data.content.seo);
-    if (!data.content[lang]) return null;
+    const { data: rows, error } = await supabase
+      .from('site_content')
+      .select('*')
+      .in('id', [pageId, SHARED_ROW_ID]);
+    if (error || !rows) return null;
+    const data = rows.find((r) => r.id === pageId);
+    const shared = rows.find((r) => r.id === SHARED_ROW_ID)?.content?.[lang] || {};
+    if (data?.content) {
+      applyImageOverrides(data.content.images);
+      applyTextStyleOverrides(data.content.textStyles);
+      applySectionLayout(data.content.sections);
+      applySeoOverrides(data.content.seo);
+    }
+    /* Ortak satır (e-posta, telefon, adres…) altta, sayfa satırı üstte —
+       bkz. lib/pages.js isSharedKey. */
+    const merged = { ...shared, ...(data?.content?.[lang] || {}) };
+    if (!Object.keys(merged).length) return null;
     return Object.fromEntries(
-      Object.entries(data.content[lang]).map(([key, value]) => [key, escapeHtml(value)])
+      Object.entries(merged).map(([key, value]) => [key, escapeHtml(value)])
     );
   } catch (e) {
     return null;
@@ -317,11 +327,40 @@ export function currentLang() {
   return langFromPath(location.pathname);
 }
 
+/* Bağlantının görünen metni editörden değişince hedefi de değişmeli: e-posta
+   ya da telefon yalnız yazı olarak güncellenip href eski kalsaydı, ziyaretçi
+   yeni numarayı görür ama tıklayınca eskisini arardı. */
+function syncContactHref(el) {
+  const href = el.getAttribute('href') || '';
+  const text = (el.textContent || '').trim();
+  if (href.startsWith('mailto:')) {
+    const mail = text.replace(/\s+/g, '').toLowerCase();
+    if (/^[^@]+@[^@]+\.[^@]+$/.test(mail)) el.setAttribute('href', `mailto:${mail}`);
+  } else if (href.startsWith('tel:')) {
+    const tel = text.replace(/[^\d+]/g, '');
+    if (tel.replace(/\D/g, '').length >= 7) el.setAttribute('href', `tel:${tel}`);
+  }
+}
+
+/* İlerleme çubuğu, yanında yazan yüzdeyi izler (data-i18n-bar="<anahtar>"):
+   editörde %88 → %90 yapılınca çubuk %88'de kalmasın. */
+function syncBars(dict) {
+  document.querySelectorAll('[data-i18n-bar]').forEach((bar) => {
+    const val = dict[bar.getAttribute('data-i18n-bar')];
+    if (val === undefined) return;
+    const n = parseFloat(String(val).replace(',', '.').replace(/[^\d.]/g, ''));
+    if (Number.isFinite(n)) bar.style.width = `${Math.max(0, Math.min(100, n))}%`;
+  });
+}
+
 function applyDict(dict) {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const val = dict[el.getAttribute('data-i18n')];
-    if (val !== undefined) el.innerHTML = val;
+    if (val === undefined) return;
+    el.innerHTML = val;
+    if (el.tagName === 'A') syncContactHref(el);
   });
+  syncBars(dict);
   document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
     const val = dict[el.getAttribute('data-i18n-placeholder')];
     if (val !== undefined) el.setAttribute('placeholder', val);

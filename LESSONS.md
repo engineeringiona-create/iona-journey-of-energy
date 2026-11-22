@@ -1,5 +1,11 @@
 # LESSONS.md — past mistakes + the rule that prevents a repeat
 
+## Editörde "görünmeyen" sayfa ve kancasız metin (2026-11-22)
+
+Hizmet sayfaları `src/lib/pages.js` PAGES listesinde yoktu. Editörün sayfa seçicisinde çıkmadılar, `pageIdForPath` null döndü ve admin'den girilen her şey sessizce yok sayıldı. IonaFlux'ta Eylül'de yaşanan hatanın birebir aynısı. Ayrıca bazı görünür metinlerde `data-i18n`, bazı görsellerde `data-img-key` yoktu. Bunlar editörde tıklanamıyordu ve dil sürümlerinde Türkçe kalıyordu: hesaplayıcı, rakam şeridi, bento etiketleri, alt bilgideki iletişim satırı.
+
+**Kural:** yeni HTML sayfası açınca PAGES'e de yaz; `tests/pages.test.mjs` eksik sayfada kırılır. Görünür her metin ve içerik görseli bir kanca taşır. Bilinçli istisnalar: sıra numaraları (01, 02…), ikon adları, dil adları ve logolar. Her sayfada tekrar eden bilgi `site.` önekiyle yazılır, yoksa 17 kopya ayrı ayrı düzenlenmek zorunda kalır.
+
 ## 1. A blanket SPA redirect broke every nav link on Railway
 
 `public/_redirects` contained `/* /index.html 200` — a Netlify-style catch-all rewrite. On a multi-page site (not a SPA), this meant every route Railway's static host couldn't resolve *before* checking for a real file got rewritten straight to the homepage. Symptom: clicking any navbar link redirected back to `index.html`.

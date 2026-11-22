@@ -31,7 +31,7 @@ const ALIGNS = [
    ImageSettingsModal already established for images) — Kaydet hands the
    accumulated patch up to LiveEditor, İptal/Escape/outside-click just
    asks the parent to revert targetEl and closes. */
-export default function TextEditPopover({ position, initial, targetEl, onSave, onClose }) {
+export default function TextEditPopover({ position, initial, targetEl, onSave, onClose, shared = false }) {
   const [text, setText] = useState(initial.text || '');
   const [fontSize, setFontSize] = useState(initial.fontSize ?? 16);
   const [color, setColor] = useState(initial.color || '#14181a');
@@ -116,6 +116,11 @@ export default function TextEditPopover({ position, initial, targetEl, onSave, o
           rows={2}
           className="w-full resize-none bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white leading-snug focus:outline-none focus:border-emerald-400"
         />
+        {shared && (
+          <p className="text-[11px] leading-snug text-amber-300/90">
+            Bu alan sitenin tüm sayfalarında ortak — kaydedince hepsinde değişir.
+          </p>
+        )}
 
         <div>
           <span className="block font-label-caps text-[10px] font-bold tracking-[0.06em] text-white/50 mb-1.5">🔠 Yazı Boyutu</span>

@@ -2,6 +2,19 @@
 
 > No panel/dashboard tool is wired into this repo yet, so nothing here auto-flows anywhere — this file is maintained by hand until such a tool exists.
 
+## 2026-11-22 · Admin editörü: düzenlenemeyen yerler açıldı
+
+- **10 hizmet sayfası artık editörde.** Sayfa seçicide "Hizmet · …" adıyla görünüyorlar. Önceden admin'den bu sayfalara girilen hiçbir şey sitede uygulanmıyordu.
+- **İletişim bilgileri tek yerden değişiyor.** E-posta, telefon ve adres hangi sayfada düzenlenirse düzenlensin 17 sayfanın hepsinde değişir. Düzenleme kutusu bunu sarı bir notla söylüyor. Bağlantı da yazıyla birlikte güncellenir: yeni numaraya tıklayan ziyaretçi yeni numarayı arar.
+- **Şirket rakamları (20+ yıl, 100+ proje, 2 ofis, 50+ mühendis) düzenlenebilir.** Ana sayfa ile Hakkımızda aynı değeri kullanır. Hakkımızda'daki sayaç girilen sayıya kadar sayar.
+- **Yeni düzenlenebilir metinler:**
+  - Ana sayfa: rakam şeridi (%98.5 / %14 / 8.25-8.75 ve etiketleri), 3D model altyazısı, "Çalışma alanlarımız" etiketleri, alt bilgideki "İletişime Geçin" ve büyük e-posta.
+  - Biyogaz hesaplayıcının bütün yazıları. Bu yazılar 6 dilde de Türkçe görünüyordu; artık çevrili.
+  - Hakkımızda: bento kartlarındaki etiketler, %99.4 değeri ve rozetler.
+  - Hizmetler: %88 / %79 / %95 metrikleri. Çubuk, yazılan yüzdeyi izler.
+  - Duyurular sayfasının başlığı ve "henüz duyuru yok" yazısı.
+- **Yeni değiştirilebilir görseller:** ana sayfadaki tesis fotoğrafı ve üç IonaFlux video karesi, Hizmetler'deki saha panoraması, her hizmet sayfasının üst görseli.
+
 ## 2026-09-19 (üçüncü tur — ikon fontu ve ana sayfa)
 
 - **Sitenin en ağır varlığı buydu: Material Symbols ikon fontu, her sayfada 6,7 MB.** `wght,FILL@100..700,0..1` ile binlerce ikonun tamamı isteniyordu. `icon_names` ile sitede gerçekten kullanılan **50 ikona** indirgendi: **6.693 KB → 17,4 KB (−99,7%)**. Optimize ettiğimiz tüm fotoğrafların toplamından büyük bir kazanç.

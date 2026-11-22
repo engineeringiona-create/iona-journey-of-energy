@@ -3,7 +3,7 @@ import { getSupabase } from '../../lib/supabaseClient.js';
 import { writeLocalContent } from '../../lib/localContent.js';
 import { writeLocalImages, clearLocalImages } from '../../lib/imageContent.js';
 import { readLocalBucket, writeLocalBucket, clearLocalBucket } from '../../lib/adminStore.js';
-import { PAGES, pageIdForPath } from '../../lib/pages.js';
+import { PAGES, pageIdForPath, SHARED_ROW_ID, isSharedKey } from '../../lib/pages.js';
 import { LANGS } from '../../i18n.js';
 import ImageSettingsModal from './ImageSettingsModal.jsx';
 import TextEditPopover from './TextEditPopover.jsx';
@@ -569,9 +569,46 @@ export default function LiveEditor({ onLogout }) {
       return;
     }
 
+    /* `site.` ile başlayan anahtarlar (e-posta, telefon, adres, şirket
+       rakamları) her sayfada aynı: sayfa satırına değil ortak satıra yazılır,
+       böylece bir sayfada yapılan düzeltme hepsinde görünür. Bkz. lib/pages.js. */
+    const sharedEdits = {};
+    const pageEdits = {};
+    Object.entries(edits).forEach(([langCode, patch]) => {
+      Object.entries(patch).forEach(([key, value]) => {
+        const bucket = isSharedKey(key) ? sharedEdits : pageEdits;
+        bucket[langCode] = { ...(bucket[langCode] || {}), [key]: value };
+      });
+    });
+    if (Object.keys(sharedEdits).length) {
+      const { data: sharedRow, error: sharedFetchError } = await supabase
+        .from('site_content')
+        .select('content')
+        .eq('id', SHARED_ROW_ID)
+        .maybeSingle();
+      const sharedContent = { ...(sharedRow?.content || {}) };
+      Object.entries(sharedEdits).forEach(([langCode, patch]) => {
+        sharedContent[langCode] = { ...(sharedContent[langCode] || {}), ...patch };
+      });
+      const { error: sharedError } = sharedFetchError
+        ? { error: sharedFetchError }
+        : await supabase.from('site_content').upsert({
+            id: SHARED_ROW_ID,
+            content: sharedContent,
+            updated_at: new Date().toISOString()
+          });
+      if (sharedError) {
+        setSaving(false);
+        setSaveError(sharedError.message);
+        showToast('error', sharedError.message);
+        return;
+      }
+      saveRevisionSnapshot(SHARED_ROW_ID, sharedContent);
+    }
+
     const payload = { ...(existing?.content || {}) };
     if (hasTextEdits) {
-      Object.entries(edits).forEach(([langCode, patch]) => {
+      Object.entries(pageEdits).forEach(([langCode, patch]) => {
         payload[langCode] = { ...(payload[langCode] || {}), ...patch };
       });
     }
@@ -906,6 +943,7 @@ export default function LiveEditor({ onLogout }) {
           targetEl={textElRef.current}
           onSave={handleTextPopoverSave}
           onClose={handleTextPopoverClose}
+          shared={isSharedKey(activeTextKey)}
         />
       )}
 

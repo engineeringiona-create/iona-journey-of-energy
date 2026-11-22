@@ -1,5 +1,12 @@
 # DECISIONS.md — preferences + why
 
+## Ortak bilgi için ayrı `site` satırı, önek kuralıyla (2026-11-22)
+Telefon, e-posta, adres ve şirket rakamları her sayfada tekrar ediyor. Bunlar `site.` önekli anahtarlarla `site_content` içindeki tek `site` satırına yazılıyor. Okurken sayfa satırı bu satırın üstüne biniyor. Seçenekler:
+- Her sayfaya ayrı yazmak: telefonu değiştirmek 17 düzenleme demekti ve biri unutulunca sitede iki numara kalırdı.
+- Mevcut `footer.*` / `common.*` anahtarlarını ortaklaştırmak: daha önce sayfaya özel girilmiş değerlerin anlamını değiştirirdi.
+
+Önek kuralı açık ve test ediliyor (`isSharedKey`). Editör, ortak alanı düzenlerken bunu kullanıcıya söylüyor.
+
 ## `serve` over `sirv-cli` for the Railway start script
 Both disable SPA fallback; `serve`'s flag is unambiguous (`-s` enables it, omitting it disables it, no separate boolean syntax to get wrong). Given the bug being fixed was an *unwanted* fallback, the option with certain, verifiable flag semantics won over the untested alternative.
 
