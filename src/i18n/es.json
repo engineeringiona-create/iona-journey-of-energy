@@ -398,5 +398,8 @@
   "svc.koku_giderme.nav": "Eliminación de olores",
   "svc.substrat_hazirlama.nav": "Preparación de sustratos",
   "svc.mikro_orc.nav": "Micro-ORC",
-  "svc.teknik_danismanlik.nav": "Viabilidad y consultoría"
+  "svc.teknik_danismanlik.nav": "Viabilidad y consultoría",
+  "footer.sub_tagline": "Soluciones de ingeniería que convierten los residuos orgánicos en energía verde sostenible.",
+  "footer.contact_label": "Contacto",
+  "footer.quick_links": "Enlaces rápidos"
 }

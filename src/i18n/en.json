@@ -556,5 +556,8 @@
   "svc.teknik_danismanlik.faq.q2": "What does a feasibility report contain?",
   "svc.teknik_danismanlik.faq.a2": "Feedstock analysis, mass and energy balance, the proposed capacity and technology, a layout concept, investment and operating costs, and a revenue estimate.",
   "svc.teknik_danismanlik.faq.q3": "Can I hire you for consulting only?",
-  "svc.teknik_danismanlik.faq.a3": "Yes. We also work as independent technical consultants on projects where another company builds the plant."
+  "svc.teknik_danismanlik.faq.a3": "Yes. We also work as independent technical consultants on projects where another company builds the plant.",
+  "footer.sub_tagline": "Engineering solutions that turn organic waste into sustainable green energy.",
+  "footer.contact_label": "Contact",
+  "footer.quick_links": "Quick Links"
 }

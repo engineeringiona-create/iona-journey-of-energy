@@ -398,5 +398,8 @@
   "svc.koku_giderme.nav": "Удаление запахов",
   "svc.substrat_hazirlama.nav": "Подготовка субстрата",
   "svc.mikro_orc.nav": "Микро-ORC",
-  "svc.teknik_danismanlik.nav": "ТЭО и консалтинг"
+  "svc.teknik_danismanlik.nav": "ТЭО и консалтинг",
+  "footer.sub_tagline": "Инженерные решения, превращающие органические отходы в устойчивую зелёную энергию.",
+  "footer.contact_label": "Контакты",
+  "footer.quick_links": "Быстрые ссылки"
 }

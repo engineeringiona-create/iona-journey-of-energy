@@ -548,5 +548,8 @@
   "svc.teknik_danismanlik.faq.q2": "Fizibilite raporunda neler bulunur?",
   "svc.teknik_danismanlik.faq.a2": "Hammadde analizi, kütle ve enerji dengesi, önerilen kapasite ve teknoloji, yerleşim fikri, yatırım ve işletme maliyetleri ile gelir tahmini yer alır.",
   "svc.teknik_danismanlik.faq.q3": "Sadece danışmanlık hizmeti alabilir miyim?",
-  "svc.teknik_danismanlik.faq.a3": "Evet. Kurulumu başka bir firmanın yapacağı projelerde de bağımsız teknik danışman olarak çalışıyoruz."
+  "svc.teknik_danismanlik.faq.a3": "Evet. Kurulumu başka bir firmanın yapacağı projelerde de bağımsız teknik danışman olarak çalışıyoruz.",
+  "footer.sub_tagline": "Organik atığı sürdürülebilir yeşil enerjiye dönüştüren mühendislik çözümleri.",
+  "footer.contact_label": "İletişim",
+  "footer.quick_links": "Hızlı Bağlantılar"
 }

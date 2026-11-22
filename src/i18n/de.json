@@ -398,5 +398,8 @@
   "svc.koku_giderme.nav": "Geruchsbeseitigung",
   "svc.substrat_hazirlama.nav": "Substrataufbereitung",
   "svc.mikro_orc.nav": "Mikro-ORC",
-  "svc.teknik_danismanlik.nav": "Machbarkeit & Beratung"
+  "svc.teknik_danismanlik.nav": "Machbarkeit & Beratung",
+  "footer.sub_tagline": "Ingenieurlösungen, die organische Abfälle in nachhaltige grüne Energie umwandeln.",
+  "footer.contact_label": "Kontakt",
+  "footer.quick_links": "Schnellzugriff"
 }

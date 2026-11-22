@@ -398,5 +398,8 @@
   "svc.koku_giderme.nav": "गंध निवारण",
   "svc.substrat_hazirlama.nav": "सब्सट्रेट तैयारी",
   "svc.mikro_orc.nav": "माइक्रो-ORC",
-  "svc.teknik_danismanlik.nav": "व्यवहार्यता और परामर्श"
+  "svc.teknik_danismanlik.nav": "व्यवहार्यता और परामर्श",
+  "footer.sub_tagline": "जैविक कचरे को टिकाऊ हरित ऊर्जा में बदलने वाले इंजीनियरिंग समाधान।",
+  "footer.contact_label": "संपर्क",
+  "footer.quick_links": "त्वरित लिंक"
 }
