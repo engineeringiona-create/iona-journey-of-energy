@@ -199,6 +199,19 @@ export const PAGES = [
 /* admin.html kasten listede yok: `noindex, nofollow` kalır, canonical/hreflang
    almaz, dil kopyası üretilmez, sitemap'e girmez. */
 
+/* WebSite kaydı: Google arama sonucunda gösterdiği "site adı"nı buradan okur.
+   Marka araması ("iona", "iona mühendislik") bu adla eşleşir; yalnız ana
+   sayfada yayınlanır (Google'ın istediği yer orası). */
+export const WEBSITE_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': SITE + '/#website',
+  name: 'İONA Mühendislik',
+  alternateName: ['IONA', 'IONA Mühendislik', 'Iona Engineering', 'IONA Biyogaz'],
+  url: SITE + '/',
+  publisher: { '@id': SITE + '/#organization' }
+};
+
 export const ORG_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': ['Organization', 'ProfessionalService'],
@@ -414,8 +427,10 @@ function build(page, html, trDict) {
   out.push(`<meta name="twitter:description" content="${attr(desc)}">`);
   out.push(`<meta name="twitter:image" content="${img}">`);
   if (page.i18n) out.push(HREFLANG_MARKER);
-  if (page.jsonLd)
+  if (page.jsonLd) {
+    out.push(`<script type="application/ld+json">${JSON.stringify(WEBSITE_JSON_LD)}</script>`);
     out.push(`<script type="application/ld+json">${JSON.stringify(ORG_JSON_LD)}</script>`);
+  }
   if (page.service)
     for (const block of serviceJsonLd(page, trDict))
       out.push(`<script type="application/ld+json">${JSON.stringify(block)}</script>`);
